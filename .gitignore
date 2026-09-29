@@ -24,3 +24,6 @@ vault_pass*
 # OS/editor
 .DS_Store
 *.swp
+
+# Operator tooling notes, kept locally and on Gitea only, not on public mirrors
+CLAUDE.md
