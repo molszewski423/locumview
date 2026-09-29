@@ -1,0 +1,5 @@
+Updating Subscription Management repositories.
+ID     | Command line                                                   | Date and time    | Action(s)      | Altered
+---------------------------------------------------------------------------------------------------------------------
+     2 | upgrade -y                                                     | 2026-09-28 18:06 | I, U           |  324 E<
+     1 |                                                                | 2026-09-28 09:19 | Install        | 1459 >E

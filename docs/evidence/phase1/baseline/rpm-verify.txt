@@ -1,0 +1,3 @@
+S.5......  c /etc/rhsm/rhsm.conf
+..5......  c /etc/pki/pesign/cert9.db
+..5......  c /etc/pki/pesign/key4.db

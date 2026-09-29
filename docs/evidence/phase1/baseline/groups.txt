@@ -1,0 +1,10 @@
+Not root, Subscription Management repositories not updated
+Last metadata expiration check: 1:49:06 ago on Mon 28 Sep 2026 06:15:35 PM EDT.
+Installed Environment Groups:
+   Workstation
+Installed Groups:
+   Container Management
+   RPM Development Tools
+   Development Tools
+   Smart Card Support
+   Security Tools
