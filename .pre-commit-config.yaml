@@ -1,0 +1,33 @@
+repos:
+  - repo: https://github.com/ansible/ansible-lint
+    rev: v26.9.0
+    hooks:
+      - id: ansible-lint
+        # Upstream's .pre-commit-hooks.yaml hardcodes python3.14, which
+        # this RHEL 10.2 system does not have (ships python3.12).
+        language_version: python3.12
+        files: ^ansible/.*\.(yml|yaml)$
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+
+  - repo: local
+    hooks:
+      - id: gitleaks
+        name: gitleaks (podman, image pinned by digest)
+        entry: >-
+          docker.io/zricethezav/gitleaks:v8.30.1@sha256:b109bc5f8f76a38196a3e413704fc5b9e3c32360bce4e4b603bd6f45b3721dbb
+          protect --staged --redact -v
+        language: docker_image
+        pass_filenames: false
+
+      - id: tflint
+        name: tflint (podman, image pinned by digest)
+        entry: >-
+          ghcr.io/terraform-linters/tflint:v0.64.0@sha256:85c63179e53e69f48fb5d1e22fb6c2b4941049c7f906f30625defa6ffcc3f834
+        language: docker_image
+        pass_filenames: false
+        files: \.tf$

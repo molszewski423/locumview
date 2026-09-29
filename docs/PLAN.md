@@ -77,7 +77,8 @@ See [README.md](../README.md) for the Horizon comparison table.
 **Phase 0, Foundations:**
 - [x] Developer subscription active
 - [x] Repo layout: terraform/, ansible/roles/, packaging/, docs/adr/, docs/evidence/, notes/
-- [ ] Pre-commit: ansible-lint, terraform fmt, tflint, secret scanning (in progress)
+- [x] Pre-commit: ansible-lint, detect-secrets, gitleaks (podman, pinned by digest), tflint (podman, pinned by digest, no-ops until terraform/ has content). `terraform fmt`/`tofu fmt` deferred until the Terraform vs OpenTofu ADR lands. See [notes/phase1-changelog.md](../notes/phase1-changelog.md).
+  - Local hooks are bypassable with `git commit --no-verify`; they are convenience, not enforcement. The same checks must also run in CI (Gitea Actions) once it exists.
 - [ ] Secrets via Ansible Vault or SOPS. Nothing sensitive in plain text, ever
 - [x] First ADR: [0001, RHEL 10 as base distribution](adr/0001-rhel10.md)
 - [ ] Remaining ADRs: why GNOME + Sway, why Guacamole, Terraform vs OpenTofu

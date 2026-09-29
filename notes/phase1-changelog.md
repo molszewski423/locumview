@@ -89,3 +89,34 @@ On this VM: generated a per-machine SSH key (`~/.ssh/id_ed25519_gitea`), added a
 Target: n/a for this repo; the fix lives entirely in `homelab-infra`'s `k8s/gitea.yaml`.
 
 Supported: yes, standard Kubernetes Service/Deployment configuration; no workarounds or unsupported hacks.
+
+## 10. Pre-commit hook tooling installed (2026-09-29)
+
+What and why: Phase 0 requires ansible-lint, terraform fmt, tflint, and secret scanning as pre-commit hooks. RHEL 10.2's enabled repos (AppStream, BaseOS; no EPEL) carry almost none of this tooling; only `python3-pip` is packaged. To avoid EPEL and keep the base desktop image clean, hook tooling was split by source: RHEL packages where they exist, `pip --user` for `pre-commit` itself (which then manages isolated per-hook environments for the two Python-based linters), and pinned-by-digest podman containers for the two tools with no RHEL/pip packaging.
+
+Exact commands:
+```
+sudo dnf install -y python3-pip podman-docker
+pip install --user pre-commit
+pre-commit install
+```
+
+- `python3-pip`, `podman-docker`: installed via `dnf` from the already-enabled `rhel-10-for-x86_64-appstream-rpms` repo. No new repo added.
+- `pre-commit` itself: installed to `~/.local/bin` via `pip install --user`, not system Python. This is operator/dev tooling for working in this repo, not part of the desktop image, so it is not something the `base`/`hardening` Ansible roles should ever install.
+- `podman-docker`: provides a `docker` shim over `podman` (`/usr/bin/docker` now calls `podman`). Chosen over hand-written `language: system` + explicit `podman run` hook entries because it lets pre-commit's built-in `docker_image` hook language work completely unmodified (pre-commit's docker language hardcodes calling a binary literally named `docker`); the package itself is vendor-supported AppStream, not EPEL.
+
+`.pre-commit-config.yaml` hooks, one per tool:
+- **ansible-lint** (`rev: v26.9.0`, pinned to a released tag): runs via pre-commit's own isolated Python venv, scoped to `ansible/**/*.yml|yaml`. Had to override `language_version: python3.12` in our config; upstream's own `.pre-commit-hooks.yaml` hardcodes `language_version: python3.14`, which this system does not have (ships python3.12). This looks like an upstream oddity in that release, not something to fix locally beyond the override.
+- **detect-secrets** (`rev: v1.5.0`, pinned to a released tag): also runs via pre-commit's own isolated venv. Needs a baseline file to diff against, which the hook itself does not generate; bootstrapped once with `~/.cache/pre-commit/<repo-hash>/py_env-python3.12/bin/detect-secrets scan > .secrets.baseline`, using the same venv pre-commit had already built for the hook, rather than a separate system/user install of `detect-secrets`. `.secrets.baseline` is committed to the repo; that is how detect-secrets is meant to be used, it is not a secret itself, just a manifest of accepted findings.
+- **gitleaks** (`docker.io/zricethezav/gitleaks:v8.30.1@sha256:b109bc5f8f76a38196a3e413704fc5b9e3c32360bce4e4b603bd6f45b3721dbb`), pinned by digest, not just tag, per the decision to prefer container hooks be reproducible down to the exact image content. Runs `gitleaks protect --staged --redact -v` against staged changes on every commit.
+- **tflint** (`ghcr.io/terraform-linters/tflint:v0.64.0@sha256:85c63179e53e69f48fb5d1e22fb6c2b4941049c7f906f30625defa6ffcc3f834`), also pinned by digest. Scoped to `*.tf` files via the hook's `files:` filter, so it is a no-op (correctly shows "Skipped") until `terraform/` actually has content.
+
+Terraform itself was deliberately not installed yet. HashiCorp and OpenTofu both publish official signed RPM repos (neither is EPEL), so installing either is not blocked by the EPEL constraint; the choice is deferred to the Terraform vs OpenTofu ADR, still open in `docs/adr/`. A `terraform fmt`/`tofu fmt` hook will be added once that ADR lands and the binary is actually installed.
+
+All four hooks verified passing (or correctly skipping) via `pre-commit run --all-files`.
+
+Important caveat, recorded in `docs/PLAN.md` too: local pre-commit hooks are bypassable with `git commit --no-verify`. They are a convenience that catches problems before they leave the machine, not an enforcement boundary. The same checks (ansible-lint, detect-secrets, gitleaks, tflint) must also run in CI (Gitea Actions) once that exists, since CI is what actually enforces the policy.
+
+Target: this is operator/dev tooling (`pre-commit`, and the two RHEL packages backing the container hook shim), explicitly excluded from any Ansible role that builds the desktop image. Nothing here is installed on `locumview-ref-dev` in a way that would carry into the production desktop.
+
+Supported: yes for the RHEL packages (AppStream) and the pinned upstream/vendor container images. The `pip install --user pre-commit` step is standard practice for this tool everywhere, including on RHEL; it is not shipped as an RPM.
