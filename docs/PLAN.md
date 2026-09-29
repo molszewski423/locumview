@@ -2,7 +2,7 @@
 
 Owner: Michael Olszewski. Status: Phase 1 in progress.
 
-LocumView is an open-source virtual desktop platform built on RHEL 10. It provisions hardened GNOME and Sway desktops with Terraform and Ansible, delivers them through the browser via Apache Guacamole behind Keycloak SSO and MFA, and never exposes a desktop directly to the internet. Every environment must be rebuildable identically from the repository. It is a portfolio project aimed at solutions architecture and platform engineering roles, with Red Hat as a target employer.
+LocumView is an open-source virtual desktop platform built on RHEL 10. It provisions hardened GNOME and Sway desktops with Terraform and Ansible, delivers them through the browser via Apache Guacamole behind Keycloak SSO and MFA, and never exposes a desktop directly to the internet. Every environment must be rebuildable identically from the repository. Beyond the base desktop, it is a platform for research and local LLM usage in regulated environments: desktops can carry agentic tooling and generative and agentic applications (clinical and research tooling to start) built on local models, so no regulated data leaves the endpoint, with the tooling layer customizable for any regulated workflow. It is a portfolio project aimed at solutions architecture and platform engineering roles, with Red Hat as a target employer.
 
 Core test for every phase: can a reviewer clone the repo and rebuild it with no manual steps? "I configured a thing" is IT administration; "it rebuilds from code" is engineering.
 
@@ -126,7 +126,7 @@ Sequencing: Phases 0 to 3 in order, then Phase 8 lite, then Phase 7 alongside AW
 
 Secure pharmacovigilance analyst workstation (ties to PV AI Workbench), OpenShift Virtualization port, Dev Spaces vs VDI tradeoff write-up, Red Hat IdM, self-healing compliance with Event-Driven Ansible, GPU desktop via VFIO passthrough, backup and DR with Velero, encrypted disks with automatic unlock (Clevis/Tang), smart card / badge login, Kasm comparison.
 
-Longer-term direction (not version one scope): positioned for clinical and life sciences, with an agentic AI angle using local models (for example RHEL Lightspeed MCP) so no regulated data leaves the boundary. Build architecturally general for any regulated environment.
+Longer-term direction (not version one scope): agentic tooling and generative/agentic applications on local models (for example RHEL Lightspeed MCP), layered onto the same base desktop, so no regulated data leaves the boundary. Initial user targets are clinical and life sciences, chosen for personal domain expertise; later phases apply the same pattern to other regulated domains. Build the desktop and delivery layers architecturally general, so only the application layer changes per domain.
 
 ## 7. Product positioning and thesis
 
