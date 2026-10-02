@@ -301,3 +301,15 @@ The full chronological record, with every command, result and checksum, is in [d
 **Decisions recorded** (owner: Michael Olszewski): ADR 0002 (access layer on k3s), ADR 0003 (secrets: SOPS + age). locumview.com (Cloudflare DNS) becomes the public entry point through a Cloudflare Tunnel, published only once Guacamole is behind Keycloak with MFA. Keycloak is the single identity provider. Nextcloud runs on k3s as an OIDC client of Keycloak, not inside the desktop VM. ADRs 0004/0005 are to be written before anything is internet-facing.
 
 Tooling: sops v3.13.3 installed on the ThinkPad to `~/.local/bin` from the upstream release, verified against `sops-v3.13.3.checksums.txt` (sha256 `e5bec334...7fef6b`). The cosign signature was not checked; cosign isn't installed. age comes from the Fedora/Debian repos.
+
+## 16. Secrets tooling: SOPS + age, and a pre-commit guard (2026-10-02)
+
+Implements ADR 0003. Details and test transcripts: [worklog](../docs/evidence/phase2/worklog-20261002.md), "Step 3".
+
+- age 1.3.1 (Fedora repo) and sops 3.13.3 (upstream release, checksum verified, #15) on the ThinkPad, the operator workstation. Operator age key at `~/.config/sops/age/keys.txt` (600). Only its public key is in the repo. **Offline backup of the private key: Mike's action.**
+- `.sops.yaml`: Kubernetes Secrets under `k8s/` named `*.sops.yaml`, with only `data`/`stringData` encrypted.
+- **Finding:** gitleaks does not catch every plain-text secret: a base64 password in a file named `*.sops.yaml` passed it. detect-secrets flags genuinely encrypted files, as false positives. Excluding `*.sops.yaml` from detect-secrets with nothing else would therefore have opened a gap.
+- **Control:** `scripts/check-sops-encrypted.py`, the `sops-encrypted` pre-commit hook. It fails any `k8s/**/*.sops.yaml` without SOPS metadata or with any unencrypted `data`/`stringData` value. detect-secrets excludes exactly those paths. Tested in three cases (encrypted passes; disguised plain text fails; partially plain fails).
+- `.ansible-lint` excludes `k8s/`. Kubernetes manifests get kubeconform when the first workload lands.
+- Operator kubeconfig on the ThinkPad is the k3s cluster-admin credential (600). Replacing it with a scoped kubeconfig for the `locumview` namespace is a follow-up.
+- To apply, decrypt in memory and pipe to kubectl: `sops -d k8s/<path>.sops.yaml | kubectl apply -f -`.

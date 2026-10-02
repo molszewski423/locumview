@@ -31,6 +31,7 @@ Name: nods to locum tenens clinicians and VMware View (now Horizon, owned by Omn
 | 2026-10-02 | Window management and keymap | Tiling Assistant (pinned), LocumView Activities extension (logo + workspace dots), Alt keymap, GDM/lock logo, Papirus folders in LocumView teal. Changelog #13. |
 | 2026-10-02 | Headless RDP validated from the LAN | MikePC via a temporary host TCP forward, nobody at the console. Remote login takes two server redirections; Debian 13 Remmina (FreeRDP 3.15) crashes on the second, Flathub Remmina (FreeRDP 3.20) works. guacd must handle both. Changelog #14. |
 | 2026-10-02 | Reference VM moved to MikePC | LAN bridge br0 on MikePC; VM at 192.168.4.36 with a fresh vTPM, Secure Boot intact, RDP verified. ADR 0002 (k3s) and 0003 (SOPS + age). locumview.com through a Cloudflare Tunnel, Keycloak as IdP, Nextcloud on k3s decided. Changelog #15. |
+| 2026-10-02 | Secrets tooling | SOPS + age (ADR 0003), `.sops.yaml`, pre-commit `sops-encrypted` guard (gitleaks missed a disguised plain-text secret). Changelog #16. |
 
 ## 2. Open items (Phase 1)
 
@@ -89,7 +90,7 @@ See [README.md](../README.md) for the Horizon comparison table.
 - [x] Repo layout: terraform/, ansible/roles/, packaging/, docs/adr/, docs/evidence/, notes/
 - [x] Pre-commit: ansible-lint, detect-secrets, gitleaks (podman, pinned by digest), tflint (podman, pinned by digest, no-ops until terraform/ has content). `terraform fmt`/`tofu fmt` deferred until the Terraform vs OpenTofu ADR lands. See [notes/phase1-changelog.md](../notes/phase1-changelog.md).
   - Local hooks are bypassable with `git commit --no-verify`; they are convenience, not enforcement. The same checks must also run in CI (Gitea Actions) once it exists.
-- [ ] Secrets via Ansible Vault or SOPS. Nothing sensitive in plain text, ever
+- [x] Secrets: SOPS + age for Kubernetes (ADR 0003, changelog #16); Ansible Vault for Phase 3 Ansible-only secrets. Nothing sensitive in plain text, ever
 - [x] First ADR: [0001, RHEL 10 as base distribution](adr/0001-rhel10.md)
 - [x] [0002, access layer on k3s](adr/0002-access-layer-on-k3s.md); [0003, secrets with SOPS + age](adr/0003-secrets-sops-age.md)
 - [ ] Remaining ADRs: why GNOME + Sway, why Guacamole, Terraform vs OpenTofu; 0004 public access via Cloudflare Tunnel; 0005 Keycloak as IdP with Nextcloud as a client

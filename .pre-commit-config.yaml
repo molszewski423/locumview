@@ -13,9 +13,18 @@ repos:
     hooks:
       - id: detect-secrets
         args: ['--baseline', '.secrets.baseline']
+        # SOPS-encrypted values are false positives; sops-encrypted below guarantees these files hold no plain text.
+        exclude: ^k8s/.*\.sops\.ya?ml$
 
   - repo: local
     hooks:
+      - id: sops-encrypted
+        name: SOPS files are encrypted (ADR 0003)
+        entry: python3 scripts/check-sops-encrypted.py
+        language: python
+        additional_dependencies: ['pyyaml==6.0.3']
+        files: ^k8s/.*\.sops\.ya?ml$
+
       - id: gitleaks
         name: gitleaks (podman, image pinned by digest)
         entry: >-

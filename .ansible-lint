@@ -1,0 +1,5 @@
+---
+# k8s/ holds Kubernetes manifests, not Ansible content (ADR 0002); SOPS-encrypted lines are long by design.
+# Kubernetes manifests get their own validation (kubeconform) when the first workload lands.
+exclude_paths:
+  - k8s/

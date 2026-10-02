@@ -1,0 +1,8 @@
+# SOPS config (ADR 0003). Only Kubernetes Secret values are encrypted; the rest of each manifest stays reviewable.
+# Recipients: age public keys only. Private keys live outside the repo (~/.config/sops/age/keys.txt, mode 600,
+# with an offline backup). After adding or removing a recipient, run `sops updatekeys` on every *.sops.yaml.
+creation_rules:
+  - path_regex: k8s/.*\.sops\.ya?ml$
+    encrypted_regex: ^(data|stringData)$
+    # Public key (not a secret): Michael Olszewski, ThinkPad operator key, created 2026-10-02.
+    age: age1rtd08pu892une8jknwex6ey2rxdp76j3w67gstrd5vpvep24ussscpr59n  # pragma: allowlist secret
