@@ -245,3 +245,34 @@ All in `packaging/install-desktop.sh`, rerun on 2026-10-02 and verified after a 
 Verified after the logout: Tiling Assistant, LocumView Activities and Dash to Dock ACTIVE; logo and workspace dots top-left; folder icons resolve to the recoloured teal.
 
 Target: Ansible `desktop` role (extensions, keymap dconf), `branding` role (GDM logo, folder recolour). Supported: the extensions.gnome.org build and the vendored papirus-folders are third-party, recorded here as deliberate decisions; our extension must be retested on every gnome-shell major update (RHEL 10.x rebases).
+
+## 14. Headless RDP validated from another LAN machine (2026-10-02)
+
+The strict test left open in #11/#12: RDP from another machine on the LAN, with nobody logged in at the console (seat0 showed only the GDM greeter throughout).
+
+**Path.** The VM is on libvirt NAT, so MikePC (192.168.4.54) cannot reach 192.168.122.158 directly. A temporary TCP forward on the hypervisor host carried it:
+```
+systemd-run --user --unit=locumview-rdp-forward socat -d -d TCP-LISTEN:13389,fork,reuseaddr TCP:192.168.122.158:3389
+```
+Fedora Workstation's default firewalld zone already allows 1025-65535/tcp. GRD sees every connection as coming from 192.168.122.1. The forward is test-only (stopped after the test); nothing changed on the VM.
+
+**How remote login works: two server redirections.** In system (headless) mode, one client login is three TCP connections:
+1. Client connects to the system `gnome-remote-desktop-daemon` and passes the RDP credentials. The daemon starts a GDM remote greeter and sends a server redirection.
+2. Client reconnects and is routed to the greeter's handover GRD. After the GDM password, GDM starts a headless user session, and the greeter sends a **second** server redirection.
+3. Client reconnects and is routed to the user session's handover GRD.
+
+**Result.**
+
+| Client | FreeRDP | Result |
+|---|---|---|
+| Fedora 45 Remmina 1.4.43 (hypervisor host, via the forward) | 3.32.1 | Desktop |
+| Debian 13 Remmina 1.4.39 (MikePC, distro package) | 3.15.0 | Follows the first redirection, **crashes on the second** |
+| Flathub `org.remmina.Remmina` 1.4.43 (MikePC, `--user`) | 3.20.0 (bundled) | **Desktop. Strict test passed.** |
+
+**Failure mode with an old client.** The VM logs `[RDP] Sending server redirection`, then 30 s later `[DaemonSystem] Aborting handover`. The user session that GDM just started is left running with no client attached. On the next attempt the GDM password only unlocks that orphaned session and no redirection is sent, so the client hangs at the greeter. Recovery: `loginctl terminate-session <id>` for the stale headless session (the user can do this for their own session).
+
+**Implication for Phase 2.** guacd is a FreeRDP client. The Guacamole build must handle two consecutive server redirections, or every browser login fails this way. Test this first when guacd is stood up, and record its FreeRDP version.
+
+Also seen: Tiling Assistant logs `_loadAfterSessionLock ... cannot be converted to ArrayBufferView` (extension.js:348) when GDM unlocks an existing session. It did not affect tiling. Not yet investigated.
+
+Snapshot `desktop-13` (taken before this test, with the same RDP configuration) serves as the "after RDP works" snapshot.

@@ -29,6 +29,7 @@ Name: nods to locum tenens clinicians and VMware View (now Horizon, owned by Omn
 | 2026-10-01 | Desktop setup and branding | packaging/install-desktop.sh: Dash to Dock/Panel, Extensions and ONLYOFFICE Flatpaks (Flathub), Papirus (pinned), LocumView logo and 12 wallpaper pairs, dconf defaults. Changelog #12. |
 | 2026-10-02 | Rebuilt VM baseline | docs/evidence/phase1/baseline-rebuild-20261001/; all differences from the original explained in changelog #12. |
 | 2026-10-02 | Window management and keymap | Tiling Assistant (pinned), LocumView Activities extension (logo + workspace dots), Alt keymap, GDM/lock logo, Papirus folders in LocumView teal. Changelog #13. |
+| 2026-10-02 | Headless RDP validated from the LAN | MikePC via a temporary host TCP forward, nobody at the console. Remote login takes two server redirections; Debian 13 Remmina (FreeRDP 3.15) crashes on the second, Flathub Remmina (FreeRDP 3.20) works. guacd must handle both. Changelog #14. |
 
 ## 2. Open items (Phase 1)
 
@@ -37,8 +38,8 @@ Name: nods to locum tenens clinicians and VMware View (now Horizon, owned by Omn
 - [x] Record baseline: cat /etc/redhat-release, uname -r, dnf group list --installed (original: baseline/; rebuilt VM: baseline-rebuild-20261001/)
 - [ ] ~~Snapshot: clean-install-registered~~ (not possible after the rebuild; superseded by rdp-working)
 - [ ] Optional: install Security Tools group and run a baseline OpenSCAP scan ("before" evidence)
-- [ ] Validate GNOME Remote Desktop headless RDP (the highest-risk item in the whole project). Partial: works from the host over NAT; still to do: another LAN machine with nobody logged in at the console
-- [ ] Snapshot after RDP works
+- [x] Validate GNOME Remote Desktop headless RDP (the highest-risk item in the whole project). Done 2026-10-02 from MikePC, nobody at the console (changelog #14)
+- [x] Snapshot after RDP works (desktop-13, changelog #14)
 - [x] Start the Git repo (Phase 0) and move this log into it
 
 ## 3. Notes to carry into automation
@@ -96,7 +97,7 @@ Done when: repo exists, lints run on commit, ADRs written.
 **Phase 1, Hand-built reference desktop** (current, being done out of order before Phase 0 finished):
 - [x] RHEL 10.2 installed and registered (locumview-ref-dev)
 - [x] Guest agent working, baseline recorded, snapshot taken
-- [ ] GNOME Remote Desktop headless RDP working from another machine on the LAN, with no one logged in at the console (partial 2026-10-01, see changelog #12)
+- [x] GNOME Remote Desktop headless RDP working from another machine on the LAN, with no one logged in at the console (2026-10-02, changelog #14)
 - [ ] GNOME customization by command, including a Familiar (GNOME Classic) profile
 - [ ] Sway kiosk profile explored
 - [ ] Every change logged as a command
