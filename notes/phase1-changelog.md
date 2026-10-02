@@ -226,3 +226,22 @@ Production wallpapers must have clear rights. These generated designs are origin
 Target: Ansible `desktop` role (extensions, Flatpak remotes and apps, dconf `local` db), `branding` role (logo, wallpapers, background properties; later the `locumview-branding` RPM in Phase 4), and a pinned Papirus task with checksum verification.
 
 Supported: yes for the AppStream RPMs, dconf system databases and Flatpak. Flathub and the upstream Papirus release are third-party sources, recorded here as deliberate decisions.
+
+## 13. Window management, Alt keymap, top-left workspace dots, GDM logo, teal folders (2026-10-02)
+
+All in `packaging/install-desktop.sh`, rerun on 2026-10-02 and verified after a real in-session logout.
+
+1. **Tiling Assistant v55** (extensions.gnome.org, GNOME 48-51), pinned by `version_tag` and sha256, installed system-wide to `/usr/local/share/gnome-shell/extensions`. Used only for quarter tiling.
+2. **LocumView Activities** (`packaging/extensions/locumview-activities@locumview.org`, ours): RHEL's gnome-shell replaces the Activities workspace dots with the distro logo. This extension shows the LocumView logo and the dots together in the top-left button. `WorkspaceDot`/`WorkspaceIndicators` are copied from gnome-shell 49 `js/ui/panel.js` (GPL-2.0-or-later, not exported), so the extension is GPL-2.0-or-later and pinned to shell-version 49.
+3. **Alt keymap** in the `local` dconf db: Alt+1..0 / Shift+Alt+1..0 workspaces, Alt+I/O/K/L quarter tiles, Alt+Return terminal (Ptyxis), Ctrl+Alt+Q lock. Alt, not Super, because the client OS or browser usually captures Super over RDP/Guacamole. Workspaces stay dynamic. Dash to Dock `hot-keys=false` so it doesn't take Super/Alt+number. User-facing draft: `docs/user-guide/desktop-shortcuts.md`.
+4. **GDM and lock-screen logo**: `packaging/branding/locumview-gdm-logo.svg` (from `gen-gdm-logo.py`), rendered at 2x to `/usr/local/share/pixmaps/locumview-gdm-logo.png` and set with `org.gnome.login-screen logo` in the `local` db, which the gdm profile also reads.
+5. **Teal folders**: Papirus' own teal (#16a085) does not match the LocumView teal (#5EEAD4, the GDM logo accent). In our `/usr/local` copy of Papirus, the `*-teal*` folder SVGs are recoloured (front #5EEAD4, back #2DD4BF, glyph #134E4A), then `packaging/vendor/papirus-folders` (upstream v1.14.0, MIT, vendored unmodified) points the default folder icons at them. `XDG_DATA_DIRS` is pinned to `/usr/local/share` for that call, so it never touches `/usr/share`.
+
+### Findings
+
+- **Reconnecting is not logging in.** With GNOME Remote Desktop in headless (system) mode, a Remmina reconnect reattaches the existing session. The first verification failed because gnome-shell had started at 00:25, before the 10:30 script run, so no new extension was loaded. New shell extensions need Log Out from inside the session, then a reconnect.
+- **`enabled-extensions` is only a default.** This VM's user had its own `enabled-extensions` (Dash to Dock only, from earlier testing), which hid the system list. Reset with `dconf reset /org/gnome/shell/enabled-extensions` (and `disabled-extensions`). Any user who toggles an extension in the Extensions app gets the same override, so a later system-list change won't reach them. Locking the key would fix that but would also stop users from switching Dock/Panel, so it is left unlocked for now and noted in the script.
+
+Verified after the logout: Tiling Assistant, LocumView Activities and Dash to Dock ACTIVE; logo and workspace dots top-left; folder icons resolve to the recoloured teal.
+
+Target: Ansible `desktop` role (extensions, keymap dconf), `branding` role (GDM logo, folder recolour). Supported: the extensions.gnome.org build and the vendored papirus-folders are third-party, recorded here as deliberate decisions; our extension must be retested on every gnome-shell major update (RHEL 10.x rebases).

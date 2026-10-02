@@ -12,6 +12,10 @@ DEFAULT_WALLPAPER=nested
 PAPIRUS_VERSION=20260801
 # Not a secret: published sha256 of the public release archive (gitleaks generic-api-key false positive).
 PAPIRUS_SHA256=646f622e9e7e9e65eef9d0ab58999d4920ddb33d98e6a75232627cfe3bd508f9  # gitleaks:allow
+TILING_VERSION_TAG=75405   # Tiling Assistant v55 (GNOME 48-51), extensions.gnome.org
+# Not a secret: published sha256 of the public extension zip (gitleaks generic-api-key false positive).
+TILING_SHA256=4cd9b848e399b0bdcf09302044f2420cf86c63fef2857a70a5be88ca04ad88de  # gitleaks:allow
+EXT_DIR=/usr/local/share/gnome-shell/extensions
 PAPIRUS_TARBALL=${PAPIRUS_TARBALL:-/home/molszewski/Downloads/papirus-icon-theme-$PAPIRUS_VERSION.tar.gz}
 
 # 1. GNOME Shell extensions (AppStream RPMs). They conflict if both are on, so only Dash to Dock is enabled.
@@ -31,6 +35,21 @@ for app in $FLATPAKS; do
   flatpak install --system -y --noninteractive "$remote" "$app"
 done
 
+# 2b. Window management extensions, system-wide under /usr/local (in XDG_DATA_DIRS).
+#     Tiling Assistant: quarter tiling (Alt+I/O/K/L). Pinned extensions.gnome.org build, checksum verified.
+#     LocumView Activities (ours, packaging/extensions/): logo + workspace dots in the top-left button.
+install -d "$EXT_DIR"
+TZIP=$(mktemp --suffix=.zip)
+curl -fsSL -A "Mozilla/5.0" -o "$TZIP" "https://extensions.gnome.org/download-extension/tiling-assistant@leleat-on-github.shell-extension.zip?version_tag=$TILING_VERSION_TAG"
+echo "$TILING_SHA256  $TZIP" | sha256sum -c -
+rm -rf "$EXT_DIR/tiling-assistant@leleat-on-github"
+install -d "$EXT_DIR/tiling-assistant@leleat-on-github"
+unzip -q "$TZIP" -d "$EXT_DIR/tiling-assistant@leleat-on-github"; rm -f "$TZIP"
+glib-compile-schemas "$EXT_DIR/tiling-assistant@leleat-on-github/schemas"
+rm -rf "$EXT_DIR/locumview-activities@locumview.org"
+cp -r "$SRC/../extensions/locumview-activities@locumview.org" "$EXT_DIR/"
+chmod -R u=rwX,go=rX "$EXT_DIR"
+
 # 3. Papirus icon theme from the pinned upstream release (not packaged in RHEL; EPEL avoided, see changelog #10).
 if [ ! -f "$PAPIRUS_TARBALL" ]; then
   PAPIRUS_TARBALL=$(mktemp --suffix=.tar.gz)
@@ -45,6 +64,15 @@ for t in Papirus Papirus-Dark Papirus-Light; do
   chown -R root:root "/usr/local/share/icons/$t"
   gtk-update-icon-cache -f -q "/usr/local/share/icons/$t"
 done
+# 3b. Folder colour: LocumView teal (#5EEAD4, the GDM logo accent). Papirus' own teal folders
+#     (#16a085 front, #12806a back, #08382e glyph) are recoloured in our /usr/local copy, then the
+#     vendored papirus-folders (upstream v1.14.0, MIT) points the default folder icons at them.
+#     XDG_DATA_DIRS pinned so it only ever touches /usr/local/share/icons.
+for t in Papirus Papirus-Dark Papirus-Light; do
+  find "/usr/local/share/icons/$t" -type f -name '*-teal*.svg' \
+    -exec sed -i 's/#16a085/#5EEAD4/gI; s/#12806a/#2DD4BF/gI; s/#08382e/#134E4A/gI' {} +
+done
+XDG_DATA_DIRS=/usr/local/share "$SRC/../vendor/papirus-folders" -o -C teal --theme Papirus
 
 # 4. Top-bar logo. gnome-shell shows the icon named by LOGO= in /etc/os-release ("fedora-logo-icon" on RHEL).
 #    /usr/local/share precedes /usr/share in XDG_DATA_DIRS, so same-named hicolor icons here win.
@@ -59,6 +87,12 @@ for name in fedora-logo-icon system-logo-icon locumview; do
   install -m 644 "$SRC/locumview-logo.svg" "$ICONS/scalable/apps/$name.svg"
 done
 gtk-update-icon-cache -f -t "$ICONS"
+
+# GDM greeter + lock-screen logo (org.gnome.login-screen logo; RHEL default is the Red Hat mark).
+# Rendered at 2x: GDM scales it to a fixed 48px logical height.
+install -d /usr/local/share/pixmaps
+rsvg-convert -h 96 "$SRC/locumview-gdm-logo.svg" -o /usr/local/share/pixmaps/locumview-gdm-logo.png
+chmod 644 /usr/local/share/pixmaps/locumview-gdm-logo.png
 
 # 5. Wallpapers: every wallpapers/<name>-{light,dark}.svg pair (text pre-outlined, see branding/README), rendered to PNG (no font dependency at
 #    runtime) and listed in Settings > Appearance. Stale PNGs from earlier runs are removed.
@@ -90,7 +124,10 @@ chmod 644 "$BG"/*.png "$PROPS"
 # 6. System-wide defaults via the "local" dconf db (already in /etc/dconf/profile/user).
 #    picture-uri / picture-uri-dark switch automatically with the light/dark color-scheme.
 #    Icon theme: Papirus (works in light and dark; symbolic icons are recoloured by GTK).
+#    enabled-extensions is a default only: a user who has toggled extensions has their own value,
+#    which hides this list (reset with: dconf reset /org/gnome/shell/enabled-extensions).
 #    Extensions: Dash to Dock on, Dash to Panel installed but off (switch in the Extensions app).
+#    login-screen logo is read by GDM (gdm profile includes system-db:local) and the lock screen.
 #    The background-logo extension (Red Hat mark on the wallpaper) is disabled.
 cat > /etc/dconf/db/local.d/10-locumview-branding <<CONF
 [org/gnome/desktop/background]
@@ -99,6 +136,9 @@ picture-uri-dark='file://$BG/$DEFAULT_WALLPAPER-dark.png'
 picture-options='zoom'
 primary-color='#0E141C'
 
+[org/gnome/login-screen]
+logo='/usr/local/share/pixmaps/locumview-gdm-logo.png'
+
 [org/gnome/desktop/interface]
 icon-theme='Papirus'
 
@@ -106,12 +146,58 @@ icon-theme='Papirus'
 picture-uri='file://$BG/$DEFAULT_WALLPAPER-dark.png'
 picture-options='zoom'
 
+# Keymap: Alt is the LocumView modifier (Super is usually eaten by the client OS/browser over Guacamole).
+# Alt+1..0 workspace, Shift+Alt+1..0 move window there, Alt+I/O/K/L quarter tiles, Alt+Return terminal,
+# Ctrl+Alt+Q lock. Workspaces stay dynamic: Alt+N only reaches workspaces that already exist.
+[org/gnome/mutter]
+dynamic-workspaces=true
+
+[org/gnome/desktop/wm/keybindings]
+switch-to-workspace-1=['<Alt>1']
+move-to-workspace-1=['<Shift><Alt>1']
+switch-to-workspace-2=['<Alt>2']
+move-to-workspace-2=['<Shift><Alt>2']
+switch-to-workspace-3=['<Alt>3']
+move-to-workspace-3=['<Shift><Alt>3']
+switch-to-workspace-4=['<Alt>4']
+move-to-workspace-4=['<Shift><Alt>4']
+switch-to-workspace-5=['<Alt>5']
+move-to-workspace-5=['<Shift><Alt>5']
+switch-to-workspace-6=['<Alt>6']
+move-to-workspace-6=['<Shift><Alt>6']
+switch-to-workspace-7=['<Alt>7']
+move-to-workspace-7=['<Shift><Alt>7']
+switch-to-workspace-8=['<Alt>8']
+move-to-workspace-8=['<Shift><Alt>8']
+switch-to-workspace-9=['<Alt>9']
+move-to-workspace-9=['<Shift><Alt>9']
+switch-to-workspace-10=['<Alt>0']
+move-to-workspace-10=['<Shift><Alt>0']
+
+[org/gnome/shell/extensions/tiling-assistant]
+tile-topleft-quarter=['<Alt>i']
+tile-topright-quarter=['<Alt>o']
+tile-bottomleft-quarter=['<Alt>k']
+tile-bottomright-quarter=['<Alt>l']
+
+[org/gnome/shell/extensions/dash-to-dock]
+hot-keys=false
+
+[org/gnome/settings-daemon/plugins/media-keys]
+screensaver=['<Control><Alt>q']
+custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/locumview-terminal/']
+
+[org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/locumview-terminal]
+name='Terminal'
+command='ptyxis --new-window'
+binding='<Alt>Return'
+
 [org/gnome/shell]
-enabled-extensions=['$DOCK']
+enabled-extensions=['$DOCK', 'tiling-assistant@leleat-on-github', 'locumview-activities@locumview.org']
 disabled-extensions=['background-logo@fedorahosted.org', '$PANEL']
 CONF
 dconf update
-restorecon -R /usr/local/share/icons /usr/local/share/backgrounds /usr/local/share/gnome-background-properties /etc/dconf/db
+restorecon -R /usr/local/share/pixmaps /usr/local/share/icons /usr/local/share/backgrounds /usr/local/share/gnome-background-properties /etc/dconf/db
 ls "$BG"
 flatpak list --system --app --columns=application,origin
 echo DONE

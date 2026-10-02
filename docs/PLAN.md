@@ -28,6 +28,7 @@ Name: nods to locum tenens clinicians and VMware View (now Horizon, owned by Omn
 | 2026-10-01 | Package groups corrected | RPM Development Tools and Security Tools added, so all five match the original. Changelog #12. |
 | 2026-10-01 | Desktop setup and branding | packaging/install-desktop.sh: Dash to Dock/Panel, Extensions and ONLYOFFICE Flatpaks (Flathub), Papirus (pinned), LocumView logo and 12 wallpaper pairs, dconf defaults. Changelog #12. |
 | 2026-10-02 | Rebuilt VM baseline | docs/evidence/phase1/baseline-rebuild-20261001/; all differences from the original explained in changelog #12. |
+| 2026-10-02 | Window management and keymap | Tiling Assistant (pinned), LocumView Activities extension (logo + workspace dots), Alt keymap, GDM/lock logo, Papirus folders in LocumView teal. Changelog #13. |
 
 ## 2. Open items (Phase 1)
 

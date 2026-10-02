@@ -1,0 +1,4 @@
+/* Space between the LocumView logo and the first workspace dot. */
+.locumview-activities-row {
+  spacing: 8px;
+}
