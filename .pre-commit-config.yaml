@@ -33,6 +33,21 @@ repos:
         language: docker_image
         pass_filenames: false
 
+      - id: kubeconform
+        name: kubeconform (podman, image pinned by digest)
+        # *.sops.yaml carry a top-level `sops:` block (invalid for strict schema); sops-encrypted covers them.
+        entry: >-
+          --entrypoint /kubeconform
+          ghcr.io/yannh/kubeconform:v0.8.0@sha256:faffaf43f95aa6425306e1ab8d6fcad72acb9049158f38e574c085ea1ec0f64e
+          -strict -summary
+          -ignore-filename-pattern kustomization\.yaml$
+          -ignore-filename-pattern \.sops\.ya?ml$
+        language: docker_image
+        files: ^k8s/.*\.ya?ml$
+        # One container at a time: podman's :Z relabel gives each container its own SELinux label,
+        # so parallel batches lock each other out of the repo (lstat: permission denied).
+        require_serial: true
+
       - id: tflint
         name: tflint (podman, image pinned by digest)
         entry: >-

@@ -1,0 +1,10 @@
+# Non-secret resources: kubectl apply -k k8s/locumview
+# Secrets are applied separately, decrypted in memory: sops -d k8s/locumview/secrets/<name>.sops.yaml | kubectl apply -f -
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - networkpolicy.yaml
+  - postgres.yaml
+  - guacd.yaml
+  - guacamole.yaml

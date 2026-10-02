@@ -32,6 +32,7 @@ Name: nods to locum tenens clinicians and VMware View (now Horizon, owned by Omn
 | 2026-10-02 | Headless RDP validated from the LAN | MikePC via a temporary host TCP forward, nobody at the console. Remote login takes two server redirections; Debian 13 Remmina (FreeRDP 3.15) crashes on the second, Flathub Remmina (FreeRDP 3.20) works. guacd must handle both. Changelog #14. |
 | 2026-10-02 | Reference VM moved to MikePC | LAN bridge br0 on MikePC; VM at 192.168.4.36 with a fresh vTPM, Secure Boot intact, RDP verified. ADR 0002 (k3s) and 0003 (SOPS + age). locumview.com through a Cloudflare Tunnel, Keycloak as IdP, Nextcloud on k3s decided. Changelog #15. |
 | 2026-10-02 | Secrets tooling | SOPS + age (ADR 0003), `.sops.yaml`, pre-commit `sops-encrypted` guard (gitleaks missed a disguised plain-text secret). Changelog #16. |
+| 2026-10-02 | Guacamole on k3s | Postgres + guacd + Guacamole 1.6.0 in namespace locumview (PSA restricted, default-deny NetworkPolicies, no exposure). Browser to desktop works; guacd (FreeRDP 2.11.7) follows GRD's two redirections. kubeconform hook. Changelog #17. |
 
 ## 2. Open items (Phase 1)
 

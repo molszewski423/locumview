@@ -1,0 +1,57 @@
+# Default deny in both directions, then only the flows the access layer needs (changelog #17).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: default-deny, namespace: locumview}
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: allow-dns, namespace: locumview}
+spec:
+  podSelector: {}
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: kube-system}}
+          podSelector: {matchLabels: {k8s-app: kube-dns}}
+      ports: [{protocol: UDP, port: 53}, {protocol: TCP, port: 53}]
+---
+# Guacamole web: talks to its database and to guacd only.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: guacamole, namespace: locumview}
+spec:
+  podSelector: {matchLabels: {app.kubernetes.io/name: guacamole}}
+  policyTypes: [Egress]
+  egress:
+    - to: [{podSelector: {matchLabels: {app.kubernetes.io/name: guacamole-db}}}]
+      ports: [{protocol: TCP, port: 5432}]
+    - to: [{podSelector: {matchLabels: {app.kubernetes.io/name: guacd}}}]
+      ports: [{protocol: TCP, port: 4822}]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: guacamole-db, namespace: locumview}
+spec:
+  podSelector: {matchLabels: {app.kubernetes.io/name: guacamole-db}}
+  policyTypes: [Ingress]
+  ingress:
+    - from: [{podSelector: {matchLabels: {app.kubernetes.io/name: guacamole}}}]
+      ports: [{protocol: TCP, port: 5432}]
+---
+# guacd: accepts the Guacamole protocol from the web app only; may open RDP to the desktops only.
+# Desktops by address until Phase 3 provisions them; 192.168.4.36 = locumview-ref-dev (changelog #15).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: guacd, namespace: locumview}
+spec:
+  podSelector: {matchLabels: {app.kubernetes.io/name: guacd}}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from: [{podSelector: {matchLabels: {app.kubernetes.io/name: guacamole}}}]
+      ports: [{protocol: TCP, port: 4822}]
+  egress:
+    - to: [{ipBlock: {cidr: 192.168.4.36/32}}]
+      ports: [{protocol: TCP, port: 3389}]

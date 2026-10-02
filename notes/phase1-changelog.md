@@ -313,3 +313,16 @@ Implements ADR 0003. Details and test transcripts: [worklog](../docs/evidence/ph
 - `.ansible-lint` excludes `k8s/`. Kubernetes manifests get kubeconform when the first workload lands.
 - Operator kubeconfig on the ThinkPad is the k3s cluster-admin credential (600). Replacing it with a scoped kubeconfig for the `locumview` namespace is a follow-up.
 - To apply, decrypt in memory and pipe to kubectl: `sops -d k8s/<path>.sops.yaml | kubectl apply -f -`.
+
+## 17. Guacamole access layer on k3s; guacd follows GRD's double redirection (2026-10-02)
+
+Implements the first part of Phase 2 per ADR 0002. Full record: [worklog](../docs/evidence/phase2/worklog-20261002.md), "Step 4" and "12:50 Result".
+
+- `k8s/locumview/` (kustomize): namespace `locumview` (Pod Security Admission `restricted`), PostgreSQL 17.11, guacd 1.6.0 and Guacamole 1.6.0, all images pinned by digest. Every pod runs as non-root, seccomp RuntimeDefault, all capabilities dropped, no service-account token, with resource limits. Postgres is a StatefulSet on mikepc (`local-path`, 2 GiB).
+- Database bootstrap on first start: the schema comes from the Guacamole image's own `initdb.sh`; a least-privilege `guacamole_app` role is created; the default `guacadmin`/`guacadmin` becomes break-glass `locumadmin` with a generated password. The default credentials never existed on the running system.
+- Secret `k8s/locumview/secrets/guacamole-db.sops.yaml` (SOPS, #16), generated straight into encryption.
+- NetworkPolicies: default deny; guacd may only open RDP to 192.168.4.36:3389. Enforcement tested from inside the guacd pod: the desktop is reachable; the k3s API, the database, the internet and other LAN hosts are blocked.
+- No exposure: operator access only via `kubectl port-forward` on 127.0.0.1 (ThinkPad and MikePC). The admin password went to MikePC's clipboard without being displayed.
+- **Result:** Guacamole → guacd → RDP → GDM remote login → desktop works. guacd 1.6.0 bundles **FreeRDP 2.11.7**, yet it followed both GRD server redirections (12:49:57 and 12:50:14), which Debian's Remmina with FreeRDP 3.15 could not (#14). Caveat: the second redirection attached to an existing headless session; re-run from a clean state.
+- kubeconform v0.8.0 added as a pre-commit hook (strict; encrypted Secrets skipped, since `sops-encrypted` covers them).
+- Open: the RDP credentials are in Guacamole's DB (admin UI), to be moved to code or Keycloak tokens; real client IPs in the audit log once a proxy is in front (RemoteIpValve); a scoped kubeconfig for operators; demo guest login (requirement recorded in the worklog, built with Keycloak).

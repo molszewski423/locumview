@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: locumview
+  labels:
+    app.kubernetes.io/part-of: locumview
+    # Pod Security Admission: restricted for everything in the access layer.
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
