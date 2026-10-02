@@ -149,7 +149,25 @@ Differences from the original VM:
 
 Same as the original: Workstation environment plus Smart Card Support, Container Management and Development Tools; hostname `locumview-ref-dev`; kdump disabled; no disk encryption; registered with BaseOS and AppStream enabled, no EPEL.
 
-Redone after install, same as the original: #9 (new per-machine `~/.ssh/id_ed25519_gitea`, `gitea` Host alias on port 2222, key registered and verified in Gitea, SSH commit/tag signing with an `allowed_signers` file) and #10 (`python3-pip`, `podman-docker`, `pip install --user pre-commit`, `pre-commit install`; all hooks pass or skip as before). The old VM's Gitea key is unrecoverable and should be removed from the Gitea account. #2 (GRD key-file credentials, no TPM sealing) is still to be redone.
+Redone after install, same as the original: #9 (new per-machine `~/.ssh/id_ed25519_gitea`, `gitea` Host alias on port 2222, key registered and verified in Gitea, SSH commit/tag signing with an `allowed_signers` file) and #10 (`python3-pip`, `podman-docker`, `pip install --user pre-commit`, `pre-commit install`; all hooks pass or skip as before). The old VM's Gitea key is unrecoverable and should be removed from the Gitea account. #2/#3/#4 (GNOME Remote Desktop) were redone in **system (headless) mode**, in the #4 order: TLS cert, credentials, enable, restart, firewall. Exact commands (as root):
+```
+GRD_HOME=/var/lib/gnome-remote-desktop
+CERT_DIR=$GRD_HOME/.local/share/gnome-remote-desktop
+install -d -o gnome-remote-desktop -g gnome-remote-desktop -m 700 $CERT_DIR
+sudo -u gnome-remote-desktop openssl req -x509 -newkey rsa:4096 -sha256 -days 825 -nodes \
+  -keyout $CERT_DIR/rdp-tls.key -out $CERT_DIR/rdp-tls.crt \
+  -subj "/CN=locumview-ref-dev" -addext "subjectAltName=DNS:locumview-ref-dev,IP:<vm-ip>"
+chmod 600 $CERT_DIR/rdp-tls.key; restorecon -R $GRD_HOME
+grdctl --system rdp set-tls-key  $CERT_DIR/rdp-tls.key
+grdctl --system rdp set-tls-cert $CERT_DIR/rdp-tls.crt
+grdctl --system rdp set-credentials locumview <password>
+grdctl --system rdp enable
+systemctl enable gnome-remote-desktop.service; systemctl restart gnome-remote-desktop.service
+firewall-cmd --permanent --add-service=rdp; firewall-cmd --reload
+```
+The cert now has SANs (DNS + IP), as #3 required. On a fresh install the `gnome-remote-desktop` user is not in `tss`, so no TPM sealing is attempted. Every `grdctl` call logs `Init TPM credentials failed ... tcti:IO failure, using GKeyFile as fallback`, and credentials land in `$GRD_HOME/.local/share/gnome-remote-desktop/credentials.ini` (0600, `gnome_remote_desktop_var_lib_t`). This is the #2 outcome without the revert steps; the warning is expected. The Ansible `remote_access` role should assert `gnome-remote-desktop` is not in `tss` rather than remove it.
+
+Verified 2026-10-01: GNOME Connections on the host reached the GDM remote login screen over RDP with the `locumview` credentials, so headless RDP (the next Phase 1 item) works. The RDP source is not yet restricted (#4 hardening, after Guacamole).
 
 Target: Terraform `libvirt_domain`: `firmware` = OVMF secboot code, `nvram` from the secboot vars template, `tpm` block (emulator, 2.0), `cpu { mode = "host-passthrough" }`, guest agent channel.
 
