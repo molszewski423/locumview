@@ -33,6 +33,7 @@ Name: nods to locum tenens clinicians and VMware View (now Horizon, owned by Omn
 | 2026-10-02 | Reference VM moved to MikePC | LAN bridge br0 on MikePC; VM at 192.168.4.36 with a fresh vTPM, Secure Boot intact, RDP verified. ADR 0002 (k3s) and 0003 (SOPS + age). locumview.com through a Cloudflare Tunnel, Keycloak as IdP, Nextcloud on k3s decided. Changelog #15. |
 | 2026-10-02 | Secrets tooling | SOPS + age (ADR 0003), `.sops.yaml`, pre-commit `sops-encrypted` guard (gitleaks missed a disguised plain-text secret). Changelog #16. |
 | 2026-10-02 | Guacamole on k3s | Postgres + guacd + Guacamole 1.6.0 in namespace locumview (PSA restricted, default-deny NetworkPolicies, no exposure). Browser to desktop works; guacd (FreeRDP 2.11.7) follows GRD's two redirections. kubeconform hook. Changelog #17. |
+| 2026-10-02 | Keycloak SSO + TOTP | Keycloak 26.8.0 (ADR 0005), realm as code, TOTP enforced for all except the demo group, Guacamole via OIDC with group-based permissions. First SSO+MFA login to the desktop verified. Changelog #18. |
 
 ## 2. Open items (Phase 1)
 
@@ -94,7 +95,8 @@ See [README.md](../README.md) for the Horizon comparison table.
 - [x] Secrets: SOPS + age for Kubernetes (ADR 0003, changelog #16); Ansible Vault for Phase 3 Ansible-only secrets. Nothing sensitive in plain text, ever
 - [x] First ADR: [0001, RHEL 10 as base distribution](adr/0001-rhel10.md)
 - [x] [0002, access layer on k3s](adr/0002-access-layer-on-k3s.md); [0003, secrets with SOPS + age](adr/0003-secrets-sops-age.md)
-- [ ] Remaining ADRs: why GNOME + Sway, why Guacamole, Terraform vs OpenTofu; 0004 public access via Cloudflare Tunnel; 0005 Keycloak as IdP with Nextcloud as a client
+- [x] [0005, Keycloak as identity provider](adr/0005-keycloak-identity-provider.md)
+- [ ] Remaining ADRs: why GNOME + Sway, why Guacamole, Terraform vs OpenTofu; 0004 public access via Cloudflare Tunnel
 
 Done when: repo exists, lints run on commit, ADRs written.
 

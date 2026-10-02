@@ -8,3 +8,5 @@ resources:
   - postgres.yaml
   - guacd.yaml
   - guacamole.yaml
+  - keycloak-db.yaml
+  - keycloak.yaml

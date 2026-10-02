@@ -1,4 +1,4 @@
-# Guacamole web application 1.6.0 (Tomcat), PostgreSQL auth. Not exposed: reach it with
+# Guacamole web application 1.6.0 (Tomcat), PostgreSQL auth + OpenID Connect (Keycloak). Not exposed: reach it with
 # `kubectl -n locumview port-forward svc/guacamole 8080:8080` until Keycloak + MFA are in front (ADR 0004).
 apiVersion: v1
 kind: Service
@@ -43,6 +43,21 @@ spec:
             - name: POSTGRESQL_PASSWORD
               valueFrom: {secretKeyRef: {name: guacamole-db, key: app-password}}
             - {name: WEBAPP_CONTEXT, value: ROOT}
+            # SSO accounts get a DB record (login history/audit); permissions come from the groups claim.
+            - {name: POSTGRESQL_AUTO_CREATE_ACCOUNTS, value: "true"}
+            # OpenID Connect to Keycloak (ADR 0005). Implicit flow only in Guacamole 1.6.0.
+            # Browser-facing URLs = operator port-forwards until the tunnel (then login./desktop.locumview.com).
+            - {name: OPENID_AUTHORIZATION_ENDPOINT, value: "http://127.0.0.1:8081/realms/locumview/protocol/openid-connect/auth"}
+            - {name: OPENID_ISSUER, value: "http://127.0.0.1:8081/realms/locumview"}
+            - {name: OPENID_JWKS_ENDPOINT, value: "http://keycloak:8080/realms/locumview/protocol/openid-connect/certs"}
+            - {name: OPENID_CLIENT_ID, value: guacamole}
+            - {name: OPENID_REDIRECT_URI, value: "http://127.0.0.1:8080/"}
+            - {name: OPENID_SCOPE, value: "openid profile email"}
+            - {name: OPENID_USERNAME_CLAIM_TYPE, value: preferred_username}
+            - {name: OPENID_GROUPS_CLAIM_TYPE, value: groups}
+            - {name: OPENID_MAX_TOKEN_VALIDITY, value: "5"}
+            # Local (break-glass) login form first, with an SSO link; SSO becomes the only path when published.
+            - {name: EXTENSION_PRIORITY, value: "*, openid"}
           securityContext:
             allowPrivilegeEscalation: false
             capabilities: {drop: [ALL]}

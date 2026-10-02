@@ -326,3 +326,15 @@ Implements the first part of Phase 2 per ADR 0002. Full record: [worklog](../doc
 - **Result:** Guacamole → guacd → RDP → GDM remote login → desktop works. guacd 1.6.0 bundles **FreeRDP 2.11.7**, yet it followed both GRD server redirections (12:49:57 and 12:50:14), which Debian's Remmina with FreeRDP 3.15 could not (#14). Caveat: the second redirection attached to an existing headless session; re-run from a clean state.
 - kubeconform v0.8.0 added as a pre-commit hook (strict; encrypted Secrets skipped, since `sops-encrypted` covers them).
 - Open: the RDP credentials are in Guacamole's DB (admin UI), to be moved to code or Keycloak tokens; real client IPs in the audit log once a proxy is in front (RemoteIpValve); a scoped kubeconfig for operators; demo guest login (requirement recorded in the worklog, built with Keycloak).
+
+## 18. Keycloak SSO with enforced TOTP in front of Guacamole (2026-10-02)
+
+ADR 0005. Full record: [worklog](../docs/evidence/phase2/worklog-20261002.md), "Step 5".
+
+- Keycloak 26.8.0 (pinned) with its own PostgreSQL in `locumview`; secrets in SOPS; NetworkPolicies limit it to Guacamole (JWKS) and its database.
+- Realm `locumview` configured by `k8s/locumview/keycloak/configure-realm.sh` (idempotent; verified with a second run that created nothing): brute-force lockout, password policy (14+ characters, not the username, no reuse of the last 5), TOTP, 30 min idle / 10 h max SSO, 5 min tokens, login and admin events for 90 days. Custom browser flow: password plus **TOTP required for everyone** except the realm role `mfa-exempt`, which only group `locumview-demo` grants (the planned demo login).
+- Guacamole: the OpenID extension against Keycloak (implicit flow only in 1.6.0; mitigations in the ADR); Keycloak groups map to Guacamole user groups (`k8s/locumview/guacamole/sso-groups.sql`) that carry the permissions; SSO accounts are auto-created for audit history; the local break-glass form stays for now.
+- Users through `k8s/locumview/keycloak/create-user.sh` (temporary password via stdin, never in arguments or output). `molszewski` created in `locumview-admins` and `locumview-users`; the temporary password went to MikePC's clipboard.
+- **Verified:** first login enforced a new password (policy rejections visible in the events) and TOTP enrolment, then SSO into Guacamole as `molszewski` and onto the desktop.
+- Operator port-forwards are now self-healing loops (a plain one dies when its pod is replaced).
+- Decided next (recorded in the worklog): straight to the desktop with no GDM, via GRD user mode with per-VM RDP credentials and an RDP firewall limited to the k3s nodes; then LocumView branding on Keycloak and Guacamole.

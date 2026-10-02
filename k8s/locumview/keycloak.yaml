@@ -1,0 +1,69 @@
+# Keycloak 26.8.0 (ADR 0005), production mode ("start") on plain HTTP inside the cluster.
+# Hostname: operator port-forward (127.0.0.1:8081) until the Cloudflare Tunnel; then https://login.locumview.com.
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+  namespace: locumview
+  labels: {app.kubernetes.io/name: keycloak, app.kubernetes.io/part-of: locumview}
+spec:
+  selector: {app.kubernetes.io/name: keycloak}
+  ports: [{name: http, port: 8080, targetPort: http}]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  namespace: locumview
+  labels: {app.kubernetes.io/name: keycloak, app.kubernetes.io/part-of: locumview}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app.kubernetes.io/name: keycloak}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/name: keycloak, app.kubernetes.io/part-of: locumview}
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 0
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: keycloak
+          image: quay.io/keycloak/keycloak:26.8.0@sha256:b0f60d489d51c5d113390bdf5461d4c06e6051be026c05549f2e1e10ec352bcc
+          args: ["start"]
+          ports:
+            - {name: http, containerPort: 8080}
+            - {name: management, containerPort: 9000}
+          env:
+            - {name: KC_DB, value: postgres}
+            - {name: KC_DB_URL_HOST, value: keycloak-db}
+            - {name: KC_DB_URL_PORT, value: "5432"}
+            - {name: KC_DB_URL_DATABASE, value: keycloak}
+            - {name: KC_DB_USERNAME, value: keycloak}
+            - name: KC_DB_PASSWORD
+              valueFrom: {secretKeyRef: {name: keycloak, key: db-password}}
+            - {name: KC_HOSTNAME, value: "http://127.0.0.1:8081"}
+            - {name: KC_HTTP_ENABLED, value: "true"}
+            - {name: KC_HEALTH_ENABLED, value: "true"}
+            - {name: KC_METRICS_ENABLED, value: "false"}
+            # Temporary master-realm admin, used only by configure-realm.sh and break-glass.
+            - {name: KC_BOOTSTRAP_ADMIN_USERNAME, value: kc-bootstrap}
+            - name: KC_BOOTSTRAP_ADMIN_PASSWORD
+              valueFrom: {secretKeyRef: {name: keycloak, key: bootstrap-admin-password}}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+          startupProbe:
+            httpGet: {path: /health/started, port: management}
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet: {path: /health/ready, port: management}
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: {path: /health/live, port: management}
+            periodSeconds: 20
+          resources: {requests: {cpu: 250m, memory: 768Mi}, limits: {memory: 1536Mi}}

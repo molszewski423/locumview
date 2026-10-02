@@ -18,7 +18,7 @@ spec:
           podSelector: {matchLabels: {k8s-app: kube-dns}}
       ports: [{protocol: UDP, port: 53}, {protocol: TCP, port: 53}]
 ---
-# Guacamole web: talks to its database and to guacd only.
+# Guacamole web: talks to its database, guacd, and Keycloak (JWKS) only.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata: {name: guacamole, namespace: locumview}
@@ -30,6 +30,8 @@ spec:
       ports: [{protocol: TCP, port: 5432}]
     - to: [{podSelector: {matchLabels: {app.kubernetes.io/name: guacd}}}]
       ports: [{protocol: TCP, port: 4822}]
+    - to: [{podSelector: {matchLabels: {app.kubernetes.io/name: keycloak}}}]
+      ports: [{protocol: TCP, port: 8080}]
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -55,3 +57,32 @@ spec:
   egress:
     - to: [{ipBlock: {cidr: 192.168.4.36/32}}]
       ports: [{protocol: TCP, port: 3389}]
+---
+# Keycloak: serves Guacamole's server-side JWKS fetch (browsers reach it via port-forward now, the tunnel later).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: keycloak, namespace: locumview}
+spec:
+  podSelector: {matchLabels: {app.kubernetes.io/name: keycloak}}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from: [{podSelector: {matchLabels: {app.kubernetes.io/name: guacamole}}}]
+      ports: [{protocol: TCP, port: 8080}]
+    # Infinispan/JGroups between Keycloak instances (rolling updates; HA later): 7800 data, 57800 failure detection.
+    - from: [{podSelector: {matchLabels: {app.kubernetes.io/name: keycloak}}}]
+      ports: [{protocol: TCP, port: 7800}, {protocol: TCP, port: 57800}]
+  egress:
+    - to: [{podSelector: {matchLabels: {app.kubernetes.io/name: keycloak-db}}}]
+      ports: [{protocol: TCP, port: 5432}]
+    - to: [{podSelector: {matchLabels: {app.kubernetes.io/name: keycloak}}}]
+      ports: [{protocol: TCP, port: 7800}, {protocol: TCP, port: 57800}]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: keycloak-db, namespace: locumview}
+spec:
+  podSelector: {matchLabels: {app.kubernetes.io/name: keycloak-db}}
+  policyTypes: [Ingress]
+  ingress:
+    - from: [{podSelector: {matchLabels: {app.kubernetes.io/name: keycloak}}}]
+      ports: [{protocol: TCP, port: 5432}]

@@ -1,0 +1,83 @@
+# Keycloak's database (PostgreSQL 17), separate from Guacamole's so each rebuilds from its own init.
+# Keycloak owns its schema (it runs its own migrations), so its role owns the database but is not a superuser.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak-db-init
+  namespace: locumview
+data:
+  001-keycloak-role.sh: |
+    #!/bin/bash
+    set -euo pipefail
+    psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v kc_pw="$KC_DB_PASSWORD" <<'SQL'
+    CREATE ROLE keycloak LOGIN PASSWORD :'kc_pw';
+    ALTER DATABASE keycloak OWNER TO keycloak;
+    ALTER SCHEMA public OWNER TO keycloak;
+    SQL
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak-db
+  namespace: locumview
+  labels: {app.kubernetes.io/name: keycloak-db, app.kubernetes.io/part-of: locumview}
+spec:
+  selector: {app.kubernetes.io/name: keycloak-db}
+  ports: [{name: postgres, port: 5432, targetPort: postgres}]
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: keycloak-db
+  namespace: locumview
+  labels: {app.kubernetes.io/name: keycloak-db, app.kubernetes.io/part-of: locumview}
+spec:
+  serviceName: keycloak-db
+  replicas: 1
+  selector:
+    matchLabels: {app.kubernetes.io/name: keycloak-db}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/name: keycloak-db, app.kubernetes.io/part-of: locumview}
+    spec:
+      nodeSelector: {kubernetes.io/hostname: mikepc}
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: postgres
+          image: docker.io/library/postgres:17.11-trixie@sha256:d74eeac9a635390a49bc21bd49fccd973de707e2a53a76ac49b552b8712ec46f
+          ports: [{name: postgres, containerPort: 5432}]
+          env:
+            - {name: POSTGRES_DB, value: keycloak}
+            - {name: POSTGRES_USER, value: postgres}
+            - {name: PGDATA, value: /var/lib/postgresql/data/pgdata}
+            - name: POSTGRES_PASSWORD
+              valueFrom: {secretKeyRef: {name: keycloak, key: postgres-password}}
+            - name: KC_DB_PASSWORD
+              valueFrom: {secretKeyRef: {name: keycloak, key: db-password}}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+          readinessProbe:
+            exec: {command: ["pg_isready", "-U", "postgres", "-d", "keycloak"]}
+            periodSeconds: 10
+          volumeMounts:
+            - {name: data, mountPath: /var/lib/postgresql/data}
+            - {name: init-scripts, mountPath: /docker-entrypoint-initdb.d}
+            - {name: run, mountPath: /var/run/postgresql}
+          resources: {requests: {cpu: 50m, memory: 128Mi}, limits: {memory: 512Mi}}
+      volumes:
+        - {name: run, emptyDir: {}}
+        - name: init-scripts
+          configMap: {name: keycloak-db-init, defaultMode: 0555}
+  volumeClaimTemplates:
+    - metadata: {name: data}
+      spec:
+        accessModes: [ReadWriteOnce]
+        storageClassName: local-path
+        resources: {requests: {storage: 2Gi}}
