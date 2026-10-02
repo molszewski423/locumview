@@ -1,0 +1,6 @@
+Red Hat Enterprise Linux release 10.2 (Coughlan)
+6.12.0-211.61.1.el10_2.x86_64
+secureboot: SecureBoot enabled
+tpm: /dev/tpm0 /dev/tpmrm0 
+firmware: UEFI
+cpu:  11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz

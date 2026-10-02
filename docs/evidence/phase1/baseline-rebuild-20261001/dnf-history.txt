@@ -1,0 +1,7 @@
+Updating Subscription Management repositories.
+ID     | Command line                              | Date and time    | Action(s)      | Altered
+------------------------------------------------------------------------------------------------
+     4 | group install -y RPM Development Tools Se | 2026-10-01 23:53 | Install        |    6   
+     3 | install -y gnome-shell-extension-dash-to- | 2026-10-01 23:24 | Install        |    3   
+     2 | install -y python3-pip podman-docker      | 2026-10-01 22:23 | Install        |    2  <
+     1 |                                           | 2026-10-01 21:32 | Install        | 1462 >E

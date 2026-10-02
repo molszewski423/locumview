@@ -1,0 +1,4 @@
+.......T.  c /etc/selinux/targeted/contexts/customizable_types
+S.5....T.  c /etc/rhsm/rhsm.conf
+..5....T.  c /etc/pki/pesign/cert9.db
+..5....T.  c /etc/pki/pesign/key4.db

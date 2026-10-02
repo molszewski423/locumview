@@ -15,21 +15,28 @@ Name: nods to locum tenens clinicians and VMware View (now Horizon, owned by Omn
 | 2026-09-28 | Red Hat Developer account created | Personal account type, company "Individual". Developer Subscription for Individuals (16 systems, self-supported). |
 | 2026-09-28 | Downloaded RHEL 10.2 x86_64 DVD ISO | Full offline BaseOS and AppStream repos. Verified with sha256sum. |
 | 2026-09-28 | Created VM locumview-ref-dev in virt-manager | Connection qemu:///system (not user session). 4 vCPU, 8192 MiB RAM, 40 GiB thin-provisioned qcow2 in /var/lib/libvirt/images, network default (NAT). |
-| 2026-09-28 | Installed RHEL 10.2 | Base environment: Workstation. Add-on groups: Smart Card Support, Container Management, Development Tools. Root disabled. Admin user mike (wheel). Hostname locumview-ref-dev. KDUMP disabled. No disk encryption (would block headless boot). |
+| 2026-09-28 | Installed RHEL 10.2 | Base environment: Workstation. Add-on groups: Smart Card Support, Container Management, Development Tools, RPM Development Tools, Security Tools (last two added on the software selection screen; see docs/evidence/phase1/baseline/groups.txt). Root disabled. Admin user mike (wheel). Hostname locumview-ref-dev. KDUMP disabled. No disk encryption (would block headless boot). |
 | 2026-09-28 | Registered during install | Role: RHEL Workstation, SLA: Self-Support, Usage: Development/Test, Insights enabled. subscription-manager status shows Registered (Simple Content Access, no attach needed). |
 | 2026-09-28 | sudo dnf upgrade -y | Already up to date. |
 | 2026-09-28 | QEMU guest agent | Package already installed by the Workstation environment; service enabled. Host was missing the virtio channel org.qemu.guest_agent.0; needs adding on the host (virt-manager Add Hardware > Channel, or virsh edit). Verify with sudo virsh domifaddr locumview-ref-dev --source agent. |
 | 2026-09-29 08:50 | Fixed Gitea SSH access | Gitea (hosted on a separate k3s cluster, control plane MikePC) had three bugs blocking git-over-ssh from any external host: SSH port was ClusterIP-only, the container's real sshd ignored the Gitea-side port setting, and INSTALL_LOCK=false was resetting the instance to the install wizard on every pod restart. All fixed in the homelab-infra repo's k8s/gitea.yaml, not this repo. Full writeup in [notes/phase1-changelog.md](../notes/phase1-changelog.md). |
 | 2026-09-29 09:08 | First commit to this repo | Phase 0 layout, this plan, CLAUDE.md, phase1-changelog.md, Phase 1 evidence. Signed with the VM's per-machine SSH key. |
+| 2026-10-01 | Original VM lost in host reinstall (Rocky 10.2 to Fedora 45) | qemu:///system was not in the backup. See changelog #11. |
+| 2026-10-01 | Rebuilt locumview-ref-dev | virt-install: UEFI + Secure Boot, swtpm TPM 2.0, host-passthrough, 4 vCPU / 8 GiB, 60 GiB, guest agent channel. RHEL 10.2 from the boot ISO, Red Hat CDN as install source. Admin user molszewski. Changelog #11. |
+| 2026-10-01 | Gitea access, signing and pre-commit redone | New per-machine key, verified in Gitea; hooks pass. Changelog #11. |
+| 2026-10-01 | GNOME Remote Desktop headless RDP | System mode, SAN TLS cert, key-file credentials. Reached the GDM remote login from the host over NAT with a console session open; the strict test from another LAN machine is still open. Changelog #11/#12. |
+| 2026-10-01 | Package groups corrected | RPM Development Tools and Security Tools added, so all five match the original. Changelog #12. |
+| 2026-10-01 | Desktop setup and branding | packaging/install-desktop.sh: Dash to Dock/Panel, Extensions and ONLYOFFICE Flatpaks (Flathub), Papirus (pinned), LocumView logo and 12 wallpaper pairs, dconf defaults. Changelog #12. |
+| 2026-10-02 | Rebuilt VM baseline | docs/evidence/phase1/baseline-rebuild-20261001/; all differences from the original explained in changelog #12. |
 
 ## 2. Open items (Phase 1)
 
-- [ ] Add guest agent channel on host and verify
-- [ ] Confirm VM firmware (UEFI) and CPU mode (host-passthrough); if not set at creation, note it for Terraform (known: it was created with SeaBIOS by mistake, see changelog)
-- [ ] Record baseline: cat /etc/redhat-release, uname -r, dnf group list --installed
-- [ ] Snapshot: clean-install-registered
+- [x] Add guest agent channel on host and verify (rebuilt VM, at creation)
+- [x] Confirm VM firmware (UEFI) and CPU mode (host-passthrough) (rebuilt VM: UEFI + Secure Boot, host-passthrough; changelog #11)
+- [x] Record baseline: cat /etc/redhat-release, uname -r, dnf group list --installed (original: baseline/; rebuilt VM: baseline-rebuild-20261001/)
+- [ ] ~~Snapshot: clean-install-registered~~ (not possible after the rebuild; superseded by rdp-working)
 - [ ] Optional: install Security Tools group and run a baseline OpenSCAP scan ("before" evidence)
-- [ ] Validate GNOME Remote Desktop headless RDP (the highest-risk item in the whole project)
+- [ ] Validate GNOME Remote Desktop headless RDP (the highest-risk item in the whole project). Partial: works from the host over NAT; still to do: another LAN machine with nobody logged in at the console
 - [ ] Snapshot after RDP works
 - [x] Start the Git repo (Phase 0) and move this log into it
 
@@ -88,7 +95,7 @@ Done when: repo exists, lints run on commit, ADRs written.
 **Phase 1, Hand-built reference desktop** (current, being done out of order before Phase 0 finished):
 - [x] RHEL 10.2 installed and registered (locumview-ref-dev)
 - [x] Guest agent working, baseline recorded, snapshot taken
-- [ ] GNOME Remote Desktop headless RDP working from another machine on the LAN, with no one logged in at the console
+- [ ] GNOME Remote Desktop headless RDP working from another machine on the LAN, with no one logged in at the console (partial 2026-10-01, see changelog #12)
 - [ ] GNOME customization by command, including a Familiar (GNOME Classic) profile
 - [ ] Sway kiosk profile explored
 - [ ] Every change logged as a command

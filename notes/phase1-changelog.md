@@ -172,3 +172,57 @@ Verified 2026-10-01: GNOME Connections on the host reached the GDM remote login 
 Target: Terraform `libvirt_domain`: `firmware` = OVMF secboot code, `nvram` from the secboot vars template, `tpm` block (emulator, 2.0), `cpu { mode = "host-passthrough" }`, guest agent channel.
 
 Supported: yes, standard libvirt/QEMU/OVMF capabilities.
+
+## 12. Desktop setup, branding, group correction and rebuilt baseline (2026-10-01/02)
+
+### Correction to #11: package groups
+
+#11 says the rebuilt VM has the "same" add-on groups as the original. It did not. The original had five, per `docs/evidence/phase1/baseline/groups.txt`: Container Management, RPM Development Tools, Development Tools, Smart Card Support and Security Tools. The last two were added on the software selection screen, and the 2026-09-28 row in `docs/PLAN.md` missed them (now fixed). The rebuild was installed with three. The missing two were added afterwards:
+```
+sudo dnf group install -y 'RPM Development Tools' 'Security Tools'
+```
+Rule going forward: `docs/evidence/` is the primary record. Check it before trusting a summary in PLAN.md.
+
+### Rebuilt VM baseline
+
+Captured with `docs/evidence/phase1/capture-baseline.sh` (same commands as the original baseline, plus `system.txt`) into `docs/evidence/phase1/baseline-rebuild-20261001/`. Diff against the original `baseline/`:
+
+- Crypto policy, default target, SELinux mode: identical (DEFAULT, graphical.target, Enforcing).
+- Groups: identical (all five), after the correction above.
+- Packages 1442 to 1455. Firmware change: `grub2-pc`/`grub2-pc-modules` replaced by `shim-x64`, `grub2-efi-x64`, `efibootmgr`, `efi-filesystem`, `mtools`, `grub2-tools-extra`. Ours: `python3-pip`, `podman-docker` (#10), `gnome-shell-extension-{common,dash-to-dock,dash-to-panel}` (below). Also new: `gnome-connections` and gtk-vnc (Remote Desktop Clients, a Workstation default the original install did not have).
+- Enabled units: `+gnome-remote-desktop.service` (headless RDP, #11).
+- firewalld: public zone `+rdp` (#4/#11).
+- `rpm -Va`: the same expected drift as #7 (`rhsm.conf`, pesign NSS DBs), plus `/etc/selinux/targeted/contexts/customizable_types` with a timestamp-only change (`.......T.`, contents unchanged) from a policy reload during package installs.
+- dnf history: no `dnf upgrade` needed. Installing from the Red Hat CDN (boot ISO) pulled current packages directly, unlike the original DVD install, which needed a 324-package upgrade.
+- `system.txt`: RHEL 10.2, kernel 6.12.0-211.61.1.el10_2, UEFI, Secure Boot enabled, TPM present.
+
+### Desktop setup: `packaging/install-desktop.sh`
+
+A single root script, run once on 2026-10-01 at 23:24, then verified after logout/login. In order:
+
+1. **GNOME Shell extensions** from AppStream RPMs: `gnome-shell-extension-dash-to-dock` (enabled) and `gnome-shell-extension-dash-to-panel` (installed but disabled, because the two conflict). Dash to Panel is the candidate for the Familiar profile.
+2. **Flatpaks**, system-wide: `org.gnome.Extensions` and `org.onlyoffice.desktopeditors`. The script prefers Red Hat's `rhel` remote, but it carries neither app, so both came from **Flathub**, added with `flatpak remote-add --system --if-not-exists flathub`. This makes Flathub a new third-party source for the image; ONLYOFFICE's Flathub build is published by ONLYOFFICE. The RHEL `gnome-extensions-app` RPM (46.2) was not used because it lags the GNOME 49 shell. If a Red Hat-only image is ever required, ONLYOFFICE's official RPM repo is the alternative.
+3. **Papirus icon theme 20260801** from the upstream GitHub release, pinned by sha256 and installed to `/usr/local/share/icons` (it is not packaged in RHEL; EPEL avoided, per #10). Set as the default icon theme.
+4. **Top-bar logo**: RHEL's `/etc/os-release` sets `LOGO=fedora-logo-icon`, which gnome-shell shows top-left. The LocumView logo is installed as `fedora-logo-icon`/`system-logo-icon` hicolor icons under `/usr/local/share/icons`. That path precedes `/usr/share` in `XDG_DATA_DIRS`, so it wins without touching `redhat-logos`. Papirus has no icon by that name, so the override still applies with Papirus active.
+5. **Wallpapers**: 12 generated light/dark pairs, rendered to 3840x2160 PNG in `/usr/local/share/backgrounds/locumview` and listed in Settings > Appearance via `/usr/local/share/gnome-background-properties/locumview.xml`. GNOME switches automatically between `picture-uri` and `picture-uri-dark` with the light/dark style.
+6. **System defaults** in the `local` dconf db (`/etc/dconf/db/local.d/10-locumview-branding`, already in `/etc/dconf/profile/user`): wallpaper (Nested), screensaver picture, `icon-theme='Papirus'`, `enabled-extensions` (Dash to Dock), and `disabled-extensions` (Dash to Panel, plus `background-logo@fedorahosted.org`, which drew the Red Hat mark on the wallpaper). User-level keys created by gnome-initial-setup override system defaults, so for this VM's existing user they were reset with `dconf reset -f /org/gnome/desktop/background/` (and screensaver). New users get the defaults directly.
+
+Everything goes under `/usr/local` and `/etc/dconf`. No package-owned file is modified, so the setup survives updates.
+
+Snapshot note: the `pre-desktop-script` snapshot was taken after the group install at 23:53, which turned out to be after the script had already run (23:24, visible in dnf history). It never provided a pre-script rollback point.
+
+### Branding: `packaging/branding/`
+
+The original logo and wallpaper were lost with the original VM. They were recreated from a screenshot: the logo is a white outlined L, and the "Nested" wallpaper is three nested rounded squares with a teal L. Every wallpaper carries the same bottom-left mark (L logo and "LocumView"). The text is set in JetBrains Mono Nerd Font and converted to vector outlines with fontTools, so the image needs no extra fonts. The SVGs are generated; `packaging/branding/README.md` explains how to regenerate them. Designs: Nested (default), Terminal, Ridgeline, Still Lake, Misty Pines, Aurora, Silk, Tide, Viewfinder, Pulse, Horizon, Monogram.
+
+Production wallpapers must have clear rights. These generated designs are original. Third-party photos (including the personal ones installed only in the dev user's `~/.local/share/backgrounds` on this VM) must not be committed or shipped. Future photographic wallpapers need a recorded source and license (own photos, CC0/CC BY, Unsplash/Pexels, or AI-generated under terms that allow commercial use) in a `LICENSES.md`.
+
+### RDP client findings
+
+- GNOME Connections does not pass touchpad (smooth) scrolling into the session, and it sizes the remote desktop to its window. Remmina (FreeRDP 3) handles both correctly and is the test client until Guacamole. In Remmina, the Server field must be a bare host or IP, not `rdp://...`.
+- In headless (system) mode, the remote monitor resolution is always set by the client at connect time. Expect the same with Guacamole (browser viewport).
+- The #11 validation was weaker than the PLAN.md criterion. It connected from the hypervisor host over libvirt NAT, with a local console session open (GDM showed "Session Already Running" and Force Stop). Still open: connect from another LAN machine with nobody logged in at the console. That needs a bridged NIC or a host port forward.
+
+Target: Ansible `desktop` role (extensions, Flatpak remotes and apps, dconf `local` db), `branding` role (logo, wallpapers, background properties; later the `locumview-branding` RPM in Phase 4), and a pinned Papirus task with checksum verification.
+
+Supported: yes for the AppStream RPMs, dconf system databases and Flatpak. Flathub and the upstream Papirus release are third-party sources, recorded here as deliberate decisions.
