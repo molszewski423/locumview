@@ -338,3 +338,13 @@ ADR 0005. Full record: [worklog](../docs/evidence/phase2/worklog-20261002.md), "
 - **Verified:** first login enforced a new password (policy rejections visible in the events) and TOTP enrolment, then SSO into Guacamole as `molszewski` and onto the desktop.
 - Operator port-forwards are now self-healing loops (a plain one dies when its pod is replaced).
 - Decided next (recorded in the worklog): straight to the desktop with no GDM, via GRD user mode with per-VM RDP credentials and an RDP firewall limited to the k3s nodes; then LocumView branding on Keycloak and Guacamole.
+
+## 19. Straight to the desktop after SSO (GRD user mode); RDP limited to the k3s nodes (2026-10-02)
+
+Full record: [worklog](../docs/evidence/phase2/worklog-20261002.md), "Step 6".
+
+- The desktop user's GNOME session runs headless from boot (`gnome-headless-session@molszewski`), and GNOME Remote Desktop in **user mode** serves it on port 3390. After Keycloak (password + TOTP), Guacamole connects straight into the session: **no GDM, no server redirections**. Verified by Mike.
+- RDP credentials for user mode: random, generated straight into `k8s/locumview/secrets/desktop-locumview-ref-dev.sops.yaml`, set on the VM by `packaging/remote-access/user-mode-user.sh` and in Guacamole by `k8s/locumview/guacamole/upsert-desktop-connection.sh`. Nobody types them, and they never appear in arguments, files or output. **Finding:** `grdctl set-credentials` segfaults on piped input (GRD 49.3), so it is driven through a pty (`script`).
+- `packaging/remote-access/user-mode-root.sh`: firewalld zone `locumview-gateways` lets only the k3s node addresses reach RDP (3389, 3390) and SSH; `rdp` removed from the public zone. Verified: blocked from the ThinkPad, reachable from guacd. This closes the interim LAN exposure noted in #15.
+- Guacamole: `locumview-ref-dev` = user mode (users and admins); `locumview-ref-dev (admin, GDM)` = system mode via GDM, admins only, as a fallback. guacd NetworkPolicy allows 3389 and 3390 to the desktop only.
+- Residual risk: pod egress is SNATed to node addresses, so any pod on a k3s node could reach RDP at the network level (credentials still required). Follow-up: cluster-wide egress policy or a dedicated gateway egress IP. The admin connection's credentials are still only in Guacamole's DB (typed in the UI); to move to SOPS like the user-mode ones.
