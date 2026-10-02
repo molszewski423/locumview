@@ -2,7 +2,7 @@
 
 Every manual change made on the `locumview-ref-dev` reference VM, in the shape: what and why, exact commands, files touched, target Ansible module or Terraform setting, supported or not.
 
-## 1. VM created with SeaBIOS instead of UEFI + Secure Boot
+## 1. VM created with SeaBIOS instead of UEFI + Secure Boot (resolved 2026-10-01, see #11)
 
 What and why: the reference VM was created with SeaBIOS by mistake. Target is UEFI + Secure Boot (OVMF secboot), which must be enforced in Terraform for Phase 3. The VM was not rebuilt; remaining Phase 1 work (desktop configuration) is firmware independent, so this was left as-is for now.
 
@@ -120,3 +120,37 @@ Important caveat, recorded in `docs/PLAN.md` too: local pre-commit hooks are byp
 Target: this is operator/dev tooling (`pre-commit`, and the two RHEL packages backing the container hook shim), explicitly excluded from any Ansible role that builds the desktop image. Nothing here is installed on `locumview-ref-dev` in a way that would carry into the production desktop.
 
 Supported: yes for the RHEL packages (AppStream) and the pinned upstream/vendor container images. The `pip install --user pre-commit` step is standard practice for this tool everywhere, including on RHEL; it is not shipped as an RPM.
+
+## 11. Reference VM rebuilt with UEFI + Secure Boot (2026-10-01)
+
+What and why: the original `locumview-ref-dev` VM was lost when the host (MikeThinkPad) was reinstalled from Rocky Linux 10.2 to Fedora 45. The pre-reinstall backup covered only `qemu:///session` and GNOME Boxes VMs, not `qemu:///system`, where this VM lived. Any host backup or inventory must include `virsh -c qemu:///system list --all`, `/var/lib/libvirt/images`, `/var/lib/libvirt/swtpm` and `/etc/libvirt/qemu/`. The VM was rebuilt from scratch, which also fixed changelog #1. The Phase 1 baseline evidence already in this repo (`rpm-verify.txt`, `groups.txt`, etc.) came from the original VM and was not recaptured.
+
+Exact command (host, Fedora 45, libvirt `qemu:///system`, after creating the `default` dir storage pool at `/var/lib/libvirt/images`, which did not exist on the fresh host):
+```
+virt-install --connect qemu:///system --name locumview-ref-dev --osinfo rhel10-unknown \
+  --memory 8192 --vcpus 4 --cpu host-passthrough \
+  --boot uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes,firmware.feature1.name=enrolled-keys,firmware.feature1.enabled=yes \
+  --tpm backend.type=emulator,backend.version=2.0,model=tpm-crb \
+  --disk pool=default,size=60,format=qcow2,bus=virtio \
+  --cdrom /var/lib/libvirt/images/rhel-10.2-x86_64-boot.iso \
+  --network network=default,model=virtio \
+  --channel unix,target.type=virtio,target.name=org.qemu.guest_agent.0 \
+  --graphics spice --video virtio --noautoconsole
+```
+
+Differences from the original VM:
+- Firmware: OVMF `OVMF_CODE_4M.secboot.qcow2` with Microsoft keys enrolled (was SeaBIOS). Guest reports `SecureBoot enabled` via `mokutil --sb-state`.
+- CPU mode: `host-passthrough`, set at creation.
+- TPM 2.0 (swtpm emulator, CRB) present from creation; `/dev/tpm0` and `/dev/tpmrm0` exist in the guest.
+- The guest agent channel was included at creation (it was missing from the original, PLAN.md 2026-09-28).
+- Disk: 60 GiB (was 40 GiB).
+- Installed from the RHEL 10.2 boot ISO with the Red Hat CDN as the install source after registering in Anaconda (the original used the DVD ISO).
+- Admin user is `molszewski` (wheel), not `mike`. Anaconda prefilled it and it was kept. Nothing in this repo hardcodes the guest home directory.
+
+Same as the original: Workstation environment plus Smart Card Support, Container Management and Development Tools; hostname `locumview-ref-dev`; kdump disabled; no disk encryption; registered with BaseOS and AppStream enabled, no EPEL.
+
+Redone after install, same as the original: #9 (new per-machine `~/.ssh/id_ed25519_gitea`, `gitea` Host alias on port 2222, key registered and verified in Gitea, SSH commit/tag signing with an `allowed_signers` file) and #10 (`python3-pip`, `podman-docker`, `pip install --user pre-commit`, `pre-commit install`; all hooks pass or skip as before). The old VM's Gitea key is unrecoverable and should be removed from the Gitea account. #2 (GRD key-file credentials, no TPM sealing) is still to be redone.
+
+Target: Terraform `libvirt_domain`: `firmware` = OVMF secboot code, `nvram` from the secboot vars template, `tpm` block (emulator, 2.0), `cpu { mode = "host-passthrough" }`, guest agent channel.
+
+Supported: yes, standard libvirt/QEMU/OVMF capabilities.
