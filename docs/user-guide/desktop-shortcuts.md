@@ -20,6 +20,8 @@ Workspaces are separate desktops. You might keep the EHR on one, email on anothe
 |---|---|
 | **Alt + 1 … 9, Alt + 0** | Go to workspace 1 … 10 (only workspaces that already exist) |
 | **Shift + Alt + 1 … 0** | Move the current window to that workspace |
+| **Alt + Page Up / Page Down** | Go to the previous / next workspace |
+| **Shift + Alt + Page Up / Page Down** | Move the current window to the previous / next workspace |
 
 ## Arranging windows
 

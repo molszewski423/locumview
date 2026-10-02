@@ -147,7 +147,7 @@ picture-uri='file://$BG/$DEFAULT_WALLPAPER-dark.png'
 picture-options='zoom'
 
 # Keymap: Alt is the LocumView modifier (Super is usually eaten by the client OS/browser over Guacamole).
-# Alt+1..0 workspace, Shift+Alt+1..0 move window there, Alt+I/O/K/L quarter tiles, Alt+Return terminal,
+# Alt+1..0 workspace, Shift+Alt+1..0 move window there, Alt+PgUp/PgDn prev/next workspace, Alt+I/O/K/L quarter tiles, Alt+Return terminal,
 # Ctrl+Alt+Q lock. Workspaces stay dynamic: Alt+N only reaches workspaces that already exist.
 [org/gnome/mutter]
 dynamic-workspaces=true
@@ -173,6 +173,11 @@ switch-to-workspace-9=['<Alt>9']
 move-to-workspace-9=['<Shift><Alt>9']
 switch-to-workspace-10=['<Alt>0']
 move-to-workspace-10=['<Shift><Alt>0']
+# Alt+PgUp/PgDn: previous/next workspace (Shift moves the window). GNOME defaults kept alongside.
+switch-to-workspace-left=['<Alt>Page_Up', '<Super>Page_Up', '<Super><Alt>Left', '<Control><Alt>Left']
+switch-to-workspace-right=['<Alt>Page_Down', '<Super>Page_Down', '<Super><Alt>Right', '<Control><Alt>Right']
+move-to-workspace-left=['<Shift><Alt>Page_Up', '<Super><Shift>Page_Up', '<Super><Shift><Alt>Left', '<Control><Shift><Alt>Left']
+move-to-workspace-right=['<Shift><Alt>Page_Down', '<Super><Shift>Page_Down', '<Super><Shift><Alt>Right', '<Control><Shift><Alt>Right']
 
 [org/gnome/shell/extensions/tiling-assistant]
 tile-topleft-quarter=['<Alt>i']
