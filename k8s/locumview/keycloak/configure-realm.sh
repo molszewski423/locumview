@@ -13,7 +13,8 @@ k config credentials --server http://localhost:8080 --realm master \
 # --- Realm and policy ---------------------------------------------------------------------------
 k get "realms/$R" >/dev/null 2>&1 || k create realms -s realm="$R" -s enabled=true
 k update "realms/$R" \
-  -s displayName=LocumView -s sslRequired=external \
+  -s displayName=LocumView -s 'displayNameHtml=<div class="kc-logo-text"><span>LocumView</span></div>' \
+  -s loginTheme=locumview -s sslRequired=external \
   -s registrationAllowed=false -s resetPasswordAllowed=false -s rememberMe=false \
   -s loginWithEmailAllowed=true -s duplicateEmailsAllowed=false \
   -s bruteForceProtected=true -s failureFactor=5 -s permanentLockout=false \

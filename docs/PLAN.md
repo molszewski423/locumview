@@ -35,6 +35,7 @@ Name: nods to locum tenens clinicians and VMware View (now Horizon, owned by Omn
 | 2026-10-02 | Guacamole on k3s | Postgres + guacd + Guacamole 1.6.0 in namespace locumview (PSA restricted, default-deny NetworkPolicies, no exposure). Browser to desktop works; guacd (FreeRDP 2.11.7) follows GRD's two redirections. kubeconform hook. Changelog #17. |
 | 2026-10-02 | Keycloak SSO + TOTP | Keycloak 26.8.0 (ADR 0005), realm as code, TOTP enforced for all except the demo group, Guacamole via OIDC with group-based permissions. First SSO+MFA login to the desktop verified. Changelog #18. |
 | 2026-10-02 | Straight to desktop | GRD user mode on a headless session (no GDM after SSO), RDP credentials in SOPS, RDP firewalled to the k3s nodes. Changelog #19. |
+| 2026-10-02 | Branding | Keycloak login theme and Guacamole extension in LocumView colours; reproducible asset build; brand kit for the website. Changelog #20. |
 
 ## 2. Open items (Phase 1)
 

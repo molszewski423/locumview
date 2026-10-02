@@ -1,0 +1,87 @@
+/* LocumView branding for Guacamole 1.6.0. Navy #0E141C, surface #151D28, teal #5EEAD4, text #E6EDF3. */
+
+/* Login screen (break-glass form and SSO link): dark, logo, teal action. */
+.login-ui.login-ui {
+    background: #0E141C url("app/ext/locumview-branding/images/locumview-bg.jpg") center / cover no-repeat;
+}
+.login-ui .login-dialog {
+    background: rgba(21, 29, 40, 0.94);
+    color: #E6EDF3;
+    border: none;
+    border-top: 3px solid #5EEAD4;
+    border-radius: 14px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+    padding: 1.5em 2em;
+    max-width: 3.6in;
+}
+.login-ui .login-dialog .logo {
+    width: 9em;
+    height: 2.7em;
+    background-image: url("app/ext/locumview-branding/images/locumview-wordmark.svg");
+    background-size: contain;
+    -moz-background-size: contain;
+    -webkit-background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.login-ui .login-dialog .version .app-name { display: none; }
+.login-ui .login-dialog h1,
+.login-ui .login-dialog .version { color: #9AA7B4; }
+.login-ui .login-dialog .login-fields input,
+.login-ui .login-dialog .login-fields input:focus {
+    background: #0E141C !important;
+    color: #E6EDF3 !important;
+    border: 1px solid #2A3644;
+    border-radius: 6px;
+}
+.login-ui .login-dialog .login-fields input:focus { border-color: #5EEAD4; outline: none; }
+.login-ui .login-dialog .login-fields input::placeholder { color: #6B7A8A; opacity: 1; }
+
+/* SSO is the normal path: show it as a clear call to action under the card (the local form is break-glass). */
+.login-ui .sso-providers {
+    position: absolute;
+    left: 0; right: 0; top: calc(50% + 175px); bottom: auto;
+    text-align: center;
+    color: #9AA7B4;
+    font-size: 0.95em;
+    background: none;
+}
+.login-ui .sso-providers .sso-provider-list { display: block; margin: 0.6em 0 0; padding: 0; }
+.login-ui .sso-providers .sso-provider { display: inline-block; list-style: none; }
+.login-ui .sso-providers .sso-provider a {
+    display: inline-block;
+    padding: 0.7em 1.6em;
+    background: #5EEAD4;
+    color: #0E141C;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+}
+.login-ui .sso-providers .sso-provider a:hover { background: #2DD4BF; }
+.login-ui .version { opacity: 0.35; }
+
+/* Buttons across the app. */
+button, input[type="submit"], a.button {
+    background-color: #5EEAD4;
+    color: #0E141C;
+    border-color: #2DD4BF;
+    font-weight: 600;
+}
+button:hover, input[type="submit"]:hover, a.button:hover {
+    background-color: #2DD4BF;
+}
+button.danger, a.button.danger { background-color: #E5484D; color: #FFFFFF; border-color: #C62F35; }
+
+/* Header bars and menu: navy with light text. */
+.header {
+    background: #0E141C;
+    color: #E6EDF3;
+    border-bottom: 2px solid #5EEAD4;
+}
+.header h2, .header .menu-title { color: #E6EDF3; }
+.user-menu .menu-dropdown .menu-title, .page-tabs .page-list li a[href].current { color: #0E141C; }
+.page-tabs .page-list li a[href].current { background: #5EEAD4; }
+
+/* Links and selection accents in content. */
+a[href] { color: #0F9D8A; }
+.list-item.selected, .list-item:hover { background-color: rgba(94, 234, 212, 0.18); }

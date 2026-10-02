@@ -1,0 +1,9 @@
+{
+    "APP": {
+        "NAME": "LocumView"
+    },
+    "LOGIN": {
+        "SECTION_HEADER_SSO_OPTIONS": "Organization sign-in",
+        "NAME_IDP_OPENID": "Sign in with LocumView SSO"
+    }
+}

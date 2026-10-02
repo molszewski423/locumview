@@ -1,0 +1,14 @@
+{
+    "guacamoleVersion": "1.6.0",
+    "name": "LocumView Branding",
+    "namespace": "locumview-branding",
+    "css": ["branding.css"],
+    "js": ["favicon.js"],
+    "translations": ["translations/en.json"],
+    "resources": {
+        "images/locumview-wordmark.svg": "image/svg+xml",
+        "images/locumview-icon-192.png": "image/png",
+        "images/locumview-icon-32.png": "image/png",
+        "images/locumview-bg.jpg": "image/jpeg"
+    }
+}

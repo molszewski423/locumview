@@ -67,3 +67,15 @@ spec:
             httpGet: {path: /health/live, port: management}
             periodSeconds: 20
           resources: {requests: {cpu: 250m, memory: 768Mi}, limits: {memory: 1536Mi}}
+          volumeMounts:
+            - {name: theme-locumview, mountPath: /opt/keycloak/themes/locumview/login, readOnly: true}
+      volumes:
+        - name: theme-locumview
+          configMap:
+            name: keycloak-theme-locumview
+            items:
+              - {key: theme.properties, path: theme.properties}
+              - {key: locumview.css, path: resources/css/locumview.css}
+              - {key: locumview-wordmark.svg, path: resources/img/locumview-wordmark.svg}
+              - {key: locumview-bg.jpg, path: resources/img/locumview-bg.jpg}
+              - {key: favicon.ico, path: resources/img/favicon.ico}

@@ -348,3 +348,12 @@ Full record: [worklog](../docs/evidence/phase2/worklog-20261002.md), "Step 6".
 - `packaging/remote-access/user-mode-root.sh`: firewalld zone `locumview-gateways` lets only the k3s node addresses reach RDP (3389, 3390) and SSH; `rdp` removed from the public zone. Verified: blocked from the ThinkPad, reachable from guacd. This closes the interim LAN exposure noted in #15.
 - Guacamole: `locumview-ref-dev` = user mode (users and admins); `locumview-ref-dev (admin, GDM)` = system mode via GDM, admins only, as a fallback. guacd NetworkPolicy allows 3389 and 3390 to the desktop only.
 - Residual risk: pod egress is SNATed to node addresses, so any pod on a k3s node could reach RDP at the network level (credentials still required). Follow-up: cluster-wide egress policy or a dedicated gateway egress IP. The admin connection's credentials are still only in Guacamole's DB (typed in the UI); to move to SOPS like the user-mode ones.
+
+## 20. LocumView branding on Keycloak and Guacamole; brand kit (2026-10-02)
+
+Full record: [worklog](../docs/evidence/phase2/worklog-20261002.md), "Step 7".
+
+- Keycloak login theme `locumview` (extends keycloak.v2; logo, navy and teal, dark fields) via a hashed ConfigMap; the realm uses it (`configure-realm.sh`).
+- Guacamole branding extension (product name, dark login with the wordmark, "Sign in with LocumView SSO" as the primary action, favicon), built reproducibly and mounted through a template `GUACAMOLE_HOME`; `EXTENSION_PRIORITY=*, openid, locumview-branding`.
+- `packaging/branding/build-web-assets.sh` regenerates every web asset (and the brand kit for the website) byte-reproducibly; verified by two identical builds.
+- All visual changes were checked with headless browser screenshots before handing over.

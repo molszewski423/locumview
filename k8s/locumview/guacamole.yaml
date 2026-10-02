@@ -43,6 +43,8 @@ spec:
             - name: POSTGRESQL_PASSWORD
               valueFrom: {secretKeyRef: {name: guacamole-db, key: app-password}}
             - {name: WEBAPP_CONTEXT, value: ROOT}
+            # Template GUACAMOLE_HOME: the image links extensions/* from here (LocumView branding).
+            - {name: GUACAMOLE_HOME, value: /etc/guacamole-home}
             # SSO accounts get a DB record (login history/audit); permissions come from the groups claim.
             - {name: POSTGRESQL_AUTO_CREATE_ACCOUNTS, value: "true"}
             # OpenID Connect to Keycloak (ADR 0005). Implicit flow only in Guacamole 1.6.0.
@@ -57,7 +59,8 @@ spec:
             - {name: OPENID_GROUPS_CLAIM_TYPE, value: groups}
             - {name: OPENID_MAX_TOKEN_VALIDITY, value: "5"}
             # Local (break-glass) login form first, with an SSO link; SSO becomes the only path when published.
-            - {name: EXTENSION_PRIORITY, value: "*, openid"}
+            # Branding last so its translations (product name, SSO button text) override the SSO extension's.
+            - {name: EXTENSION_PRIORITY, value: "*, openid, locumview-branding"}
           securityContext:
             allowPrivilegeEscalation: false
             capabilities: {drop: [ALL]}
@@ -66,3 +69,10 @@ spec:
             initialDelaySeconds: 20
             periodSeconds: 10
           resources: {requests: {cpu: 100m, memory: 384Mi}, limits: {memory: 1Gi}}
+          volumeMounts:
+            - {name: branding, mountPath: /etc/guacamole-home/extensions, readOnly: true}
+      volumes:
+        - name: branding
+          configMap:
+            name: guacamole-branding
+            items: [{key: locumview-branding.jar, path: locumview-branding.jar}]

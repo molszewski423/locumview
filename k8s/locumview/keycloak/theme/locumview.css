@@ -1,0 +1,82 @@
+/* LocumView brand on top of keycloak.v2 (PatternFly 5). Navy #0E141C, surface #151D28, teal #5EEAD4.
+   The page is always dark: the same palette applies whether or not the browser prefers dark mode. */
+:root,
+.pf-v5-theme-dark {
+  --keycloak-logo-url: url("../img/locumview-wordmark.svg");
+  --keycloak-bg-logo-url: url("../img/locumview-bg.jpg");
+  --keycloak-logo-height: 56px;
+  --keycloak-logo-width: 188px;
+  --keycloak-card-top-color: #5EEAD4;
+
+  --pf-v5-global--primary-color--100: #5EEAD4;
+  --pf-v5-global--primary-color--200: #2DD4BF;
+  --pf-v5-global--active-color--100: #5EEAD4;
+  --pf-v5-global--link--Color: #5EEAD4;
+  --pf-v5-global--link--Color--hover: #99F6E4;
+  --pf-v5-global--BackgroundColor--100: #151D28;
+  --pf-v5-global--BackgroundColor--200: #0E141C;
+  --pf-v5-global--Color--100: #E6EDF3;
+  --pf-v5-global--Color--200: #9AA7B4;
+  --pf-v5-global--BorderColor--100: #2A3644;
+  --pf-v5-global--BorderColor--200: #3A4858;
+
+  --pf-v5-c-button--m-primary--Color: #0E141C;
+  --pf-v5-c-button--m-primary--hover--Color: #0E141C;
+  --pf-v5-c-button--m-primary--focus--Color: #0E141C;
+  --pf-v5-c-button--m-primary--active--Color: #0E141C;
+  --pf-v5-c-button--m-primary--BackgroundColor: #5EEAD4;
+  --pf-v5-c-button--m-primary--hover--BackgroundColor: #2DD4BF;
+  --pf-v5-c-button--m-primary--focus--BackgroundColor: #2DD4BF;
+  --pf-v5-c-button--m-primary--active--BackgroundColor: #2DD4BF;
+
+  --pf-v5-c-form-control--BackgroundColor: #0E141C;
+  --pf-v5-c-form-control--Color: #E6EDF3;
+  --pf-v5-c-form-control--before--BorderColor: #2A3644;
+  --pf-v5-c-form-control--after--BorderColor: #3A4858;
+  --pf-v5-c-form-control--hover--after--BorderBottomColor: #5EEAD4;
+  --pf-v5-c-form-control--focus--after--BorderBottomColor: #5EEAD4;
+}
+
+.login-pf body {
+  background-color: #0E141C;
+  color: #E6EDF3;
+}
+
+.pf-v5-c-login__main {
+  background-color: rgba(21, 29, 40, 0.94);
+  border-radius: 14px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.pf-v5-c-login__main-header {
+  border-top-width: 3px;
+}
+
+.pf-v5-c-title,
+.pf-v5-c-login__main-header .pf-v5-c-title,
+.pf-v5-c-form__label-text {
+  color: #E6EDF3;
+}
+
+#kc-header-wrapper {
+  padding-block: 8px 4px;
+}
+
+/* PatternFly 5 paints the input itself; force the dark field and readable primary-button text. */
+.pf-v5-c-form-control,
+.pf-v5-c-form-control > input,
+.pf-v5-c-form-control > textarea,
+.pf-v5-c-form-control > select {
+  background-color: #0E141C !important;
+  color: #E6EDF3 !important;
+}
+.pf-v5-c-form-control > input::placeholder { color: #6B7A8A; }
+.pf-v5-c-input-group .pf-v5-c-button.pf-m-control {
+  background-color: #0E141C;
+  color: #9AA7B4;
+}
+.pf-v5-c-button.pf-m-primary {
+  color: #0E141C !important;
+  font-weight: 600;
+}
