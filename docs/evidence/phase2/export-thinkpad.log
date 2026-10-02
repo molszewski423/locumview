@@ -1,0 +1,72 @@
++ date -Is
+2026-10-02T12:05:51-04:00
++ hostname
+DevThinkPad
++ rpm -q libvirt-daemon qemu-kvm-core edk2-ovmf swtpm
+libvirt-daemon-12.6.0-2.fc45.x86_64
+qemu-kvm-core-11.1.2-1.fc45.x86_64
+edk2-ovmf-20260812-8.fc45.noarch
+swtpm-0.10.2-1.fc45.x86_64
++ virsh -c qemu:///system dumpxml --inactive locumview-ref-dev
++ virsh -c qemu:///system snapshot-list locumview-ref-dev
+ Name          Creation Time               State
+----------------------------------------------------
+ desktop-13    2026-10-02 10:50:59 -0400   running
+ rdp-working   2026-10-02 00:07:17 -0400   running
+
+++ virsh -c qemu:///system snapshot-list locumview-ref-dev --name
++ for s in $($V snapshot-list "$DOM" --name)
++ virsh -c qemu:///system snapshot-dumpxml locumview-ref-dev desktop-13
++ for s in $($V snapshot-list "$DOM" --name)
++ virsh -c qemu:///system snapshot-dumpxml locumview-ref-dev rdp-working
+++ virsh -c qemu:///system domstate locumview-ref-dev
++ '[' running = running ']'
++ virsh -c qemu:///system shutdown locumview-ref-dev
+Domain 'locumview-ref-dev' is being shutdown
+
+++ seq 180
++ for _ in $(seq 180)
+++ virsh -c qemu:///system domstate locumview-ref-dev
++ '[' running = 'shut off' ']'
++ sleep 1
++ for _ in $(seq 180)
+++ virsh -c qemu:///system domstate locumview-ref-dev
++ '[' running = 'shut off' ']'
++ sleep 1
++ for _ in $(seq 180)
+++ virsh -c qemu:///system domstate locumview-ref-dev
++ '[' running = 'shut off' ']'
++ sleep 1
++ for _ in $(seq 180)
+++ virsh -c qemu:///system domstate locumview-ref-dev
++ '[' 'shut off' = 'shut off' ']'
++ break
+++ virsh -c qemu:///system domstate locumview-ref-dev
++ '[' 'shut off' = 'shut off' ']'
++ virsh -c qemu:///system autostart --disable locumview-ref-dev
+Domain 'locumview-ref-dev' unmarked as autostarted
+
++ qemu-img check /var/lib/libvirt/images/locumview-ref-dev.qcow2
+No errors were found on the image.
+319184/983040 = 32.47% allocated, 3.30% fragmented, 0.00% compressed clusters
+Image end offset: 64434601984
++ qemu-img info --output=json /var/lib/libvirt/images/locumview-ref-dev.qcow2
++ qemu-img convert -p -O qcow2 /var/lib/libvirt/images/locumview-ref-dev.qcow2 /home/mike/locumview-export/locumview-ref-dev.qcow2
+
++ qemu-img check /home/mike/locumview-export/locumview-ref-dev.qcow2
+No errors were found on the image.
+211156/983040 = 21.48% allocated, 0.00% fragmented, 0.00% compressed clusters
+Image end offset: 13841596416
++ qemu-img convert -f qcow2 -O raw /var/lib/libvirt/qemu/nvram/locumview-ref-dev_VARS.qcow2 /home/mike/locumview-export/locumview-ref-dev_VARS.fd
++ stat -c '%s %n' /home/mike/locumview-export/locumview-ref-dev_VARS.fd
+540672 /home/mike/locumview-export/locumview-ref-dev_VARS.fd
++ tar -C /var/lib/libvirt/swtpm -cpf /home/mike/locumview-export/swtpm-2604cc64-67d1-40eb-850c-940d67c13402.tar 2604cc64-67d1-40eb-850c-940d67c13402
++ cd /home/mike/locumview-export
++ sha256sum locumview-ref-dev.qcow2 locumview-ref-dev_VARS.fd swtpm-2604cc64-67d1-40eb-850c-940d67c13402.tar
++ cat SHA256SUMS
+3c6bc4e7c70bc597c9ddbc2b9557aa7b62c8dabc40220025214401c08280a7f3  locumview-ref-dev.qcow2
+15a92c55961d653fdb828be3298abd2acd01c08a62d39824de99e48a1a347fc3  locumview-ref-dev_VARS.fd
+5f7c47c4fdfcbaa68f490af934379501e42d35af212bf8d8b6d0f74355b7035e  swtpm-2604cc64-67d1-40eb-850c-940d67c13402.tar
++ chown -R mike:mike /home/mike/locumview-export
++ echo 'EXPORT DONE'
+EXPORT DONE

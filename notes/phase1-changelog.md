@@ -276,3 +276,28 @@ Fedora Workstation's default firewalld zone already allows 1025-65535/tcp. GRD s
 Also seen: Tiling Assistant logs `_loadAfterSessionLock ... cannot be converted to ArrayBufferView` (extension.js:348) when GDM unlocks an existing session. It did not affect tiling. Not yet investigated.
 
 Snapshot `desktop-13` (taken before this test, with the same RDP configuration) serves as the "after RDP works" snapshot.
+
+## 15. Reference VM moved to MikePC on a LAN bridge; Phase 2 decisions (2026-10-02)
+
+The full chronological record, with every command, result and checksum, is in [docs/evidence/phase2/worklog-20261002.md](../docs/evidence/phase2/worklog-20261002.md), with the script logs beside it. This entry summarises it.
+
+**Why.** guacd (Phase 2, on k3s) has to reach the desktop's RDP port. On the ThinkPad the VM sat on libvirt NAT, which the k3s nodes can't reach, and the ThinkPad is on Wi-Fi, which can't be bridged. MikePC (Ryzen 7 7800X3D, 30 GiB RAM, wired, k3s control plane) was chosen as the hypervisor. No GPU passthrough: GRD renders in software, and the RTX stays with the k3s Ollama workload.
+
+**What was done** (scripts in `hypervisor/`, all run as root by Mike, target: an Ansible `hypervisor` role and Terraform):
+1. `mikepc-br0.sh`: NetworkManager bridge `br0` over `enp8s0`, cloning the NIC MAC so DHCP kept 192.168.4.54 (k3s `--node-ip`). Runs in a transient unit with automatic rollback. Adds `iptables -I FORWARD -i br0 -o br0 -j ACCEPT` (a boot unit), because k3s turns on `bridge-nf-call-iptables`, and restarts k3s. Result: OK first try; all nodes Ready; flannel VXLAN now on br0.
+2. `export-thinkpad.sh`: graceful shutdown; copies the disk's active layer (13.8 GB), converts the NVRAM from qcow2 to raw, saves the swtpm state, writes SHA256SUMS. The ThinkPad VM and its snapshots are left untouched as the rollback copy (autostart off).
+3. `rsync -S` to MikePC (36 MB/s); checksums verified.
+4. `import-mikepc.sh` with `locumview-ref-dev.mikepc.xml`: five changes from `locumview-ref-dev.thinkpad.xml` (machine `pc-q35-10.0`, Debian `OVMF_CODE_4M.ms.fd`, raw NVRAM, disk in pool `locumview` at `/home/libvirt/images`, NIC on `br0` with the same MAC and UUID).
+
+**Results.** VM running at **192.168.4.36** (DHCP), autostart on, AppArmor-confined. Same SSH host key, so it's the same machine. Secure Boot still enabled. GRD, firewalld and `git.lan` all work. RDP from MikePC to 192.168.4.36 reaches the desktop.
+
+**Deviations and findings.**
+- swtpm 0.7.1 (Debian) can't read state written by swtpm 0.10.2 (Fedora) (`CMD_INIT: 0x101`). The VM now has a fresh vTPM; the old state is kept. Nothing was lost, because GRD uses key-file credentials (SELinux blocks its TPM access, #2).
+- Internal snapshots are not possible on MikePC: libvirt 11.3 requires qcow2 NVRAM, and Debian's OVMF is raw. Rollback points are the checksummed ThinkPad export and the ThinkPad VM. An offline backup procedure for MikePC is open.
+- The hypervisor host is Debian, not RHEL: a homelab deviation (see ADR 0002).
+- **Interim exposure:** RDP (firewalld `rdp`, public zone) is now reachable from the whole home LAN, not only through NAT. Accepted until guacd is up; then RDP gets restricted to the k3s nodes (#4 follow-up).
+- The guest also receives the ISP's IPv6 DNS servers from router advertisements next to AdGuard. To be fixed in Ansible (`ipv6.ignore-auto-dns yes`) before it breaks `.lan` resolution.
+
+**Decisions recorded** (owner: Michael Olszewski): ADR 0002 (access layer on k3s), ADR 0003 (secrets: SOPS + age). locumview.com (Cloudflare DNS) becomes the public entry point through a Cloudflare Tunnel, published only once Guacamole is behind Keycloak with MFA. Keycloak is the single identity provider. Nextcloud runs on k3s as an OIDC client of Keycloak, not inside the desktop VM. ADRs 0004/0005 are to be written before anything is internet-facing.
+
+Tooling: sops v3.13.3 installed on the ThinkPad to `~/.local/bin` from the upstream release, verified against `sops-v3.13.3.checksums.txt` (sha256 `e5bec334...7fef6b`). The cosign signature was not checked; cosign isn't installed. age comes from the Fedora/Debian repos.
