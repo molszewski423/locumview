@@ -2,7 +2,7 @@
 # LocumView: straight-to-desktop remote access, user part (changelog #19). Run as the desktop user (no sudo).
 # The RDP credentials come on stdin (two lines: username, password), never as arguments:
 #   sops -d --extract ... | ssh <user>@<vm> 'bash -s' < user-mode-user.sh   (see the operator wrapper)
-# Configures the headless (user-mode) GNOME Remote Desktop on port 3390 with its own TLS certificate.
+# Configures the headless (user-mode) GNOME Remote Desktop on port ${RDP_PORT:-3390} with its own TLS certificate.
 set -euo pipefail
 read -r RDP_USER; read -r RDP_PASS
 D=~/.local/share/gnome-remote-desktop
@@ -15,7 +15,7 @@ if [ ! -s "$D/rdp-tls.crt" ]; then
 fi
 grdctl --headless rdp set-tls-cert "$D/rdp-tls.crt"
 grdctl --headless rdp set-tls-key "$D/rdp-tls.key"
-grdctl --headless rdp set-port 3390
+grdctl --headless rdp set-port "${RDP_PORT:-3390}"
 grdctl --headless rdp disable-port-negotiation
 grdctl --headless rdp disable-view-only
 # grdctl reads credentials from its interactive prompt only when it has a terminal (on a plain pipe it

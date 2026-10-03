@@ -15,6 +15,9 @@ PAPIRUS_SHA256=646f622e9e7e9e65eef9d0ab58999d4920ddb33d98e6a75232627cfe3bd508f9 
 TILING_VERSION_TAG=75405   # Tiling Assistant v55 (GNOME 48-51), extensions.gnome.org
 # Not a secret: published sha256 of the public extension zip (gitleaks generic-api-key false positive).
 TILING_SHA256=4cd9b848e399b0bdcf09302044f2420cf86c63fef2857a70a5be88ca04ad88de  # gitleaks:allow
+BLUR_VERSION_TAG=69740     # Blur my Shell v72 (GNOME 46-50), extensions.gnome.org
+# Not a secret: published sha256 of the public extension zip.
+BLUR_SHA256=4b82a0a0be4f2f917bff88e0952fab4d6c347d1128e7d8487caef240b699a910  # gitleaks:allow
 EXT_DIR=/usr/local/share/gnome-shell/extensions
 PAPIRUS_TARBALL=${PAPIRUS_TARBALL:-/home/molszewski/Downloads/papirus-icon-theme-$PAPIRUS_VERSION.tar.gz}
 
@@ -46,6 +49,14 @@ rm -rf "$EXT_DIR/tiling-assistant@leleat-on-github"
 install -d "$EXT_DIR/tiling-assistant@leleat-on-github"
 unzip -q "$TZIP" -d "$EXT_DIR/tiling-assistant@leleat-on-github"; rm -f "$TZIP"
 glib-compile-schemas "$EXT_DIR/tiling-assistant@leleat-on-github/schemas"
+# Blur my Shell: blurred panel/overview/dock (look and feel only). Pinned build, checksum verified.
+BZIP=$(mktemp --suffix=.zip)
+curl -fsSL -A "Mozilla/5.0" -o "$BZIP" "https://extensions.gnome.org/download-extension/blur-my-shell@aunetx.shell-extension.zip?version_tag=$BLUR_VERSION_TAG"
+echo "$BLUR_SHA256  $BZIP" | sha256sum -c -
+rm -rf "$EXT_DIR/blur-my-shell@aunetx"
+install -d "$EXT_DIR/blur-my-shell@aunetx"
+unzip -q "$BZIP" -d "$EXT_DIR/blur-my-shell@aunetx"; rm -f "$BZIP"
+glib-compile-schemas "$EXT_DIR/blur-my-shell@aunetx/schemas"
 rm -rf "$EXT_DIR/locumview-activities@locumview.org"
 cp -r "$SRC/../extensions/locumview-activities@locumview.org" "$EXT_DIR/"
 chmod -R u=rwX,go=rX "$EXT_DIR"
@@ -141,6 +152,11 @@ logo='/usr/local/share/pixmaps/locumview-gdm-logo.png'
 
 [org/gnome/desktop/interface]
 icon-theme='Papirus'
+color-scheme='prefer-dark'
+accent-color='teal'
+
+[org/gnome/desktop/wm/preferences]
+button-layout='appmenu:minimize,maximize,close'
 
 [org/gnome/desktop/screensaver]
 picture-uri='file://$BG/$DEFAULT_WALLPAPER-dark.png'
@@ -184,9 +200,21 @@ tile-topleft-quarter=['<Alt>i']
 tile-topright-quarter=['<Alt>o']
 tile-bottomleft-quarter=['<Alt>k']
 tile-bottomright-quarter=['<Alt>l']
+focus-hint-color='rgb(145,65,172)'
 
+# Dock and panel look, promoted from the reference user's settings (changelog #22) so every user gets them.
 [org/gnome/shell/extensions/dash-to-dock]
 hot-keys=false
+dock-position='BOTTOM'
+dash-max-icon-size=48
+dock-fixed=false
+intellihide-mode='FOCUS_APPLICATION_WINDOWS'
+height-fraction=0.9
+background-opacity=0.8
+transparency-mode='DYNAMIC'
+autohide-in-fullscreen=false
+require-pressure-to-show=false
+preview-size-scale=0.34
 
 [org/gnome/settings-daemon/plugins/media-keys]
 screensaver=['<Control><Alt>q']
@@ -198,7 +226,8 @@ command='ptyxis --new-window'
 binding='<Alt>Return'
 
 [org/gnome/shell]
-enabled-extensions=['$DOCK', 'tiling-assistant@leleat-on-github', 'locumview-activities@locumview.org']
+enabled-extensions=['$DOCK', 'tiling-assistant@leleat-on-github', 'locumview-activities@locumview.org', 'blur-my-shell@aunetx']
+favorite-apps=['org.gnome.Nautilus.desktop', 'org.gnome.Calculator.desktop', 'org.onlyoffice.desktopeditors.desktop', 'org.mozilla.firefox.desktop']
 disabled-extensions=['background-logo@fedorahosted.org', '$PANEL']
 CONF
 dconf update

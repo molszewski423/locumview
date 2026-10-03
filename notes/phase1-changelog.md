@@ -367,3 +367,14 @@ ADR 0004. Full record: [worklog](../docs/evidence/phase2/worklog-20261002.md), "
 - Verified from outside: the site and OIDC discovery work; the admin console, master realm, health and metrics return 404 (they never reach Keycloak); TLS 1.3, TLS 1.1 refused; HTTP redirects to HTTPS (Cloudflare Always Use HTTPS, min TLS 1.2). **First internet login (Mike's phone, mobile data): password + TOTP, real IP in the Keycloak and Guacamole audit logs.**
 - Findings: the home AdGuard cached NXDOMAIN for the new name (cleared); the in-cluster hop (cloudflared → apps) is HTTP over flannel VXLAN, unencrypted between nodes. **Open compliance item:** WireGuard pod network. Also open: Tomcat default error page, scoped kubeconfig, admin GDM connection credentials into SOPS, cluster-wide egress policies.
 - Next (Mike): directory service (proposed: Red Hat IdM) and Nextcloud on k3s via Keycloak; demo guest login.
+
+## 22. Demo/guest login: password only, own account, same desktop environment (2026-10-02)
+
+Full record: [worklog](../docs/evidence/phase2/worklog-20261002.md), "Step 9".
+
+- Keycloak user `demo` (group `locumview-demo` → `mfa-exempt`): an easy-to-share word-word-number password (SOPS `demo-login.sops.yaml`), permanent, no TOTP, **no account self-service** (default roles removed, so guests can't change the password or add MFA). Brute-force lockout still applies.
+- Guacamole: connection `LocumView Demo` (port 3391, credentials from SOPS) visible only to `locumview-demo` and admins; demo users can't see the reference connections; no admin rights.
+- VM: local user `demo` (not in wheel, password locked, home 700) with its own always-on headless GNOME session and user-mode GRD on 3391 (`packaging/remote-access/demo-user-root.sh`); no screen lock; **an nftables egress fence by uid** (internet yes; LAN, cluster and VPN ranges no, except DNS). Chosen over sharing Mike's own session, which would hand an MFA-less guest his files, browser sessions and Gitea SSH key.
+- Same look for everyone: the dock/panel settings, favorite apps, dark style, teal accent, window buttons and **Blur my Shell v72** (pinned, checksum-verified) are now **system defaults** in `install-desktop.sh`, so demo and future users match the reference user.
+- **Finding:** `systemctl restart` of a headless session can race the old session's teardown, so the new one exits cleanly and stays down (the stock unit only restarts on failure). Fixed with a `Restart=always`/`RestartSec=5` drop-in (now in `user-mode-root.sh`); verified on the next restart.
+- Deviation: the demo wallpaper is a third-party photo set per-user only (not distributed by the project); to replace before public demos. Mike chose **Red Hat IdM** as the directory (ADR to follow; waiting on domain name and activation key).

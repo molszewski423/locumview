@@ -45,7 +45,8 @@ spec:
 ---
 # guacd: accepts the Guacamole protocol from the web app only; may open RDP to the desktops only.
 # Desktops by address until Phase 3 provisions them; 192.168.4.36 = locumview-ref-dev (changelog #15):
-# 3390 = user-mode GRD (users, straight to desktop), 3389 = system-mode GRD/GDM (admin fallback). Changelog #19.
+# 3390 = user-mode GRD (users, straight to desktop), 3389 = system-mode GRD/GDM (admin fallback), Changelog #19;
+# 3391 = demo user's user-mode GRD (group locumview-demo), changelog #22.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata: {name: guacd, namespace: locumview}
@@ -57,7 +58,7 @@ spec:
       ports: [{protocol: TCP, port: 4822}]
   egress:
     - to: [{ipBlock: {cidr: 192.168.4.36/32}}]
-      ports: [{protocol: TCP, port: 3389}, {protocol: TCP, port: 3390}]
+      ports: [{protocol: TCP, port: 3389}, {protocol: TCP, port: 3390}, {protocol: TCP, port: 3391}]
 ---
 # Keycloak: serves Guacamole's server-side JWKS fetch (browsers reach it via port-forward now, the tunnel later).
 apiVersion: networking.k8s.io/v1

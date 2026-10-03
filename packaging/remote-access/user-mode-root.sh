@@ -32,6 +32,11 @@ firewall-cmd --reload
 firewall-cmd --zone="$ZONE" --list-all
 firewall-cmd --zone=public --list-all
 
+# Always-on: restart the headless session whenever it ends. The stock unit only restarts on failure, and a
+# `systemctl restart` can race the old session's teardown so the new one exits cleanly and stays down (#22).
+install -d /etc/systemd/system/gnome-headless-session@.service.d
+printf '[Service]\nRestart=always\nRestartSec=5\n' > /etc/systemd/system/gnome-headless-session@.service.d/10-locumview-restart.conf
+systemctl daemon-reload
 systemctl enable --now "gnome-headless-session@$U.service"
 for _ in $(seq 60); do ss -ltn | grep -q ':3390 ' && break; sleep 2; done
 systemctl --no-pager status "gnome-headless-session@$U.service" | head -5
