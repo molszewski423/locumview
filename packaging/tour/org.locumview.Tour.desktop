@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=LocumView Tour
+Comment=A quick tour of the LocumView desktop and its shortcuts
+Exec=locumview-tour
+Icon=locumview
+Categories=GNOME;GTK;Utility;Documentation;
+StartupNotify=true

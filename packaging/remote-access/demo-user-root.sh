@@ -68,6 +68,8 @@ as_demo() { runuser -u "$U" -- env XDG_RUNTIME_DIR="/run/user/$UIDN" DBUS_SESSIO
 # 5. No screen lock for guests (they know no Linux password); front-door timeouts apply instead.
 as_demo gsettings set org.gnome.desktop.screensaver lock-enabled false
 as_demo gsettings set org.gnome.desktop.lockdown disable-lock-screen true
+# Each guest connection starts with the LocumView Tour (unit installed by install-desktop.sh).
+as_demo systemctl --user enable --now locumview-tour-on-connect.service || true
 
 # 6. User-mode GRD on $PORT with the staged credentials, then start it.
 set +x

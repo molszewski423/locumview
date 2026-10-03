@@ -38,6 +38,7 @@ Name: nods to locum tenens clinicians and VMware View (now Horizon, owned by Omn
 | 2026-10-02 | Branding | Keycloak login theme and Guacamole extension in LocumView colours; reproducible asset build; brand kit for the website. Changelog #20. |
 | 2026-10-02 | Public access | https://login.locumview.com via Cloudflare Tunnel (ADR 0004): SSO + TOTP from the internet verified (phone, mobile data), admin surfaces 404, real client IPs in audit logs. Changelog #21. |
 | 2026-10-02 | Demo/guest login | Keycloak `demo` (password only, no self-service), own Linux account and desktop session with egress fence, same desktop defaults for all users incl. Blur my Shell. Changelog #22. |
+| 2026-10-03 | Tour, layout switch, website | LocumView Tour (guest: every connection), Mac/Windows layout tile, locumview.com live on Cloudflare Pages with honest status, hello@ email routing. Changelog #23. |
 
 ## 2. Open items (Phase 1)
 

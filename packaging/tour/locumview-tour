@@ -1,0 +1,160 @@
+#!/usr/bin/python3
+"""LocumView Tour: first-login walkthrough of the LocumView desktop (GTK 4 + libadwaita 1.6).
+
+Replaces GNOME Tour, whose pages are compiled in. Content mirrors docs/user-guide/desktop-shortcuts.md and
+the keymap in packaging/install-desktop.sh. Installed by install-desktop.sh (changelog #23).
+  locumview-tour              open the tour
+  locumview-tour --first-run  open only if this user hasn't seen it (autostart); records that it was shown
+  locumview-tour --restart    open, or bring an open tour to the front at page 1 (demo: each guest connection)
+"""
+import os
+import pathlib
+import sys
+
+import gi
+
+gi.require_version("Gtk", "4.0")
+gi.require_version("Adw", "1")
+from gi.repository import Adw, Gdk, Gtk  # noqa: E402
+
+ART = pathlib.Path(os.environ.get("LOCUMVIEW_TOUR_ART", "/usr/local/share/locumview-tour"))
+STATE = pathlib.Path(os.environ.get("XDG_STATE_HOME", pathlib.Path.home() / ".local/state")) / "locumview/tour-shown"
+
+CSS = b"""
+window, .tour-page { background-color: #0E141C; color: #E6EDF3; }
+headerbar { background-color: #0E141C; box-shadow: none; }
+.tour-title { font-size: 26px; font-weight: 700; }
+.tour-body { font-size: 15px; color: #C9D3DD; }
+.tour-hint { color: #9AA7B4; }
+.tour-card { background-color: #151D28; border-radius: 14px; padding: 10px 16px; }
+button.suggested-action { background-color: #5EEAD4; color: #0E141C; font-weight: 700; }
+button.suggested-action:hover { background-color: #2DD4BF; }
+carouselindicatordots { color: #5EEAD4; }
+"""
+
+PAGES = [
+    ("welcome", "Welcome to LocumView",
+     "Your secure virtual desktop. You signed in once with LocumView SSO, and everything here runs on "
+     "LocumView's servers, not on the device in front of you.", []),
+    ("corner", "The top-left corner",
+     "The LocumView logo and your workspace dots. Click it to see every window and search for apps. "
+     "Scroll over it to move between workspaces.", []),
+    ("workspaces", "Workspaces",
+     "Separate desktops for separate jobs. A new one appears when you use the last; empty ones go away.",
+     [("<Alt>1", "Go to workspace 1 (Alt+1 … Alt+9, Alt+0)"),
+      ("<Shift><Alt>1", "Move the window to workspace 1"),
+      ("<Alt>Page_Up <Alt>Page_Down", "Previous / next workspace")]),
+    ("tiling", "Arrange windows",
+     "Snap the active window into a quarter of the screen, or drag a window to an edge or corner.",
+     [("<Alt>i", "Top left"), ("<Alt>o", "Top right"), ("<Alt>k", "Bottom left"), ("<Alt>l", "Bottom right")]),
+    ("dock", "The dock",
+     "Files, Calculator, ONLYOFFICE and Firefox are pinned at the bottom; the last button shows every app. "
+     "The dock steps aside when a window needs the room: move the pointer to the bottom edge to bring it back. "
+     "Prefer a taskbar? See the next page.", []),
+    ("layout", "Make it feel familiar",
+     "Open the menu at the top right and choose Layout. Mac style keeps the dock at the bottom with window buttons "
+     "on the left; Windows style gives you a taskbar with window buttons on the right. Click the tile to switch "
+     "instantly; your choice is saved for next time.", []),
+    ("keys", "Why Alt?",
+     "Your own computer keeps the Windows key for itself, so LocumView shortcuts use Alt.",
+     [("<Alt>Return", "Open a terminal"), ("<Control><Alt>q", "Lock the screen when you step away")]),
+    ("menu", "The LocumView menu",
+     "Opens over the desktop for the clipboard, the on-screen keyboard and the input method. On a phone or "
+     "tablet, swipe in from the left edge and choose Text input to get your keyboard.",
+     [("<Control><Alt><Shift>", "Open or close the menu")]),
+    ("done", "You're all set",
+     "Reopen this tour any time from the app grid: LocumView Tour.", []),
+]
+
+
+def page(art, title, body, shortcuts):
+    box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=14, hexpand=True, vexpand=True)
+    box.add_css_class("tour-page")
+    box.set_margin_start(36); box.set_margin_end(36); box.set_margin_top(8); box.set_margin_bottom(8)
+    pic = Gtk.Picture.new_for_filename(str(ART / f"{art}.svg"))
+    pic.set_content_fit(Gtk.ContentFit.CONTAIN)
+    pic.set_size_request(-1, 200)
+    pic.set_can_shrink(True)
+    box.append(pic)
+    t = Gtk.Label(label=title, wrap=True, justify=Gtk.Justification.CENTER)
+    t.add_css_class("tour-title")
+    box.append(t)
+    b = Gtk.Label(label=body, wrap=True, justify=Gtk.Justification.CENTER, max_width_chars=60)
+    b.add_css_class("tour-body")
+    box.append(b)
+    if shortcuts:
+        grid = Gtk.Grid(column_spacing=16, row_spacing=8, halign=Gtk.Align.CENTER)
+        grid.add_css_class("tour-card")
+        for row, (accel, what) in enumerate(shortcuts):
+            keys = Gtk.Box(spacing=6, halign=Gtk.Align.END)
+            for a in accel.split():
+                keys.append(Gtk.ShortcutLabel(accelerator=a))
+            grid.attach(keys, 0, row, 1, 1)
+            grid.attach(Gtk.Label(label=what, xalign=0), 1, row, 1, 1)
+        box.append(grid)
+    return box
+
+
+class Tour(Adw.Application):
+    def __init__(self, first_run, start_page):
+        super().__init__(application_id="org.locumview.Tour")
+        self.first_run, self.start_page = first_run, start_page
+
+    def do_activate(self):
+        win = self.get_active_window()
+        if win is not None:   # already running (single instance): show it again from the first page
+            self.carousel.scroll_to(self.carousel.get_nth_page(0), False)
+            self.update()
+            win.present()
+            return
+        if self.first_run and STATE.exists():
+            self.quit()
+            return
+        Adw.StyleManager.get_default().set_color_scheme(Adw.ColorScheme.FORCE_DARK)
+        css = Gtk.CssProvider()
+        css.load_from_data(CSS, len(CSS))
+        Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), css,
+                                                  Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+        win = Adw.ApplicationWindow(application=self, title="LocumView Tour", default_width=760, default_height=640)
+        self.carousel = Adw.Carousel(hexpand=True, vexpand=True, allow_scroll_wheel=True)
+        # --page N (previews/screenshots) shows that page alone; normal runs show the whole tour.
+        for p in ([PAGES[self.start_page]] if self.start_page is not None else PAGES):
+            self.carousel.append(page(*p))
+        dots = Adw.CarouselIndicatorDots(carousel=self.carousel)
+        self.back = Gtk.Button(label="Back")
+        self.back.connect("clicked", lambda *_: self.go(-1))
+        self.next = Gtk.Button(label="Next")
+        self.next.add_css_class("suggested-action")
+        self.next.connect("clicked", lambda *_: self.go(+1))
+        bar = Gtk.CenterBox(margin_start=24, margin_end=24, margin_top=8, margin_bottom=20)
+        bar.set_start_widget(self.back); bar.set_center_widget(dots); bar.set_end_widget(self.next)
+        body = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        body.append(self.carousel); body.append(bar)
+        tv = Adw.ToolbarView(content=body)
+        tv.add_top_bar(Adw.HeaderBar(show_title=False))
+        win.set_content(tv)
+        self.carousel.connect("page-changed", lambda *_: self.update())
+        win.present()
+        self.update()
+        if self.first_run:
+            STATE.parent.mkdir(parents=True, exist_ok=True)
+            STATE.touch()
+
+    def go(self, step):
+        i = round(self.carousel.get_position()) + step
+        if i >= self.carousel.get_n_pages():
+            self.quit()
+            return
+        self.carousel.scroll_to(self.carousel.get_nth_page(max(i, 0)), True)
+
+    def update(self):
+        i = round(self.carousel.get_position())
+        last = i == self.carousel.get_n_pages() - 1
+        self.back.set_sensitive(i > 0)
+        self.next.set_label("Get started" if last else "Next")
+
+
+if __name__ == "__main__":
+    args = sys.argv[1:]
+    start = int(args[args.index("--page") + 1]) if "--page" in args else None
+    sys.exit(Tour("--first-run" in args, start).run([sys.argv[0]]))

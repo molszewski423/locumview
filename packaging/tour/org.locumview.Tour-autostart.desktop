@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=LocumView Tour (first login)
+Exec=locumview-tour --first-run
+Icon=locumview
+NoDisplay=true
+OnlyShowIn=GNOME;
+X-GNOME-Autostart-Delay=3

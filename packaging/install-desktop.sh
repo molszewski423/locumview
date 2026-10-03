@@ -59,6 +59,8 @@ unzip -q "$BZIP" -d "$EXT_DIR/blur-my-shell@aunetx"; rm -f "$BZIP"
 glib-compile-schemas "$EXT_DIR/blur-my-shell@aunetx/schemas"
 rm -rf "$EXT_DIR/locumview-activities@locumview.org"
 cp -r "$SRC/../extensions/locumview-activities@locumview.org" "$EXT_DIR/"
+rm -rf "$EXT_DIR/locumview-layout@locumview.org"
+cp -r "$SRC/../extensions/locumview-layout@locumview.org" "$EXT_DIR/"   # Mac/Windows layout switch (Quick Settings)
 chmod -R u=rwX,go=rX "$EXT_DIR"
 
 # 3. Papirus icon theme from the pinned upstream release (not packaged in RHEL; EPEL avoided, see changelog #10).
@@ -104,6 +106,24 @@ gtk-update-icon-cache -f -t "$ICONS"
 install -d /usr/local/share/pixmaps
 rsvg-convert -h 96 "$SRC/locumview-gdm-logo.svg" -o /usr/local/share/pixmaps/locumview-gdm-logo.png
 chmod 644 /usr/local/share/pixmaps/locumview-gdm-logo.png
+
+# 4b. LocumView Tour (packaging/tour): replaces GNOME Tour, whose pages are compiled in. Opens once per user at
+#     first login (autostart, --first-run marker in ~/.local/state/locumview), and from the app grid any time.
+#     GNOME's own welcome dialog is suppressed below (welcome-dialog-last-shown-version) and GNOME Tour hidden.
+TOUR=$SRC/../tour
+install -d /usr/local/share/locumview-tour /usr/local/share/applications /etc/xdg/autostart
+install -m 644 "$TOUR"/art/*.svg /usr/local/share/locumview-tour/
+install -m 755 "$TOUR/locumview-tour" /usr/local/bin/locumview-tour
+install -m 644 "$TOUR/org.locumview.Tour.desktop" /usr/local/share/applications/
+install -m 644 "$TOUR/org.locumview.Tour-autostart.desktop" /etc/xdg/autostart/
+# Demo account only (enabled per user by remote-access/demo-user-root.sh): reopen the tour on every guest connection.
+install -m 755 "$TOUR/locumview-tour-on-connect" /usr/local/bin/locumview-tour-on-connect
+install -d /etc/systemd/user
+install -m 644 "$TOUR/locumview-tour-on-connect.service" /etc/systemd/user/
+# /usr/local/share precedes /usr/share in XDG_DATA_DIRS: this copy hides GNOME Tour from the app grid.
+sed '/^\[Desktop Entry\]/a NoDisplay=true' /usr/share/applications/org.gnome.Tour.desktop > /usr/local/share/applications/org.gnome.Tour.desktop
+update-desktop-database -q /usr/local/share/applications || true
+restorecon -R /usr/local/bin/locumview-tour /usr/local/bin/locumview-tour-on-connect /usr/local/share/locumview-tour /usr/local/share/applications /etc/xdg/autostart /etc/systemd/user/locumview-tour-on-connect.service
 
 # 5. Wallpapers: every wallpapers/<name>-{light,dark}.svg pair (text pre-outlined, see branding/README), rendered to PNG (no font dependency at
 #    runtime) and listed in Settings > Appearance. Stale PNGs from earlier runs are removed.
@@ -226,7 +246,8 @@ command='ptyxis --new-window'
 binding='<Alt>Return'
 
 [org/gnome/shell]
-enabled-extensions=['$DOCK', 'tiling-assistant@leleat-on-github', 'locumview-activities@locumview.org', 'blur-my-shell@aunetx']
+enabled-extensions=['$DOCK', 'tiling-assistant@leleat-on-github', 'locumview-activities@locumview.org', 'blur-my-shell@aunetx', 'locumview-layout@locumview.org']
+welcome-dialog-last-shown-version='999'
 favorite-apps=['org.gnome.Nautilus.desktop', 'org.gnome.Calculator.desktop', 'org.onlyoffice.desktopeditors.desktop', 'org.mozilla.firefox.desktop']
 disabled-extensions=['background-logo@fedorahosted.org', '$PANEL']
 CONF

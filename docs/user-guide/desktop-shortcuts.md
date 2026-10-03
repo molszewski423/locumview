@@ -34,6 +34,15 @@ Workspaces are separate desktops. You might keep the EHR on one, email on anothe
 
 You can also drag a window to a screen edge or corner to snap it there.
 
+## Desktop layout: Mac style or Windows style
+
+Open the menu at the top right (network, sound, power) and find the **Layout** tile.
+
+- **Mac style:** the dock at the bottom of the screen, window buttons on the left.
+- **Windows style:** a taskbar along the bottom, window buttons on the right.
+
+Click the tile to switch instantly, or click the arrow beside it to choose. Your choice is saved and comes back the next time you sign in.
+
 ## Other shortcuts
 
 | Shortcut | Action |

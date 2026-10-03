@@ -378,3 +378,13 @@ Full record: [worklog](../docs/evidence/phase2/worklog-20261002.md), "Step 9".
 - Same look for everyone: the dock/panel settings, favorite apps, dark style, teal accent, window buttons and **Blur my Shell v72** (pinned, checksum-verified) are now **system defaults** in `install-desktop.sh`, so demo and future users match the reference user.
 - **Finding:** `systemctl restart` of a headless session can race the old session's teardown, so the new one exits cleanly and stays down (the stock unit only restarts on failure). Fixed with a `Restart=always`/`RestartSec=5` drop-in (now in `user-mode-root.sh`); verified on the next restart.
 - Deviation: the demo wallpaper is a third-party photo set per-user only (not distributed by the project); to replace before public demos. Mike chose **Red Hat IdM** as the directory (ADR to follow; waiting on domain name and activation key).
+
+## 23. LocumView Tour, guest tour on every connection, Mac/Windows layout switch; website and email live (2026-10-02/03)
+
+Full record: [worklog](../docs/evidence/phase2/worklog-20261002.md), "Step 10" onward.
+
+- **LocumView Tour** (`packaging/tour/`): our own GTK 4 / libadwaita app replacing GNOME Tour (whose pages are compiled in). 9 pages: welcome, top-left corner, workspaces, arranging windows, dock, Mac/Windows layout, why Alt, the Guacamole menu (including mobile), done. Illustrations generated from code; previewed headlessly (GTK Broadway + Chromium) before deployment. Opens once per user at first login; GNOME's welcome dialog suppressed and GNOME Tour hidden.
+- **Demo:** the tour opens on **every guest connection** (`locumview-tour-on-connect` user service watches the account's own journal for GRD's per-connection line). Found and fixed: the demo had kept RHEL's GNOME Tour open from before the change, because its session never restarts.
+- **Layout switch** (`packaging/extensions/locumview-layout@locumview.org`): a Quick Settings tile switching between Mac style (Dash to Dock, buttons left) and Windows style (Dash to Panel, buttons right), saved per user, through GNOME's extension manager. Installed; live verification pending.
+- User guide updated (desktop layout section).
+- **Marketing site live** at https://locumview.com on Cloudflare Pages (separate site repo): honest live/next/planned status throughout, verified externally (pages, HTTPS/TLS 1.3, security headers). **Email Routing** live: hello@locumview.com forwards to Mike. The contact-form Worker is written, and deploying it is pending.

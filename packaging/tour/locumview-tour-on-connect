@@ -1,0 +1,13 @@
+#!/bin/bash
+# Demo account only: open the LocumView Tour every time a new RDP client connects (changelog #23).
+# The demo's headless session runs continuously, so "first login" happens once; each guest's connection is the
+# real start of a demo. GNOME Remote Desktop logs "[RDP.RDPGFX] CapsAdvertise" once per new connection, and
+# every account can read its own journal entries, so no extra privileges are needed.
+journalctl _UID="$(id -u)" -f -n 0 -o cat | while IFS= read -r line; do
+  case "$line" in
+    *"[RDP.RDPGFX] CapsAdvertise"*)
+      sleep 2   # let the client's first frames arrive
+      locumview-tour --restart >/dev/null 2>&1 &
+      ;;
+  esac
+done
