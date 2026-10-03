@@ -4,7 +4,7 @@
 #   kubectl -n locumview exec -i deploy/keycloak -- bash -s < k8s/locumview/keycloak/configure-realm.sh
 # Change GUAC_URL when Guacamole's public address changes (Cloudflare Tunnel, ADR 0004).
 set -euo pipefail
-GUAC_URL=http://127.0.0.1:8080
+GUAC_URL=https://login.locumview.com
 R=locumview
 k() { /opt/keycloak/bin/kcadm.sh "$@" --config /tmp/kcadm.config; }
 k config credentials --server http://localhost:8080 --realm master \

@@ -36,6 +36,7 @@ Name: nods to locum tenens clinicians and VMware View (now Horizon, owned by Omn
 | 2026-10-02 | Keycloak SSO + TOTP | Keycloak 26.8.0 (ADR 0005), realm as code, TOTP enforced for all except the demo group, Guacamole via OIDC with group-based permissions. First SSO+MFA login to the desktop verified. Changelog #18. |
 | 2026-10-02 | Straight to desktop | GRD user mode on a headless session (no GDM after SSO), RDP credentials in SOPS, RDP firewalled to the k3s nodes. Changelog #19. |
 | 2026-10-02 | Branding | Keycloak login theme and Guacamole extension in LocumView colours; reproducible asset build; brand kit for the website. Changelog #20. |
+| 2026-10-02 | Public access | https://login.locumview.com via Cloudflare Tunnel (ADR 0004): SSO + TOTP from the internet verified (phone, mobile data), admin surfaces 404, real client IPs in audit logs. Changelog #21. |
 
 ## 2. Open items (Phase 1)
 
@@ -98,7 +99,8 @@ See [README.md](../README.md) for the Horizon comparison table.
 - [x] First ADR: [0001, RHEL 10 as base distribution](adr/0001-rhel10.md)
 - [x] [0002, access layer on k3s](adr/0002-access-layer-on-k3s.md); [0003, secrets with SOPS + age](adr/0003-secrets-sops-age.md)
 - [x] [0005, Keycloak as identity provider](adr/0005-keycloak-identity-provider.md)
-- [ ] Remaining ADRs: why GNOME + Sway, why Guacamole, Terraform vs OpenTofu; 0004 public access via Cloudflare Tunnel
+- [x] [0004, public access through a Cloudflare Tunnel](adr/0004-public-access-cloudflare-tunnel.md)
+- [ ] Remaining ADRs: why GNOME + Sway, why Guacamole, Terraform vs OpenTofu
 
 Done when: repo exists, lints run on commit, ADRs written.
 

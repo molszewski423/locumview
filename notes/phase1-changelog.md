@@ -357,3 +357,13 @@ Full record: [worklog](../docs/evidence/phase2/worklog-20261002.md), "Step 7".
 - Guacamole branding extension (product name, dark login with the wordmark, "Sign in with LocumView SSO" as the primary action, favicon), built reproducibly and mounted through a template `GUACAMOLE_HOME`; `EXTENSION_PRIORITY=*, openid, locumview-branding`.
 - `packaging/branding/build-web-assets.sh` regenerates every web asset (and the brand kit for the website) byte-reproducibly; verified by two identical builds.
 - All visual changes were checked with headless browser screenshots before handing over.
+
+## 21. LocumView on the internet: login.locumview.com through a Cloudflare Tunnel (2026-10-02)
+
+ADR 0004. Full record: [worklog](../docs/evidence/phase2/worklog-20261002.md), "Step 8".
+
+- One public hostname, **https://login.locumview.com** (apex locumview.com stays with the marketing site). By path: `/realms/locumview/*` and `/resources/*` → Keycloak; everything else → Guacamole. Remotely managed Cloudflare Tunnel `locumview` (separate from RingCatch's); connector `cloudflared` 2026.9.3 (pinned) with 2 replicas in k3s, outbound-only, egress restricted to public addresses on 7844/443. Tunnel token only in SOPS (plaintext shredded).
+- Keycloak: public issuer, admin console only on the operator port-forward (`KC_HOSTNAME_ADMIN`), proxy headers trusted. Guacamole: straight to SSO, real client IPs (RemoteIpValve), break-glass `locumadmin` **disabled** (`guacamole/break-glass.sh`).
+- Verified from outside: the site and OIDC discovery work; the admin console, master realm, health and metrics return 404 (they never reach Keycloak); TLS 1.3, TLS 1.1 refused; HTTP redirects to HTTPS (Cloudflare Always Use HTTPS, min TLS 1.2). **First internet login (Mike's phone, mobile data): password + TOTP, real IP in the Keycloak and Guacamole audit logs.**
+- Findings: the home AdGuard cached NXDOMAIN for the new name (cleared); the in-cluster hop (cloudflared → apps) is HTTP over flannel VXLAN, unencrypted between nodes. **Open compliance item:** WireGuard pod network. Also open: Tomcat default error page, scoped kubeconfig, admin GDM connection credentials into SOPS, cluster-wide egress policies.
+- Next (Mike): directory service (proposed: Red Hat IdM) and Nextcloud on k3s via Keycloak; demo guest login.

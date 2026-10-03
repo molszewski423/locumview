@@ -69,6 +69,8 @@ spec:
   ingress:
     - from: [{podSelector: {matchLabels: {app.kubernetes.io/name: guacamole}}}]
       ports: [{protocol: TCP, port: 8080}]
+    - from: [{podSelector: {matchLabels: {app.kubernetes.io/name: cloudflared}}}]
+      ports: [{protocol: TCP, port: 8080}]
     # Infinispan/JGroups between Keycloak instances (rolling updates; HA later): 7800 data, 57800 failure detection.
     - from: [{podSelector: {matchLabels: {app.kubernetes.io/name: keycloak}}}]
       ports: [{protocol: TCP, port: 7800}, {protocol: TCP, port: 57800}]
@@ -87,3 +89,34 @@ spec:
   ingress:
     - from: [{podSelector: {matchLabels: {app.kubernetes.io/name: keycloak}}}]
       ports: [{protocol: TCP, port: 5432}]
+---
+# cloudflared: outbound to Cloudflare's edge only (no private ranges), inbound to nothing.
+# 7844 = tunnel (QUIC/UDP, HTTP2/TCP fallback); 443 = Cloudflare API/edge discovery.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: cloudflared, namespace: locumview}
+spec:
+  podSelector: {matchLabels: {app.kubernetes.io/name: cloudflared}}
+  policyTypes: [Ingress, Egress]
+  ingress: []
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except: [10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 100.64.0.0/10, 169.254.0.0/16]
+      ports: [{protocol: UDP, port: 7844}, {protocol: TCP, port: 7844}, {protocol: TCP, port: 443}]
+    - to: [{podSelector: {matchLabels: {app.kubernetes.io/name: guacamole}}}]
+      ports: [{protocol: TCP, port: 8080}]
+    - to: [{podSelector: {matchLabels: {app.kubernetes.io/name: keycloak}}}]
+      ports: [{protocol: TCP, port: 8080}]
+---
+# Guacamole web: reachable only from the tunnel connector (port-forwards bypass NetworkPolicy by design).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: guacamole-ingress, namespace: locumview}
+spec:
+  podSelector: {matchLabels: {app.kubernetes.io/name: guacamole}}
+  policyTypes: [Ingress]
+  ingress:
+    - from: [{podSelector: {matchLabels: {app.kubernetes.io/name: cloudflared}}}]
+      ports: [{protocol: TCP, port: 8080}]

@@ -10,6 +10,7 @@ resources:
   - guacamole.yaml
   - keycloak-db.yaml
   - keycloak.yaml
+  - cloudflared.yaml
 
 # Keycloak login theme (keycloak/theme/*), mounted at /opt/keycloak/themes/locumview/login. The generated name
 # carries a content hash, so any theme change rolls Keycloak (themes are cached in production mode).

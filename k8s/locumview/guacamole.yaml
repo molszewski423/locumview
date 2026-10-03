@@ -48,19 +48,21 @@ spec:
             # SSO accounts get a DB record (login history/audit); permissions come from the groups claim.
             - {name: POSTGRESQL_AUTO_CREATE_ACCOUNTS, value: "true"}
             # OpenID Connect to Keycloak (ADR 0005). Implicit flow only in Guacamole 1.6.0.
-            # Browser-facing URLs = operator port-forwards until the tunnel (then login./desktop.locumview.com).
-            - {name: OPENID_AUTHORIZATION_ENDPOINT, value: "http://127.0.0.1:8081/realms/locumview/protocol/openid-connect/auth"}
-            - {name: OPENID_ISSUER, value: "http://127.0.0.1:8081/realms/locumview"}
+            # Browser-facing URLs via the Cloudflare Tunnel (ADR 0004); JWKS fetched in-cluster.
+            - {name: OPENID_AUTHORIZATION_ENDPOINT, value: "https://login.locumview.com/realms/locumview/protocol/openid-connect/auth"}
+            - {name: OPENID_ISSUER, value: "https://login.locumview.com/realms/locumview"}
             - {name: OPENID_JWKS_ENDPOINT, value: "http://keycloak:8080/realms/locumview/protocol/openid-connect/certs"}
             - {name: OPENID_CLIENT_ID, value: guacamole}
-            - {name: OPENID_REDIRECT_URI, value: "http://127.0.0.1:8080/"}
+            - {name: OPENID_REDIRECT_URI, value: "https://login.locumview.com/"}
             - {name: OPENID_SCOPE, value: "openid profile email"}
             - {name: OPENID_USERNAME_CLAIM_TYPE, value: preferred_username}
             - {name: OPENID_GROUPS_CLAIM_TYPE, value: groups}
             - {name: OPENID_MAX_TOKEN_VALIDITY, value: "5"}
-            # Local (break-glass) login form first, with an SSO link; SSO becomes the only path when published.
-            # Branding last so its translations (product name, SSO button text) override the SSO extension's.
-            - {name: EXTENSION_PRIORITY, value: "*, openid, locumview-branding"}
+            # SSO first: visitors go straight to Keycloak. The local break-glass account is disabled by default
+            # (k8s/locumview/guacamole/break-glass.sh). Branding last so its translations win.
+            - {name: EXTENSION_PRIORITY, value: "openid, *, locumview-branding"}
+            # Real client IPs in Guacamole's audit log: trust X-Forwarded-For from in-cluster proxies (cloudflared).
+            - {name: REMOTE_IP_VALVE_ENABLED, value: "true"}
           securityContext:
             allowPrivilegeEscalation: false
             capabilities: {drop: [ALL]}

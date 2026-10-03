@@ -1,5 +1,5 @@
 # Keycloak 26.8.0 (ADR 0005), production mode ("start") on plain HTTP inside the cluster.
-# Hostname: operator port-forward (127.0.0.1:8081) until the Cloudflare Tunnel; then https://login.locumview.com.
+# Hostname: https://login.locumview.com via the Cloudflare Tunnel; admin console only at http://127.0.0.1:8081.
 apiVersion: v1
 kind: Service
 metadata:
@@ -45,7 +45,11 @@ spec:
             - {name: KC_DB_USERNAME, value: keycloak}
             - name: KC_DB_PASSWORD
               valueFrom: {secretKeyRef: {name: keycloak, key: db-password}}
-            - {name: KC_HOSTNAME, value: "http://127.0.0.1:8081"}
+            # Public issuer through the Cloudflare Tunnel (ADR 0004); the admin console only on the operator
+            # port-forward (its paths return 404 on the public hostname).
+            - {name: KC_HOSTNAME, value: "https://login.locumview.com"}
+            - {name: KC_HOSTNAME_ADMIN, value: "http://127.0.0.1:8081"}
+            - {name: KC_PROXY_HEADERS, value: xforwarded}
             - {name: KC_HTTP_ENABLED, value: "true"}
             - {name: KC_HEALTH_ENABLED, value: "true"}
             - {name: KC_METRICS_ENABLED, value: "false"}
