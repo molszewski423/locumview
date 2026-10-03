@@ -39,6 +39,7 @@ Name: nods to locum tenens clinicians and VMware View (now Horizon, owned by Omn
 | 2026-10-02 | Public access | https://login.locumview.com via Cloudflare Tunnel (ADR 0004): SSO + TOTP from the internet verified (phone, mobile data), admin surfaces 404, real client IPs in audit logs. Changelog #21. |
 | 2026-10-02 | Demo/guest login | Keycloak `demo` (password only, no self-service), own Linux account and desktop session with egress fence, same desktop defaults for all users incl. Blur my Shell. Changelog #22. |
 | 2026-10-03 | Tour, layout switch, website | LocumView Tour (guest: every connection), Mac/Windows layout tile, locumview.com live on Cloudflare Pages with honest status, hello@ email routing. Changelog #23. |
+| 2026-10-03 | ADRs 0006 to 0009, README, ROADMAP | IdM directory (planned), desktop as a bootc image, EU regulatory posture, version-one scope lock; README and new ROADMAP.md separate version one from planned. Changelog #24. |
 
 ## 2. Open items (Phase 1)
 
@@ -102,6 +103,7 @@ See [README.md](../README.md) for the Horizon comparison table.
 - [x] [0002, access layer on k3s](adr/0002-access-layer-on-k3s.md); [0003, secrets with SOPS + age](adr/0003-secrets-sops-age.md)
 - [x] [0005, Keycloak as identity provider](adr/0005-keycloak-identity-provider.md)
 - [x] [0004, public access through a Cloudflare Tunnel](adr/0004-public-access-cloudflare-tunnel.md)
+- [x] [0006, Red Hat IdM directory](adr/0006-red-hat-idm-directory.md); [0007, desktop as a bootc image, session as a VM](adr/0007-desktop-containerization-bootc.md); [0008, EU regulatory posture](adr/0008-eu-regulatory-posture.md); [0009, version-one scope, integrate don't bundle, hypervisor at deploy time](adr/0009-v1-scope-integrate-dont-bundle.md)
 - [ ] Remaining ADRs: why GNOME + Sway, why Guacamole, Terraform vs OpenTofu
 
 Done when: repo exists, lints run on commit, ADRs written.
@@ -122,12 +124,7 @@ Done when: you can RDP into a headless session, and the notes log fully describe
 
 ### Minimum shippable version (version one)
 
-Version one is interview-ready when all are true:
-
-- One RHEL 10 desktop provisioned by Terraform and configured by Ansible, rebuildable from a clean clone.
-- Reached through Guacamole in a browser, Keycloak MFA in front, no exposed RDP.
-- STIG-hardened with a committed OpenSCAP report.
-- README with architecture diagram, working quick start, and HIPAA mapping.
+Superseded by [ADR 0009](adr/0009-v1-scope-integrate-dont-bundle.md) (2026-10-03), which locks version one to five items, tracked in [ROADMAP.md](../ROADMAP.md): a desktop built as a bootc image from code and provisioned on libvirt with zero manual steps (ADR 0007); browser access through Guacamole with Keycloak SSO and enforced MFA, no exposed RDP (done); STIG applied with a committed OpenSCAP report; encryption in transit everywhere; README with diagram, quick start, HIPAA mapping and honest status. Phase 3 below is read in that light: the desktop artifact is a bootc image, with provisioning per hypervisor target.
 
 Everything below is optional until version one ships.
 

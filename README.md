@@ -1,18 +1,63 @@
 # LocumView
 
-Secure, reproducible Linux desktops for regulated environments, delivered anywhere through the browser, built to run agentic AI and research tooling without regulated data ever leaving the compliance boundary.
+An open-source virtual desktop platform for regulated environments, built in the open on Red Hat Enterprise Linux 10. Desktops are delivered through the browser behind single sign-on and MFA, and no desktop is ever exposed directly to the internet.
 
-Status: Phase 1 in progress (hand-built reference desktop). No quick start or architecture diagram yet; those land at the end of Phase 3. See [docs/PLAN.md](docs/PLAN.md) for the full plan and [notes/phase1-changelog.md](notes/phase1-changelog.md) for the build log.
+Website: [locumview.com](https://locumview.com) · Sign in: [login.locumview.com](https://login.locumview.com)
 
-## About
+## Status
 
-LocumView is an open-source virtual desktop platform built on Red Hat Enterprise Linux 10. It provisions hardened GNOME and Sway desktops with Terraform and Ansible, then delivers them through a browser via Apache Guacamole, protected by Keycloak single sign-on and multi-factor authentication. No desktop is ever exposed directly to the internet, and every environment can be torn down and rebuilt identically from this repository. Desktops are hardened against DISA STIG profiles, scanned with OpenSCAP, and mapped to HIPAA technical safeguards, with the compliance evidence committed alongside the code.
+**Version one is not complete.** Its scope is locked by [ADR 0009](docs/adr/0009-v1-scope-integrate-dont-bundle.md); see [ROADMAP.md](ROADMAP.md) for what is in it and what is planned after it.
 
-Beyond the base desktop, LocumView is a platform for research and local LLM usage inside regulated environments. Desktops can be built out with agentic tooling and generative and agentic applications, for example clinical and research assistants, with local models so nothing regulated leaves the endpoint. The same base image, hardening, and delivery path stay constant; only the application layer changes. Initial user targets are clinical and life sciences, chosen for personal domain expertise; later phases apply the same pattern to other regulated domains (finance, legal, defense, and similar), since the tooling is customizable for any regulated workflow, not specific to healthcare.
+**Live today**
+- A RHEL 10 GNOME desktop reached at login.locumview.com: Keycloak SSO with TOTP enforced, then straight onto the desktop (no second login screen).
+- Access layer on k3s: Apache Guacamole, guacd, Keycloak and their databases, with Pod Security `restricted` and default-deny network policies.
+- Public access through an outbound-only Cloudflare Tunnel; RDP is reachable only from the cluster, never from the internet.
+- Secrets in the repo only as SOPS + age ciphertext, enforced by pre-commit checks.
+- An isolated guest demo account, LocumView branding, and a first-run tour.
+
+**Not done yet (version one)**
+- The desktop is still built by documented scripts, not yet as a bootc image from code ([ADR 0007](docs/adr/0007-desktop-containerization-bootc.md)).
+- DISA STIG hardening and the OpenSCAP report are not applied yet.
+- Pod-to-pod traffic between cluster nodes is not yet encrypted.
+- No quick start or final architecture diagram yet.
+
+The full build history, with every command and its evidence, is in [notes/phase1-changelog.md](notes/phase1-changelog.md) and [docs/evidence/](docs/evidence/).
+
+## How it fits together (today)
+
+```
+Browser ─HTTPS─▶ Cloudflare edge ─tunnel─▶ cloudflared (k3s)
+   ├─ /realms/locumview, /resources ─▶ Keycloak (SSO, MFA, audit)
+   └─ everything else ─▶ Guacamole ─▶ guacd ─RDP over TLS─▶ RHEL 10 desktop VM (libvirt)
+```
+
+The access layer runs as containers on k3s. The desktop runs as a VM: a GNOME session with audio and remote display behaves like a machine, not a process. From version one the desktop OS itself is built and shipped as a container image (RHEL image mode / bootc), and the hypervisor becomes a deploy-time choice ([ADR 0007](docs/adr/0007-desktop-containerization-bootc.md), [ADR 0009](docs/adr/0009-v1-scope-integrate-dont-bundle.md)).
+
+## Architecture decisions
+
+| ADR | Decision |
+|---|---|
+| [0001](docs/adr/0001-rhel10.md) | RHEL 10 as the base distribution |
+| [0002](docs/adr/0002-access-layer-on-k3s.md) | Access layer on k3s |
+| [0003](docs/adr/0003-secrets-sops-age.md) | Secrets with SOPS and age |
+| [0004](docs/adr/0004-public-access-cloudflare-tunnel.md) | Public access through a Cloudflare Tunnel |
+| [0005](docs/adr/0005-keycloak-identity-provider.md) | Keycloak as the single identity provider |
+| [0006](docs/adr/0006-red-hat-idm-directory.md) | Red Hat IdM as the directory (planned) |
+| [0007](docs/adr/0007-desktop-containerization-bootc.md) | Desktop OS as a bootc image; the session is a VM workload |
+| [0008](docs/adr/0008-eu-regulatory-posture.md) | EU regulatory posture; clinical AI as a detachable module |
+| [0009](docs/adr/0009-v1-scope-integrate-dont-bundle.md) | Version-one scope, integrate don't bundle, hypervisor at deploy time |
+
+## Where it is going
+
+Beyond the base desktop, LocumView is meant to host research tooling and local LLM applications inside regulated environments, so regulated data never leaves the boundary. The desktop, hardening and delivery path stay the same; only the application layer changes. Clinical and life sciences come first because of the author's domain expertise; the same pattern applies to other regulated domains.
+
+LocumView **integrates rather than bundles**: it works with the identity provider, directory, file storage and clinical systems an organization already runs, through open standards. The homelab instances (Keycloak, IdM, Nextcloud, a synthetic FHIR server) demonstrate those integrations; they are not product components. Clinical decision support is a detachable module: outside version one, and outside the initial EU product, which needs medical-device certification for it ([ADR 0008](docs/adr/0008-eu-regulatory-posture.md)).
+
+These are plans, listed with their status in [ROADMAP.md](ROADMAP.md).
 
 ## Vision
 
-In healthcare, a locum clinician steps in wherever care is needed, ready to work on day one. LocumView applies that idea to infrastructure: a trusted, compliant workspace that appears wherever an authorized user signs in, and disappears cleanly when the work is done. The goal is to show that the capabilities of commercial VDI suites like VMware Horizon (originally VMware View) can be delivered with open, auditable, reproducible tooling, from a homelab on libvirt, to Kubernetes with KubeVirt, to AWS, and that the same hardened endpoint can safely host the agentic AI tooling regulated work increasingly needs.
+In healthcare, a locum clinician steps in wherever care is needed, ready to work on day one. LocumView applies that idea to infrastructure: a trusted, compliant workspace that appears wherever an authorized user signs in, and disappears cleanly when the work is done. The aim is to show that the capabilities of commercial VDI suites like VMware Horizon (originally VMware View) can be delivered with open, auditable, reproducible tooling.
 
 ## Why I built it
 
@@ -20,12 +65,20 @@ After two decades as a critical care and infectious disease pharmacist, I've wor
 
 ## How LocumView maps to VMware Horizon
 
-| VMware Horizon | LocumView |
-|---|---|
-| Unified Access Gateway | Traefik + Tailscale / Cloudflare Tunnel |
-| Connection Server | Apache Guacamole |
-| Blast / HTML Access | RDP via guacd, delivered in the browser |
-| Identity / MFA | Keycloak with MFA (WebAuthn) |
-| Instant-clone pools | Terraform + Ansible desktop profiles |
+| VMware Horizon | LocumView | Status |
+|---|---|---|
+| Unified Access Gateway | Cloudflare Tunnel (Tailscale for administration) | Live |
+| Connection Server | Apache Guacamole | Live |
+| Blast / HTML Access | RDP via guacd, in the browser | Live |
+| Identity / MFA | Keycloak with TOTP; WebAuthn next | Live (TOTP) |
+| Instant-clone pools | bootc desktop images, provisioned per hypervisor | Planned (version one: one desktop) |
 
 Horizon is now owned by Omnissa after Broadcom divested VMware's end-user computing business. Horizon was originally named VMware View, which the LocumView name nods to.
+
+## Repository layout
+
+- `k8s/locumview/`: access layer manifests (kustomize), encrypted secrets, Keycloak realm and Guacamole scripts.
+- `packaging/`: desktop setup, branding, remote access, the LocumView Tour and GNOME extensions.
+- `hypervisor/`: host preparation and VM move scripts.
+- `docs/adr/`: architecture decisions. `docs/evidence/`: compliance evidence and worklogs. `docs/user-guide/`: end-user help.
+- `terraform/`, `ansible/`: provisioning (version one work, not populated yet).
