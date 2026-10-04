@@ -409,3 +409,11 @@ Owner decision: the layout is an organization setting, not a user preference.
 - User guide and ROADMAP updated. The website's "Familiar from day one" section (review branch) says the organization sets the layout; status "built, being validated".
 - Cleanup: Python `__pycache__` for the tour had been committed in #23; removed and gitignored.
 - Verification on the VM pending (Mike to run the installer and check each style).
+
+## 26. Clipboard controls for PHI (2026-10-03)
+
+Owner concern: copied content may be PHI and must not persist. Findings: no clipboard manager exists on the VDI (no extension, package, Flatpak or process; GNOME keeps only the current item), and with the extension list locked (#25) users can't add one. The real exposures were: (1) always-on headless sessions keep the last copied item indefinitely; (2) Guacamole syncs the clipboard to the user's own device; (3) the owner's laptop clipboard history (clipboard-indicator) persists to disk. Owner decisions (2026-10-03): 5-minute clear, block copy-out and allow paste-in, laptop history in memory only.
+
+- **Copy-out blocked:** Guacamole `disable-copy=true` on all three connections (set in the DB; `upsert-desktop-connection.sh` now always sets it). Paste into the desktop stays allowed. Takes effect at each connection's next start.
+- **LocumView Clipboard Guard** (`packaging/extensions/locumview-clipboard-guard@locumview.org`): clears CLIPBOARD and PRIMARY a fixed time after the last change, and immediately when the screen locks. TTL from `/etc/locumview/clipboard.conf` (`CLIPBOARD_TTL_SECONDS=300`, created by `install-desktop.sh`, organization policy). Keeps no history and never reads contents. Always in the locked extension list (`set-desktop-layout.sh` BASE), so users can't disable it. Syntax-checked; live verification pending.
+- **Owner's laptop** (dotfiles `gnome-desktop-user.sh`): clipboard-indicator caches only pinned favorites, no images, 10 items, cleared every 30 min and at boot; its existing on-disk history (3 files, likely including secrets that passed through the clipboard during setup) shredded.

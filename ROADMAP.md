@@ -28,6 +28,7 @@ Version one is complete when all five items are Done. Nothing else is required f
 | Identity | Red Hat IdM directory (`corp.locumview.com`, VM on debianbox), Keycloak federation, desktop enrollment | Planned | ADR 0006 |
 | Identity | WebAuthn / passkeys; MFA for the demo login | Planned | ADR 0005 |
 | Access | Guacamole session recording; edge rate limiting | Planned | |
+| Access | Clipboard DLP: copy-out blocked, 5-minute clipboard clear in sessions | Built (copy-out live; clipboard guard validation pending) | changelog #26 |
 | Desktop | Image signing (cosign), SBOMs (syft), registry and build pipeline | Planned (part of version-one item 1 where needed) | ADR 0007 |
 | Desktop | Organization-set desktop layout (Mac, Windows or GNOME style), locked centrally | Built, validation pending | changelog #25 |
 | Desktop | Sway kiosk profile | Planned | |

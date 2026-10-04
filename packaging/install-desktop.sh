@@ -59,6 +59,10 @@ unzip -q "$BZIP" -d "$EXT_DIR/blur-my-shell@aunetx"; rm -f "$BZIP"
 glib-compile-schemas "$EXT_DIR/blur-my-shell@aunetx/schemas"
 rm -rf "$EXT_DIR/locumview-activities@locumview.org"
 cp -r "$SRC/../extensions/locumview-activities@locumview.org" "$EXT_DIR/"
+rm -rf "$EXT_DIR/locumview-clipboard-guard@locumview.org"
+cp -r "$SRC/../extensions/locumview-clipboard-guard@locumview.org" "$EXT_DIR/"   # clears the clipboard after a timeout (PHI)
+install -d -m 755 /etc/locumview
+[ -f /etc/locumview/clipboard.conf ] || printf '# Seconds before copied content is cleared from the clipboard (organization policy; PHI).\nCLIPBOARD_TTL_SECONDS=300\n' > /etc/locumview/clipboard.conf
 rm -rf "$EXT_DIR/locumview-layout@locumview.org"
 cp -r "$SRC/../extensions/locumview-layout@locumview.org" "$EXT_DIR/"   # Mac/Windows layout switch (Quick Settings)
 chmod -R u=rwX,go=rX "$EXT_DIR"

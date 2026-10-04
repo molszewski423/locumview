@@ -21,7 +21,8 @@ INSERT INTO guacamole_connection_parameter (connection_id, parameter_name, param
 SELECT c.connection_id, p.n, p.v FROM guacamole_connection c,
   (VALUES ('hostname', :'host'), ('port', :'port'), ('username', :'rdpuser'), ('password', :'rdppass'),
           ('security', 'nla'), ('ignore-cert', 'true'), ('resize-method', 'display-update'),
-          ('enable-font-smoothing', 'true'), ('enable-wallpaper', 'true'), ('enable-theming', 'true')) p(n, v)
+          ('enable-font-smoothing', 'true'), ('enable-wallpaper', 'true'), ('enable-theming', 'true'),
+          ('disable-copy', 'true')) p(n, v)   -- DLP: nothing copied inside the desktop reaches the user's device (#26)
 WHERE c.connection_name = :'name' AND c.parent_id IS NULL;
 DELETE FROM guacamole_connection_permission cp USING guacamole_connection c, guacamole_entity e
 WHERE cp.connection_id = c.connection_id AND cp.entity_id = e.entity_id AND c.connection_name = :'name'

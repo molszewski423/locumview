@@ -18,7 +18,8 @@ DB=/etc/dconf/db/local.d/20-locumview-layout
 LOCKS=/etc/dconf/db/local.d/locks/20-locumview-layout
 DOCK=dash-to-dock@micxgx.gmail.com
 PANEL=dash-to-panel@jderose9.github.com
-BASE="'tiling-assistant@leleat-on-github', 'locumview-activities@locumview.org', 'blur-my-shell@aunetx', 'locumview-layout@locumview.org'"
+# Always on in every style; the clipboard guard is a PHI control and stays enabled (the list is locked).
+BASE="'tiling-assistant@leleat-on-github', 'locumview-activities@locumview.org', 'blur-my-shell@aunetx', 'locumview-layout@locumview.org', 'locumview-clipboard-guard@locumview.org'"
 [ "$(id -u)" = 0 ] || { echo "run as root"; exit 1; }
 
 style=${1:-}
