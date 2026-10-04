@@ -82,3 +82,7 @@ Horizon is now owned by Omnissa after Broadcom divested VMware's end-user comput
 - `hypervisor/`: host preparation and VM move scripts.
 - `docs/adr/`: architecture decisions. `docs/evidence/`: compliance evidence and worklogs. `docs/user-guide/`: end-user help.
 - `terraform/`, `ansible/`: provisioning (version one work, not populated yet).
+
+## License
+
+Copyright 2026 Michael Olszewski. Licensed under the [Apache License, Version 2.0](LICENSE); see [NOTICE](NOTICE). Every file in this repository is original to the project, including the generated wallpapers, logos and login background. The project website's text is not part of this repository and is not covered by this license.
