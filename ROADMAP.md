@@ -29,7 +29,8 @@ Version one is complete when all five items are Done. Nothing else is required f
 | Identity | WebAuthn / passkeys; MFA for the demo login | Planned | ADR 0005 |
 | Access | Guacamole session recording; edge rate limiting | Planned | |
 | Desktop | Image signing (cosign), SBOMs (syft), registry and build pipeline | Planned (part of version-one item 1 where needed) | ADR 0007 |
-| Desktop | Windows-familiar layout profile and Sway kiosk profile | Planned | Layout switch (Mac/Windows) already Done, changelog #23 |
+| Desktop | Organization-set desktop layout (Mac, Windows or GNOME style), locked centrally | Built, validation pending | changelog #25 |
+| Desktop | Sway kiosk profile | Planned | |
 | Desktop | Separate, resettable demo desktop | Planned | First KubeVirt workload |
 | Hypervisors | Proxmox VE (practical production target) | Planned | ADR 0007, 0009 |
 | Hypervisors | KubeVirt / OpenShift Virtualization (scoped learning piece) | Planned | ADR 0007, 0009 |

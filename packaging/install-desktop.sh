@@ -155,9 +155,8 @@ chmod 644 "$BG"/*.png "$PROPS"
 # 6. System-wide defaults via the "local" dconf db (already in /etc/dconf/profile/user).
 #    picture-uri / picture-uri-dark switch automatically with the light/dark color-scheme.
 #    Icon theme: Papirus (works in light and dark; symbolic icons are recoloured by GTK).
-#    enabled-extensions is a default only: a user who has toggled extensions has their own value,
-#    which hides this list (reset with: dconf reset /org/gnome/shell/enabled-extensions).
-#    Extensions: Dash to Dock on, Dash to Panel installed but off (switch in the Extensions app).
+#    Extensions and window buttons are NOT set here: the organization's desktop layout (mac, windows or
+#    gnome) owns them, locked, via desktop-layout/set-desktop-layout.sh (step 7, changelog #25).
 #    login-screen logo is read by GDM (gdm profile includes system-db:local) and the lock screen.
 #    The background-logo extension (Red Hat mark on the wallpaper) is disabled.
 cat > /etc/dconf/db/local.d/10-locumview-branding <<CONF
@@ -174,9 +173,6 @@ logo='/usr/local/share/pixmaps/locumview-gdm-logo.png'
 icon-theme='Papirus'
 color-scheme='prefer-dark'
 accent-color='teal'
-
-[org/gnome/desktop/wm/preferences]
-button-layout='appmenu:minimize,maximize,close'
 
 [org/gnome/desktop/screensaver]
 picture-uri='file://$BG/$DEFAULT_WALLPAPER-dark.png'
@@ -246,12 +242,14 @@ command='ptyxis --new-window'
 binding='<Alt>Return'
 
 [org/gnome/shell]
-enabled-extensions=['$DOCK', 'tiling-assistant@leleat-on-github', 'locumview-activities@locumview.org', 'blur-my-shell@aunetx', 'locumview-layout@locumview.org']
 welcome-dialog-last-shown-version='999'
 favorite-apps=['org.gnome.Nautilus.desktop', 'org.gnome.Calculator.desktop', 'org.onlyoffice.desktopeditors.desktop', 'org.mozilla.firefox.desktop']
-disabled-extensions=['background-logo@fedorahosted.org', '$PANEL']
 CONF
 dconf update
+
+# 7. Organization desktop layout: re-applies the recorded choice (first install: mac, locked).
+#    To change it for everyone: sudo packaging/desktop-layout/set-desktop-layout.sh mac|windows|gnome
+bash "$SRC/../desktop-layout/set-desktop-layout.sh"
 restorecon -R /usr/local/share/pixmaps /usr/local/share/icons /usr/local/share/backgrounds /usr/local/share/gnome-background-properties /etc/dconf/db
 ls "$BG"
 flatpak list --system --app --columns=application,origin

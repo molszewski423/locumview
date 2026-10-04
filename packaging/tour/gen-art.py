@@ -103,25 +103,29 @@ def menu():
 
 
 def layout():
-    def screen(x, label, win_style):
-        b = f'<rect x="{x}" y="34" width="190" height="118" rx="10" fill="{NAVY}" stroke="{LINE}"/>'
-        b += f'<rect x="{x+38}" y="54" width="114" height="62" rx="6" fill="#1E2A38" stroke="{LINE}"/>'
-        if win_style:   # buttons right, full-width taskbar
+    def screen(x, label, style):
+        w = 132
+        b = f'<rect x="{x}" y="40" width="{w}" height="104" rx="10" fill="{NAVY}" stroke="{LINE}"/>'
+        b += f'<rect x="{x+4}" y="44" width="{w-8}" height="9" rx="3" fill="#1E2A38"/>'
+        b += f'<rect x="{x+24}" y="62" width="{w-48}" height="48" rx="5" fill="#1E2A38" stroke="{LINE}"/>'
+        if style == "mac":       # buttons left, centred dock
             for i in range(3):
-                b += f'<circle cx="{x+122+i*10}" cy="62" r="3" fill="{MUTED}"/>'
-            b += f'<rect x="{x+4}" y="134" width="182" height="14" rx="4" fill="#1E2A38" stroke="{TEAL}" stroke-width="1.2"/>'
-            for i in range(5):
-                b += f'<rect x="{x+12+i*16}" y="137" width="10" height="8" rx="2" fill="{TEAL if i == 0 else MUTED}"/>'
-        else:           # buttons left, centred dock
-            for i in range(3):
-                b += f'<circle cx="{x+48+i*10}" cy="62" r="3" fill="{MUTED}"/>'
-            b += f'<rect x="{x+58}" y="128" width="74" height="18" rx="7" fill="#1E2A38" stroke="{TEAL}" stroke-width="1.2"/>'
+                b += f'<circle cx="{x+31+i*7}" cy="68" r="2.4" fill="{MUTED}"/>'
+            b += f'<rect x="{x+38}" y="122" width="56" height="15" rx="6" fill="#1E2A38" stroke="{TEAL}" stroke-width="1.2"/>'
             for i in range(4):
-                b += f'<rect x="{x+64+i*17}" y="132" width="11" height="10" rx="3" fill="{TEAL if i == 0 else MUTED}"/>'
-        return b + text(x + 95, 174, label, 15, TEAL if win_style else TEXT)
-    b = screen(36, "Mac style", False) + screen(254, "Windows style", True)
-    b += f'<rect x="196" y="190" width="88" height="22" rx="11" fill="#1E2A38" stroke="{TEAL}" stroke-width="1.2"/>'
-    b += text(240, 205, "Layout", 12, TEAL)
+                b += f'<rect x="{x+43+i*12}" y="125" width="8" height="9" rx="2" fill="{TEAL if i == 0 else MUTED}"/>'
+        elif style == "windows": # buttons right, full-width taskbar
+            for i in range(3):
+                b += f'<circle cx="{x+w-45+i*7}" cy="68" r="2.4" fill="{MUTED}"/>'
+            b += f'<rect x="{x+4}" y="126" width="{w-8}" height="13" rx="3" fill="#1E2A38" stroke="{TEAL}" stroke-width="1.2"/>'
+            for i in range(5):
+                b += f'<rect x="{x+9+i*12}" y="129" width="8" height="7" rx="2" fill="{TEAL if i == 0 else MUTED}"/>'
+        else:                    # GNOME: overview, close button only, no dock
+            b += f'<circle cx="{x+w-31}" cy="68" r="2.4" fill="{MUTED}"/>'
+            b += f'<rect x="{x+8}" y="45.5" width="16" height="6" rx="3" fill="{TEAL}"/>'
+        return b + text(x + w / 2, 168, label, 14, TEXT)
+    b = screen(24, "Mac style", "mac") + screen(174, "Windows style", "windows") + screen(324, "GNOME style", "gnome")
+    b += text(240, 202, "Set by your organization", 12, MUTED, weight="500")
     return svg(b)
 
 

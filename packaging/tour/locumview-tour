@@ -15,7 +15,7 @@ import gi
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
-from gi.repository import Adw, Gdk, Gtk  # noqa: E402
+from gi.repository import Adw, Gdk, Gio, Gtk  # noqa: E402
 
 ART = pathlib.Path(os.environ.get("LOCUMVIEW_TOUR_ART", "/usr/local/share/locumview-tour"))
 STATE = pathlib.Path(os.environ.get("XDG_STATE_HOME", pathlib.Path.home() / ".local/state")) / "locumview/tour-shown"
@@ -32,7 +32,7 @@ button.suggested-action:hover { background-color: #2DD4BF; }
 carouselindicatordots { color: #5EEAD4; }
 """
 
-PAGES = [
+STATIC_PAGES = [
     ("welcome", "Welcome to LocumView",
      "Your secure virtual desktop. You signed in once with LocumView SSO, and everything here runs on "
      "LocumView's servers, not on the device in front of you.", []),
@@ -47,14 +47,7 @@ PAGES = [
     ("tiling", "Arrange windows",
      "Snap the active window into a quarter of the screen, or drag a window to an edge or corner.",
      [("<Alt>i", "Top left"), ("<Alt>o", "Top right"), ("<Alt>k", "Bottom left"), ("<Alt>l", "Bottom right")]),
-    ("dock", "The dock",
-     "Files, Calculator, ONLYOFFICE and Firefox are pinned at the bottom; the last button shows every app. "
-     "The dock steps aside when a window needs the room: move the pointer to the bottom edge to bring it back. "
-     "Prefer a taskbar? See the next page.", []),
-    ("layout", "Make it feel familiar",
-     "Open the menu at the top right and choose Layout. Mac style keeps the dock at the bottom with window buttons "
-     "on the left; Windows style gives you a taskbar with window buttons on the right. Click the tile to switch "
-     "instantly; your choice is saved for next time.", []),
+    "LAYOUT",
     ("keys", "Why Alt?",
      "Your own computer keeps the Windows key for itself, so LocumView shortcuts use Alt.",
      [("<Alt>Return", "Open a terminal"), ("<Control><Alt>q", "Lock the screen when you step away")]),
@@ -65,6 +58,56 @@ PAGES = [
     ("done", "You're all set",
      "Reopen this tour any time from the app grid: LocumView Tour.", []),
 ]
+
+
+STYLE_NAMES = {"mac": "Mac style", "windows": "Windows style", "gnome": "GNOME style"}
+DOCK_TEXT = {
+    "mac": ("The dock", "Files, Calculator, ONLYOFFICE and Firefox are pinned in the dock at the bottom; the last button "
+            "shows every app. The dock steps aside when a window needs the room: move the pointer to the bottom "
+            "edge to bring it back."),
+    "windows": ("The taskbar", "Files, Calculator, ONLYOFFICE and Firefox are pinned in the taskbar along the bottom, "
+                "next to your open windows; the apps button shows everything else."),
+    "gnome": ("The overview", "Click the LocumView logo at the top left to open the overview: your pinned apps "
+              "(Files, Calculator, ONLYOFFICE and Firefox) are in the dash, and the grid button shows every app."),
+}
+LAYOUT_TEXT = {
+    "mac": "the dock at the bottom and window buttons on the left",
+    "windows": "a taskbar along the bottom and window buttons on the right",
+    "gnome": "the GNOME overview, with no dock or taskbar, and a close button on each window",
+}
+
+
+def current_layout():
+    """The layout the organization set (set-desktop-layout.sh), and whether users may change it."""
+    try:
+        shell = Gio.Settings.new("org.gnome.shell")
+        enabled = shell.get_strv("enabled-extensions")
+        locked = not shell.is_writable("enabled-extensions")
+    except Exception:
+        return "mac", False
+    if "dash-to-panel@jderose9.github.com" in enabled:
+        return "windows", locked
+    return ("mac" if "dash-to-dock@micxgx.gmail.com" in enabled else "gnome"), locked
+
+
+def layout_pages():
+    style, locked = current_layout()
+    title, dock_body = DOCK_TEXT[style]
+    if locked:
+        body = (f"Your organization has set this desktop to {STYLE_NAMES[style]}: {LAYOUT_TEXT[style]}. "
+                "It's the same for everyone, and your IT team manages it.")
+    else:
+        body = ("Open the menu at the top right and choose Layout. Mac style keeps the dock at the bottom with window "
+                "buttons on the left; Windows style gives you a taskbar with window buttons on the right; GNOME style "
+                "uses the overview. Click the tile to switch; your choice is saved for next time.")
+    return [("dock", title, dock_body, []), ("layout", "Familiar from day one", body, [])]
+
+
+def build_pages():
+    out = []
+    for p in STATIC_PAGES:
+        out.extend(layout_pages() if p == "LAYOUT" else [p])
+    return out
 
 
 def page(art, title, body, shortcuts):
@@ -118,7 +161,8 @@ class Tour(Adw.Application):
         win = Adw.ApplicationWindow(application=self, title="LocumView Tour", default_width=760, default_height=640)
         self.carousel = Adw.Carousel(hexpand=True, vexpand=True, allow_scroll_wheel=True)
         # --page N (previews/screenshots) shows that page alone; normal runs show the whole tour.
-        for p in ([PAGES[self.start_page]] if self.start_page is not None else PAGES):
+        pages = build_pages()
+        for p in ([pages[self.start_page]] if self.start_page is not None else pages):
             self.carousel.append(page(*p))
         dots = Adw.CarouselIndicatorDots(carousel=self.carousel)
         self.back = Gtk.Button(label="Back")

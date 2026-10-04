@@ -396,3 +396,16 @@ Full record: [worklog](../docs/evidence/phase2/worklog-20261002.md), "Step 10" o
 - **ADR 0008, EU regulatory posture** (owner's text): clinical AI as a detachable module; no clinical decision support in the initial EU product (MDR Rule 11, AI Act high-risk); productivity verbs only in EU healthcare. Note added: the US position must also be checked against FDA's 2022 final CDS guidance (patient-specific flags, time-critical or directive outputs may be device functions).
 - **ADR 0009, version-one scope lock:** five requirements (desktop as a bootc image from code, provisioned with zero manual steps; browser access with SSO and MFA, done; STIG + OpenSCAP; encryption in transit everywhere; documentation with honest status). Integrate, don't bundle (homelab Keycloak/IdM/Nextcloud/FHIR/Matrix are reference integrations). Hypervisor as a deploy-time parameter.
 - `README.md` rewritten: live / not-done status, current architecture, ADR index, Horizon mapping with status; it no longer states STIG hardening or Terraform as done. New `ROADMAP.md`: version one (Done / Open), planned, parked. `docs/PLAN.md`: ADR list and the version-one section point to ADR 0009.
+
+## 25. The organization sets the desktop layout (Mac, Windows or GNOME), locked (2026-10-03)
+
+Owner decision: the layout is an organization setting, not a user preference.
+
+- `packaging/desktop-layout/set-desktop-layout.sh mac|windows|gnome [--allow-user-choice]` (root; target: an Ansible desktop-role variable). Writes the extensions list and window-button layout to `/etc/dconf/db/local.d/20-locumview-layout` and, unless user choice is allowed, **locks** them (`locks/20-locumview-layout`: `enabled-extensions`, `disabled-extensions`, `button-layout`). A locked system value applies even where a user has their own setting, which also closes the "user-level `enabled-extensions` hides the system list" problem (#13). The choice is recorded in `/etc/locumview/desktop-layout.conf`; run without arguments it re-applies that choice (default `mac`).
+- Styles: **mac** (Dash to Dock, buttons `close,minimize,maximize:appmenu`), **windows** (Dash to Panel, `appmenu:minimize,maximize,close`), **gnome** (neither extension, `appmenu:close`).
+- `install-desktop.sh` no longer sets those keys in the branding file; step 7 calls the layout command (re-applies the recorded choice, so re-running the installer never resets it).
+- LocumView Layout tile: adds GNOME style; **shown only when the keys are writable** (the organization allowed user choice); hidden otherwise.
+- LocumView Tour: the dock page becomes "The dock", "The taskbar" or "The overview", and the layout page says "Your organization has set this desktop to … style", or describes the tile when choice is allowed (all six combinations checked). The illustration now shows the three styles, "Set by your organization".
+- User guide and ROADMAP updated. The website's "Familiar from day one" section (review branch) says the organization sets the layout; status "built, being validated".
+- Cleanup: Python `__pycache__` for the tour had been committed in #23; removed and gitignored.
+- Verification on the VM pending (Mike to run the installer and check each style).

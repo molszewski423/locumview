@@ -34,14 +34,15 @@ Workspaces are separate desktops. You might keep the EHR on one, email on anothe
 
 You can also drag a window to a screen edge or corner to snap it there.
 
-## Desktop layout: Mac style or Windows style
+## Desktop layout: Mac, Windows or GNOME style
 
-Open the menu at the top right (network, sound, power) and find the **Layout** tile.
+Your organization chooses one layout for everyone:
 
 - **Mac style:** the dock at the bottom of the screen, window buttons on the left.
 - **Windows style:** a taskbar along the bottom, window buttons on the right.
+- **GNOME style:** no dock or taskbar; open the overview from the top-left corner to find apps and windows.
 
-Click the tile to switch instantly, or click the arrow beside it to choose. Your choice is saved and comes back the next time you sign in.
+The layout is managed by your IT team, so it's the same on every LocumView desktop in your organization. If your organization lets people choose, a **Layout** tile appears in the menu at the top right: click it to switch, and your choice is saved.
 
 ## Other shortcuts
 

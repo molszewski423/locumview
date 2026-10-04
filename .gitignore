@@ -30,3 +30,7 @@ CLAUDE.md
 
 # Generated brand kit (packaging/branding/build-web-assets.sh)
 build/
+
+# Python bytecode
+__pycache__/
+*.pyc

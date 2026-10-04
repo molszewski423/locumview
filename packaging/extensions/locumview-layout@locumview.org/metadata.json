@@ -1,7 +1,9 @@
 {
   "uuid": "locumview-layout@locumview.org",
   "name": "LocumView Layout",
-  "description": "Quick Settings switch between a Mac-style desktop (Dash to Dock, window buttons on the left) and a Windows-style desktop (Dash to Panel taskbar, window buttons on the right). The choice is saved per user.",
-  "shell-version": ["49"],
+  "description": "Quick Settings switch between Mac, Windows and GNOME style desktops, shown only when the organization allows users to choose. By default the organization sets and locks the layout (set-desktop-layout.sh).",
+  "shell-version": [
+    "49"
+  ],
   "url": "http://git.lan/mike/locumview"
 }

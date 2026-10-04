@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-// LocumView Layout: switch between Mac-style and Windows-style desktops from Quick Settings (changelog #23).
-// Uses GNOME Shell's own extension manager (as the Extensions app does), so the switch is instant and saved
-// per user. Dash to Dock and Dash to Panel conflict, so exactly one of them is enabled at a time.
+// LocumView Layout: Quick Settings switch between Mac, Windows and GNOME style desktops (changelogs #23, #25).
+// The ORGANIZATION owns the layout: set-desktop-layout.sh writes it to the system dconf db and locks it, and
+// then this tile doesn't appear at all. Only when the organization allows user choice (keys not locked) does
+// the tile show, switching through GNOME Shell's own extension manager (as the Extensions app does).
+// Dash to Dock and Dash to Panel conflict, so at most one of them is enabled at a time.
 import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 
@@ -28,6 +30,13 @@ const MODES = {
         disable: DOCK,
         buttons: 'appmenu:minimize,maximize,close',
     },
+    gnome: {
+        label: 'GNOME style',
+        detail: 'Activities overview, no dock or taskbar',
+        enable: null,
+        disable: [DOCK, PANEL],
+        buttons: 'appmenu:close',
+    },
 };
 
 const ICON = 'view-paged-symbolic';
@@ -49,22 +58,28 @@ class LayoutToggle extends QuickMenuToggle {
             this._items[id] = item;
         }
 
-        // Clicking the tile itself flips to the other layout.
-        this.connect('clicked', () => this._apply(this._current() === 'windows' ? 'mac' : 'windows'));
+        // Clicking the tile itself steps to the next layout: Mac, Windows, GNOME.
+        const order = Object.keys(MODES);
+        this.connect('clicked', () => this._apply(order[(order.indexOf(this._current()) + 1) % order.length]));
 
         this._shellChangedId = this._shell.connect('changed::enabled-extensions', () => this._sync());
         this._sync();
     }
 
     _current() {
-        return this._shell.get_strv('enabled-extensions').includes(PANEL) ? 'windows' : 'mac';
+        const enabled = this._shell.get_strv('enabled-extensions');
+        if (enabled.includes(PANEL))
+            return 'windows';
+        return enabled.includes(DOCK) ? 'mac' : 'gnome';
     }
 
     _apply(id) {
         const mode = MODES[id];
         const manager = Main.extensionManager;
-        manager.disableExtension(mode.disable);
-        manager.enableExtension(mode.enable);
+        for (const uuid of [].concat(mode.disable))
+            manager.disableExtension(uuid);
+        if (mode.enable)
+            manager.enableExtension(mode.enable);
         this._wm.set_string('button-layout', mode.buttons);
         this._sync();
     }
@@ -90,7 +105,11 @@ const LayoutIndicator = GObject.registerClass(
 class LayoutIndicator extends SystemIndicator {
     constructor() {
         super();
-        this.quickSettingsItems.push(new LayoutToggle());
+        // The organization locks the layout by default (set-desktop-layout.sh): no tile then.
+        const shell = new Gio.Settings({schema_id: 'org.gnome.shell'});
+        const wm = new Gio.Settings({schema_id: 'org.gnome.desktop.wm.preferences'});
+        if (shell.is_writable('enabled-extensions') && wm.is_writable('button-layout'))
+            this.quickSettingsItems.push(new LayoutToggle());
     }
 
     destroy() {
