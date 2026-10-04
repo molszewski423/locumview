@@ -4,6 +4,9 @@
 // This clears CLIPBOARD and PRIMARY a fixed time after the last change, and immediately when the screen locks.
 // The organization sets the time in /etc/locumview/clipboard.conf (CLIPBOARD_TTL_SECONDS=300 by default).
 // It holds no clipboard history and never reads the clipboard contents.
+// It stays enabled on the lock screen (session-modes includes unlock-dialog): GNOME disables every other
+// extension while the session is locked, which would cancel the timer and could miss the lock signal.
+// Clearing in disable() is the backstop for any other reason the shell turns it off (logout, reload).
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
@@ -79,6 +82,7 @@ export default class LocumViewClipboardGuard extends Extension {
             Main.screenShield.disconnect(this._lockId);
             this._lockId = 0;
         }
+        this._clear();
         this._selection = null;
     }
 }

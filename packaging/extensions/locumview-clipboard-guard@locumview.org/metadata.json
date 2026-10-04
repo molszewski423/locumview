@@ -2,6 +2,12 @@
   "uuid": "locumview-clipboard-guard@locumview.org",
   "name": "LocumView Clipboard Guard",
   "description": "Clears the clipboard (and the primary selection) a set time after the last copy, and when the screen locks, so copied content such as PHI doesn't linger in always-on desktop sessions. Timeout from /etc/locumview/clipboard.conf (CLIPBOARD_TTL_SECONDS, default 300).",
-  "shell-version": ["49"],
-  "url": "http://git.lan/mike/locumview"
+  "shell-version": [
+    "49"
+  ],
+  "url": "http://git.lan/mike/locumview",
+  "session-modes": [
+    "user",
+    "unlock-dialog"
+  ]
 }
