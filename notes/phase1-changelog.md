@@ -438,7 +438,7 @@ Owner decision: LocumView is licensed under Apache-2.0. Until now the repo had n
 
 ## 29. centosbook leaves the cluster; desktop allowlist down to two nodes (2026-10-04)
 
-- **Cluster change (about 19:00 to 20:43 EDT):** centosbook (192.168.4.33) was reinstalled as `devsuse`, an openSUSE Leap 16.0 dev box for the SUSE variant of LocumView, and deleted from k3s. The cluster is mikepc and debianbox. The `locumview` pods that were on centosbook (guacd, cloudflared, Keycloak) were rescheduled: guacd and Keycloak run on mikepc, cloudflared on mikepc and debianbox. Checked with `kubectl get pods -n locumview -o wide`.
+- **Cluster change (about 18:20 to 20:43 EDT; openSUSE was installed at 18:30):** centosbook (192.168.4.33) was reinstalled as `devsuse`, an openSUSE Leap 16.0 dev box for the SUSE variant of LocumView, and deleted from k3s. The cluster is mikepc and debianbox. The `locumview` pods that were on centosbook (guacd, cloudflared, Keycloak) were rescheduled: guacd and Keycloak run on mikepc, cloudflared on mikepc and debianbox. Checked with `kubectl get pods -n locumview -o wide`.
 - `packaging/remote-access/user-mode-root.sh`: `K3S_NODES` drops 192.168.4.33. That address now belongs to a developer laptop, not a node where guacd can run, so it must not reach RDP (3389, 3390) or SSH on the desktops.
 - ADR 0002: dated update note; the decision is unchanged.
 - **Owner decision:** devsuse gets no direct RDP to the desktops, even though it is the SUSE development machine. Reference desktops are reached through Guacamole (Keycloak password + TOTP), the same path users take; desktops built locally on devsuse are unaffected.
