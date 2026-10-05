@@ -451,3 +451,9 @@ Owner decision: LocumView is licensed under Apache-2.0. Until now the repo had n
 - `packaging/remote-access/user-mode-root.sh`: also removes `ssh` from the public zone, so a rebuilt VM matches. Target: the Ansible `remote_access` role.
 - **Cockpit too (owner decision, applied 2026-10-04 22:0x):** `sudo firewall-cmd --permanent --zone=locumview-gateways --add-service=cockpit && sudo firewall-cmd --permanent --zone=public --remove-service=cockpit && sudo firewall-cmd --reload`. `public` now lists only `dhcpv6-client`; `locumview-gateways` lists `cockpit ssh`. Verified: from devsuse port 9090 times out; from mikepc `https://192.168.4.36:9090/` returns 200. Use it through mikepc: `ssh -L 9090:192.168.4.36:9090 mikepc`, then https://localhost:9090. The script adds the same two rules.
 
+## 31. Commit signing on the owner's laptop (2026-10-04)
+
+- **Why:** commits are SSH-signed since #9, but that key lives in the VM. Work on the repo now also happens in the clone on the owner's laptop (DevThinkPad, Fedora 45), which had no git identity or signing, so #29 to #30 went out unsigned: `be83824`, `ee97a19`, `84eb302`, `8569264`, `62d03ea`, `546aad7`, `c2586be`, `c55fa10`, `161a9b4`, `9cf3138`. Left as they are rather than force-pushing `main`.
+- **Laptop setup:** dedicated key `~/.ssh/id_ed25519_signing` (ED25519, SHA256:yFRTuVFRSIjcIjX5U1KNac7G6zcIlFxkKT2lcTPepAY); global git config `gpg.format=ssh`, `commit.gpgsign=true`, `tag.gpgsign=true`, identity Michael Olszewski <molszewski423@gmail.com>; `~/.config/git/allowed_signers` so `git log --show-signature` verifies locally. This entry's commit is the first signed with it.
+- **Pending, owner:** add the public key as a signing key in Gitea (Settings, SSH / GPG Keys, then Verify) and on GitHub (SSH and GPG keys, key type Signing Key) so both show the commits as verified.
+
