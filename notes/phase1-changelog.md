@@ -443,3 +443,11 @@ Owner decision: LocumView is licensed under Apache-2.0. Until now the repo had n
 - **Applied on the VM (owner, 2026-10-04 21:33):** `sudo firewall-cmd --permanent --zone=locumview-gateways --remove-source=192.168.4.33/32 && sudo firewall-cmd --reload`; `--list-sources` now shows `192.168.4.54/32 192.168.4.45/32`. Verified from devsuse (192.168.4.33): RDP (3390) to 192.168.4.36 times out. **SSH (22) is still reachable from devsuse**, most likely because the `public` zone keeps RHEL's default `ssh` service (the script removes only `rdp` from it), so SSH is open to the whole LAN, not just the k3s nodes. This predates #29. Not changed yet; owner decision.
 - Not changed: `docs/evidence/phase2/worklog-20261002.md` records the three-node cluster as it was on 2026-10-02.
 
+## 30. SSH limited to the k3s nodes, like RDP (2026-10-04)
+
+- **Gap:** #19 added `ssh` to the `locumview-gateways` zone but never removed RHEL's default `ssh` service from the `public` zone, so SSH to the desktop was open to the whole LAN. Found while verifying #29.
+- **Applied on the VM (owner, 2026-10-04 21:57):** `sudo firewall-cmd --permanent --zone=public --remove-service=ssh && sudo firewall-cmd --reload`. `public` now lists `cockpit dhcpv6-client`; `locumview-gateways` has sources `192.168.4.54/32 192.168.4.45/32`, service `ssh`, ports `3389/tcp 3390/tcp 3391/tcp`.
+- **Verified:** from devsuse (192.168.4.33) ports 22 and 3390 time out; from mikepc port 22 connects. Admin SSH from elsewhere goes through mikepc: `ssh -J mikepc molszewski@192.168.4.36` (password; mikepc holds no key for `molszewski`).
+- `packaging/remote-access/user-mode-root.sh`: also removes `ssh` from the public zone, so a rebuilt VM matches. Target: the Ansible `remote_access` role.
+- **Still open:** Cockpit (9090) remains reachable from the whole LAN through the `public` zone. Decide whether to drop it from `public`, move it to `locumview-gateways`, or disable `cockpit.socket`.
+

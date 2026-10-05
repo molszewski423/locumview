@@ -5,7 +5,8 @@
 #  1. The user's GNOME session runs headless from boot (gnome-headless-session@<user>), so GNOME Remote
 #     Desktop in user mode (port 3390) serves it directly: no GDM, no server redirections.
 #  2. firewalld: RDP (3389 system/GDM admin fallback, 3390 user mode) only from the k3s nodes, where guacd
-#     runs (pod traffic leaves the cluster SNATed to the node address). SSH is kept for those nodes too.
+#     runs (pod traffic leaves the cluster SNATed to the node address). SSH is allowed only from those
+#     nodes too: it leaves the public zone (changelog #30); reach the VM with ssh -J mikepc.
 set -euo pipefail
 U=${1:?usage: user-mode-root.sh <desktop-user>}
 K3S_NODES="192.168.4.54/32 192.168.4.45/32"   # mikepc, debianbox (centosbook removed 2026-10-04, changelog #29)
@@ -28,6 +29,7 @@ for src in $K3S_NODES; do firewall-cmd --permanent --zone="$ZONE" --add-source="
 firewall-cmd --permanent --zone="$ZONE" --add-port=3389/tcp --add-port=3390/tcp
 firewall-cmd --permanent --zone="$ZONE" --add-service=ssh
 firewall-cmd --permanent --zone=public --remove-service=rdp || true
+firewall-cmd --permanent --zone=public --remove-service=ssh || true
 firewall-cmd --reload
 firewall-cmd --zone="$ZONE" --list-all
 firewall-cmd --zone=public --list-all
