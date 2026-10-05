@@ -1,0 +1,35 @@
+#cloud-config
+# idm01.corp.locumview.com (ADR 0006). First-boot config; registration values are appended at
+# create time from ~/.config/locumview/rhsm.env and never committed.
+hostname: idm01
+fqdn: idm01.corp.locumview.com
+prefer_fqdn_over_hostname: true
+manage_etc_hosts: false
+timezone: UTC
+ssh_pwauth: false
+disable_root: true
+users:
+  - name: mike
+    gecos: Michael Olszewski
+    groups: [wheel]
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAD84UGttsnVPoYcndD2mcEkivzhpJ2JonwcErDAaQEX mike@devsuse
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBSZ050zIuBS1CXte/SiokwaqVYFqm+MVvFJQumpaI5A mike@MikePC
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINduebEN8BM5kejTdDPiJwHua6zSOvzoSXbMEEQWB1Ft mike@MikeThinkPad
+write_files:
+  # IdM requires the FQDN to resolve to the static address, not to 127.0.0.1.
+  - path: /etc/hosts
+    content: |
+      127.0.0.1   localhost localhost.localdomain
+      ::1         localhost localhost.localdomain
+      192.168.4.47 idm01.corp.locumview.com idm01
+package_update: true
+packages:
+  - qemu-guest-agent
+runcmd:
+  - [systemctl, enable, --now, qemu-guest-agent]
+rh_subscription:
+  org: "${RHSM_ORG}"
+  activation-key: "${RHSM_KEY}"

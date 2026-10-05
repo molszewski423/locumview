@@ -1,0 +1,16 @@
+version: 2
+ethernets:
+  lan0:
+    match:
+      macaddress: "52:54:00:4c:56:47"
+    addresses: [192.168.4.47/22]
+    routes:
+      - to: 0.0.0.0/0
+        via: 192.168.4.1
+    nameservers:
+      addresses: [192.168.4.45]
+      search: [corp.locumview.com]
+    dhcp4: false
+    dhcp6: false
+    # Router advertisements would add the ISP's IPv6 DNS next to AdGuard (lesson from changelog #15).
+    accept-ra: false
