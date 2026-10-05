@@ -3,9 +3,10 @@ repos:
     rev: v26.9.0
     hooks:
       - id: ansible-lint
-        # Upstream's .pre-commit-hooks.yaml hardcodes python3.14, which
-        # this RHEL 10.2 system does not have (ships python3.12).
-        language_version: python3.12
+        # Upstream's .pre-commit-hooks.yaml hardcodes python3.14, which none of the
+        # development machines have. Use the system python3 instead: 3.12 on RHEL 10.2,
+        # 3.13 on openSUSE Leap 16 (devsuse), Fedora's current version on the laptop.
+        language_version: python3
         files: ^ansible/.*\.(yml|yaml)$
 
   - repo: https://github.com/Yelp/detect-secrets
