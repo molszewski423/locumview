@@ -2,6 +2,8 @@
 
 Every manual change made on the `locumview-ref-dev` reference VM, in the shape: what and why, exact commands, files touched, target Ansible module or Terraform setting, supported or not.
 
+Times: from #29 on, entries give clock times in America/New_York (EDT/EST) for when each change was applied and verified. For #1 to #28, the time a change was recorded is its commit time: `TZ=America/New_York git log --date=format-local:'%Y-%m-%d %H:%M' -- notes/phase1-changelog.md`.
+
 ## 1. VM created with SeaBIOS instead of UEFI + Secure Boot (resolved 2026-10-01, see #11)
 
 What and why: the reference VM was created with SeaBIOS by mistake. Target is UEFI + Secure Boot (OVMF secboot), which must be enforced in Terraform for Phase 3. The VM was not rebuilt; remaining Phase 1 work (desktop configuration) is firmware independent, so this was left as-is for now.
@@ -436,7 +438,7 @@ Owner decision: LocumView is licensed under Apache-2.0. Until now the repo had n
 
 ## 29. centosbook leaves the cluster; desktop allowlist down to two nodes (2026-10-04)
 
-- **Cluster change:** centosbook (192.168.4.33) was reinstalled as `devsuse`, an openSUSE Leap 16.0 dev box for the SUSE variant of LocumView, and deleted from k3s. The cluster is mikepc and debianbox. The `locumview` pods that were on centosbook (guacd, cloudflared, Keycloak) were rescheduled: guacd and Keycloak run on mikepc, cloudflared on mikepc and debianbox. Checked with `kubectl get pods -n locumview -o wide`.
+- **Cluster change (about 19:00 to 20:43 EDT):** centosbook (192.168.4.33) was reinstalled as `devsuse`, an openSUSE Leap 16.0 dev box for the SUSE variant of LocumView, and deleted from k3s. The cluster is mikepc and debianbox. The `locumview` pods that were on centosbook (guacd, cloudflared, Keycloak) were rescheduled: guacd and Keycloak run on mikepc, cloudflared on mikepc and debianbox. Checked with `kubectl get pods -n locumview -o wide`.
 - `packaging/remote-access/user-mode-root.sh`: `K3S_NODES` drops 192.168.4.33. That address now belongs to a developer laptop, not a node where guacd can run, so it must not reach RDP (3389, 3390) or SSH on the desktops.
 - ADR 0002: dated update note; the decision is unchanged.
 - **Owner decision:** devsuse gets no direct RDP to the desktops, even though it is the SUSE development machine. Reference desktops are reached through Guacamole (Keycloak password + TOTP), the same path users take; desktops built locally on devsuse are unaffected.
@@ -449,7 +451,7 @@ Owner decision: LocumView is licensed under Apache-2.0. Until now the repo had n
 - **Applied on the VM (owner, 2026-10-04 21:57):** `sudo firewall-cmd --permanent --zone=public --remove-service=ssh && sudo firewall-cmd --reload`. `public` now lists `cockpit dhcpv6-client`; `locumview-gateways` has sources `192.168.4.54/32 192.168.4.45/32`, service `ssh`, ports `3389/tcp 3390/tcp 3391/tcp`.
 - **Verified:** from devsuse (192.168.4.33) ports 22 and 3390 time out; from mikepc port 22 connects. Admin SSH from elsewhere goes through mikepc: `ssh -J mikepc molszewski@192.168.4.36` (password; mikepc holds no key for `molszewski`).
 - `packaging/remote-access/user-mode-root.sh`: also removes `ssh` from the public zone, so a rebuilt VM matches. Target: the Ansible `remote_access` role.
-- **Cockpit too (owner decision, applied 2026-10-04 22:0x):** `sudo firewall-cmd --permanent --zone=locumview-gateways --add-service=cockpit && sudo firewall-cmd --permanent --zone=public --remove-service=cockpit && sudo firewall-cmd --reload`. `public` now lists only `dhcpv6-client`; `locumview-gateways` lists `cockpit ssh`. Verified: from devsuse port 9090 times out; from mikepc `https://192.168.4.36:9090/` returns 200. Use it through mikepc: `ssh -L 9090:192.168.4.36:9090 mikepc`, then https://localhost:9090. The script adds the same two rules.
+- **Cockpit too (owner decision, applied between 21:58 and 22:05 EDT; verified 22:05):** `sudo firewall-cmd --permanent --zone=locumview-gateways --add-service=cockpit && sudo firewall-cmd --permanent --zone=public --remove-service=cockpit && sudo firewall-cmd --reload`. `public` now lists only `dhcpv6-client`; `locumview-gateways` lists `cockpit ssh`. Verified: from devsuse port 9090 times out; from mikepc `https://192.168.4.36:9090/` returns 200. Use it through mikepc: `ssh -L 9090:192.168.4.36:9090 mikepc`, then https://localhost:9090. The script adds the same two rules.
 
 ## 31. Commit signing on the owner's laptop (2026-10-04)
 
