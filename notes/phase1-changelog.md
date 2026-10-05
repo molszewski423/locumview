@@ -453,7 +453,7 @@ Owner decision: LocumView is licensed under Apache-2.0. Until now the repo had n
 
 ## 31. Commit signing on the owner's laptop (2026-10-04)
 
-- **Why:** commits are SSH-signed since #9, but that key lives in the VM. Work on the repo now also happens in the clone on the owner's laptop (DevThinkPad, Fedora 45), which had no git identity or signing, so #29 to #30 went out unsigned: `be83824`, `ee97a19`, `84eb302`, `8569264`, `62d03ea`, `546aad7`, `c2586be`, `c55fa10`, `161a9b4`, `9cf3138`. Left as they are rather than force-pushing `main`.
+- **Why:** commits are SSH-signed since #9, but that key lives in the VM. Work on the repo now also happens in the clone on the owner's laptop (DevThinkPad, Fedora 45), which had no git identity or signing, so the #29 and #30 commits went out unsigned: `546aad7`, `62d03ea`, `8569264`, `84eb302`, `ee97a19`, `be83824`. Left as they are rather than force-pushing `main`. (The four Phase 0 commits of 2026-09-29, `9cf3138` to `c2586be`, are also unsigned; they predate #9. Commits signed in the VM show as `U` on the laptop because the VM key isn't in its allowed_signers; their signatures are intact.)
 - **Laptop setup:** dedicated key `~/.ssh/id_ed25519_signing` (ED25519, SHA256:yFRTuVFRSIjcIjX5U1KNac7G6zcIlFxkKT2lcTPepAY); global git config `gpg.format=ssh`, `commit.gpgsign=true`, `tag.gpgsign=true`, identity Michael Olszewski <molszewski423@gmail.com>; `~/.config/git/allowed_signers` so `git log --show-signature` verifies locally. This entry's commit is the first signed with it.
 - **Pending, owner:** add the public key as a signing key in Gitea (Settings, SSH / GPG Keys, then Verify) and on GitHub (SSH and GPG keys, key type Signing Key) so both show the commits as verified.
 
