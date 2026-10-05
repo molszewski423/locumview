@@ -15,6 +15,11 @@ resources:
 # Keycloak login theme (keycloak/theme/*), mounted at /opt/keycloak/themes/locumview/login. The generated name
 # carries a content hash, so any theme change rolls Keycloak (themes are cached in production mode).
 configMapGenerator:
+  # IdM CA certificate (public), trusted by Keycloak for LDAPS to idm01 (ADR 0006, changelog #34).
+  - name: keycloak-idm-ca
+    namespace: locumview
+    files:
+      - keycloak/idm-ca.pem
   - name: keycloak-theme-locumview
     namespace: locumview
     files:

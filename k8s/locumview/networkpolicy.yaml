@@ -80,6 +80,9 @@ spec:
       ports: [{protocol: TCP, port: 5432}]
     - to: [{podSelector: {matchLabels: {app.kubernetes.io/name: keycloak}}}]
       ports: [{protocol: TCP, port: 7800}, {protocol: TCP, port: 57800}]
+    # User federation: LDAPS to IdM only (idm01.corp.locumview.com, ADR 0006, changelog #34).
+    - to: [{ipBlock: {cidr: 192.168.4.47/32}}]
+      ports: [{protocol: TCP, port: 636}]
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy

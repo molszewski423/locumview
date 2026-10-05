@@ -8,6 +8,8 @@
 
 # Secrets and credentials
 *.pem
+# Public CA certificate only (IdM CA trusted by Keycloak, changelog #34); never a private key.
+!k8s/locumview/keycloak/idm-ca.pem
 *.key
 id_rsa*
 id_ed25519*

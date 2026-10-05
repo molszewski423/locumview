@@ -52,6 +52,8 @@ spec:
             - {name: KC_PROXY_HEADERS, value: xforwarded}
             - {name: KC_HTTP_ENABLED, value: "true"}
             - {name: KC_HEALTH_ENABLED, value: "true"}
+            # Extra trust anchors: IdM CA for LDAPS user federation (ADR 0006, changelog #34).
+            - {name: KC_TRUSTSTORE_PATHS, value: /opt/keycloak/conf/truststores/idm-ca.pem}
             - {name: KC_METRICS_ENABLED, value: "false"}
             # Temporary master-realm admin, used only by configure-realm.sh and break-glass.
             - {name: KC_BOOTSTRAP_ADMIN_USERNAME, value: kc-bootstrap}
@@ -73,7 +75,10 @@ spec:
           resources: {requests: {cpu: 250m, memory: 768Mi}, limits: {memory: 1536Mi}}
           volumeMounts:
             - {name: theme-locumview, mountPath: /opt/keycloak/themes/locumview/login, readOnly: true}
+            - {name: idm-ca, mountPath: /opt/keycloak/conf/truststores, readOnly: true}
       volumes:
+        - name: idm-ca
+          configMap: {name: keycloak-idm-ca}
         - name: theme-locumview
           configMap:
             name: keycloak-theme-locumview
