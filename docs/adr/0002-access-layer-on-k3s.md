@@ -26,3 +26,7 @@ Run the whole access layer on the existing k3s cluster, in a dedicated `locumvie
 - Stateful parts (the Guacamole database, Keycloak's database) start on `local-path` volumes, which tie them to one node. Acceptable for version one; backups are required before any real data.
 - Secrets for these workloads are handled per ADR 0003.
 - guacd's bundled FreeRDP must handle GNOME Remote Desktop's two consecutive server redirections (changelog #14). This is the first thing to verify once it's deployed.
+
+## Update 2026-10-04
+
+The cluster is now two nodes: mikepc (control plane) and debianbox, both Debian 13. centosbook was reinstalled as `devsuse`, an openSUSE Leap 16.0 machine for developing the SUSE variant of LocumView, and is no longer a k3s node. The decision is unchanged. The homelab deviation is now Debian only. guacd, Guacamole and Keycloak were rescheduled onto the remaining nodes, and the desktop firewall allowlist drops 192.168.4.33 (changelog #29).

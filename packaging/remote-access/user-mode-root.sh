@@ -8,7 +8,7 @@
 #     runs (pod traffic leaves the cluster SNATed to the node address). SSH is kept for those nodes too.
 set -euo pipefail
 U=${1:?usage: user-mode-root.sh <desktop-user>}
-K3S_NODES="192.168.4.54/32 192.168.4.45/32 192.168.4.33/32"   # mikepc, debianbox, centosbook
+K3S_NODES="192.168.4.54/32 192.168.4.45/32"   # mikepc, debianbox (centosbook removed 2026-10-04, changelog #29)
 ZONE=locumview-gateways
 [ "$(id -u)" = 0 ] || { echo "run as root"; exit 1; }
 id "$U" >/dev/null

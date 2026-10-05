@@ -434,3 +434,11 @@ Owner decision: LocumView is licensed under Apache-2.0. Until now the repo had n
 - **Gap found and fixed:** the session was locked, and every extension, the guard included, reported state 2 (inactive). GNOME disables extensions while the session is locked unless they list `unlock-dialog` in `session-modes`. For the guard this meant the 5-minute timer was cancelled on lock, and if the extension was turned off before the lock signal reached it, content copied just before locking stayed on the clipboard for the whole lock. Fix: `metadata.json` adds `"session-modes": ["user", "unlock-dialog"]`, so the guard stays on at the lock screen (it touches no UI), and `disable()` now clears the clipboard as a backstop (logout, reload). Syntax-checked; takes effect when `install-desktop.sh` is re-run and the sessions are restarted (pending, owner).
 - **Still to verify live:** copy out of the desktop blocked; clipboard empty 5 minutes after a copy; clipboard empty after lock and unlock; the guard state 1 (active) while the session is locked.
 
+## 29. centosbook leaves the cluster; desktop allowlist down to two nodes (2026-10-04)
+
+- **Cluster change:** centosbook (192.168.4.33) was reinstalled as `devsuse`, an openSUSE Leap 16.0 dev box for the SUSE variant of LocumView, and deleted from k3s. The cluster is mikepc and debianbox. The `locumview` pods that were on centosbook (guacd, cloudflared, Keycloak) were rescheduled: guacd and Keycloak run on mikepc, cloudflared on mikepc and debianbox. Checked with `kubectl get pods -n locumview -o wide`.
+- `packaging/remote-access/user-mode-root.sh`: `K3S_NODES` drops 192.168.4.33. That address now belongs to a developer laptop, not a node where guacd can run, so it must not reach RDP (3389, 3390) or SSH on the desktops.
+- ADR 0002: dated update note; the decision is unchanged.
+- **Pending, owner:** the live `locumview-gateways` zone on the reference VM still lists 192.168.4.33/32. Remove it with `sudo firewall-cmd --permanent --zone=locumview-gateways --remove-source=192.168.4.33/32 && sudo firewall-cmd --reload`, or re-run the script.
+- Not changed: `docs/evidence/phase2/worklog-20261002.md` records the three-node cluster as it was on 2026-10-02.
+
