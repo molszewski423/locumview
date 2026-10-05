@@ -27,6 +27,11 @@ k update "realms/$R" \
   -s adminEventsEnabled=true -s adminEventsDetailsEnabled=true
 echo "realm $R: policy applied"
 
+# master realm (Keycloak administration, break-glass admin kc-bootstrap): same brute-force protection (changelog #33).
+k update realms/master -s bruteForceProtected=true -s failureFactor=5 -s permanentLockout=false \
+  -s waitIncrementSeconds=60 -s maxFailureWaitSeconds=900 -s maxDeltaTimeSeconds=43200
+echo "realm master: brute-force protection applied"
+
 # --- Role and groups ----------------------------------------------------------------------------
 k get "roles/mfa-exempt" -r "$R" >/dev/null 2>&1 || k create roles -r "$R" -s name=mfa-exempt \
   -s 'description=Skips TOTP in the locumview-browser flow. Granted only through group locumview-demo (ADR 0005).'

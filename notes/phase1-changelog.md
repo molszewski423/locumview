@@ -473,3 +473,16 @@ Decision: ADR 0006 and its updates of 2026-10-04 (Keycloak is the only MFA autho
 - **Owner:** eero DHCP reservation 192.168.4.47 for 52:54:00:4c:56:47 (00:45).
 - **Next, before anything depends on IdM (ADR 0006):** `ipa-backup` with an off-host copy; break-glass accounts outside IdM (Keycloak local admin, a local desktop admin); then Keycloak LDAPS federation (read-only bind account, IdM CA in Keycloak's truststore) and the acceptance test (IdM test user, forced TOTP enrolment in Keycloak, correct Guacamole groups). Replica on debianbox after its bridge.
 
+## 33. IdM backup off-host; break-glass access documented (2026-10-05)
+
+The two ADR 0006 prerequisites before anything depends on IdM, except the replica. Times are America/New_York.
+
+- **00:55:45 to 00:56:05, backup:** `sudo ipa-backup` on idm01 (full, offline) wrote `/var/lib/ipa/backup/ipa-full-2026-10-05-04-56-04` (2.7 MB); all nine services back up afterwards.
+- **00:56, off-host copy:** streamed `tar` from idm01 through `age -r age1rtd08pu892une8jknwex6ey2rxdp76j3w67gstrd5vpvep24ussscpr59n` (the `.sops.yaml` recipient, private key on DevThinkPad) on devsuse to `debianbox:~/backups/idm01/idm01-ipa-full-2026-10-05-04-56-04.tar.age` (0600, directory 0700; SHA-256 `9e1d6c09ee8b21618ebf7f8fa12f4cb48bdacef35683c134fc613f64d08d4258`). No plaintext copy exists outside idm01. debianbox is a different machine from MikePC, which hosts idm01.
+- **Verified 00:57:** decrypted on DevThinkPad and listed without writing to disk: `ipa-full.tar` and `header`, intact.
+- **00:59:** the restore needs the Directory Manager password, whose only copy was on devsuse; an age-encrypted copy of `idm-secrets.env` now sits beside the backup (`idm-secrets.env.age`), verified to decrypt on DevThinkPad.
+- **Break-glass inventory:** Keycloak `master` realm has one admin, local `kc-bootstrap` (SOPS secret `keycloak`); the `locumview` realm's `molszewski` and `demo` are local users, no federation provider yet; Guacamole's `locumadmin` exists and is disabled (`guacamole/break-glass.sh`, #21); idm01 has local `mike` (keys only, sudo); the reference desktop has local `molszewski` (`wheel`).
+- **01:00:49, gap fixed:** the Keycloak `master` realm had no brute-force protection. Now `bruteForceProtected=true`, `failureFactor=5`, temporary lockout (60 s steps, up to 15 min), same as `locumview`. Added to `k8s/locumview/keycloak/configure-realm.sh` so a rebuild keeps it.
+- **`docs/break-glass.md`:** one table of every path back in that works without IdM (account, where it's defined, where the credential lives, state, how to use), the IdM backup and restore procedure, and the rules. New rule: IdM enrolment must not convert or remove a desktop's local `wheel` account; on the reference desktop that is `molszewski`. This replaces ADR 0006's planned migration of the local `molszewski`: the owner's daily IdM account will use a different login, so there's no name or UID clash.
+- **Still open:** scheduled IdM backups (systemd timer plus the off-host copy); the replica on debianbox; Keycloak LDAPS federation and the acceptance test.
+
