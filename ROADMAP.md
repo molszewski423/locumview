@@ -25,7 +25,7 @@ Version one is complete when all five items are Done. Nothing else is required f
 
 | Area | Item | Status | Reference |
 |---|---|---|---|
-| Identity | Red Hat IdM directory (`corp.locumview.com`, VM on debianbox), Keycloak federation, desktop enrollment | Planned | ADR 0006 |
+| Identity | Red Hat IdM directory (`corp.locumview.com`, VM on debianbox), Keycloak federation, desktop enrollment; Keycloak stays the MFA authority for IdM users | **In progress** (started 2026-10-04 ahead of version one, owner decision; not a version-one dependency) | ADR 0006 |
 | Identity | WebAuthn / passkeys; MFA for the demo login | Planned | ADR 0005 |
 | Access | Guacamole session recording; edge rate limiting | Planned | |
 | Access | Clipboard DLP: copy-out blocked, 5-minute clipboard clear in sessions | Built; lock-screen fix in #28, live clipboard tests pending | changelog #26, #28 |

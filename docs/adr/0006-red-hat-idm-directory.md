@@ -36,3 +36,12 @@ Run **Red Hat Identity Management (IdM, upstream FreeIPA)** as the directory for
 - A single IdM server is a single point of failure for every login: with IdM down, Keycloak can't verify passwords for federated users (it validates against LDAP), and desktops can't resolve or authenticate IdM accounts beyond SSSD's offline cache. The break-glass paths (Keycloak's local admin, a local desktop admin) must stay outside IdM. A replica on another host and IdM backups (`ipa-backup`) are prerequisites before anyone depends on it.
 - debianbox is a homelab deviation: an old desktop-class CPU, no ECC, a Debian hypervisor. The production reference is RHEL hosts.
 - Not in the version-one critical path (ADR 0009): built when it doesn't delay version one, or immediately after it.
+
+## Update 2026-10-04: MFA for IdM users
+
+- **Keycloak is the only MFA authority.** Federated IdM users sign in through the existing `locumview-browser` flow: Keycloak checks the password against IdM over LDAPS, then requires the second factor itself. OTP credentials live in Keycloak, not IdM. New IdM users get Keycloak's `CONFIGURE_TOTP` required action and enrol on first sign-in. The `mfa-exempt` role keeps working through the `locumview-demo` group, which can now come from IdM.
+- **IdM users stay on user auth type `password`.** IdM's native OTP (`ipa otptoken-add`, auth type `otp`) stays off for anyone who signs in through Keycloak: with it on, IdM expects the password and the OTP concatenated on every LDAP bind, which breaks Keycloak's password check, and users would enrol two authenticators.
+- **Linux-side logins** (sudo, screen unlock, SSH) use the IdM password. Acceptable because desktops are reached only through Guacamole after Keycloak MFA, and SSH and RDP are firewalled to the k3s nodes (changelog #19, #30). Later experiments, not part of the first build: IdM passkeys (FIDO2) for sudo and SSH, enabled alongside `password` so the LDAP bind still works; IdM external IdP authentication delegated to Keycloak, which creates a circular dependency while Keycloak validates passwords against IdM.
+- **Acceptance test for the federation step:** create a test user in IdM, sign in at login.locumview.com, confirm Keycloak forces TOTP enrolment, then reaches Guacamole with the expected groups.
+- **Timing:** the owner started the build on 2026-10-04, ahead of version one. It stays outside ADR 0009's scope; version one does not depend on it.
+
