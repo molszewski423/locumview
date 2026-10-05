@@ -54,3 +54,12 @@ Run **Red Hat Identity Management (IdM, upstream FreeIPA)** as the directory for
 - **Unchanged:** domain `corp.locumview.com`, realm `CORP.LOCUMVIEW.COM`, sizing (2 vCPU, 4 GiB, 40 GiB), Keycloak federation over LDAPS, MFA in Keycloak only (update of 2026-10-04).
 - **Provisioning detail:** the base image is a RHEL 10.2 qcow2 built with Red Hat Image Builder (package mode, no packages, register later; SHA-256 `b5a806e00f4338c7f2f1bc678e0e7bb8d9c303094ab9c70c23f2611470a2f8e7`), configured on first boot by cloud-init (hostname, static address, admin SSH keys, activation-key registration) instead of a kickstart.
 
+## Update 2026-10-05: accounts and naming
+
+Standard practice for an organisation with its own domain and services (desktops now; mail and Nextcloud later). Owner decision, 2026-10-05.
+
+- **People:** one account per person, in IdM. Login (`uid`) is first initial + last name, lower case (`molszewski`); collisions get a middle initial or a number. Email (`mail`) is `<uid>@locumview.com` and is what people type at sign-in (Keycloak accepts email or username). The Kerberos principal follows automatically (`molszewski@CORP.LOCUMVIEW.COM`). The same account and the same MFA reach every service through Keycloak SSO. Rights come from IdM groups mapped to applications (`locumview-admins`, `locumview-users`, `locumview-demo`), never from per-application accounts.
+- **Break-glass:** a few generic, role-named emergency accounts outside IdM (`lv-breakglass` in Keycloak, `lvadmin` on desktops and servers, Guacamole's `locumadmin`, Keycloak's `kc-bootstrap`). Credentials sealed (age/SOPS), used only when the normal path fails, every use logged. See `docs/break-glass.md`.
+- **Services:** applications authenticate as IdM system accounts (for example Keycloak's read-only LDAP bind), which can't log in interactively.
+- **Transition:** the existing local `molszewski` accounts predate the directory. In Keycloak, a local `lv-breakglass` admin is created before federation; once the IdM `molszewski` signs in (TOTP enrolled again on the federated account), the local Keycloak `molszewski` is removed, because Keycloak won't import an LDAP user whose name matches a local user. Desktops get `lvadmin` in the bootc image (version-one item 1) and no personal local accounts; the current reference desktop keeps its local `molszewski` until it is rebuilt from that image, and only test users and `demo` are enrolled on it before then, so no account is migrated by hand. This supersedes the account-migration plan in Consequences.
+
