@@ -60,7 +60,7 @@ Name: nods to locum tenens clinicians and VMware View (now Horizon, owned by Omn
 - Accounts: mike is a named admin account (good for audit traceability). Add a separate ansible service account with SSH key and scoped sudo. End users are separate, non-admin, and eventually come from Keycloak or Red Hat IdM.
 - Base images: the DVD ISO is for the hand-built reference; Phase 3 uses the RHEL KVM guest qcow2 image (cloud-init ready) from the developer portal Images page.
 - KubeVirt note: k3s/KubeVirt does not use the host's qemu:///system. What carries to Kubernetes is the Ansible, applied to a RHEL guest image imported via CDI.
-- VM sizing: 4 vCPU / 8 GB mirrors a realistic knowledge-worker VDI; a task worker is about 2 vCPU / 4 GB. Memory is allocated on demand but tends to grow to its full allocation, so size realistically.
+- VM sizing: 4 vCPU / 8 GB mirrors a realistic knowledge-worker VDI; a task worker is about 2 vCPU / 4 GB. Memory is allocated on demand but tends to grow to its full allocation, so size realistically. Superseded by ADR 0010: Standard tier 2 vCPU / 4 GiB, Power tier 4 vCPU / 8 GiB, with free page reporting and KSM so host memory follows real use.
 
 ## 4. Architecture decisions
 
@@ -175,4 +175,4 @@ One-line thesis: as clinical computing moves to the browser, LocumView lets heal
 
 - Guacamole hosting: Podman/Quadlet vs k3s
 - Verify Red Hat Cloud Access before the AWS rung
-- Set VM memory limits on MikePC before KubeVirt
+- ~~Set VM memory limits on MikePC before KubeVirt~~ Decided 2026-10-05: ADR 0010 (desktop tiers, free page reporting, KSM)

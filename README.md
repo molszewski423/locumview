@@ -46,6 +46,7 @@ The access layer runs as containers on k3s. The desktop runs as a VM: a GNOME se
 | [0007](docs/adr/0007-desktop-containerization-bootc.md) | Desktop OS as a bootc image; the session is a VM workload |
 | [0008](docs/adr/0008-eu-regulatory-posture.md) | EU regulatory posture; clinical AI as a detachable module |
 | [0009](docs/adr/0009-v1-scope-integrate-dont-bundle.md) | Version-one scope, integrate don't bundle, hypervisor at deploy time |
+| [0010](docs/adr/0010-desktop-vm-sizing-memory.md) | Desktop VM sizing tiers and host memory overcommit (free page reporting, KSM) |
 
 ## Where it is going
 

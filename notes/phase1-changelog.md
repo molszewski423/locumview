@@ -538,3 +538,12 @@ ADR 0006 (update of this date). Files: `packaging/idm/refdev-enroll.sh`, `refdev
 - **Unchanged:** `demo` keeps its own local account and headless session on 3391 (isolated guest).
 - **Open:** decrypt test of the VM backup on DevThinkPad, then delete the staging copy; lock or remove `molszewski-legacy` once nothing is missing; a live `lv-test1` login through the GNOME screen; the two follow-ups above.
 
+
+## 37. MikePC memory: free page reporting, KSM, desktop tiers (2026-10-05)
+
+ADR 0010 (closes the PLAN.md pending decision "Set VM memory limits on MikePC"). File: `hypervisor/mikepc-memory.sh`; `hypervisor/locumview-ref-dev.mikepc.xml` and `hypervisor/idm01/create-idm01.sh` updated to match. Times are America/New_York.
+
+- **Before:** locumview-ref-dev 4 vCPU / 8 GiB, 2.6 GiB used in the guest, 6.9 GiB held by qemu on the host; idm01 2 vCPU / 4 GiB, 1.5 GiB used, 3.7 GiB held. Both at load 0.00. Host: 8 threads, 30 GiB, about 12 GiB available. KSM off, THP `always`.
+- **About 20:35, `mikepc-memory.sh`** (root on MikePC): `/etc/tmpfiles.d/locumview-ksm.conf` (KSM `run=1`, advisor `scan-time`, `use_zero_pages=1`); balloon set to `freePageReporting='on'` with `<stats period='10'/>` on both VMs via `virt-xml`; each VM shut down cleanly and started again (ref-dev up 20:36:18, idm01 up 20:36:22). The idle headless `molszewski` session and the `demo` session on ref-dev ended with the restart.
+- **Verified 20:37:** `ipactl status` all running; GRD active and listening on 3389; idm01 LDAPS (636) reachable from MikePC; login.locumview.com answers 200. Right after boot, qemu RSS was 2.6 GiB (ref-dev) and 2.8 GiB (idm01); KSM already sharing 13,056 pages.
+- **Open:** recheck qemu RSS against guest use after a day of normal use, to confirm reporting keeps host usage near real use; a concurrent-session load test before more desktops are added (ADR 0010, Capacity).

@@ -14,6 +14,7 @@ virt-install --connect qemu:///system --name idm01 --osinfo rhel10-unknown \
   --disk vol=locumview/idm01.qcow2,bus=virtio \
   --network bridge=br0,model=virtio,mac=52:54:00:4c:56:47 \
   --channel unix,target.type=virtio,target.name=org.qemu.guest_agent.0 \
+  --memballoon model=virtio,freePageReporting=on,stats.period=10 \
   --graphics none --console pty,target.type=serial,log.file=/var/log/libvirt/qemu/idm01-serial.log \
   --import --cloud-init user-data="$T/user-data",network-config="$HERE/network-config" \
   --autostart --noautoconsole
