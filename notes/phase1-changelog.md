@@ -551,3 +551,12 @@ ADR 0010 (closes the PLAN.md pending decision "Set VM memory limits on MikePC").
 ## 38. Proof-of-concept capacity target and scale-up triggers (2026-10-05)
 
 ADR 0010 (update of this date). No system changes. Measured at 21:07: MikePC `MemAvailable` 17.3 GiB, qemu RSS about 2.8 GiB per VM, KSM saving about 0.95 GiB. Owner decision: the proof of concept runs on MikePC as it is, 5 dedicated desktops comfortably (6 at the edge); scale up only when a trigger in the ADR fires, first with a second 2×16 GB kit and multi-session desktops (its own ADR).
+
+## 39. guacamole-db init container survives a node reboot (2026-10-06)
+
+File: `k8s/locumview/postgres.yaml` (StatefulSet `guacamole-db`, init container `guacamole-schema`). Times are America/New_York.
+
+- **Symptom, about 08:40:** after MikePC rebooted, `guacamole-db-0` stuck in `Init:CrashLoopBackOff`: `cp: cannot create regular file '/initdb/002-roles-and-admin.sh': Permission denied`. The pod keeps its UID across a node reboot, so its `initdb` emptyDir still held the scripts copied on the first boot, and those are read-only (ConfigMap `defaultMode` 0555). Plain `cp` cannot overwrite a read-only file the same user owns; `cp -f` removes and recreates it.
+- **Fix:** `cp /init-scripts/*.sh /initdb/` became `cp -f /init-scripts/*.sh /initdb/`. Applied live at about 09:00 with a JSON patch (rolling the pod), here in git at about 11:00. Database data is on the PVC and was never affected.
+- **Verified:** reproduced the failure and the fix with a 0555 file as a non-root user (plain `cp` exit 1, `cp -f` exit 0); `guacamole-db-0` Running after the patch; the live StatefulSet now matches this file.
+
