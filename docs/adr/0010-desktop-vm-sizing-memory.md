@@ -49,3 +49,17 @@ Applied by `hypervisor/mikepc-memory.sh` (changelog #37). Terraform and the Kube
 - **Lower allocations only:** less wasted memory, but a desktop still grows to its allocation and keeps it.
 - **Hugepages:** better TLB behavior, but hugepage-backed memory can't be shared or reported back, which defeats overcommit.
 - **Balloon targets managed by a daemon:** more control, more moving parts; free page reporting gives most of the benefit with none.
+
+## Update 2026-10-05: proof-of-concept target and scale-up path
+
+Owner decision, 2026-10-05.
+
+- **Measured after the change (20:37 to 21:07):** MikePC `MemAvailable` 17.3 GiB (about 12 before); qemu RSS about 2.8 GiB each for locumview-ref-dev and idm01; KSM saving about 0.95 GiB with two guests.
+- **Target:** MikePC as it is (32 GB) carries the proof of concept: **5 dedicated desktops comfortably, 6 at the edge** (counting locumview-ref-dev), after keeping about 4 GiB spare for the AI stack. That is enough for the proof of concept; nothing is bought until a trigger below fires.
+- **Scale-up triggers,** with everyone signed in: `MemAvailable` stays below about 4 GiB; load average stays near 8 (all threads busy) or users notice input lag; or more than 6 concurrent users are actually needed.
+- **Scale-up path, in order:**
+  1. A second 2×16 GB kit of the installed part (CMH32GX5M2M6000Z36) in MikePC's two empty slots (B850 board, 4 slots, 128 GB maximum) → 64 GB.
+  2. **Multi-session desktops:** several users' private GNOME sessions per RHEL VM (GRD system mode, IdM accounts, per-user systemd slice limits), 6 to 8 users per VM, with dedicated VMs kept for users who need them. Estimated 15 to 20 concurrent office users on 64 GB, where CPU (8 threads) and memory meet. Needs its own ADR.
+  3. More cores (a 16-core AM5 CPU) or a second host if CPU is the limit.
+- **Alternatives priced 2026-10-05:** DDR5 and DDR4 prices are high (96 GB DDR5 kits about $750 to $1,900; 128 GB DDR4 for a used HP Z440 about $735 to $1,120), so the path favors fewer GiB per user over more hardware. A one-hour cloud test is the cheapest way to show 20 concurrent sessions without owning the hardware (Phase 7, budget alarm first).
+- **Still open:** the load test (6 to 8 IdM test users, Firefox and ONLYOFFICE) that replaces these estimates with measurements.

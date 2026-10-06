@@ -547,3 +547,7 @@ ADR 0010 (closes the PLAN.md pending decision "Set VM memory limits on MikePC").
 - **About 20:35, `mikepc-memory.sh`** (root on MikePC): `/etc/tmpfiles.d/locumview-ksm.conf` (KSM `run=1`, advisor `scan-time`, `use_zero_pages=1`); balloon set to `freePageReporting='on'` with `<stats period='10'/>` on both VMs via `virt-xml`; each VM shut down cleanly and started again (ref-dev up 20:36:18, idm01 up 20:36:22). The idle headless `molszewski` session and the `demo` session on ref-dev ended with the restart.
 - **Verified 20:37:** `ipactl status` all running; GRD active and listening on 3389; idm01 LDAPS (636) reachable from MikePC; login.locumview.com answers 200. Right after boot, qemu RSS was 2.6 GiB (ref-dev) and 2.8 GiB (idm01); KSM already sharing 13,056 pages.
 - **Open:** recheck qemu RSS against guest use after a day of normal use, to confirm reporting keeps host usage near real use; a concurrent-session load test before more desktops are added (ADR 0010, Capacity).
+
+## 38. Proof-of-concept capacity target and scale-up triggers (2026-10-05)
+
+ADR 0010 (update of this date). No system changes. Measured at 21:07: MikePC `MemAvailable` 17.3 GiB, qemu RSS about 2.8 GiB per VM, KSM saving about 0.95 GiB. Owner decision: the proof of concept runs on MikePC as it is, 5 dedicated desktops comfortably (6 at the edge); scale up only when a trigger in the ADR fires, first with a second 2×16 GB kit and multi-session desktops (its own ADR).
