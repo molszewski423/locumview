@@ -1,6 +1,6 @@
 # LocumView roadmap
 
-Status as of 2026-10-05. Labels: **Done** (built and verified), **Open** (version-one work not finished), **Planned** (after version one, or alongside it only if it doesn't delay it), **Parked** (deliberately not pursued for now). The build log ([notes/phase1-changelog.md](notes/phase1-changelog.md)) and [docs/PLAN.md](docs/PLAN.md) hold the detail.
+Status as of 2026-10-07. Labels: **Done** (built and verified), **Open** (version-one work not finished), **In progress** (work has started outside version one, not finished or shipped), **Planned** (after version one, or alongside it only if it doesn't delay it), **Parked** (deliberately not pursued for now). The build log ([notes/phase1-changelog.md](notes/phase1-changelog.md)) and [docs/PLAN.md](docs/PLAN.md) hold the detail.
 
 ## Version one (scope locked by ADR 0009)
 
@@ -39,7 +39,8 @@ Version one is complete when all five items are Done. Nothing else is required f
 | Integrations | Nextcloud (files) via Keycloak OIDC, as a reference integration | Planned | ADR 0009 |
 | Integrations | Synthetic FHIR server, Matrix messaging | Planned | ADR 0009 |
 | Clinical AI | Detachable clinical AI module (US first, FDA CDS design principles), antimicrobial stewardship as the lead agent | Planned | ADR 0008 |
-| Distributions | SUSE / openSUSE and Debian builds from the same definitions | Planned | |
+| Distributions | SUSE / openSUSE build from the same definitions | **In progress, not shipped** | Infrastructure work has begun and runs largely in parallel with the RHEL build; not supported or shipped yet |
+| Distributions | Debian build from the same definitions | Planned | |
 
 ## Parked
 
