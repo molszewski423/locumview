@@ -579,3 +579,11 @@ The locumview.com privacy policy says demo logs are kept up to 90 days. This mak
 - **Guacamole:** CronJob `guacamole-history-cleanup`, daily at 03:17 America/New_York, deletes rows older than 90 days from `guacamole_connection_history` and `guacamole_user_history` (username, client IP, times). It runs as the least-privilege `guacamole_app` role, with its own egress policy and a matching ingress rule on `guacamole-db`.
 - **Verified:** a manual run completed (0 rows deleted; the oldest history is from 2026-10-02). A rolled-back test with a 1-day cutoff, as `guacamole_app`, deleted 75 connection and 200 login rows before the rollback.
 - **Open:** demo-account expiry (proposal pending); Keycloak's `jboss-logging` event listener also writes events to the pod log, which k3s rotates by size, well inside 90 days.
+
+## 42. Guacamole idle timeout 30 minutes; demo password rotation runbook (2026-10-07)
+
+Files: `k8s/locumview/guacamole.yaml`, `docs/runbooks.md` (new), `ROADMAP.md`.
+
+- **Guacamole:** `API_SESSION_TIMEOUT=30` (was the 60-minute default), matching Keycloak's 30-minute SSO idle timeout. Applied with `kubectl apply -k` (only the Guacamole pod restarted; no desktop connection was open). Login page answered 200 afterwards.
+- **Whole path, as configured:** Keycloak SSO sessions end after 30 minutes idle and 10 hours at most; Guacamole sessions after 30 minutes idle. Guacamole never expires a session while it has an open desktop connection (`HashTokenSessionMap` in 1.6.0 skips sessions with tunnels), and the demo desktop has no screen lock (#22), so an open connection stays up until it is closed. Signing in again goes through Keycloak with MFA (the demo account is MFA-exempt).
+- **Demo accounts:** owner decision: the privacy policy now says the shared guest password is rotated after each evaluation. Procedure in `docs/runbooks.md`. Per-evaluator accounts with an expiry date are on the ROADMAP backlog.

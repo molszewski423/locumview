@@ -58,6 +58,9 @@ spec:
             - {name: OPENID_USERNAME_CLAIM_TYPE, value: preferred_username}
             - {name: OPENID_GROUPS_CLAIM_TYPE, value: groups}
             - {name: OPENID_MAX_TOKEN_VALIDITY, value: "5"}
+            # Guacamole sessions end after 30 minutes idle, matching Keycloak's SSO idle timeout (configure-realm.sh).
+            # Guacamole never expires a session while a desktop connection is open (HashTokenSessionMap, 1.6.0).
+            - {name: API_SESSION_TIMEOUT, value: "30"}
             # SSO first: visitors go straight to Keycloak. The local break-glass account is disabled by default
             # (k8s/locumview/guacamole/break-glass.sh). Branding last so its translations win.
             - {name: EXTENSION_PRIORITY, value: "openid, *, locumview-branding"}

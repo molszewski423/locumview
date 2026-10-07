@@ -28,6 +28,7 @@ Version one is complete when all five items are Done. Nothing else is required f
 | Identity | Red Hat IdM directory (`corp.locumview.com`, first server on MikePC), Keycloak federation, organizational login on desktops; Keycloak stays the MFA authority | **Built** 2026-10-05, ahead of version one by owner decision (#32 to #36): idm01, read-only federation, owner's account in IdM, reference desktop enrolled (GNOME login, lock screen, sudo via IdM), nightly encrypted backups. Open: replica on debianbox, password policy, backup alerting | ADR 0006 |
 | Identity | WebAuthn / passkeys; MFA for the demo login | Planned | ADR 0005 |
 | Access | Guacamole session recording; edge rate limiting | Planned | |
+| Access | Per-evaluator demo accounts with an expiry date (disabled at expiry, deleted later) | Planned | When real evaluators exist; until then the shared guest password is rotated after each evaluation (docs/runbooks.md) |
 | Access | Clipboard DLP: copy-out blocked, 5-minute clipboard clear in sessions | Built; lock-screen fix in #28, live clipboard tests pending | changelog #26, #28 |
 | Desktop | Image signing (cosign), SBOMs (syft), registry and build pipeline | Planned (part of version-one item 1 where needed) | ADR 0007 |
 | Desktop | Organization-set desktop layout (Mac, Windows or GNOME style), locked centrally | Built; Mac style and lock verified, Windows/GNOME not exercised | changelog #25, #28 |
