@@ -560,3 +560,13 @@ File: `k8s/locumview/postgres.yaml` (StatefulSet `guacamole-db`, init container 
 - **Fix:** `cp /init-scripts/*.sh /initdb/` became `cp -f /init-scripts/*.sh /initdb/`. Applied live at about 09:00 with a JSON patch (rolling the pod), here in git at about 11:00. Database data is on the PVC and was never affected.
 - **Verified:** reproduced the failure and the fix with a 0555 file as a non-root user (plain `cp` exit 1, `cp -f` exit 0); `guacamole-db-0` Running after the patch; the live StatefulSet now matches this file.
 
+## 40. Reference VM memory: 6 GiB maximum, 4 GiB current (2026-10-06)
+
+ADR 0010 (update of 2026-10-06). File: `hypervisor/locumview-ref-dev.mikepc.xml` updated to match. Times are America/New_York.
+
+- **Why:** MikePC's kubelet now reserves memory for everything k3s cannot see (VMs, desktop, Ollama). With this VM at 6 GiB maximum the reservation is 16 GiB instead of 18 GiB, which keeps about 13 GiB allocatable for pods.
+- **About 09:30, on MikePC as root:** `virsh setmaxmem locumview-ref-dev 6G --config`, `virsh setmem locumview-ref-dev 4G --config`; clean shutdown through the guest agent at 09:34:21, started 09:34:30.
+- **Verified:** guest agent answering 15 s after start; `virsh dominfo` max 6291456 KiB, used 4194304 KiB; balloon `actual` 4194304. On 2026-10-07 about 1.8 GiB used in the guest, about 1 GiB held by qemu, MikePC `MemAvailable` 17.4 GB.
+- **Before:** 4 vCPU / 8 GiB, about 1.7 GiB used in the guest, 2.7 GiB held by qemu.
+- **Open:** include this VM in the concurrent-session load test; raise the balloon target first if a session needs more.
+

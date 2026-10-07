@@ -63,3 +63,25 @@ Owner decision, 2026-10-05.
   3. More cores (a 16-core AM5 CPU) or a second host if CPU is the limit.
 - **Alternatives priced 2026-10-05:** DDR5 and DDR4 prices are high (96 GB DDR5 kits about $750 to $1,900; 128 GB DDR4 for a used HP Z440 about $735 to $1,120), so the path favors fewer GiB per user over more hardware. A one-hour cloud test is the cheapest way to show 20 concurrent sessions without owning the hardware (Phase 7, budget alarm first).
 - **Still open:** the load test (6 to 8 IdM test users, Firefox and ONLYOFFICE) that replaces these estimates with measurements.
+
+## Update 2026-10-06: reference VM memory lowered to 6 GiB maximum, 4 GiB current
+
+Owner decision, 2026-10-06 (recorded 2026-10-07). An exception to the Power tier for locumview-ref-dev: it keeps
+4 vCPU but its memory is 6 GiB maximum with a 4 GiB balloon target, instead of 8 GiB. Changelog #40.
+
+- **Why:** MikePC now also reserves memory for k3s explicitly. The kubelet's `system-reserved` on MikePC must cover
+  every VM's maximum memory plus the desktop and the AI stack, because libvirt VMs are invisible to the k3s scheduler.
+  At 8 GiB for this VM that reservation would have been 18 GiB; at 6 GiB it is 16 GiB, leaving about 13 GiB
+  allocatable for pods. **Every new or resized desktop VM requires raising MikePC's `system-reserved` by its maximum
+  memory** (k3s-migration runbook rule).
+- **Evidence before (2026-10-06, about 09:20 EDT):** 8 GiB allocated, about 1.7 GiB used in the guest (balloon
+  stats: 6.4 GB usable, 6.0 GB unused), 2.7 GiB held by qemu on the host.
+- **Change:** `virsh setmaxmem 6G --config`, `virsh setmem 4G --config`, clean shutdown through the guest agent at
+  09:34:21 EDT, started 09:34:30 EDT, guest agent answering 15 s later. Free page reporting and balloon stats unchanged.
+- **Evidence after (2026-10-07):** 4 GiB current (6 GiB maximum), about 1.8 GiB used in the guest, about 1 GiB held
+  by qemu on the host; MikePC `MemAvailable` 17.4 GB.
+- **Reverting:** `virsh setmaxmem 8G --config`, `virsh setmem 8G --config`, restart the VM, and raise MikePC's
+  `system-reserved` back to 18 GiB.
+- **Still open:** the load test (2026-10-05 update) should include this VM at 6 GiB maximum; if a developer session
+  needs more, raise the balloon target first, up to the 6 GiB maximum, before raising the maximum.
+
