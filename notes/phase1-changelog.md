@@ -570,3 +570,12 @@ ADR 0010 (update of 2026-10-06). File: `hypervisor/locumview-ref-dev.mikepc.xml`
 - **Before:** 4 vCPU / 8 GiB, about 1.7 GiB used in the guest, 2.7 GiB held by qemu.
 - **Open:** include this VM in the concurrent-session load test; raise the balloon target first if a session needs more.
 
+
+## 41. Privacy retention enforced: 90-day Keycloak events and Guacamole history (2026-10-07)
+
+The locumview.com privacy policy says demo logs are kept up to 90 days. This makes that true rather than stated. Files: `k8s/locumview/keycloak/configure-realm.sh`, `k8s/locumview/guacamole-history-cleanup.yaml` (new), `k8s/locumview/networkpolicy.yaml`, `k8s/locumview/kustomization.yaml`.
+
+- **Keycloak (realm `locumview`):** sign-in events already expired after 90 days (`eventsExpiration=7776000`); admin events had no expiry. Added the realm attribute `adminEventsExpiration=7776000`, applied live with kcadm and recorded in `configure-realm.sh`. The `master` realm has events off.
+- **Guacamole:** CronJob `guacamole-history-cleanup`, daily at 03:17 America/New_York, deletes rows older than 90 days from `guacamole_connection_history` and `guacamole_user_history` (username, client IP, times). It runs as the least-privilege `guacamole_app` role, with its own egress policy and a matching ingress rule on `guacamole-db`.
+- **Verified:** a manual run completed (0 rows deleted; the oldest history is from 2026-10-02). A rolled-back test with a 1-day cutoff, as `guacamole_app`, deleted 75 connection and 200 login rows before the rollback.
+- **Open:** demo-account expiry (proposal pending); Keycloak's `jboss-logging` event listener also writes events to the pod log, which k3s rotates by size, well inside 90 days.

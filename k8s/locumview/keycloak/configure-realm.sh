@@ -24,7 +24,9 @@ k update "realms/$R" \
   -s ssoSessionIdleTimeout=1800 -s ssoSessionMaxLifespan=36000 \
   -s accessTokenLifespan=300 -s accessTokenLifespanForImplicitFlow=300 \
   -s eventsEnabled=true -s eventsExpiration=7776000 \
-  -s adminEventsEnabled=true -s adminEventsDetailsEnabled=true
+  -s adminEventsEnabled=true -s adminEventsDetailsEnabled=true \
+  -s 'attributes.adminEventsExpiration=7776000'
+# Events (sign-ins, with IP) and admin events are deleted after 90 days (7776000 s), as the privacy policy states.
 echo "realm $R: policy applied"
 
 # master realm (Keycloak administration, break-glass admin kc-bootstrap): same brute-force protection (changelog #33).

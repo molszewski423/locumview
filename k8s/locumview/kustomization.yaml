@@ -8,6 +8,7 @@ resources:
   - postgres.yaml
   - guacd.yaml
   - guacamole.yaml
+  - guacamole-history-cleanup.yaml
   - keycloak-db.yaml
   - keycloak.yaml
   - cloudflared.yaml

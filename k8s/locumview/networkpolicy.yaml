@@ -42,6 +42,20 @@ spec:
   ingress:
     - from: [{podSelector: {matchLabels: {app.kubernetes.io/name: guacamole}}}]
       ports: [{protocol: TCP, port: 5432}]
+    # Nightly 90-day history cleanup (guacamole-history-cleanup.yaml).
+    - from: [{podSelector: {matchLabels: {app.kubernetes.io/name: guacamole-history-cleanup}}}]
+      ports: [{protocol: TCP, port: 5432}]
+---
+# Guacamole history cleanup: talks to the Guacamole database only.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: guacamole-history-cleanup, namespace: locumview}
+spec:
+  podSelector: {matchLabels: {app.kubernetes.io/name: guacamole-history-cleanup}}
+  policyTypes: [Egress]
+  egress:
+    - to: [{podSelector: {matchLabels: {app.kubernetes.io/name: guacamole-db}}}]
+      ports: [{protocol: TCP, port: 5432}]
 ---
 # guacd: accepts the Guacamole protocol from the web app only; may open RDP to the desktops only.
 # Desktops by address until Phase 3 provisions them; 192.168.4.36 = locumview-ref-dev (changelog #15):
