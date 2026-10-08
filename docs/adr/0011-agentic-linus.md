@@ -1,6 +1,6 @@
 # ADR 0011: Agentic Linus for LocumView engineering, local and git-gated
 
-Status: Accepted (build on hold until the prerequisites in section 7 are done)
+Status: Accepted (build on hold until the prerequisites in section 7 are done). Updated 2026-10-07: the persona is Argus, staged (see the update at the end)
 Date: 2026-10-07
 
 ## Context
@@ -180,3 +180,84 @@ switch off is also the first step of any incident involving Linus.
   model resisting it. Limited identities, one capped write path into review, and the kill switch bound the damage.
 - If LocumView ever processes real patient data, logs read by `lv_logs` may contain it. That data stays on local
   systems, but log summarization for such environments needs its own data-handling review first.
+
+## Update 2026-10-07: the persona is Argus; staged path to coding and a platform agent
+
+Owner direction, 2026-10-07. Everything above still applies except where this section changes it. Plan only: nothing
+here is built, and the build stays on hold until the prerequisites at the end of this section are done.
+
+**Name and scope.** The persona is **Argus** (model id `argus`; this ADR called it `linus-locumview`, "agentic
+Linus"). It is private to the owner: no access grants to other users, hidden from everyone else. Its definition lives
+in git with the other personas (`homelab-infra/linus/personas/`, applied by `apply.py`). The name was freed by
+retiring the PV workbench's Argus Discord bot on 2026-10-07; nothing from that bot carries over. The Gitea account
+`argus-bot` below is new and unrelated to that bot's old Kubernetes Deployment of the same name. All identities in
+sections 3 to 5 take the new name: Gitea user `argus-bot` with its fork `argus-bot/locumview` and branches
+`argus/<date>-<slug>`, ServiceAccount `argus-reader`, ConfigMap `argus-agent-controls`, kill switch
+`argus-writes off|on`, audit log `/var/log/argus/audit.jsonl`.
+
+**Stages.** Each stage starts only after the previous one has run cleanly and the owner says go.
+
+1. **Read-only knowledge and tools.** The read tools of section 4 (repository, `locumview` namespace objects, logs,
+   events, drift) and read-only claude-memory knowledge. No write tool exists in this stage.
+2. **Coding through the fork model.** `argus-bot` has Read on `mike/locumview` and writes only to its own fork; it
+   opens pull requests and never pushes to `main` or merges, and it never applies anything to the cluster: the owner
+   applies after merge, as in section 1. Pre-commit checks run on every Argus PR (see Sandbox). The patch limits of
+   section 2 stay as written: about 40 changed lines, 3 files, allowlisted paths only. Added to the excluded paths:
+   Argus's own tool server, sandbox and persona definitions (`agent/` and its deployment manifests), so it can never
+   propose changes to its own controls. **At most 3 open Argus pull requests at a time:** before opening one, the tool
+   server counts `argus-bot`'s open PRs on `mike/locumview` and refuses at 3, telling Argus to wait for review. This
+   keeps review load bounded and limits how much an injection could queue up.
+3. **Platform agent, later.** Argus becomes the general agent of the LocumView platform. That is a product feature
+   with real users and possibly regulated data, so it needs its own ADR first (users and permissions, audit, data
+   protection, the EU posture of ADR 0008). Nothing in this ADR authorizes stage 3.
+
+**Sandbox for code execution.** Code Argus writes or runs (tests, linters, pre-commit, applying a patch to check it)
+runs only in short-lived Kubernetes Jobs in a dedicated namespace `argus-sandbox`:
+- No cluster credentials: a ServiceAccount with no RoleBindings and `automountServiceAccountToken: false`.
+- Network: default-deny NetworkPolicy; egress only to DNS and the Gitea service, nothing else (no internet, LAN,
+  cluster API or other namespaces). Ingress: none.
+- The Job holds only a read-only Gitea token (clone); it never holds `argus-bot`'s write token. It returns a patch
+  and its check results to the tool server, which enforces the path allowlist and size caps and does the push itself.
+- `ttlSecondsAfterFinished: 600`, `activeDeadlineSeconds: 900`, `backoffLimit: 0`; resource limits (1 CPU, 1 GiB
+  memory, 2 GiB ephemeral storage); Pod Security `restricted`, non-root, read-only root filesystem with an `emptyDir`
+  workspace; the toolchain image pinned by digest.
+- Pre-commit runs in the sandbox before every push, and its output goes into the PR body. Once CI exists (the
+  ROADMAP housekeeping item), the same checks also run on every PR in a runner of the same class, with no secrets.
+
+**Tools as a portable tool server.** Argus's tools are not Open WebUI tool code. They are a small tool server in git
+(MCP over HTTP, or a similar open protocol), in the `locumview` repo under `agent/`, built as a pinned image and run in
+its own namespace `argus` with the `argus-reader` and `argus-bot` identities. Open WebUI connects to it as an external
+tool server, and the stage 3 platform agent can reuse it unchanged. This supersedes section 4's "all tools are Open
+WebUI tools" for Argus: the Open WebUI pod never holds Argus's tokens. The tool list, limits and single write tool of
+section 4 are unchanged. (The general Linus personas' tools still move to `homelab-infra/linus/tools/` as decided.)
+Policy lives in the server's code, not in the prompt: path allowlist, size caps, kill-switch check, audit write.
+
+**Prompt injection.** Everything Argus reads is untrusted: repository files, PR comments, commit messages, pod logs,
+events, manifests and memory. Instructions found in that content are data, never commands. The containment does not
+rely on the model resisting injection: the fork-only write path (no rights on `mike/locumview`), human review of every
+PR, the sandbox without credentials or network beyond Gitea, and tool-server policy enforced in code bound what a
+successful injection can do to "a pull request the owner rejects".
+
+**Kill switch and audit:** as written in section 5, under the new names, with the audit storage made explicit. The
+audit log is a PersistentVolumeClaim `argus-audit` (storage class `local-path`) in namespace `argus`, mounted only by
+the tool server; no Argus pod uses a hostPath volume. The nightly restic job of the node that holds the volume backs it
+up with every other local-path volume (`backup-mikepc` or `backup-debianbox`, both include all local-path PVs), so the
+7 daily, 4 weekly and 6 monthly snapshots keep the history even if the live file were changed. Stdout to cluster logs
+was considered and not chosen: the cluster has no log aggregation, and container logs rotate within days, so they
+are not an audit record. The tool server also prints each audit line to stdout for live viewing. No tool reads the
+audit log back. Until the homelab Matrix server exists (on hold since 2026-10-07), PR notifications come from
+Gitea's own notifications instead of a Matrix room.
+
+**Prerequisites (unchanged, current state):**
+1. Cloudflare Access in front of Open WebUI (`linus.ringcatch.io`), verified from outside the LAN. Not done: the
+   Cloudflare account has no Zero Trust organization yet.
+2. Phase 3 complete, including Linus's read-only claude-memory access. Steps 1 to 5 done 2026-10-07; read-only
+   access waits for item 1.
+3. Cluster-admin removed (done 2026-10-07: binding `linus-viewer-clusterbinding` deleted) and the `linus-readonly`
+   Job scope narrowed (pending).
+
+**Acceptance tests added** to section 7, for stage 2: a sandbox Job has no ServiceAccount token mounted, cannot reach
+anything except DNS and Gitea (tested against the cluster API, the internet and a LAN host), holds no write token, and
+is gone within `ttlSecondsAfterFinished`; a patch touching `agent/` or another excluded path is refused by the tool
+server; a fourth PR is refused while 3 are open; the audit volume appears in the next nightly restic snapshot; an
+injected instruction planted in a test file does not produce any action outside a PR to the fork.

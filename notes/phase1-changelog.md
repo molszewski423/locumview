@@ -587,3 +587,15 @@ Files: `k8s/locumview/guacamole.yaml`, `docs/runbooks.md` (new), `ROADMAP.md`.
 - **Guacamole:** `API_SESSION_TIMEOUT=30` (was the 60-minute default), matching Keycloak's 30-minute SSO idle timeout. Applied with `kubectl apply -k` (only the Guacamole pod restarted; no desktop connection was open). Login page answered 200 afterwards.
 - **Whole path, as configured:** Keycloak SSO sessions end after 30 minutes idle and 10 hours at most; Guacamole sessions after 30 minutes idle. Guacamole never expires a session while it has an open desktop connection (`HashTokenSessionMap` in 1.6.0 skips sessions with tunnels), and the demo desktop has no screen lock (#22), so an open connection stays up until it is closed. Signing in again goes through Keycloak with MFA (the demo account is MFA-exempt).
 - **Demo accounts:** owner decision: the privacy policy now says the shared guest password is rotated after each evaluation. Procedure in `docs/runbooks.md`. Per-evaluator accounts with an expiry date are on the ROADMAP backlog.
+
+## 43. ADR 0011 update: the persona is Argus, staged toward coding and a platform agent (2026-10-07)
+
+Owner direction. File: `docs/adr/0011-agentic-linus.md` (dated update section; status line), `README.md` (ADR table). Plan only; nothing built, and the build stays on hold behind the same prerequisites.
+
+- **Name:** Argus, private to the owner (was "agentic Linus", `linus-locumview`). The name was freed the same day by retiring the PV workbench's Argus Discord bot (homelab-infra). Identities renamed: Gitea `argus-bot` and fork `argus-bot/locumview`, ServiceAccount `argus-reader`, kill switch `argus-writes`.
+- **Stages:** (1) read-only knowledge and tools; (2) coding through the fork model: PRs from the fork only, never `main`, never the cluster, pre-commit on every PR, patch limits unchanged, at most 3 open PRs (the tool server refuses a fourth), and its own tools, sandbox and persona excluded from what it may change; (3) platform agent later, under its own ADR.
+- **Sandbox:** short-lived Jobs in `argus-sandbox` with no cluster credentials, egress only to DNS and Gitea, a read-only clone token (the push is done by the tool server), TTL, deadline and resource limits, Pod Security restricted.
+- **Tools:** a portable tool server in git (`agent/`, MCP or similar), run in namespace `argus`, used by Open WebUI as an external tool server and reusable by the platform agent; policy enforced in code.
+- **Prompt injection:** all input untrusted; the fork-only write path, review, the sandbox and code-enforced policy are the containment.
+- **Audit:** PVC `argus-audit` (local-path) in namespace `argus`, no hostPath, captured by the node's nightly restic job with all local-path volumes; stdout to cluster logs rejected as the record (no log aggregation, logs rotate) but kept for live viewing.
+- **Prerequisites (unchanged):** Cloudflare Access in front of Open WebUI verified from outside the LAN (not done: no Zero Trust organization yet); Phase 3's last step; cluster-admin removed (done) and the `linus-readonly` Job scope narrowed (pending).

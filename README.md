@@ -47,7 +47,7 @@ The access layer runs as containers on k3s. The desktop runs as a VM: a GNOME se
 | [0008](docs/adr/0008-eu-regulatory-posture.md) | EU regulatory posture; clinical AI as a detachable module |
 | [0009](docs/adr/0009-v1-scope-integrate-dont-bundle.md) | Version-one scope, integrate don't bundle, hypervisor at deploy time |
 | [0010](docs/adr/0010-desktop-vm-sizing-memory.md) | Desktop VM sizing tiers and host memory overcommit (free page reporting, KSM) |
-| [0011](docs/adr/0011-agentic-linus.md) | Agentic Linus for LocumView engineering: local model, read-only scoped access, changes only as PRs from a fork |
+| [0011](docs/adr/0011-agentic-linus.md) | Argus (was "agentic Linus") for LocumView engineering: local model, read-only scoped access, changes only as PRs from a fork, code in a sandbox; staged toward a platform agent |
 
 ## Where it is going
 
