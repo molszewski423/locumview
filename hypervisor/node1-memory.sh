@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# MikePC VM memory settings (ADR 0010). Run on MikePC as root; idempotent.
+# node1 VM memory settings (ADR 0010). Run on node1 as root; idempotent.
 #   1. KSM always on, scan rate tuned by the kernel's KSM advisor.
 #   2. virtio-balloon free page reporting (+ 10 s guest stats) on every
 #      listed VM; a running VM is shut down cleanly and started again,
 #      because the balloon device is only rebuilt on a cold start.
-# Usage: sudo ./mikepc-memory.sh [vm ...]   (default: locumview-ref-dev idm01)
+# Usage: sudo ./node1-memory.sh [vm ...]   (default: locumview-ref-dev idm01)
 set -euo pipefail
 
 VMS=("${@:-locumview-ref-dev idm01}")

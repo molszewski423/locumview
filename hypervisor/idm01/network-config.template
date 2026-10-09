@@ -3,12 +3,12 @@ ethernets:
   lan0:
     match:
       macaddress: "52:54:00:4c:56:47"
-    addresses: [192.168.4.47/22]
+    addresses: [${IDM_IP}/${LAN_PREFIX}]
     routes:
       - to: 0.0.0.0/0
-        via: 192.168.4.1
+        via: ${GATEWAY_IP}
     nameservers:
-      addresses: [192.168.4.45]
+      addresses: [${DNS_IP}]
       search: [corp.locumview.com]
     dhcp4: false
     dhcp6: false

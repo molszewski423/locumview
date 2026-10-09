@@ -12,19 +12,19 @@ users:
   - name: mike
     gecos: Michael Olszewski
     groups: [wheel]
-    sudo: "ALL=(ALL) NOPASSWD:ALL"
-    lock_passwd: true
+    # sudo asks for a password (changelog #45); the hash comes from ADMIN_PASSWORD_HASH at create time.
+    sudo: "ALL=(ALL) ALL"
+    lock_passwd: false
+    hashed_passwd: "${ADMIN_PASSWORD_HASH}"
     ssh_authorized_keys:
-      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAD84UGttsnVPoYcndD2mcEkivzhpJ2JonwcErDAaQEX mike@devsuse
-      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBSZ050zIuBS1CXte/SiokwaqVYFqm+MVvFJQumpaI5A mike@MikePC
-      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINduebEN8BM5kejTdDPiJwHua6zSOvzoSXbMEEQWB1Ft mike@MikeThinkPad
+${ADMIN_SSH_KEYS}
 write_files:
   # IdM requires the FQDN to resolve to the static address, not to 127.0.0.1.
   - path: /etc/hosts
     content: |
       127.0.0.1   localhost localhost.localdomain
       ::1         localhost localhost.localdomain
-      192.168.4.47 idm01.corp.locumview.com idm01
+      ${IDM_IP} idm01.corp.locumview.com idm01
 package_update: true
 packages:
   - qemu-guest-agent

@@ -1,5 +1,5 @@
-# Guacamole's database (PostgreSQL 17). Single replica on local-path storage, pinned to mikepc
-# (local-path volumes are node-bound; mikepc has the most headroom). See changelog #17.
+# Guacamole's database (PostgreSQL 17). Single replica on local-path storage, pinned to the node in site.env
+# (local-path volumes are node-bound; pick the node with the most headroom). See changelog #17.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -54,7 +54,7 @@ spec:
     metadata:
       labels: {app.kubernetes.io/name: guacamole-db, app.kubernetes.io/part-of: locumview}
     spec:
-      nodeSelector: {kubernetes.io/hostname: mikepc}
+      nodeSelector: {kubernetes.io/hostname: DB_NODE}   # set from site.env
       automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true

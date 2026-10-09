@@ -40,7 +40,7 @@ spec:
     metadata:
       labels: {app.kubernetes.io/name: keycloak-db, app.kubernetes.io/part-of: locumview}
     spec:
-      nodeSelector: {kubernetes.io/hostname: mikepc}
+      nodeSelector: {kubernetes.io/hostname: DB_NODE}   # set from site.env
       automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true

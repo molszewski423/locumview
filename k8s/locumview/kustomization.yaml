@@ -34,3 +34,25 @@ configMapGenerator:
     namespace: locumview
     files:
       - guacamole/locumview-branding.jar
+
+# Site-specific values (addresses, node names) are not in git: copy site.env.example to site.env (git-ignored) and
+# fill it in. Without it, `kubectl apply -k` fails instead of applying placeholders. The ConfigMap only feeds the
+# replacements below and is never applied (local-config).
+  - name: site-values
+    envs: [site.env]
+    options:
+      disableNameSuffixHash: true
+      annotations: {config.kubernetes.io/local-config: "true"}
+replacements:
+  - source: {kind: ConfigMap, name: site-values, fieldPath: data.REFDEV_CIDR}
+    targets: [{select: {kind: NetworkPolicy, name: guacd}, fieldPaths: [spec.egress.0.to.0.ipBlock.cidr]}]
+  - source: {kind: ConfigMap, name: site-values, fieldPath: data.IDM_CIDR}
+    targets: [{select: {kind: NetworkPolicy, name: keycloak}, fieldPaths: [spec.egress.2.to.0.ipBlock.cidr]}]
+  - source: {kind: ConfigMap, name: site-values, fieldPath: data.DB_NODE}
+    targets:
+      - select: {kind: StatefulSet, name: guacamole-db}
+        fieldPaths:
+          - "spec.template.spec.nodeSelector.[kubernetes.io/hostname]"
+      - select: {kind: StatefulSet, name: keycloak-db}
+        fieldPaths:
+          - "spec.template.spec.nodeSelector.[kubernetes.io/hostname]"

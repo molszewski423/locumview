@@ -36,3 +36,6 @@ build/
 # Python bytecode
 __pycache__/
 *.pyc
+
+# Site-specific values (addresses, host names); see site.env.example files
+site.env

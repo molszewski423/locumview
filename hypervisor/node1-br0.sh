@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 # LocumView hypervisor prep (Phase 2, manual step; target: Ansible "hypervisor" role).
-# MikePC (Debian 13, k3s server, --node-ip=192.168.4.54): LAN bridge br0 so desktop VMs get LAN addresses
+# node1 (Debian 13, k3s node, --node-ip=NODE1_IP): LAN bridge br0 so desktop VMs get LAN addresses
 # that guacd pods on any k3s node can reach. See changelog #15.
-# Run as root:  sudo bash hypervisor/mikepc-br0.sh
+# Run as root:  sudo bash hypervisor/node1-br0.sh
 #
-# br0 clones the NIC's MAC, so the router's DHCP hands back the same 192.168.4.54 and k3s is unaffected.
+# br0 clones the NIC's MAC, so the router's DHCP hands back the same NODE1_IP and k3s is unaffected.
 # The switchover runs in a transient systemd unit (an SSH drop can't stop it halfway) and rolls back to the
-# original wired profile if br0 doesn't get 192.168.4.54 and reach the gateway within 60 s.
+# original wired profile if br0 doesn't get NODE1_IP and reach the gateway within 60 s.
 set -euo pipefail
+SITE=${SITE_ENV:-$(cd "$(dirname "$0")/.." && pwd)/site.env}; [ -f "$SITE" ] && . "$SITE"   # see site.env.example
 NIC=enp8s0
 OLD="Wired connection 1"
-EXPECT_IP=192.168.4.54
-GW=192.168.4.1
+EXPECT_IP=${NODE1_IP:?set NODE1_IP in site.env}
+GW=${GATEWAY_IP:?set GATEWAY_IP in site.env}
+NODE=${NODE1_NAME:?set NODE1_NAME in site.env}
 LOG=/var/log/locumview-br0.log
 [ "$(id -u)" = 0 ] || { echo "run as root"; exit 1; }
 
@@ -76,7 +78,7 @@ systemctl enable --now locumview-br0-forward.service
 # flannel picks its VXLAN interface from --node-ip at start; that address now lives on br0.
 systemctl restart k3s
 for _ in $(seq 90); do
-  kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml get node mikepc -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null | grep -q True && break
+  kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml get node "$NODE" -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null | grep -q True && break
   sleep 2
 done
 kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml get nodes -o wide

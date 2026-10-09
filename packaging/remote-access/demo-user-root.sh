@@ -6,7 +6,8 @@
 # headless GNOME session with user-mode GNOME Remote Desktop on port 3391; no sudo, locked password,
 # no screen lock, and an egress fence (nftables, by uid): internet yes, home LAN / cluster / VPN ranges no.
 set -euo pipefail
-U=demo PORT=3391 DNS=192.168.4.45
+SITE=${SITE_ENV:-$(cd "$(dirname "$0")/.." && pwd)/site.env}; [ -f "$SITE" ] && . "$SITE"   # see site.env.example
+U=demo PORT=3391 DNS=${DNS_IP:?set DNS_IP in site.env}
 CRED=/home/molszewski/.locumview-demo-rdp
 HERE=$(cd "$(dirname "$0")" && pwd)
 [ "$(id -u)" = 0 ] || { echo "run as root"; exit 1; }

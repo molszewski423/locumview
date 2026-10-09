@@ -5,7 +5,7 @@
 #   { printf 'BIND_PASSWORD=%q\n' "$KC_LDAP_BIND_PASSWORD"; cat configure-idm-federation.sh; } |
 #     kubectl -n locumview exec -i deploy/keycloak -- bash -s
 # The bind password never appears in arguments or output. Prerequisites: the IdM CA in Keycloak's truststore
-# (keycloak/idm-ca.pem, KC_TRUSTSTORE_PATHS) and the NetworkPolicy egress to 192.168.4.47:636.
+# (keycloak/idm-ca.pem, KC_TRUSTSTORE_PATHS) and the NetworkPolicy egress to IdM on 636 (IDM_CIDR in site.env).
 #
 # Read-only: IdM is the source of truth; Keycloak never writes to it. Only members of the three locumview-*
 # IdM groups are visible to Keycloak. Their IdM groups map onto the existing Keycloak groups of the same name,

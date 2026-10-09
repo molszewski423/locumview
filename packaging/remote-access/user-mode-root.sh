@@ -7,10 +7,11 @@
 #  2. firewalld: RDP (3389 system/GDM admin fallback, 3390 user mode) only from the k3s nodes, where guacd
 #     runs (pod traffic leaves the cluster SNATed to the node address). SSH is allowed only from those
 #     nodes too, and so is Cockpit (9090): both leave the public zone (changelog #30); reach the VM with
-#     ssh -J mikepc, and Cockpit with ssh -L 9090:<vm-ip>:9090 mikepc.
+#     ssh -J <k3s node>, and Cockpit with ssh -L 9090:<vm-ip>:9090 <k3s node>.
 set -euo pipefail
 U=${1:?usage: user-mode-root.sh <desktop-user>}
-K3S_NODES="192.168.4.54/32 192.168.4.45/32"   # mikepc, debianbox (centosbook removed 2026-10-04, changelog #29)
+SITE=${SITE_ENV:-$(cd "$(dirname "$0")/.." && pwd)/site.env}; [ -f "$SITE" ] && . "$SITE"   # see site.env.example
+K3S_NODES=${K3S_NODE_CIDRS:?set K3S_NODE_CIDRS in site.env}   # every k3s node, /32 each (changelog #29)
 ZONE=locumview-gateways
 [ "$(id -u)" = 0 ] || { echo "run as root"; exit 1; }
 id "$U" >/dev/null

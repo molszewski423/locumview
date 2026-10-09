@@ -615,7 +615,16 @@ Owner direction. No files changed besides this entry; live state only.
 Owner direction. Docs and evidence only; nothing running changed. Pass 2 (live config) follows.
 
 - **Host names** in docs, notes and evidence logs are now roles: `node1` (GPU agent and hypervisor), `node2` (k3s server), `node3` (the retired CentOS worker), `dev-laptop-1` (openSUSE), `dev-laptop-2` (Fedora), `git.internal` (the private Gitea). Addresses are named placeholders (`<idm-ip>`, `<ref-dev-ip>`, `<node1-ip>`, `<node2-ip>`, `<gateway-ip>`, ...); home paths are `~`. `idm01` and `corp.locumview.com` stay: they are part of the reference design. Earlier entries keep their meaning; only the names changed.
-- **Files renamed:** `hypervisor/import-node1.sh`, `node1-br0.sh`, `node1-memory.sh`, `locumview-ref-dev.node1.xml`, `docs/evidence/phase2/import-node1.log` (were `*mikepc*`).
+- **Files renamed:** `hypervisor/import-node1.sh`, `node1-br0.sh`, `node1-memory.sh`, `locumview-ref-dev.node1.xml`, `docs/evidence/phase2/import-node1.log` (previously named after the host).
 - **`docs/break-glass.md`** says what kind of credential each account uses, not where it is kept; the locations are in the owner's private runbook. The idm01 admin account's sudo now asks for a password (it had none before).
 - **GNOME extension metadata** links to the public repository instead of the private Gitea address.
 - **History:** gitleaks over all 60 commits found no secrets, and a manual check of every password- or token-like line found only SOPS ciphertext, variable names and settings, so history is not rewritten. Older commits still show the previous names and addresses.
+
+## 46. Public repo cleanup, pass 2: site values out of the live config (2026-10-09)
+
+Owner direction. Addresses, node names and admin SSH keys move out of tracked files into git-ignored `site.env` files; the committed `*.example` files show what to fill in. Nothing running changed.
+
+- **Kubernetes:** `k8s/locumview/site.env` (`REFDEV_CIDR`, `IDM_CIDR`, `DB_NODE`) feeds kustomize `replacements` into the guacd and Keycloak NetworkPolicies and the two database StatefulSets' `nodeSelector`, through a `local-config` ConfigMap that is never applied. Verified: `kubectl kustomize` output is byte-identical to before, a server-side dry run of `apply -k` shows no change, and without `site.env` the build fails instead of applying placeholders.
+- **Scripts:** repo-root `site.env` (see `site.env.example`) for `hypervisor/node1-br0.sh`, `hypervisor/idm01/create-idm01.sh`, `ipa-install.sh` and `packaging/remote-access/{demo-user,user-mode}-root.sh`; each stops with a clear message when a value is missing. `hypervisor/idm01/network-config` is now `network-config.template`, rendered at create time. Home paths come from the invoking user. Rendered idm01 files are identical to the old ones apart from the sudo change below.
+- **idm01 at the next rebuild:** admin SSH keys come from `ADMIN_SSH_KEYS_FILE`, and sudo asks for a password (`ADMIN_PASSWORD_HASH`, `openssl passwd -6`, supplied at create time like the activation key). Matches the running server since #45.
+- **Where the real values live:** the owner's private runbook keeps a copy of both `site.env` files.

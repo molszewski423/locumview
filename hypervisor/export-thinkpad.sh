@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# LocumView: export locumview-ref-dev from the ThinkPad (Fedora 45) for the move to MikePC. See changelog #15.
+# LocumView: export locumview-ref-dev from the ThinkPad (Fedora 45) for the move to node1. See changelog #15.
 # Run as root:  sudo bash hypervisor/export-thinkpad.sh
 # Read-only for the source VM: it is shut down gracefully, never undefined or modified, and its
-# autostart is turned off, so it stays a complete rollback copy (with its snapshots) until MikePC is verified.
+# autostart is turned off, so it stays a complete rollback copy (with its snapshots) until node1 is verified.
 set -euo pipefail
 DOM=locumview-ref-dev
 UUID=2604cc64-67d1-40eb-850c-940d67c13402
 SRC=/var/lib/libvirt/images/$DOM.qcow2
 NVRAM=/var/lib/libvirt/qemu/nvram/${DOM}_VARS.qcow2
-OUT=/home/mike/locumview-export
+OUT=${OUT:-/home/${SUDO_USER:?run with sudo}/locumview-export}
 V="virsh -c qemu:///system"
 [ "$(id -u)" = 0 ] || { echo "run as root"; exit 1; }
 install -d -o mike -g mike "$OUT"
@@ -39,7 +39,7 @@ qemu-img check "$OUT/$DOM.qcow2"
 qemu-img convert -f qcow2 -O raw "$NVRAM" "$OUT/${DOM}_VARS.fd"
 stat -c '%s %n' "$OUT/${DOM}_VARS.fd"
 
-# 5. vTPM state (swtpm 0.10.2 here; MikePC has 0.7.1, which may not read it; the import handles that).
+# 5. vTPM state (swtpm 0.10.2 here; node1 has 0.7.1, which may not read it; the import handles that).
 tar -C /var/lib/libvirt/swtpm -cpf "$OUT/swtpm-$UUID.tar" "$UUID"
 
 cd "$OUT"

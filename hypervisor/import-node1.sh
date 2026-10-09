@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# LocumView: import locumview-ref-dev on MikePC (Debian 13) after export-thinkpad.sh. See changelog #15.
-# Run as root:  sudo bash hypervisor/import-mikepc.sh
-# Expects /home/mike/locumview-import/ (export files + locumview-ref-dev.mikepc.xml). Disk goes under /home
+# LocumView: import locumview-ref-dev on node1 (Debian 13) after export-thinkpad.sh. See changelog #15.
+# Run as root:  sudo bash hypervisor/import-node1.sh
+# Expects ~/locumview-import/ of the invoking user (export files + locumview-ref-dev.node1.xml). Disk goes under /home
 # (root has 30 GiB free, and a full root has caused outages on this cluster before).
 set -euo pipefail
 DOM=locumview-ref-dev
 UUID=2604cc64-67d1-40eb-850c-940d67c13402
-IN=/home/mike/locumview-import
+IN=${IN:-/home/${SUDO_USER:?run with sudo}/locumview-import}
 POOL_DIR=/home/libvirt/images
 V="virsh -c qemu:///system"
 [ "$(id -u)" = 0 ] || { echo "run as root"; exit 1; }
@@ -36,7 +36,7 @@ install -m 600 "$IN/${DOM}_VARS.fd" "/var/lib/libvirt/qemu/nvram/${DOM}_VARS.fd"
 install -d /var/lib/libvirt/swtpm
 tar -C /var/lib/libvirt/swtpm --no-same-owner -xpf "$IN/swtpm-$UUID.tar"
 
-$V define "$IN/$DOM.mikepc.xml"
+$V define "$IN/$DOM.node1.xml"
 if ! $V start "$DOM"; then
   # swtpm 0.7.1 may not read state written by 0.10.2. Keep that state, start with a fresh vTPM.
   journalctl -u libvirtd -u virtqemud --since -2min --no-pager | tail -20 || true

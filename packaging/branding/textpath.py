@@ -1,10 +1,11 @@
 """Render text to SVG path data with a TTF (fontTools), so wallpapers need no installed fonts."""
+import os
 from functools import lru_cache
 from fontTools.ttLib import TTFont
 from fontTools.pens.svgPathPen import SVGPathPen
 from fontTools.pens.transformPen import TransformPen
 
-FONT_DIR = "/home/mike/.local/share/fonts/JetBrainsMonoNerd"
+FONT_DIR = os.path.expanduser("~/.local/share/fonts/JetBrainsMonoNerd")
 
 @lru_cache(None)
 def font(weight="Medium"):
