@@ -19,7 +19,7 @@ Name: nods to locum tenens clinicians and VMware View (now Horizon, owned by Omn
 | 2026-09-28 | Registered during install | Role: RHEL Workstation, SLA: Self-Support, Usage: Development/Test, Insights enabled. subscription-manager status shows Registered (Simple Content Access, no attach needed). |
 | 2026-09-28 | sudo dnf upgrade -y | Already up to date. |
 | 2026-09-28 | QEMU guest agent | Package already installed by the Workstation environment; service enabled. Host was missing the virtio channel org.qemu.guest_agent.0; needs adding on the host (virt-manager Add Hardware > Channel, or virsh edit). Verify with sudo virsh domifaddr locumview-ref-dev --source agent. |
-| 2026-09-29 08:50 | Fixed Gitea SSH access | Gitea (hosted on a separate k3s cluster, control plane MikePC) had three bugs blocking git-over-ssh from any external host: SSH port was ClusterIP-only, the container's real sshd ignored the Gitea-side port setting, and INSTALL_LOCK=false was resetting the instance to the install wizard on every pod restart. All fixed in the homelab-infra repo's k8s/gitea.yaml, not this repo. Full writeup in [notes/phase1-changelog.md](../notes/phase1-changelog.md). |
+| 2026-09-29 08:50 | Fixed Gitea SSH access | Gitea (hosted on a separate k3s cluster, control plane node1) had three bugs blocking git-over-ssh from any external host: SSH port was ClusterIP-only, the container's real sshd ignored the Gitea-side port setting, and INSTALL_LOCK=false was resetting the instance to the install wizard on every pod restart. All fixed in the homelab-infra repo's k8s/gitea.yaml, not this repo. Full writeup in [notes/phase1-changelog.md](../notes/phase1-changelog.md). |
 | 2026-09-29 09:08 | First commit to this repo | Phase 0 layout, this plan, CLAUDE.md, phase1-changelog.md, Phase 1 evidence. Signed with the VM's per-machine SSH key. |
 | 2026-10-01 | Original VM lost in host reinstall (Rocky 10.2 to Fedora 45) | qemu:///system was not in the backup. See changelog #11. |
 | 2026-10-01 | Rebuilt locumview-ref-dev | virt-install: UEFI + Secure Boot, swtpm TPM 2.0, host-passthrough, 4 vCPU / 8 GiB, 60 GiB, guest agent channel. RHEL 10.2 from the boot ISO, Red Hat CDN as install source. Admin user molszewski. Changelog #11. |
@@ -29,8 +29,8 @@ Name: nods to locum tenens clinicians and VMware View (now Horizon, owned by Omn
 | 2026-10-01 | Desktop setup and branding | packaging/install-desktop.sh: Dash to Dock/Panel, Extensions and ONLYOFFICE Flatpaks (Flathub), Papirus (pinned), LocumView logo and 12 wallpaper pairs, dconf defaults. Changelog #12. |
 | 2026-10-02 | Rebuilt VM baseline | docs/evidence/phase1/baseline-rebuild-20261001/; all differences from the original explained in changelog #12. |
 | 2026-10-02 | Window management and keymap | Tiling Assistant (pinned), LocumView Activities extension (logo + workspace dots), Alt keymap, GDM/lock logo, Papirus folders in LocumView teal. Changelog #13. |
-| 2026-10-02 | Headless RDP validated from the LAN | MikePC via a temporary host TCP forward, nobody at the console. Remote login takes two server redirections; Debian 13 Remmina (FreeRDP 3.15) crashes on the second, Flathub Remmina (FreeRDP 3.20) works. guacd must handle both. Changelog #14. |
-| 2026-10-02 | Reference VM moved to MikePC | LAN bridge br0 on MikePC; VM at 192.168.4.36 with a fresh vTPM, Secure Boot intact, RDP verified. ADR 0002 (k3s) and 0003 (SOPS + age). locumview.com through a Cloudflare Tunnel, Keycloak as IdP, Nextcloud on k3s decided. Changelog #15. |
+| 2026-10-02 | Headless RDP validated from the LAN | node1 via a temporary host TCP forward, nobody at the console. Remote login takes two server redirections; Debian 13 Remmina (FreeRDP 3.15) crashes on the second, Flathub Remmina (FreeRDP 3.20) works. guacd must handle both. Changelog #14. |
+| 2026-10-02 | Reference VM moved to node1 | LAN bridge br0 on node1; VM at <ref-dev-ip> with a fresh vTPM, Secure Boot intact, RDP verified. ADR 0002 (k3s) and 0003 (SOPS + age). locumview.com through a Cloudflare Tunnel, Keycloak as IdP, Nextcloud on k3s decided. Changelog #15. |
 | 2026-10-02 | Secrets tooling | SOPS + age (ADR 0003), `.sops.yaml`, pre-commit `sops-encrypted` guard (gitleaks missed a disguised plain-text secret). Changelog #16. |
 | 2026-10-02 | Guacamole on k3s | Postgres + guacd + Guacamole 1.6.0 in namespace locumview (PSA restricted, default-deny NetworkPolicies, no exposure). Browser to desktop works; guacd (FreeRDP 2.11.7) follows GRD's two redirections. kubeconform hook. Changelog #17. |
 | 2026-10-02 | Keycloak SSO + TOTP | Keycloak 26.8.0 (ADR 0005), realm as code, TOTP enforced for all except the demo group, Guacamole via OIDC with group-based permissions. First SSO+MFA login to the desktop verified. Changelog #18. |
@@ -48,7 +48,7 @@ Name: nods to locum tenens clinicians and VMware View (now Horizon, owned by Omn
 - [x] Record baseline: cat /etc/redhat-release, uname -r, dnf group list --installed (original: baseline/; rebuilt VM: baseline-rebuild-20261001/)
 - [ ] ~~Snapshot: clean-install-registered~~ (not possible after the rebuild; superseded by rdp-working)
 - [ ] Optional: install Security Tools group and run a baseline OpenSCAP scan ("before" evidence)
-- [x] Validate GNOME Remote Desktop headless RDP (the highest-risk item in the whole project). Done 2026-10-02 from MikePC, nobody at the console (changelog #14)
+- [x] Validate GNOME Remote Desktop headless RDP (the highest-risk item in the whole project). Done 2026-10-02 from node1, nobody at the console (changelog #14)
 - [x] Snapshot after RDP works (desktop-13, changelog #14)
 - [x] Start the Git repo (Phase 0) and move this log into it
 
@@ -131,7 +131,7 @@ Everything below is optional until version one ships.
 
 **Phase 5, Cross-distro Ansible (last, skippable):** branch on ansible_os_family, test with Molecule on Fedora/Debian/Arch. Least aligned with Red Hat targeting; deprioritized.
 
-**Phase 6, Kubernetes:** KubeVirt + CDI on k3s, import RHEL guest image, apply same Ansible; Argo CD GitOps; Prometheus/Grafana. Set VM memory limits first (MikePC's 32 GB is shared with the AI stack).
+**Phase 6, Kubernetes:** KubeVirt + CDI on k3s, import RHEL guest image, apply same Ansible; Argo CD GitOps; Prometheus/Grafana. Set VM memory limits first (node1's 32 GB is shared with the AI stack).
 
 **Phase 7, AWS:** budget alarm first; VPC with private subnets; S3 remote state; no public IPs; IAM roles; destroy after every session. Check Red Hat Cloud Access before using RHEL AMIs (pay-as-you-go RHEL adds hourly cost); otherwise record an ADR.
 
@@ -174,4 +174,4 @@ One-line thesis: as clinical computing moves to the browser, LocumView lets heal
 
 - Guacamole hosting: Podman/Quadlet vs k3s
 - Verify Red Hat Cloud Access before the AWS rung
-- ~~Set VM memory limits on MikePC before KubeVirt~~ Decided 2026-10-05: ADR 0010 (desktop tiers, free page reporting, KSM)
+- ~~Set VM memory limits on node1 before KubeVirt~~ Decided 2026-10-05: ADR 0010 (desktop tiers, free page reporting, KSM)

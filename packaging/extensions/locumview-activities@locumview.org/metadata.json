@@ -3,5 +3,5 @@
   "name": "LocumView Activities",
   "description": "Shows the LocumView logo and GNOME's workspace dots together in the top-left Activities button. RHEL's gnome-shell shows the distro logo instead of the dots; this restores the dots beside it.",
   "shell-version": ["49"],
-  "url": "http://git.lan/mike/locumview"
+  "url": "https://gitlab.com/molszewski423/locumview"
 }

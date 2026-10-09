@@ -5,8 +5,8 @@ Date: 2026-10-07
 
 ## Context
 
-Linus is the owner's assistant in Open WebUI (k3s namespace `ai` on MikePC). Since 2026-10-06 it runs on
-`qwen3.8-27b-q4km` through the in-cluster `ollama` Service (an HAProxy in front of the host Ollama on MikePC's
+Linus is the owner's assistant in Open WebUI (k3s namespace `ai` on node1). Since 2026-10-06 it runs on
+`qwen3.8-27b-q4km` through the in-cluster `ollama` Service (an HAProxy in front of the host Ollama on node1's
 RTX 5060 Ti), with a 16k context. Measured on 2026-10-06: about 10 tokens/s generation, about 600 tokens/s prompt
 processing (a full 16k prompt takes about 26 s), about 2.4 GiB of the model spills to system RAM, and Open WebUI's
 native tool calling works end to end (a tool question answered in 24 s once tool output was kept compact).
@@ -132,7 +132,7 @@ switch off is also the first step of any incident involving Linus.
 
 ### 6. How this keeps local AI inside the boundary
 
-- Inference is local: the model runs on MikePC's GPU through the in-cluster `ollama` Service. No prompt, file,
+- Inference is local: the model runs on node1's GPU through the in-cluster `ollama` Service. No prompt, file,
   manifest or log line goes to an external model API.
 - The data path is local: the tools talk only to the cluster API and the self-hosted Gitea on the LAN. The persona
   has no web search and no third-party integrations.
@@ -241,7 +241,7 @@ successful injection can do to "a pull request the owner rejects".
 **Kill switch and audit:** as written in section 5, under the new names, with the audit storage made explicit. The
 audit log is a PersistentVolumeClaim `argus-audit` (storage class `local-path`) in namespace `argus`, mounted only by
 the tool server; no Argus pod uses a hostPath volume. The nightly restic job of the node that holds the volume backs it
-up with every other local-path volume (`backup-mikepc` or `backup-debianbox`, both include all local-path PVs), so the
+up with every other local-path volume (`backup-node1` or `backup-node2`, both include all local-path PVs), so the
 7 daily, 4 weekly and 6 monthly snapshots keep the history even if the live file were changed. Stdout to cluster logs
 was considered and not chosen: the cluster has no log aggregation, and container logs rotate within days, so they
 are not an audit record. The tool server also prints each audit line to stdout for live viewing. No tool reads the

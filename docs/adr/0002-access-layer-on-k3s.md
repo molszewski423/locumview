@@ -7,7 +7,7 @@ Date: 2026-10-02
 
 Phase 2 adds the access layer: Apache Guacamole (web app), guacd (the RDP proxy), their database, and Keycloak for SSO and MFA, behind TLS. PLAN.md left the hosting choice open: Podman with Quadlet units on one host, or Kubernetes.
 
-The homelab already runs a three-node k3s cluster (v1.36.5+k3s1): mikepc (control plane, Debian 13), debianbox (Debian 13) and centosbook (CentOS Stream 10). It already provides Traefik as the default ingress controller, `local-path` storage, and Helm. On 2026-10-02 the reference desktop VM moved to MikePC on a LAN bridge (changelog #15), so any node can reach it.
+The homelab already runs a three-node k3s cluster (v1.36.5+k3s1): node1 (control plane, Debian 13), node2 (Debian 13) and node3 (CentOS Stream 10). It already provides Traefik as the default ingress controller, `local-path` storage, and Helm. On 2026-10-02 the reference desktop VM moved to node1 on a LAN bridge (changelog #15), so any node can reach it.
 
 ## Decision
 
@@ -29,4 +29,4 @@ Run the whole access layer on the existing k3s cluster, in a dedicated `locumvie
 
 ## Update 2026-10-04
 
-The cluster is now two nodes: mikepc (control plane) and debianbox, both Debian 13. centosbook was reinstalled as `devsuse`, an openSUSE Leap 16.0 machine for developing the SUSE variant of LocumView, and is no longer a k3s node. The decision is unchanged. The homelab deviation is now Debian only. guacd, Guacamole and Keycloak were rescheduled onto the remaining nodes, and the desktop firewall allowlist drops 192.168.4.33 (changelog #29).
+The cluster is now two nodes: node1 (control plane) and node2, both Debian 13. node3 was reinstalled as `dev-laptop-1`, an openSUSE Leap 16.0 machine for developing the SUSE variant of LocumView, and is no longer a k3s node. The decision is unchanged. The homelab deviation is now Debian only. guacd, Guacamole and Keycloak were rescheduled onto the remaining nodes, and the desktop firewall allowlist drops <dev-laptop-1-ip> (changelog #29).

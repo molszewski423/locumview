@@ -1,13 +1,13 @@
 + date -Is
 2026-10-02T12:18:25-04:00
 + hostname
-MikePC
+node1
 + dpkg-query -W libvirt-daemon-system qemu-system-x86 ovmf swtpm
 libvirt-daemon-system	11.3.0-3+deb13u3
 ovmf	2025.02-8+deb13u1
 qemu-system-x86	1:10.0.13+ds-0+deb13u1
 swtpm	0.7.1-1.5
-+ cd /home/mike/locumview-import
++ cd ~/locumview-import
 + sha256sum -c SHA256SUMS
 locumview-ref-dev.qcow2: OK
 locumview-ref-dev_VARS.fd: OK
@@ -24,17 +24,17 @@ Pool locumview marked as autostarted
 + virsh -c qemu:///system pool-start locumview
 Pool locumview started
 
-+ mv /home/mike/locumview-import/locumview-ref-dev.qcow2 /home/libvirt/images/locumview-ref-dev.qcow2
++ mv ~/locumview-import/locumview-ref-dev.qcow2 /home/libvirt/images/locumview-ref-dev.qcow2
 + chown root:root /home/libvirt/images/locumview-ref-dev.qcow2
 + chmod 600 /home/libvirt/images/locumview-ref-dev.qcow2
 + virsh -c qemu:///system pool-refresh locumview
 Pool locumview refreshed
 
-+ install -m 600 /home/mike/locumview-import/locumview-ref-dev_VARS.fd /var/lib/libvirt/qemu/nvram/locumview-ref-dev_VARS.fd
++ install -m 600 ~/locumview-import/locumview-ref-dev_VARS.fd /var/lib/libvirt/qemu/nvram/locumview-ref-dev_VARS.fd
 + install -d /var/lib/libvirt/swtpm
-+ tar -C /var/lib/libvirt/swtpm --no-same-owner -xpf /home/mike/locumview-import/swtpm-2604cc64-67d1-40eb-850c-940d67c13402.tar
-+ virsh -c qemu:///system define /home/mike/locumview-import/locumview-ref-dev.mikepc.xml
-Domain 'locumview-ref-dev' defined from /home/mike/locumview-import/locumview-ref-dev.mikepc.xml
++ tar -C /var/lib/libvirt/swtpm --no-same-owner -xpf ~/locumview-import/swtpm-2604cc64-67d1-40eb-850c-940d67c13402.tar
++ virsh -c qemu:///system define ~/locumview-import/locumview-ref-dev.node1.xml
+Domain 'locumview-ref-dev' defined from ~/locumview-import/locumview-ref-dev.node1.xml
 
 + virsh -c qemu:///system start locumview-ref-dev
 error: Failed to start domain 'locumview-ref-dev'
@@ -42,9 +42,9 @@ error: internal error: QEMU unexpectedly closed the monitor (vm='locumview-ref-d
 
 + journalctl -u libvirtd -u virtqemud --since -2min --no-pager
 + tail -20
-Oct 02 12:18:33 MikePC libvirtd[1324]: This swtpm version doesn't support explicit locking
-Oct 02 12:18:34 MikePC libvirtd[1324]: Unable to read from monitor: Connection reset by peer
-Oct 02 12:18:34 MikePC libvirtd[1324]: internal error: QEMU unexpectedly closed the monitor (vm='locumview-ref-dev'): 2026-10-02T16:18:34.181684Z qemu-system-x86_64: tpm-emulator: TPM result for CMD_INIT: 0x101 operation failed
+Oct 02 12:18:33 node1 libvirtd[1324]: This swtpm version doesn't support explicit locking
+Oct 02 12:18:34 node1 libvirtd[1324]: Unable to read from monitor: Connection reset by peer
+Oct 02 12:18:34 node1 libvirtd[1324]: internal error: QEMU unexpectedly closed the monitor (vm='locumview-ref-dev'): 2026-10-02T16:18:34.181684Z qemu-system-x86_64: tpm-emulator: TPM result for CMD_INIT: 0x101 operation failed
 + mv /var/lib/libvirt/swtpm/2604cc64-67d1-40eb-850c-940d67c13402 /var/lib/libvirt/swtpm/2604cc64-67d1-40eb-850c-940d67c13402.from-thinkpad-swtpm-0.10.2
 + echo 'RETRY with a fresh vTPM (old state kept beside it)'
 RETRY with a fresh vTPM (old state kept beside it)
@@ -84,7 +84,7 @@ Domain 'locumview-ref-dev' marked as autostarted
 -------------------------------------------------------------------------------
  lo         00:00:00:00:00:00    ipv4         127.0.0.1/8
  -          -                    ipv6         ::1/128
- enp1s0     52:54:00:fb:95:74    ipv4         192.168.4.36/22
+ enp1s0     52:54:00:fb:95:74    ipv4         <ref-dev-ip>/22
  -          -                    ipv6         fe80::5054:ff:fefb:9574/64
 
 + virsh -c qemu:///system dominfo locumview-ref-dev

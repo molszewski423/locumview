@@ -5,7 +5,7 @@ Date: 2026-10-03
 
 ## Context
 
-A reviewer asked why LocumView is not "container-based." The question is fair, because the access layer (Guacamole, guacd, Keycloak, Postgres, cloudflared) already runs as containers on k3s, while the desktop itself runs as a libvirt VM on MikePC.
+A reviewer asked why LocumView is not "container-based." The question is fair, because the access layer (Guacamole, guacd, Keycloak, Postgres, cloudflared) already runs as containers on k3s, while the desktop itself runs as a libvirt VM on node1.
 
 Two different things are easy to conflate here:
 

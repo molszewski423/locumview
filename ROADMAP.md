@@ -19,13 +19,13 @@ Version one is complete when all five items are Done. Nothing else is required f
 - Remaining ADRs: GNOME, Guacamole, Terraform vs OpenTofu. **Open**
 - CI that re-runs the pre-commit checks on every push. **Open**
 - Scoped kubeconfig for operators; admin GDM connection credentials into SOPS; Tomcat error page; cluster-wide egress policies. **Open**
-- Backup procedure for desktop VMs on MikePC. **Open**
+- Backup procedure for desktop VMs on node1. **Open**
 
 ## Planned after version one
 
 | Area | Item | Status | Reference |
 |---|---|---|---|
-| Identity | Red Hat IdM directory (`corp.locumview.com`, first server on MikePC), Keycloak federation, organizational login on desktops; Keycloak stays the MFA authority | **Built** 2026-10-05, ahead of version one by owner decision (#32 to #36): idm01, read-only federation, owner's account in IdM, reference desktop enrolled (GNOME login, lock screen, sudo via IdM), nightly encrypted backups. Open: replica on debianbox, password policy, backup alerting | ADR 0006 |
+| Identity | Red Hat IdM directory (`corp.locumview.com`, first server on node1), Keycloak federation, organizational login on desktops; Keycloak stays the MFA authority | **Built** 2026-10-05, ahead of version one by owner decision (#32 to #36): idm01, read-only federation, owner's account in IdM, reference desktop enrolled (GNOME login, lock screen, sudo via IdM), nightly encrypted backups. Open: replica on node2, password policy, backup alerting | ADR 0006 |
 | Identity | WebAuthn / passkeys; MFA for the demo login | Planned | ADR 0005 |
 | Access | Guacamole session recording; edge rate limiting | Planned | |
 | Access | Per-evaluator demo accounts with an expiry date (disabled at expiry, deleted later) | Planned | When real evaluators exist; until then the shared guest password is rotated after each evaluation (docs/runbooks.md) |
@@ -51,7 +51,7 @@ Version one is complete when all five items are Done. Nothing else is required f
 
 - Hand-built RHEL 10.2 reference desktop: UEFI + Secure Boot, vTPM, headless GNOME Remote Desktop, branding (changelog #1 to #13).
 - Strict LAN RDP validation, including GNOME's double redirection (changelog #14).
-- VM moved to MikePC on a LAN bridge (changelog #15).
+- VM moved to node1 on a LAN bridge (changelog #15).
 - SOPS + age secrets with a pre-commit guard (changelog #16).
 - Guacamole, Keycloak (TOTP), straight-to-desktop sessions, RDP firewalled to the cluster (changelog #17 to #19).
 - Branding, public access through the tunnel, guest demo, LocumView Tour, layout switch, marketing site and email (changelog #20 to #23).
