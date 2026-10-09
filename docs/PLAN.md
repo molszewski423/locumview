@@ -2,7 +2,7 @@
 
 Owner: Michael Olszewski. Status: Phase 1 in progress.
 
-LocumView is an open-source virtual desktop platform built on RHEL 10. It provisions hardened GNOME and Sway desktops with Terraform and Ansible, delivers them through the browser via Apache Guacamole behind Keycloak SSO and MFA, and never exposes a desktop directly to the internet. Every environment must be rebuildable identically from the repository. Beyond the base desktop, it is a platform for research and local LLM usage in regulated environments: desktops can carry agentic tooling and generative and agentic applications (clinical and research tooling to start) built on local models, so no regulated data leaves the endpoint, with the tooling layer customizable for any regulated workflow. It is a portfolio project aimed at solutions architecture and platform engineering roles, with Red Hat as a target employer.
+LocumView is an open-source virtual desktop platform built on RHEL 10. It provisions hardened GNOME desktops with Terraform and Ansible, delivers them through the browser via Apache Guacamole behind Keycloak SSO and MFA, and never exposes a desktop directly to the internet. Every environment must be rebuildable identically from the repository. Beyond the base desktop, it is a platform for research and local LLM usage in regulated environments: desktops can carry agentic tooling and generative and agentic applications (clinical and research tooling to start) built on local models, so no regulated data leaves the endpoint, with the tooling layer customizable for any regulated workflow. It is a portfolio project aimed at solutions architecture and platform engineering roles, with Red Hat as a target employer.
 
 Core test for every phase: can a reviewer clone the repo and rebuild it with no manual steps? "I configured a thing" is IT administration; "it rebuilds from code" is engineering.
 
@@ -67,7 +67,7 @@ Name: nods to locum tenens clinicians and VMware View (now Horizon, owned by Omn
 | Area | Decision | Why |
 |---|---|---|
 | OS | RHEL 10 via Developer Subscription for Individuals | Dominant enterprise Linux in regulated healthcare; STIG/CIS baselines, FIPS crypto, 10-year lifecycle; target employer's product. See [ADR 0001](adr/0001-rhel10.md). |
-| Desktop | GNOME default via GNOME Remote Desktop headless RDP (RHEL 10 is Wayland-only). Sway (EPEL) as minimal/kiosk profile via wayvnc. | Supported, native RDP path. |
+| Desktop | GNOME via GNOME Remote Desktop headless RDP (RHEL 10 is Wayland-only). GNOME is the only desktop; organization-set layouts give Windows, Mac or GNOME style (owner decision 2026-10-08). | Supported, native RDP path. |
 | Windows-familiar layout | GNOME Classic (Red Hat-shipped Window List, Applications and Places extensions) as a "Familiar" profile, not Dash to Panel | Vendor-supported, survives GNOME updates, easy to lock with dconf. Dash to Panel only as a documented optional extra via ADR. |
 | Broker | Apache Guacamole (guacd translates RDP to browser) | Apache 2.0, native RDP, Keycloak OIDC/SAML, session recording for audit evidence. Traefik is a reverse proxy, not a substitute. |
 | Path | Browser > Traefik (TLS) > Guacamole > guacd > RDP > RHEL desktop | RDP never exposed. |
@@ -104,7 +104,7 @@ See [README.md](../README.md) for the Horizon comparison table.
 - [x] [0005, Keycloak as identity provider](adr/0005-keycloak-identity-provider.md)
 - [x] [0004, public access through a Cloudflare Tunnel](adr/0004-public-access-cloudflare-tunnel.md)
 - [x] [0006, Red Hat IdM directory](adr/0006-red-hat-idm-directory.md); [0007, desktop as a bootc image, session as a VM](adr/0007-desktop-containerization-bootc.md); [0008, EU regulatory posture](adr/0008-eu-regulatory-posture.md); [0009, version-one scope, integrate don't bundle, hypervisor at deploy time](adr/0009-v1-scope-integrate-dont-bundle.md)
-- [ ] Remaining ADRs: why GNOME + Sway, why Guacamole, Terraform vs OpenTofu
+- [ ] Remaining ADRs: why GNOME, why Guacamole, Terraform vs OpenTofu
 
 Done when: repo exists, lints run on commit, ADRs written.
 
@@ -113,14 +113,13 @@ Done when: repo exists, lints run on commit, ADRs written.
 - [x] Guest agent working, baseline recorded, snapshot taken
 - [x] GNOME Remote Desktop headless RDP working from another machine on the LAN, with no one logged in at the console (2026-10-02, changelog #14)
 - [ ] GNOME customization by command, including a Familiar (GNOME Classic) profile
-- [ ] Sway kiosk profile explored
 - [ ] Every change logged as a command
 
 Done when: you can RDP into a headless session, and the notes log fully describes how to reproduce the desktop. See [notes/phase1-changelog.md](../notes/phase1-changelog.md).
 
 **Phase 2, Access layer:** Guacamole + guacd on k3s (ADR 0002), first test: guacd follows GRD's two redirections (#14); Keycloak SSO + MFA (TOTP first, then WebAuthn); remove default guacadmin; Cloudflare Tunnel for locumview.com (published only after MFA works), Tailscale for admin access; Nextcloud on k3s as a Keycloak OIDC client; session policies and session recording. Done when a user reaches the desktop in a browser through SSO + MFA with no exposed RDP.
 
-**Phase 3, Automation and hardening (end of version one):** Terraform libvirt VM from RHEL KVM guest qcow2 (UEFI, host-passthrough, guest agent channel, cloud-init, activation key registration); Ansible roles base, hardening, gnome_desktop, sway_kiosk, devtools, remote_access; STIG profile applied, OpenSCAP report committed to docs/evidence/; HIPAA safeguard mapping; bake-vs-fry ADR. Done when terraform destroy then apply rebuilds the desktop with zero manual steps.
+**Phase 3, Automation and hardening (end of version one):** Terraform libvirt VM from RHEL KVM guest qcow2 (UEFI, host-passthrough, guest agent channel, cloud-init, activation key registration); Ansible roles base, hardening, gnome_desktop, devtools, remote_access; STIG profile applied, OpenSCAP report committed to docs/evidence/; HIPAA safeguard mapping; bake-vs-fry ADR. Done when terraform destroy then apply rebuilds the desktop with zero manual steps.
 
 ### Minimum shippable version (version one)
 

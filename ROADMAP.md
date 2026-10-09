@@ -16,7 +16,7 @@ Version one is complete when all five items are Done. Nothing else is required f
 
 ### Version-one housekeeping (small, not scope items)
 
-- Remaining ADRs: GNOME + Sway, Guacamole, Terraform vs OpenTofu. **Open**
+- Remaining ADRs: GNOME, Guacamole, Terraform vs OpenTofu. **Open**
 - CI that re-runs the pre-commit checks on every push. **Open**
 - Scoped kubeconfig for operators; admin GDM connection credentials into SOPS; Tomcat error page; cluster-wide egress policies. **Open**
 - Backup procedure for desktop VMs on MikePC. **Open**
@@ -33,7 +33,6 @@ Version one is complete when all five items are Done. Nothing else is required f
 | Access | Clipboard DLP: copy-out blocked, 5-minute clipboard clear in sessions | Built; lock-screen fix in #28, live clipboard tests pending | changelog #26, #28 |
 | Desktop | Image signing (cosign), SBOMs (syft), registry and build pipeline | Planned (part of version-one item 1 where needed) | ADR 0007 |
 | Desktop | Organization-set desktop layout (Mac, Windows or GNOME style), locked centrally | Built; Mac style and lock verified, Windows/GNOME not exercised | changelog #25, #28 |
-| Desktop | Sway kiosk profile | Planned | |
 | Desktop | Separate, resettable demo desktop | Planned | First KubeVirt workload |
 | Hypervisors | Proxmox VE (practical production target) | Planned | ADR 0007, 0009 |
 | Hypervisors | KubeVirt / OpenShift Virtualization (scoped learning piece) | Planned | ADR 0007, 0009 |
