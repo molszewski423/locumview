@@ -599,3 +599,13 @@ Owner direction. File: `docs/adr/0011-agentic-linus.md` (dated update section; s
 - **Prompt injection:** all input untrusted; the fork-only write path, review, the sandbox and code-enforced policy are the containment.
 - **Audit:** PVC `argus-audit` (local-path) in namespace `argus`, no hostPath, captured by the node's nightly restic job with all local-path volumes; stdout to cluster logs rejected as the record (no log aggregation, logs rotate) but kept for live viewing.
 - **Prerequisites (unchanged):** Cloudflare Access in front of Open WebUI verified from outside the LAN (not done: no Zero Trust organization yet); Phase 3's last step; cluster-admin removed (done) and the `linus-readonly` Job scope narrowed (pending).
+
+## 44. Test account `lv-test1` disabled (2026-10-08)
+
+Owner direction. No files changed besides this entry; live state only.
+
+- **IdM (03:41 UTC):** `nsAccountLock: TRUE` on `uid=lv-test1`, set as root on idm01 over the LDAPI socket (the same attribute `ipa user-disable` sets; no Kerberos admin ticket needed). Verified: `kinit lv-test1` fails with "credentials have been revoked", and an LDAP bind as `lv-test1` fails with "Account inactivated".
+- **Keycloak `locumview` realm:** the federated user set to `enabled=false` with kcadm, so it shows as disabled in the console as well; it had no active sessions.
+- **Guacamole:** the user record created at its first sign-in (#32 acceptance test) set to `disabled=true`.
+- **Disabled, not deleted:** the group memberships, HBAC rule membership and Guacamole permissions stay, so the account can be switched back on for a future acceptance test (reverse all three). To remove it for good: `ipa user-del lv-test1`, then delete it in Keycloak and Guacamole.
+- **Accounts left after this:** IdM `admin` (locked down by HBAC, #36) and `molszewski`; Keycloak `demo` (shared guest, password rotated after each evaluation, #42), `molszewski` and `lv-breakglass`; Guacamole `locumadmin` (disabled, break-glass). No test or default accounts remain enabled.
