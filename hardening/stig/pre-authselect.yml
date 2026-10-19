@@ -3,7 +3,8 @@
 # features, then try to restore them with sudo. Dropping with-sudo removes the
 # IdM (SSSD) sudo rules, so that restore step fails and sudo is lost. Selecting
 # custom/hardening here, features kept, makes those SSG tasks skip.
-- hosts: all
+- name: Keep authselect features before the SSG playbook
+  hosts: all
   become: true
   gather_facts: false
   tasks:
@@ -24,3 +25,4 @@
           ansible.builtin.command: >-
             authselect select custom/hardening {{ authselect_now.stdout.split()[1:] | join(' ') }}
             --force --backup=before-locumview-stig
+          changed_when: true  # only runs when the profile is not custom/ yet
