@@ -46,7 +46,7 @@ Several SSG 0.1.82 remediations create the authselect profile `custom/hardening`
 ## What users and administrators notice
 
 - Login screen and SSH show the banner; GDM has no user list (type the user name); restart and shutdown are not offered at the login screen.
-- The screen blanks and locks after 10 minutes idle, and users cannot change that. It applies to every session on the desktop, so it is a candidate fix for the ROADMAP item on abandoned demo connections (to verify with the demo account).
+- The screen blanks and locks after 10 minutes idle, and users cannot change that. **Exception, not visible to the scanner:** the guest demo account keeps its own user-level `org.gnome.desktop.lockdown disable-lock-screen=true` (changelog #22; guests know no Linux password), which the STIG settings do not lock, so its session blanks but never locks. The scan checks only the system dconf database. Idle logout for the demo is still the open ROADMAP item.
 - `sudo` asks for the password every time.
 - **Three wrong passwords within 15 minutes lock the account on that desktop until an administrator unlocks it** (pam_faillock, `unlock_time=0`, as the STIG requires). This applies to IdM users too, at the login screen, the lock screen and sudo. Unlock: `faillock --user <name> --reset` as root, from another administrator's session, `lvadmin`, or the VM console (`virsh console`). IdM has its own, separate lockout.
 - New local passwords: 15 or more characters, all four character classes, no more than 4 characters of one class in a row, 60-day maximum age. IdM passwords follow the IdM password policy (open item).

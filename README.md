@@ -6,7 +6,7 @@ Website: [locumview.com](https://locumview.com) · Sign in: [login.locumview.com
 
 ## Status
 
-**Version one is not complete.** Its scope is locked by [ADR 0009](docs/adr/0009-v1-scope-integrate-dont-bundle.md); see [ROADMAP.md](ROADMAP.md) for what is in it and what is planned after it.
+**Version one is not complete.** Its scope is locked by [ADR 0009](docs/adr/0009-v1-scope-integrate-dont-bundle.md); [ROADMAP.md](ROADMAP.md) has the live status of each item and what is planned after it.
 
 **Live today**
 - A RHEL 10 GNOME desktop reached at login.locumview.com: Keycloak SSO with TOTP enforced, then straight onto the desktop (no second login screen).
@@ -14,12 +14,14 @@ Website: [locumview.com](https://locumview.com) · Sign in: [login.locumview.com
 - Public access through an outbound-only Cloudflare Tunnel; RDP is reachable only from the cluster, never from the internet.
 - Secrets in the repo only as SOPS + age ciphertext, enforced by pre-commit checks.
 - An isolated guest demo account, LocumView branding, and a first-run tour.
+- Organizational login through Red Hat IdM, with Keycloak as the only MFA authority.
+- The reference desktop hardened to the DISA STIG with GUI profile: 417 OpenSCAP rules pass, and every rule not applied is documented ([hardening/stig/](hardening/stig/README.md)).
+- Encryption on every network hop, including WireGuard between cluster nodes.
+- CI that re-runs every check on each push.
 
 **Not done yet (version one)**
-- The desktop is still built by documented scripts, not yet as a bootc image from code ([ADR 0007](docs/adr/0007-desktop-containerization-bootc.md)).
-- DISA STIG hardening and the OpenSCAP report are not applied yet.
-- Pod-to-pod traffic between cluster nodes is not yet encrypted.
-- No quick start or final architecture diagram yet.
+- The desktop is still built by documented scripts, not yet as a bootc image from code ([ADR 0007](docs/adr/0007-desktop-containerization-bootc.md)). Until then the quick start below covers the access layer, and the desktop is rebuilt from the build log.
+- Data at rest is not encrypted (see the HIPAA mapping).
 
 The full build history, with every command and its evidence, is in [notes/phase1-changelog.md](notes/phase1-changelog.md) and [docs/evidence/](docs/evidence/).
 
@@ -33,6 +35,34 @@ Browser ─HTTPS─▶ Cloudflare edge ─tunnel─▶ cloudflared (k3s)
 
 The access layer runs as containers on k3s. The desktop runs as a VM: a GNOME session with audio and remote display behaves like a machine, not a process. From version one the desktop OS itself is built and shipped as a container image (RHEL image mode / bootc), and the hypervisor becomes a deploy-time choice ([ADR 0007](docs/adr/0007-desktop-containerization-bootc.md), [ADR 0009](docs/adr/0009-v1-scope-integrate-dont-bundle.md)).
 
+## Quick start
+
+**Try it.** The guest demo is at [login.locumview.com](https://login.locumview.com) (request access at [locumview.com/contact](https://locumview.com/contact); the guest password is rotated after each evaluation). It is a shared demo: never enter real patient data.
+
+**Check the repository.** Every check CI runs is a pre-commit hook:
+
+```
+pre-commit install
+pre-commit run --all-files     # ansible-lint, detect-secrets, SOPS check, gitleaks, kubeconform, tflint
+```
+
+The container-based hooks need `docker` (or podman with its `docker` shim).
+
+**Run the access layer on your own k3s cluster.** You need k3s (the reference cluster uses `flannel-backend: wireguard-native`), `kubectl`, `sops` and `age`, and a RHEL 10 desktop reachable over RDP.
+
+1. Create an age key and put its public key in `.sops.yaml`; the committed secrets are encrypted to the project's key and will not decrypt for you.
+2. Create the six secrets in `k8s/locumview/secrets/` with your own values and encrypt them (`sops -e -i <file>`). Names and keys: `cloudflared` (`token`, only for public access), `guacamole-db` (`postgres-password`, `app-password`, `admin-password`), `keycloak` (`postgres-password`, `db-password`, `bootstrap-admin-password`), `demo-login` (`username`, `password`), and one per desktop connection (`hostname`, `port`, `rdp-username`, `rdp-password`). Generate passwords straight into the file; never type them.
+3. Copy `k8s/locumview/site.env.example` to `k8s/locumview/site.env` and fill it in (desktop and IdM addresses, the node for the databases).
+4. Apply: `sops -d` each secret into `kubectl apply -f -`, then `kubectl apply -k k8s/locumview`.
+5. Configure Keycloak and Guacamole with the idempotent scripts, each documented in its header: `keycloak/configure-realm.sh`, `keycloak/create-user.sh`, `guacamole/upsert-desktop-connection.sh`, and `keycloak/configure-idm-federation.sh` if you use IdM.
+6. Without a Cloudflare tunnel, reach Guacamole and Keycloak with `kubectl port-forward`.
+
+**The desktop** is built today by the documented scripts in `packaging/` (desktop, remote access, IdM enrollment), in the order of [the build log](notes/phase1-changelog.md) entries #11 to #36, then hardened with `hardening/stig/apply-stig.sh`. Version-one item 1 replaces all of this with one bootc image built from a Containerfile.
+
+## HIPAA technical safeguards
+
+Each technical safeguard of 45 CFR 164.312 is mapped to the control that addresses it and the evidence in this repository in [docs/hipaa-technical-safeguards.md](docs/hipaa-technical-safeguards.md). In short: access control, emergency access, authentication and transmission security are met; audit controls are partly met (no central log collection or session recording yet); **encryption at rest is a gap** (planned with the bootc image). HIPAA compliance itself belongs to the organization running the platform.
+
 ## Architecture decisions
 
 | ADR | Decision |
@@ -42,7 +72,7 @@ The access layer runs as containers on k3s. The desktop runs as a VM: a GNOME se
 | [0003](docs/adr/0003-secrets-sops-age.md) | Secrets with SOPS and age |
 | [0004](docs/adr/0004-public-access-cloudflare-tunnel.md) | Public access through a Cloudflare Tunnel |
 | [0005](docs/adr/0005-keycloak-identity-provider.md) | Keycloak as the single identity provider |
-| [0006](docs/adr/0006-red-hat-idm-directory.md) | Red Hat IdM as the directory (planned) |
+| [0006](docs/adr/0006-red-hat-idm-directory.md) | Red Hat IdM as the directory (built) |
 | [0007](docs/adr/0007-desktop-containerization-bootc.md) | Desktop OS as a bootc image; the session is a VM workload |
 | [0008](docs/adr/0008-eu-regulatory-posture.md) | EU regulatory posture; clinical AI as a detachable module |
 | [0009](docs/adr/0009-v1-scope-integrate-dont-bundle.md) | Version-one scope, integrate don't bundle, hypervisor at deploy time |
@@ -82,7 +112,9 @@ Horizon is now owned by Omnissa after Broadcom divested VMware's end-user comput
 - `k8s/locumview/`: access layer manifests (kustomize), encrypted secrets, Keycloak realm and Guacamole scripts.
 - `packaging/`: desktop setup, branding, remote access, the LocumView Tour and GNOME extensions.
 - `hypervisor/`: host preparation and VM move scripts.
-- `docs/adr/`: architecture decisions. `docs/evidence/`: compliance evidence and worklogs. `docs/user-guide/`: end-user help.
+- `hardening/stig/`: the DISA STIG tailoring and the scripts that apply and scan it.
+- `docs/adr/`: architecture decisions. `docs/evidence/`: compliance evidence and worklogs. `docs/user-guide/`: end-user help. `docs/hipaa-technical-safeguards.md`: the HIPAA mapping.
+- `.gitea/workflows/`: CI.
 - `terraform/`, `ansible/`: provisioning (version one work, not populated yet).
 
 ## License

@@ -12,7 +12,7 @@ Version one is complete when all five items are Done. Nothing else is required f
 | 2 | Reached in a browser through Guacamole, Keycloak SSO with enforced MFA, no exposed RDP | **Done** | Live at login.locumview.com since 2026-10-02 (changelog #17 to #21). |
 | 3 | DISA STIG profile applied, OpenSCAP report committed, exceptions documented | **Done** | 2026-10-19 on the reference desktop: DISA STIG with GUI, tailored; 417 pass, 0 open failures; reports in docs/evidence/stig, exceptions in hardening/stig/README.md (changelog #47). FIPS mode and separate partitions are deferred to the bootc image (item 1). |
 | 4 | Encryption in transit everywhere | **Done** | 2026-10-19: every hop that crosses a network is encrypted. Browser to Cloudflare (TLS), the tunnel, pod traffic between cluster nodes (k3s WireGuard backend, changelog #49), Keycloak to IdM (LDAPS), and RDP to the desktop (TLS). Traffic between pods on the same node does not leave the host. |
-| 5 | README with architecture diagram, quick start, HIPAA technical-safeguard mapping, honest status | **Open** | Status section and current-state diagram done; quick start and HIPAA mapping not yet. |
+| 5 | README with architecture diagram, quick start, HIPAA technical-safeguard mapping, honest status | **Done** | 2026-10-19 (changelog #50): quick start for the checks and the access layer; HIPAA mapping in docs/hipaa-technical-safeguards.md with encryption at rest as the stated gap. The desktop part of the quick start points to the build log until item 1 makes it one image. |
 
 ### Version-one housekeeping (small, not scope items)
 
@@ -20,6 +20,8 @@ Version one is complete when all five items are Done. Nothing else is required f
 - CI that re-runs the pre-commit checks on every push. **Done**
 - Scoped kubeconfig for operators; admin GDM connection credentials into SOPS; Tomcat error page; cluster-wide egress policies. **Open**
 - Backup procedure for desktop VMs on node1. **Open**
+- Encryption at rest for desktop disks and cluster nodes (LUKS bound to the vTPM; with item 1 for desktops). **Open**
+- The 39 rules the SSG HIPAA profile still fails on the reference desktop: applied through the tailoring or documented. **Open**
 
 ## Planned after version one
 
@@ -58,3 +60,4 @@ Version one is complete when all five items are Done. Nothing else is required f
 - DISA STIG with GUI applied to the reference desktop through a tailoring file reusable in the bootc build; 164 to 417 passing rules (changelog #47).
 - CI on every push, with the website preview following this roadmap (changelog #48).
 - Pod traffic between cluster nodes encrypted with WireGuard, closing the last unencrypted network hop (changelog #49).
+- README quick start and a HIPAA technical-safeguard mapping with its evidence (changelog #50).

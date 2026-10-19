@@ -662,3 +662,12 @@ Version-one item 4 (ADR 0009), "encryption in transit everywhere". The last unen
 - **The hops, for the record:** browser to Cloudflare TLS; Cloudflare to the cluster through the outbound tunnel; between nodes WireGuard; Keycloak to IdM LDAPS (`configure-idm-federation.sh`); guacd to the desktop RDP over TLS. Traffic between pods on the same node (today the whole access layer runs on node1) does not leave the host and is not encrypted separately.
 - **Rollback:** remove the line from the server config and repeat the same steps.
 
+## 50. README quick start and HIPAA technical-safeguard mapping (2026-10-19)
+
+Version-one item 5 (ADR 0009). Owner decision: item 5 is Done with the desktop part of the quick start pointing to the build log, since item 1 owns making the desktop one image.
+
+- **README:** status brought up to date (STIG, IdM, encryption in transit, CI); a quick start in three parts (try the demo, run the checks, deploy the access layer on your own k3s with your own age key, the six secrets by name and key, `site.env` and the setup scripts in order); a HIPAA summary; ADR 0006 marked built; `hardening/`, the HIPAA mapping and CI in the layout.
+- **`docs/hipaa-technical-safeguards.md`:** every standard and implementation specification of 45 CFR 164.312 with the control, the evidence in this repository and a status. Met: access control, unique user identification, emergency access, person or entity authentication, transmission security. Partly met: audit controls (no central log collection, no session recording). **Gap: encryption at rest** (desktop disk, node disks, databases), now a housekeeping item. States that compliance belongs to the operating organization, and that Cloudflare terminates TLS at its edge, so PHI through it needs a business associate agreement or another ingress.
+- **Evidence:** SSG HIPAA profile on the reference desktop, read-only: 120 pass / 39 fail (38 / 121 before #47). The remaining failures are mostly audit rules the STIG does not include; recorded as an open housekeeping item, not as exceptions. Sanitized report in `docs/evidence/stig/20261019-hipaa/`.
+- **Correction to #47:** the guest demo's session does not lock. Its user-level `disable-lock-screen=true` (#22) is not covered by the STIG's system locks, so the session blanks after 10 minutes but never locks; the scan cannot see user-level settings. `hardening/stig/README.md` said the lock applied to every session and could close the demo idle item; corrected.
+
