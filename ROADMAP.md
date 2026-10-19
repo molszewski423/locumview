@@ -17,7 +17,7 @@ Version one is complete when all five items are Done. Nothing else is required f
 ### Version-one housekeeping (small, not scope items)
 
 - Remaining ADRs: GNOME, Guacamole, Terraform vs OpenTofu. **Open**
-- CI that re-runs the pre-commit checks on every push. **Open**
+- CI that re-runs the pre-commit checks on every push. **Done**
 - Scoped kubeconfig for operators; admin GDM connection credentials into SOPS; Tomcat error page; cluster-wide egress policies. **Open**
 - Backup procedure for desktop VMs on node1. **Open**
 

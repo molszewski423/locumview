@@ -1,0 +1,65 @@
+# Re-runs the pre-commit checks on every push (Gitea Actions, runner in the homelab k3s cluster).
+# On main, a passing run then asks the website repo to rebuild its preview, so the Status page follows ROADMAP.md.
+#
+# The podman-based hooks (gitleaks, kubeconform, tflint) run here as their own pinned container steps instead of
+# through pre-commit: inside CI, pre-commit's docker_image hooks would mount a path the Docker daemon cannot see
+# and pass without checking anything. Images and arguments match .pre-commit-config.yaml; keep them in step.
+name: checks
+"on":
+  push:
+
+jobs:
+  checks:
+    runs-on: debian
+    container:
+      image: docker.io/library/python:3.13-bookworm@sha256:073ffebb96ae4d0ed73ccad59f08c47bd84af8a79f5258130f8458ac50ad9ff4
+    steps:
+      - name: Check out (full history, for gitleaks)
+        env:
+          TOKEN: ${{ gitea.token }}
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git clone -q "http://x-access-token:${TOKEN}@gitea.infra.svc.cluster.local:3000/${GITHUB_REPOSITORY}.git" "$GITHUB_WORKSPACE"
+          cd "$GITHUB_WORKSPACE"
+          git remote set-url origin "http://gitea.infra.svc.cluster.local:3000/${GITHUB_REPOSITORY}.git"
+          git checkout -q "$GITHUB_SHA"
+          git log -1 --format='%h %s'
+
+      - name: pre-commit (ansible-lint, detect-secrets, SOPS check)
+        env:
+          SKIP: gitleaks,kubeconform,tflint
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          python3 -m pip install -q --root-user-action=ignore 'pre-commit==4.2.0'
+          pre-commit run --all-files --show-diff-on-failure
+
+      - name: gitleaks (whole history)
+        uses: docker://docker.io/zricethezav/gitleaks:v8.30.1@sha256:b109bc5f8f76a38196a3e413704fc5b9e3c32360bce4e4b603bd6f45b3721dbb
+        with:
+          args: git --redact -v .
+
+      - name: kubeconform
+        uses: docker://ghcr.io/yannh/kubeconform:v0.8.0@sha256:faffaf43f95aa6425306e1ab8d6fcad72acb9049158f38e574c085ea1ec0f64e
+        with:
+          entrypoint: /kubeconform
+          args: -strict -summary -ignore-filename-pattern kustomization\.yaml$ -ignore-filename-pattern \.sops\.ya?ml$ k8s
+
+      - name: tflint
+        uses: docker://ghcr.io/terraform-linters/tflint:v0.64.0@sha256:85c63179e53e69f48fb5d1e22fb6c2b4941049c7f906f30625defa6ffcc3f834
+
+  website-preview:
+    needs: checks
+    if: github.ref == 'refs/heads/main'
+    runs-on: debian
+    container:
+      image: docker.io/library/python:3.13-bookworm@sha256:073ffebb96ae4d0ed73ccad59f08c47bd84af8a79f5258130f8458ac50ad9ff4
+    steps:
+      - name: Ask locumview-website to rebuild its preview
+        env:
+          TOKEN: ${{ secrets.WEBSITE_DISPATCH_TOKEN }}
+        run: |
+          code=$(curl -s -o /tmp/resp -w '%{http_code}' -X POST \
+            -H "Authorization: token ${TOKEN}" -H 'Content-Type: application/json' \
+            -d '{"ref":"master","inputs":{"target":"preview"}}' \
+            http://gitea.infra.svc.cluster.local:3000/api/v1/repos/mike/locumview-website/actions/workflows/deploy.yml/dispatches)
+          echo "HTTP $code"; cat /tmp/resp; [ "$code" = 204 ]
