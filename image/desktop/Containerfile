@@ -1,0 +1,55 @@
+# LocumView desktop: RHEL 10 image mode (bootc). Version-one item 1, ADR 0007.
+#
+# Build from the repository root (see image/desktop/README.md):
+#   podman build --secret id=rhsm,src=<file with RHSM_ORG=... and RHSM_KEY=...> \
+#     -f image/desktop/Containerfile -t <registry>/locumview/desktop:<tag> .
+#
+# Everything here is the same for every desktop. Per-desktop values (hostname, directory enrollment, RDP
+# credentials, the break-glass password, firewall sources, disk encryption) are applied at provisioning, never
+# baked in. The repository is bind-mounted at /src for the steps that need it, not copied into the image.
+#
+# Base pinned by digest (registry.redhat.io needs a Red Hat login): rhel10/rhel-bootc 10.2, pulled 2026-10-19.
+ARG BASE=registry.redhat.io/rhel10/rhel-bootc:10.2@sha256:e80d87d7eba68cdd0277d37214144adeef854ebb4343e5f410d7b8874e17d7a7
+FROM ${BASE}
+
+# 1. Packages. The same environment and add-on groups as the hand-built reference desktop
+#    (docs/evidence/phase1/baseline: Workstation + 5 groups), plus what the LocumView pieces need.
+#    gnome-tour stays installed: its entry is hidden, the LocumView Tour replaces it.
+RUN --mount=type=secret,id=rhsm --mount=type=bind,target=/src \
+    set -euo pipefail; \
+    . /src/image/desktop/build/rhsm.sh; rhsm_on; \
+    dnf -y group install workstation-product-environment \
+        container-management rpm-development-tools development smart-card security-tools; \
+    dnf -y install \
+        gnome-shell-extension-dash-to-dock gnome-shell-extension-dash-to-panel \
+        gnome-remote-desktop flatpak librsvg2-tools unzip \
+        firewalld nftables cockpit ipa-client \
+        openscap-scanner openscap-utils scap-security-guide; \
+    rhsm_off; \
+    systemctl set-default graphical.target
+
+# 2. The LocumView desktop: extensions, Papirus, branding, wallpapers, tour, system dconf defaults and the
+#    organization layout (mac, locked). Same script as the hand-built desktop, in image mode (installs to /usr).
+RUN --mount=type=bind,target=/src \
+    set -euo pipefail; \
+    cp -a /src/packaging /tmp/packaging; \
+    LV_IMAGE_BUILD=1 bash /tmp/packaging/install-desktop.sh; \
+    rm -rf /tmp/packaging
+
+# 3. Image-only files: FIPS and STIG kernel arguments, the XDG override, the always-on headless session drop-in,
+#    the first-boot Flatpak installer.
+COPY image/desktop/files/ /
+RUN systemctl enable locumview-flatpaks.service
+
+# 4. DISA STIG with GUI, LocumView image profile (hardening/stig/README.md), applied at build time by oscap-im.
+#    It installs the packages some rules need (AIDE, fapolicyd, USBGuard, ...), so it gets the entitlement too.
+RUN --mount=type=secret,id=rhsm --mount=type=bind,target=/src \
+    set -euo pipefail; \
+    . /src/image/desktop/build/rhsm.sh; rhsm_on; \
+    oscap-im --profile xccdf_org.locumview_profile_stig_gui_image \
+        --tailoring-file /src/hardening/stig/locumview-stig-gui-tailoring.xml \
+        /usr/share/xml/scap/ssg/content/ssg-rhel10-ds.xml; \
+    rhsm_off
+
+# 5. Checks.
+RUN bootc container lint

@@ -1,13 +1,23 @@
 #!/bin/bash
-# LocumView reference desktop setup (Phase 1 manual step; target: Ansible "desktop"/"branding" roles).
-# Run as root:  sudo packaging/install-desktop.sh
-# Branding and icon themes go only under /usr/local and /etc/dconf, never over package-owned files.
+# LocumView reference desktop setup. Two modes:
+#   sudo packaging/install-desktop.sh          a running desktop (the hand-built reference VM): installs under
+#                                              /usr/local, installs the extension RPMs and the Flatpaks itself
+#   LV_IMAGE_BUILD=1 install-desktop.sh        inside the bootc image build (image/desktop/Containerfile):
+#                                              installs under /usr (in a bootc image /usr/local lives in /var, which
+#                                              image updates never touch); packages come from the Containerfile and
+#                                              Flatpaks from a first-boot service
+# Branding and icon themes never go over package-owned files: own directories, plus an override directory that
+# precedes /usr/share in XDG_DATA_DIRS (/usr/local/share on the VM; /usr/share/locumview/override in the image).
 # Apps: RPMs from AppStream; Flatpaks from Red Hat's "rhel" remote when available, else Flathub.
 set -euo pipefail
 SRC=$(cd "$(dirname "$0")" && pwd)/branding
-ICONS=/usr/local/share/icons/hicolor
-BG=/usr/local/share/backgrounds/locumview
-PROPS=/usr/local/share/gnome-background-properties/locumview.xml
+IMAGE=${LV_IMAGE_BUILD:-0}
+if [ "$IMAGE" = 1 ]; then SHARE=/usr/share; OVERRIDE=/usr/share/locumview/override; BIN=/usr/bin; USERUNITS=/usr/lib/systemd/user
+else SHARE=/usr/local/share; OVERRIDE=/usr/local/share; BIN=/usr/local/bin; USERUNITS=/etc/systemd/user; fi
+relabel() { [ "$IMAGE" = 1 ] || restorecon "$@"; }   # the image is labelled when it is deployed
+ICONS=$OVERRIDE/icons/hicolor
+BG=$SHARE/backgrounds/locumview
+PROPS=$SHARE/gnome-background-properties/locumview.xml
 DEFAULT_WALLPAPER=nested
 PAPIRUS_VERSION=20260801
 # Not a secret: published sha256 of the public release archive (gitleaks generic-api-key false positive).
@@ -18,27 +28,30 @@ TILING_SHA256=4cd9b848e399b0bdcf09302044f2420cf86c63fef2857a70a5be88ca04ad88de  
 BLUR_VERSION_TAG=69740     # Blur my Shell v72 (GNOME 46-50), extensions.gnome.org
 # Not a secret: published sha256 of the public extension zip.
 BLUR_SHA256=4b82a0a0be4f2f917bff88e0952fab4d6c347d1128e7d8487caef240b699a910  # gitleaks:allow
-EXT_DIR=/usr/local/share/gnome-shell/extensions
+EXT_DIR=$SHARE/gnome-shell/extensions
 PAPIRUS_TARBALL=${PAPIRUS_TARBALL:-/home/molszewski/Downloads/papirus-icon-theme-$PAPIRUS_VERSION.tar.gz}
 
 # 1. GNOME Shell extensions (AppStream RPMs). They conflict if both are on, so only Dash to Dock is enabled.
 DOCK=dash-to-dock@micxgx.gmail.com
 PANEL=dash-to-panel@jderose9.github.com
-dnf install -y gnome-shell-extension-dash-to-dock gnome-shell-extension-dash-to-panel
+[ "$IMAGE" = 1 ] || dnf install -y gnome-shell-extension-dash-to-dock gnome-shell-extension-dash-to-panel
 for uuid in $DOCK $PANEL; do
   [ -d "/usr/share/gnome-shell/extensions/$uuid" ] || { echo "missing extension $uuid (UUID changed?)"; exit 1; }
 done
 
 # 2. Flatpak apps, system-wide. Prefer the Red Hat remote; fall back to Flathub.
+#    In the image they live in /var/lib/flatpak, so locumview-flatpaks.service installs them at first boot instead.
 FLATPAKS="org.gnome.Extensions org.onlyoffice.desktopeditors"
-flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-for app in $FLATPAKS; do
-  if flatpak remote-info --system rhel "$app" >/dev/null 2>&1; then remote=rhel; else remote=flathub; fi
-  echo "== $app from $remote"
-  flatpak install --system -y --noninteractive "$remote" "$app"
-done
+if [ "$IMAGE" != 1 ]; then
+  flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+  for app in $FLATPAKS; do
+    if flatpak remote-info --system rhel "$app" >/dev/null 2>&1; then remote=rhel; else remote=flathub; fi
+    echo "== $app from $remote"
+    flatpak install --system -y --noninteractive "$remote" "$app"
+  done
+fi
 
-# 2b. Window management extensions, system-wide under /usr/local (in XDG_DATA_DIRS).
+# 2b. Window management extensions, system-wide under $SHARE (in XDG_DATA_DIRS).
 #     Tiling Assistant: quarter tiling (Alt+I/O/K/L). Pinned extensions.gnome.org build, checksum verified.
 #     LocumView Activities (ours, packaging/extensions/): logo + workspace dots in the top-left button.
 install -d "$EXT_DIR"
@@ -75,24 +88,25 @@ fi
 echo "$PAPIRUS_SHA256  $PAPIRUS_TARBALL" | sha256sum -c -
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 tar xzf "$PAPIRUS_TARBALL" -C "$TMP"
+install -d "$SHARE/icons"
 for t in Papirus Papirus-Dark Papirus-Light; do
-  rm -rf "/usr/local/share/icons/$t"
-  cp -a "$TMP/papirus-icon-theme-$PAPIRUS_VERSION/$t" /usr/local/share/icons/
-  chown -R root:root "/usr/local/share/icons/$t"
-  gtk-update-icon-cache -f -q "/usr/local/share/icons/$t"
+  rm -rf "$SHARE/icons/$t"
+  cp -a "$TMP/papirus-icon-theme-$PAPIRUS_VERSION/$t" "$SHARE/icons/"
+  chown -R root:root "$SHARE/icons/$t"
+  gtk-update-icon-cache -f -q "$SHARE/icons/$t"
 done
 # 3b. Folder colour: LocumView teal (#5EEAD4, the GDM logo accent). Papirus' own teal folders
 #     (#16a085 front, #12806a back, #08382e glyph) are recoloured in our /usr/local copy, then the
 #     vendored papirus-folders (upstream v1.14.0, MIT) points the default folder icons at them.
-#     XDG_DATA_DIRS pinned so it only ever touches /usr/local/share/icons.
+#     XDG_DATA_DIRS pinned so it only ever touches our copy of Papirus.
 for t in Papirus Papirus-Dark Papirus-Light; do
-  find "/usr/local/share/icons/$t" -type f -name '*-teal*.svg' \
+  find "$SHARE/icons/$t" -type f -name '*-teal*.svg' \
     -exec sed -i 's/#16a085/#5EEAD4/gI; s/#12806a/#2DD4BF/gI; s/#08382e/#134E4A/gI' {} +
 done
-XDG_DATA_DIRS=/usr/local/share "$SRC/../vendor/papirus-folders" -o -C teal --theme Papirus
+XDG_DATA_DIRS=$SHARE "$SRC/../vendor/papirus-folders" -o -C teal --theme Papirus
 
 # 4. Top-bar logo. gnome-shell shows the icon named by LOGO= in /etc/os-release ("fedora-logo-icon" on RHEL).
-#    /usr/local/share precedes /usr/share in XDG_DATA_DIRS, so same-named hicolor icons here win.
+#    The override directory precedes /usr/share in XDG_DATA_DIRS, so same-named hicolor icons there win.
 for s in 16 22 24 32 36 48 64 96 128 256; do
   install -d "$ICONS/${s}x${s}/apps"
   for name in fedora-logo-icon system-logo-icon; do
@@ -107,27 +121,30 @@ gtk-update-icon-cache -f -t "$ICONS"
 
 # GDM greeter + lock-screen logo (org.gnome.login-screen logo; RHEL default is the Red Hat mark).
 # Rendered at 2x: GDM scales it to a fixed 48px logical height.
-install -d /usr/local/share/pixmaps
-rsvg-convert -h 96 "$SRC/locumview-gdm-logo.svg" -o /usr/local/share/pixmaps/locumview-gdm-logo.png
-chmod 644 /usr/local/share/pixmaps/locumview-gdm-logo.png
+GDM_LOGO=$SHARE/pixmaps/locumview-gdm-logo.png
+install -d "$SHARE/pixmaps"
+rsvg-convert -h 96 "$SRC/locumview-gdm-logo.svg" -o "$GDM_LOGO"
+chmod 644 "$GDM_LOGO"
 
 # 4b. LocumView Tour (packaging/tour): replaces GNOME Tour, whose pages are compiled in. Opens once per user at
 #     first login (autostart, --first-run marker in ~/.local/state/locumview), and from the app grid any time.
 #     GNOME's own welcome dialog is suppressed below (welcome-dialog-last-shown-version) and GNOME Tour hidden.
 TOUR=$SRC/../tour
-install -d /usr/local/share/locumview-tour /usr/local/share/applications /etc/xdg/autostart
-install -m 644 "$TOUR"/art/*.svg /usr/local/share/locumview-tour/
-install -m 755 "$TOUR/locumview-tour" /usr/local/bin/locumview-tour
-install -m 644 "$TOUR/org.locumview.Tour.desktop" /usr/local/share/applications/
-install -m 644 "$TOUR/org.locumview.Tour-autostart.desktop" /etc/xdg/autostart/
+install -d "$SHARE/locumview-tour" "$SHARE/applications" "$OVERRIDE/applications" /etc/xdg/autostart
+install -m 644 "$TOUR"/art/*.svg "$SHARE/locumview-tour/"
+sed "s|/usr/local/share/locumview-tour|$SHARE/locumview-tour|g" "$TOUR/locumview-tour" > "$BIN/locumview-tour"; chmod 755 "$BIN/locumview-tour"
+sed "s|/usr/local/bin/|$BIN/|g" "$TOUR/org.locumview.Tour.desktop" > "$SHARE/applications/org.locumview.Tour.desktop"
+sed "s|/usr/local/bin/|$BIN/|g" "$TOUR/org.locumview.Tour-autostart.desktop" > /etc/xdg/autostart/org.locumview.Tour-autostart.desktop
+chmod 644 "$SHARE/applications/org.locumview.Tour.desktop" /etc/xdg/autostart/org.locumview.Tour-autostart.desktop
 # Demo account only (enabled per user by remote-access/demo-user-root.sh): reopen the tour on every guest connection.
-install -m 755 "$TOUR/locumview-tour-on-connect" /usr/local/bin/locumview-tour-on-connect
-install -d /etc/systemd/user
-install -m 644 "$TOUR/locumview-tour-on-connect.service" /etc/systemd/user/
-# /usr/local/share precedes /usr/share in XDG_DATA_DIRS: this copy hides GNOME Tour from the app grid.
-sed '/^\[Desktop Entry\]/a NoDisplay=true' /usr/share/applications/org.gnome.Tour.desktop > /usr/local/share/applications/org.gnome.Tour.desktop
-update-desktop-database -q /usr/local/share/applications || true
-restorecon -R /usr/local/bin/locumview-tour /usr/local/bin/locumview-tour-on-connect /usr/local/share/locumview-tour /usr/local/share/applications /etc/xdg/autostart /etc/systemd/user/locumview-tour-on-connect.service
+sed "s|/usr/local/bin/|$BIN/|g" "$TOUR/locumview-tour-on-connect" > "$BIN/locumview-tour-on-connect"; chmod 755 "$BIN/locumview-tour-on-connect"
+install -d "$USERUNITS"
+sed "s|/usr/local/bin/|$BIN/|g" "$TOUR/locumview-tour-on-connect.service" > "$USERUNITS/locumview-tour-on-connect.service"; chmod 644 "$USERUNITS/locumview-tour-on-connect.service"
+# The override directory precedes /usr/share in XDG_DATA_DIRS: this copy hides GNOME Tour from the app grid.
+sed '/^\[Desktop Entry\]/a NoDisplay=true' /usr/share/applications/org.gnome.Tour.desktop > "$OVERRIDE/applications/org.gnome.Tour.desktop"
+update-desktop-database -q "$SHARE/applications" || true
+update-desktop-database -q "$OVERRIDE/applications" || true
+relabel -R "$BIN/locumview-tour" "$BIN/locumview-tour-on-connect" "$SHARE/locumview-tour" "$SHARE/applications" /etc/xdg/autostart "$USERUNITS/locumview-tour-on-connect.service"
 
 # 5. Wallpapers: every wallpapers/<name>-{light,dark}.svg pair (text pre-outlined, see branding/README), rendered to PNG (no font dependency at
 #    runtime) and listed in Settings > Appearance. Stale PNGs from earlier runs are removed.
@@ -171,7 +188,7 @@ picture-options='zoom'
 primary-color='#0E141C'
 
 [org/gnome/login-screen]
-logo='/usr/local/share/pixmaps/locumview-gdm-logo.png'
+logo='$GDM_LOGO'
 
 [org/gnome/desktop/interface]
 icon-theme='Papirus'
@@ -254,7 +271,7 @@ dconf update
 # 7. Organization desktop layout: re-applies the recorded choice (first install: mac, locked).
 #    To change it for everyone: sudo packaging/desktop-layout/set-desktop-layout.sh mac|windows|gnome
 bash "$SRC/../desktop-layout/set-desktop-layout.sh"
-restorecon -R /usr/local/share/pixmaps /usr/local/share/icons /usr/local/share/backgrounds /usr/local/share/gnome-background-properties /etc/dconf/db
+relabel -R "$SHARE/pixmaps" "$SHARE/icons" "$OVERRIDE/icons" "$SHARE/backgrounds" "$SHARE/gnome-background-properties" /etc/dconf/db
 ls "$BG"
-flatpak list --system --app --columns=application,origin
+[ "$IMAGE" = 1 ] || flatpak list --system --app --columns=application,origin
 echo DONE

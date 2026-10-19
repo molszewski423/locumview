@@ -52,6 +52,10 @@
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_no_files_unowned_by_user" selected="false"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_file_permissions_ungroupowned" selected="false"/>
 
+    <!-- Exception: removing gssproxy also removes nfs-utils, which ipa-client requires (the IdM client tools).
+         Found 2026-10-19: the first remediation had removed ipa-client this way. -->
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_package_gssproxy_removed" selected="false"/>
+
     <!-- Local accounts allowed to exist. The remediation DELETES any other local account,
          so every system account on the image must be listed (gnome-remote-desktop above all). -->
     <xccdf:set-value idref="xccdf_org.ssgproject.content_value_var_accounts_authorized_local_users_regex">^(root|bin|daemon|adm|lp|sync|shutdown|halt|mail|operator|games|ftp|nobody|tss|systemd-coredump|systemd-oom|dbus|polkitd|avahi|colord|rtkit|pipewire|clevis|sssd|geoclue|flatpak|setroubleshoot|fapolicyd|libstoragemgmt|gdm|gnome-initial-setup|gnome-remote-desktop|sshd|chrony|dnsmasq|postfix|tcpdump|rpc|rpcuser|pesign|unbound|wsdd|stapunpriv|yggdrasil|yggdrasil-worker|usbguard|lvadmin|demo)$</xccdf:set-value>
@@ -62,5 +66,21 @@
     <xccdf:set-value idref="xccdf_org.ssgproject.content_value_dconf_login_banner_text">^Authorized[\s\n]+users[\s\n]+only\.[\s\n]+All[\s\n]+activity[\s\n]+may[\s\n]+be[\s\n]+monitored[\s\n]+and[\s\n]+reported\.$</xccdf:set-value>
     <xccdf:set-value idref="xccdf_org.ssgproject.content_value_login_banner_contents">Authorized users only. All activity may be monitored and reported.</xccdf:set-value>
     <xccdf:set-value idref="xccdf_org.ssgproject.content_value_dconf_login_banner_contents">Authorized users only. All activity may be monitored and reported.</xccdf:set-value>
+  </xccdf:Profile>
+  <xccdf:Profile id="xccdf_org.locumview_profile_stig_gui_image" extends="xccdf_org.locumview_profile_stig_gui">
+    <xccdf:title>LocumView: DISA STIG with GUI for RHEL 10, bootc image</xccdf:title>
+    <xccdf:description>The LocumView profile for the bootc desktop image (oscap-im at build time): everything the hand-built desktop could not do comes back. FIPS mode and its crypto policy are set in the image, and the separate file systems come from the installer's disk layout.</xccdf:description>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_sysctl_crypto_fips_enabled" selected="true"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_configure_crypto_policy" selected="true"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_harden_sshd_ciphers_openssh_conf_crypto_policy" selected="true"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_harden_sshd_ciphers_opensshserver_conf_crypto_policy" selected="true"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_harden_sshd_macs_openssh_conf_crypto_policy" selected="true"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_harden_sshd_macs_opensshserver_conf_crypto_policy" selected="true"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_tmp" selected="true"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_var" selected="true"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_var_log" selected="true"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_var_log_audit" selected="true"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_var_tmp" selected="true"/>
+    <xccdf:set-value idref="xccdf_org.ssgproject.content_value_var_system_crypto_policy">FIPS</xccdf:set-value>
   </xccdf:Profile>
 </xccdf:Tailoring>

@@ -32,6 +32,7 @@ Four STIG items are not automated by SSG and were done by hand on the reference 
 | `rsyslog_remote_loghost`, `rsyslog_remote_access_monitoring` | **Exception, open item** | No central log server yet. Logs stay local (auditd, journald). |
 | `network_configure_name_resolution` | **Exception, open item** | One resolver, the network's DNS server, which also holds the internal names. A second resolver comes with the IdM replica on node2. |
 | `selinux_context_elevation_for_sudo` | **Deferred** | Confined administrators (`sysadm_r`) need IdM SELinux user maps; planned with the IdM password-policy work. |
+| `package_gssproxy_removed` | **Exception** | Removing `gssproxy` also removes `nfs-utils`, which `ipa-client` (the IdM client tools: `ipa`, `ipa-certupdate`, `ipa-getkeytab`, unenroll) requires. The first remediation on 2026-10-17 removed `ipa-client` this way; logins kept working because SSSD and the enrollment stayed, which is why the hands-on checks missed it. Found and reinstalled 2026-10-19 (changelog #51). |
 | `no_files_unowned_by_user`, `file_permissions_ungroupowned` | **False positive** | The OVAL check reads only `/etc/passwd` and `/etc/group`, so every file owned by an IdM user counts as unowned. Checked instead with `find / -xdev \( -nouser -o -nogroup \)`, which resolves owners through NSS (SSSD): no results on 2026-10-19. |
 
 ### Values changed
@@ -51,7 +52,7 @@ Several SSG 0.1.82 remediations create the authselect profile `custom/hardening`
 - **Three wrong passwords within 15 minutes lock the account on that desktop until an administrator unlocks it** (pam_faillock, `unlock_time=0`, as the STIG requires). This applies to IdM users too, at the login screen, the lock screen and sudo. Unlock: `faillock --user <name> --reset` as root, from another administrator's session, `lvadmin`, or the VM console (`virsh console`). IdM has its own, separate lockout.
 - New local passwords: 15 or more characters, all four character classes, no more than 4 characters of one class in a row, 60-day maximum age. IdM passwords follow the IdM password policy (open item).
 - `/home` is `noexec`, and **fapolicyd** allows only files that RPM installed to run or to be loaded by interpreters. Installed Flatpaks and the GNOME extensions work. `pip install --user`, scripts in a home directory and similar developer tools do not. The reference desktop is no longer a development machine; development happens on the dev laptops (ADR 0009).
-- New packages and services: AIDE (check weekly, Sunday 04:05, mailed to root), auditd with the STIG rule set, fapolicyd, USBGuard (policy generated from the devices present at install), postfix for local mail to root. Removed: tuned, gssproxy (and nfs-utils, which depends on it), unbound (and `ipa-client-encrypted-dns`, unused).
+- New packages and services: AIDE (check weekly, Sunday 04:05, mailed to root), auditd with the STIG rule set, fapolicyd, USBGuard (policy generated from the devices present at install), postfix for local mail to root. Removed: tuned, unbound (and `ipa-client-encrypted-dns`, unused). gssproxy stays (exception above).
 - Kernel arguments: `audit=1 audit_backlog_limit=8192 init_on_free=1 page_poison=1 pti=on vsyscall=none`.
 
 ## Results

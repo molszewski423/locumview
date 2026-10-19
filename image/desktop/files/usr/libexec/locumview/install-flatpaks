@@ -1,0 +1,12 @@
+#!/bin/bash
+# First boot: the desktop's system-wide Flatpaks. They live in /var/lib/flatpak, which an image cannot update,
+# so they are installed on the running system (same apps and remotes as packaging/install-desktop.sh).
+set -euo pipefail
+FLATPAKS="org.gnome.Extensions org.onlyoffice.desktopeditors"
+flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+for app in $FLATPAKS; do
+  if flatpak remote-info --system rhel "$app" >/dev/null 2>&1; then remote=rhel; else remote=flathub; fi
+  flatpak install --system -y --noninteractive "$remote" "$app"
+done
+install -d /var/lib/locumview
+touch /var/lib/locumview/flatpaks-installed
