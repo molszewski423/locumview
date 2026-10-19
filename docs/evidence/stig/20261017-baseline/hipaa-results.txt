@@ -1,0 +1,817 @@
+--- Starting Evaluation ---
+
+Title	Verify File Hashes with RPM
+Rule	xccdf_org.ssgproject.content_rule_rpm_verify_hashes
+Ident	CCE-89944-3
+Result	pass
+
+Title	Verify and Correct File Permissions with RPM
+Rule	xccdf_org.ssgproject.content_rule_rpm_verify_permissions
+Ident	CCE-88623-4
+Result	pass
+
+Title	Configure System Cryptography Policy
+Rule	xccdf_org.ssgproject.content_rule_configure_crypto_policy
+Ident	CCE-89085-5
+Result	pass
+
+Title	Encrypt Partitions
+Rule	xccdf_org.ssgproject.content_rule_encrypt_partitions
+Ident	CCE-89165-5
+Result	notchecked
+
+Title	Ensure /var/log/audit Located On Separate Partition
+Rule	xccdf_org.ssgproject.content_rule_partition_for_var_log_audit
+Ident	CCE-89211-7
+Result	fail
+
+Title	Make sure that the dconf databases are up-to-date with regards to respective keyfiles
+Rule	xccdf_org.ssgproject.content_rule_dconf_db_up_to_date
+Ident	CCE-86609-5
+Result	pass
+
+Title	Install sequoia-sq Package
+Rule	xccdf_org.ssgproject.content_rule_package_sequoia-sq_installed
+Ident	CCE-86458-7
+Result	pass
+
+Title	Ensure gpgcheck Enabled In Main dnf Configuration
+Rule	xccdf_org.ssgproject.content_rule_ensure_gpgcheck_globally_activated
+Ident	CCE-88404-9
+Result	pass
+
+Title	Ensure gpgcheck Enabled for Local Packages
+Rule	xccdf_org.ssgproject.content_rule_ensure_gpgcheck_local_packages
+Ident	CCE-89409-7
+Result	fail
+
+Title	Ensure gpgcheck Enabled for All dnf Package Repositories
+Rule	xccdf_org.ssgproject.content_rule_ensure_gpgcheck_never_disabled
+Ident	CCE-88176-3
+Result	pass
+
+Title	Ensure gpgcheck Enabled for Repository Metadata
+Rule	xccdf_org.ssgproject.content_rule_ensure_gpgcheck_repo_metadata
+Ident	CCE-88518-6
+Result	fail
+
+Title	Ensure Red Hat GPG Key Installed
+Rule	xccdf_org.ssgproject.content_rule_ensure_redhat_gpgkey_installed
+Ident	CCE-88256-3
+Result	pass
+
+Title	Disable debug-shell SystemD Service
+Rule	xccdf_org.ssgproject.content_rule_service_debug-shell_disabled
+Ident	CCE-90212-2
+Result	fail
+
+Title	Disable Ctrl-Alt-Del Burst Action
+Rule	xccdf_org.ssgproject.content_rule_disable_ctrlaltdel_burstaction
+Ident	CCE-87627-6
+Result	fail
+
+Title	Disable Ctrl-Alt-Del Reboot Activation
+Rule	xccdf_org.ssgproject.content_rule_disable_ctrlaltdel_reboot
+Ident	CCE-90035-7
+Result	fail
+
+Title	Verify that Interactive Boot is Disabled
+Rule	xccdf_org.ssgproject.content_rule_grub2_disable_interactive_boot
+Ident	CCE-89661-3
+Result	pass
+
+Title	Require Authentication for Emergency Systemd Target
+Rule	xccdf_org.ssgproject.content_rule_require_emergency_target_auth
+Ident	CCE-89188-7
+Result	pass
+
+Title	Require Authentication for Single User Mode
+Rule	xccdf_org.ssgproject.content_rule_require_singleuser_auth
+Ident	CCE-90014-2
+Result	pass
+
+Title	Prevent Login to Accounts With Empty Password
+Rule	xccdf_org.ssgproject.content_rule_no_empty_passwords
+Ident	CCE-86640-0
+Result	fail
+
+Title	Direct root Logins Not Allowed
+Rule	xccdf_org.ssgproject.content_rule_no_direct_root_logins
+Ident	CCE-87481-8
+Result	fail
+
+Title	Restrict Serial Port Root Logins
+Rule	xccdf_org.ssgproject.content_rule_restrict_serial_port_logins
+Ident	CCE-89728-0
+Result	pass
+
+Title	Restrict Virtual Console Root Logins
+Rule	xccdf_org.ssgproject.content_rule_securetty_root_login_console_only
+Ident	CCE-89376-8
+Result	pass
+
+Title	Verify /boot/grub2/grub.cfg Group Ownership
+Rule	xccdf_org.ssgproject.content_rule_file_groupowner_grub2_cfg
+Ident	CCE-88691-1
+Result	pass
+
+Title	Verify /boot/grub2/user.cfg Group Ownership
+Rule	xccdf_org.ssgproject.content_rule_file_groupowner_user_cfg
+Ident	CCE-86797-8
+Result	pass
+
+Title	Verify /boot/grub2/grub.cfg User Ownership
+Rule	xccdf_org.ssgproject.content_rule_file_owner_grub2_cfg
+Ident	CCE-89438-6
+Result	pass
+
+Title	Verify /boot/grub2/user.cfg User Ownership
+Rule	xccdf_org.ssgproject.content_rule_file_owner_user_cfg
+Ident	CCE-90573-7
+Result	pass
+
+Title	Verify /boot/grub2/grub.cfg Permissions
+Rule	xccdf_org.ssgproject.content_rule_file_permissions_grub2_cfg
+Ident	CCE-89290-1
+Result	pass
+
+Title	Verify /boot/grub2/user.cfg Permissions
+Rule	xccdf_org.ssgproject.content_rule_file_permissions_user_cfg
+Ident	CCE-90099-3
+Result	pass
+
+Title	Set the Boot Loader Admin Username to a Non-Default Value
+Rule	xccdf_org.ssgproject.content_rule_grub2_admin_username
+Ident	CCE-89960-9
+Result	fail
+
+Title	Set Boot Loader Password in grub2
+Rule	xccdf_org.ssgproject.content_rule_grub2_password
+Ident	CCE-87614-4
+Result	fail
+
+Title	Ensure rsyslog is Installed
+Rule	xccdf_org.ssgproject.content_rule_package_rsyslog_installed
+Ident	CCE-90353-4
+Result	pass
+
+Title	Enable rsyslog Service
+Rule	xccdf_org.ssgproject.content_rule_service_rsyslog_enabled
+Ident	CCE-90584-4
+Result	pass
+
+Title	Ensure Logs Sent To Remote Host
+Rule	xccdf_org.ssgproject.content_rule_rsyslog_remote_loghost
+Ident	CCE-90372-4
+Result	fail
+
+Title	Verify Any Configured IPSec Tunnel Connections
+Rule	xccdf_org.ssgproject.content_rule_libreswan_approved_tunnels
+Ident	CCE-87382-8
+Result	notchecked
+
+Title	Disable the Automounter
+Rule	xccdf_org.ssgproject.content_rule_service_autofs_disabled
+Ident	CCE-88947-7
+Result	fail
+
+Title	Disable Modprobe Loading of USB Storage Driver
+Rule	xccdf_org.ssgproject.content_rule_kernel_module_usb-storage_disabled
+Ident	CCE-89301-6
+Result	fail
+
+Title	Restrict Access to Kernel Message Buffer
+Rule	xccdf_org.ssgproject.content_rule_sysctl_kernel_dmesg_restrict
+Ident	CCE-89000-4
+Result	fail
+
+Title	Disable Core Dumps for SUID programs
+Rule	xccdf_org.ssgproject.content_rule_sysctl_fs_suid_dumpable
+Ident	CCE-88399-1
+Result	fail
+
+Title	Enable ExecShield via sysctl
+Rule	xccdf_org.ssgproject.content_rule_sysctl_kernel_exec_shield
+Ident	CCE-89079-8
+Result	pass
+
+Title	Enable Randomized Layout of Virtual Address Space
+Rule	xccdf_org.ssgproject.content_rule_sysctl_kernel_randomize_va_space
+Ident	CCE-87876-9
+Result	fail
+
+Title	Ensure SELinux Not Disabled in /etc/default/grub
+Rule	xccdf_org.ssgproject.content_rule_grub2_enable_selinux
+Ident	CCE-88989-9
+Result	pass
+
+Title	Ensure No Daemons are Unconfined by SELinux
+Rule	xccdf_org.ssgproject.content_rule_selinux_confinement_of_daemons
+Ident	CCE-88979-0
+Result	fail
+
+Title	Configure SELinux Policy
+Rule	xccdf_org.ssgproject.content_rule_selinux_policytype
+Ident	CCE-88366-0
+Result	pass
+
+Title	Ensure SELinux State is Enforcing
+Rule	xccdf_org.ssgproject.content_rule_selinux_state
+Ident	CCE-89386-7
+Result	pass
+
+Title	Disable the selinuxuser_execheap SELinux Boolean
+Rule	xccdf_org.ssgproject.content_rule_sebool_selinuxuser_execheap
+Ident	CCE-90413-6
+Result	pass
+
+Title	Enable the selinuxuser_execmod SELinux Boolean
+Rule	xccdf_org.ssgproject.content_rule_sebool_selinuxuser_execmod
+Ident	CCE-86922-2
+Result	pass
+
+Title	Disable the selinuxuser_execstack SELinux Boolean
+Rule	xccdf_org.ssgproject.content_rule_sebool_selinuxuser_execstack
+Ident	CCE-87842-1
+Result	fail
+
+Title	Disable KDump Kernel Crash Analyzer (kdump)
+Rule	xccdf_org.ssgproject.content_rule_service_kdump_disabled
+Ident	CCE-88407-2
+Result	fail
+
+Title	Install the cron service
+Rule	xccdf_org.ssgproject.content_rule_package_cron_installed
+Ident	CCE-86619-4
+Result	pass
+
+Title	Enable cron Service
+Rule	xccdf_org.ssgproject.content_rule_service_cron_enabled
+Ident	CCE-87885-0
+Result	pass
+
+Title	Enable cron Service
+Rule	xccdf_org.ssgproject.content_rule_service_crond_enabled
+Ident	CCE-90044-9
+Result	pass
+
+Title	The Postfix package is installed
+Rule	xccdf_org.ssgproject.content_rule_package_postfix_installed
+Ident	CCE-86466-0
+Result	fail
+
+Title	Use Kerberos Security on All Exports
+Rule	xccdf_org.ssgproject.content_rule_use_kerberos_security_all_exports
+Ident	CCE-90391-4
+Result	pass
+
+Title	Uninstall telnet-server Package
+Rule	xccdf_org.ssgproject.content_rule_package_telnet-server_removed
+Ident	CCE-88105-2
+Result	pass
+
+Title	Remove telnet Clients
+Rule	xccdf_org.ssgproject.content_rule_package_telnet_removed
+Ident	CCE-90545-5
+Result	fail
+
+Title	Disable telnet Service
+Rule	xccdf_org.ssgproject.content_rule_service_telnet_disabled
+Ident	CCE-89078-0
+Result	notapplicable
+
+Title	Disable Host-Based Authentication
+Rule	xccdf_org.ssgproject.content_rule_disable_host_auth
+Ident	CCE-88057-5
+Result	fail
+
+Title	Disable Compression Or Set Compression to delayed
+Rule	xccdf_org.ssgproject.content_rule_sshd_disable_compression
+Ident	CCE-90051-4
+Result	fail
+
+Title	Disable SSH Access via Empty Passwords
+Rule	xccdf_org.ssgproject.content_rule_sshd_disable_empty_passwords
+Ident	CCE-86753-1
+Result	fail
+
+Title	Disable SSH Support for Rhosts RSA Authentication
+Rule	xccdf_org.ssgproject.content_rule_sshd_disable_rhosts_rsa
+Ident	CCE-89866-8
+Result	fail
+
+Title	Disable SSH Root Login
+Rule	xccdf_org.ssgproject.content_rule_sshd_disable_root_login
+Ident	CCE-89730-6
+Result	fail
+
+Title	Disable SSH Support for User Known Hosts
+Rule	xccdf_org.ssgproject.content_rule_sshd_disable_user_known_hosts
+Ident	CCE-87313-3
+Result	fail
+
+Title	Do Not Allow SSH Environment Options
+Rule	xccdf_org.ssgproject.content_rule_sshd_do_not_permit_user_env
+Ident	CCE-87395-0
+Result	fail
+
+Title	Enable Use of Strict Mode Checking
+Rule	xccdf_org.ssgproject.content_rule_sshd_enable_strictmodes
+Ident	CCE-88037-7
+Result	fail
+
+Title	Enable SSH Warning Banner
+Rule	xccdf_org.ssgproject.content_rule_sshd_enable_warning_banner
+Ident	CCE-86539-4
+Result	fail
+
+Title	Distribute the SSH Server configuration to multiple files in a config directory.
+Rule	xccdf_org.ssgproject.content_rule_sshd_use_directory_configuration
+Ident	CCE-87449-5
+Result	pass
+
+Title	Enable Use of Privilege Separation
+Rule	xccdf_org.ssgproject.content_rule_sshd_use_priv_separation
+Ident	CCE-88712-5
+Result	notapplicable
+
+Title	Ensure the audit Subsystem is Installed
+Rule	xccdf_org.ssgproject.content_rule_package_audit_installed
+Ident	CCE-88240-7
+Result	pass
+
+Title	Enable auditd Service
+Rule	xccdf_org.ssgproject.content_rule_service_auditd_enabled
+Ident	CCE-87955-1
+Result	pass
+
+Title	Enable Auditing for Processes Which Start Prior to the Audit Daemon
+Rule	xccdf_org.ssgproject.content_rule_grub2_audit_argument
+Ident	CCE-88376-9
+Result	fail
+
+Title	Extend Audit Backlog Limit for the Audit Daemon
+Rule	xccdf_org.ssgproject.content_rule_grub2_audit_backlog_limit_argument
+Ident	CCE-88192-0
+Result	fail
+
+Title	Make the auditd Configuration Immutable
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_immutable
+Ident	CCE-89816-3
+Result	fail
+
+Title	Record Events that Modify the System's Mandatory Access Controls (/etc/selinux)
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_mac_modification_etc_selinux
+Ident	CCE-90737-8
+Result	fail
+
+Title	Record Events that Modify the System's Mandatory Access Controls in usr/share
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_mac_modification_usr_share
+Ident	CCE-88117-7
+Result	fail
+
+Title	Ensure auditd Collects Information on Exporting to Media (successful)
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_media_export
+Ident	CCE-86590-7
+Result	fail
+
+Title	Record Events that Modify the System's Network Environment
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_networkconfig_modification
+Ident	CCE-87775-3
+Result	fail
+
+Title	Record Attempts to Alter Process and Session Initiation Information btmp
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_session_events_btmp
+Ident	CCE-86190-6
+Result	fail
+
+Title	Record Attempts to Alter Process and Session Initiation Information utmp
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_session_events_utmp
+Ident	CCE-86193-0
+Result	fail
+
+Title	Record Attempts to Alter Process and Session Initiation Information wtmp
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_session_events_wtmp
+Ident	CCE-86206-0
+Result	fail
+
+Title	Ensure auditd Collects System Administrator Actions
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_sysadmin_actions
+Ident	CCE-89678-7
+Result	fail
+
+Title	Shutdown System When Auditing Failures Occur
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_system_shutdown
+Ident	CCE-87352-1
+Result	fail
+
+Title	Record Events that Modify User/Group Information - /etc/group
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_usergroup_modification_group
+Ident	CCE-87111-1
+Result	fail
+
+Title	Record Events that Modify User/Group Information - /etc/gshadow
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_usergroup_modification_gshadow
+Ident	CCE-87736-5
+Result	fail
+
+Title	Record Events that Modify User/Group Information - /etc/security/opasswd
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_usergroup_modification_opasswd
+Ident	CCE-90664-4
+Result	fail
+
+Title	Record Events that Modify User/Group Information - /etc/passwd
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_usergroup_modification_passwd
+Ident	CCE-88286-0
+Result	fail
+
+Title	Record Events that Modify User/Group Information - /etc/shadow
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_usergroup_modification_shadow
+Ident	CCE-88637-4
+Result	fail
+
+Title	Record Events that Modify the System's Discretionary Access Controls - chmod
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_dac_modification_chmod
+Ident	CCE-90466-4
+Result	fail
+
+Title	Record Events that Modify the System's Discretionary Access Controls - chown
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_dac_modification_chown
+Ident	CCE-89540-9
+Result	fail
+
+Title	Record Events that Modify the System's Discretionary Access Controls - fchmod
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_dac_modification_fchmod
+Ident	CCE-88200-1
+Result	fail
+
+Title	Record Events that Modify the System's Discretionary Access Controls - fchmodat
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_dac_modification_fchmodat
+Ident	CCE-89356-0
+Result	fail
+
+Title	Record Events that Modify the System's Discretionary Access Controls - fchmodat2
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_dac_modification_fchmodat2
+Ident	CCE-86535-2
+Result	fail
+
+Title	Record Events that Modify the System's Discretionary Access Controls - fchown
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_dac_modification_fchown
+Ident	CCE-90685-9
+Result	fail
+
+Title	Record Events that Modify the System's Discretionary Access Controls - fchownat
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_dac_modification_fchownat
+Ident	CCE-90651-1
+Result	fail
+
+Title	Record Events that Modify the System's Discretionary Access Controls - fremovexattr
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_dac_modification_fremovexattr
+Ident	CCE-88352-0
+Result	fail
+
+Title	Record Events that Modify the System's Discretionary Access Controls - fsetxattr
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_dac_modification_fsetxattr
+Ident	CCE-89370-1
+Result	fail
+
+Title	Record Events that Modify the System's Discretionary Access Controls - lchown
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_dac_modification_lchown
+Ident	CCE-88243-1
+Result	fail
+
+Title	Record Events that Modify the System's Discretionary Access Controls - lremovexattr
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_dac_modification_lremovexattr
+Ident	CCE-90100-9
+Result	fail
+
+Title	Record Events that Modify the System's Discretionary Access Controls - lsetxattr
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_dac_modification_lsetxattr
+Ident	CCE-88052-6
+Result	fail
+
+Title	Record Events that Modify the System's Discretionary Access Controls - removexattr
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_dac_modification_removexattr
+Ident	CCE-89677-9
+Result	fail
+
+Title	Record Events that Modify the System's Discretionary Access Controls - setxattr
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_dac_modification_setxattr
+Ident	CCE-89571-4
+Result	fail
+
+Title	Record Any Attempts to Run chcon
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_execution_chcon
+Ident	CCE-87762-1
+Result	fail
+
+Title	Record Any Attempts to Run restorecon
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_execution_restorecon
+Ident	CCE-87531-0
+Result	fail
+
+Title	Record Any Attempts to Run semanage
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_execution_semanage
+Ident	CCE-89541-7
+Result	fail
+
+Title	Record Any Attempts to Run setsebool
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_execution_setsebool
+Ident	CCE-87741-5
+Result	fail
+
+Title	Ensure auditd Collects File Deletion Events by User - rename
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_file_deletion_events_rename
+Ident	CCE-90733-7
+Result	fail
+
+Title	Ensure auditd Collects File Deletion Events by User - renameat
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_file_deletion_events_renameat
+Ident	CCE-90237-9
+Result	fail
+
+Title	Ensure auditd Collects File Deletion Events by User - renameat2
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_file_deletion_events_renameat2
+Ident	CCE-86188-0
+Result	fail
+
+Title	Ensure auditd Collects File Deletion Events by User - rmdir
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_file_deletion_events_rmdir
+Ident	CCE-88762-0
+Result	fail
+
+Title	Ensure auditd Collects File Deletion Events by User - unlink
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_file_deletion_events_unlink
+Ident	CCE-86737-4
+Result	fail
+
+Title	Ensure auditd Collects File Deletion Events by User - unlinkat
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_file_deletion_events_unlinkat
+Ident	CCE-87813-2
+Result	fail
+
+Title	Record Unsuccessful Access Attempts to Files - creat
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_unsuccessful_file_modification_creat
+Ident	CCE-87052-7
+Result	fail
+
+Title	Record Unsuccessful Access Attempts to Files - ftruncate
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_unsuccessful_file_modification_ftruncate
+Ident	CCE-86729-1
+Result	fail
+
+Title	Record Unsuccessful Access Attempts to Files - open
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_unsuccessful_file_modification_open
+Ident	CCE-87349-7
+Result	fail
+
+Title	Record Unsuccessful Access Attempts to Files - open_by_handle_at
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_unsuccessful_file_modification_open_by_handle_at
+Ident	CCE-90251-0
+Result	fail
+
+Title	Record Unsuccessful Creation Attempts to Files - open_by_handle_at O_CREAT
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_unsuccessful_file_modification_open_by_handle_at_o_creat
+Ident	CCE-89622-5
+Result	fail
+
+Title	Record Unsuccessful Modification Attempts to Files - open_by_handle_at O_TRUNC_WRITE
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_unsuccessful_file_modification_open_by_handle_at_o_trunc_write
+Ident	CCE-86749-9
+Result	fail
+
+Title	Ensure auditd Unauthorized Access Attempts To open_by_handle_at Are Ordered Correctly
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_unsuccessful_file_modification_open_by_handle_at_rule_order
+Ident	CCE-87518-7
+Result	fail
+
+Title	Record Unsuccessful Creation Attempts to Files - open O_CREAT
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_unsuccessful_file_modification_open_o_creat
+Ident	CCE-88300-9
+Result	fail
+
+Title	Record Unsuccessful Modification Attempts to Files - open O_TRUNC_WRITE
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_unsuccessful_file_modification_open_o_trunc_write
+Ident	CCE-90742-8
+Result	fail
+
+Title	Ensure auditd Rules For Unauthorized Attempts To open Are Ordered Correctly
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_unsuccessful_file_modification_open_rule_order
+Ident	CCE-87190-5
+Result	fail
+
+Title	Record Unsuccessful Access Attempts to Files - openat
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_unsuccessful_file_modification_openat
+Ident	CCE-89291-9
+Result	fail
+
+Title	Record Unsuccessful Creation Attempts to Files - openat O_CREAT
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_unsuccessful_file_modification_openat_o_creat
+Ident	CCE-89098-8
+Result	fail
+
+Title	Record Unsuccessful Modification Attempts to Files - openat O_TRUNC_WRITE
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_unsuccessful_file_modification_openat_o_trunc_write
+Ident	CCE-86897-6
+Result	fail
+
+Title	Ensure auditd Rules For Unauthorized Attempts To openat Are Ordered Correctly
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_unsuccessful_file_modification_openat_rule_order
+Ident	CCE-90507-5
+Result	fail
+
+Title	Record Unsuccessful Delete Attempts to Files - rename
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_unsuccessful_file_modification_rename
+Ident	CCE-89713-2
+Result	fail
+
+Title	Record Unsuccessful Delete Attempts to Files - renameat
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_unsuccessful_file_modification_renameat
+Ident	CCE-88132-6
+Result	fail
+
+Title	Record Unsuccessful Access Attempts to Files - truncate
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_unsuccessful_file_modification_truncate
+Ident	CCE-89869-2
+Result	fail
+
+Title	Record Unsuccessful Delete Attempts to Files - unlink
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_unsuccessful_file_modification_unlink
+Ident	CCE-88520-2
+Result	fail
+
+Title	Record Unsuccessful Delete Attempts to Files - unlinkat
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_unsuccessful_file_modification_unlinkat
+Ident	CCE-89972-4
+Result	fail
+
+Title	Ensure auditd Collects Information on Kernel Module Unloading - delete_module
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_kernel_module_loading_delete
+Ident	CCE-89982-3
+Result	fail
+
+Title	Ensure auditd Collects Information on Kernel Module Loading and Unloading - finit_module
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_kernel_module_loading_finit
+Ident	CCE-88638-2
+Result	fail
+
+Title	Ensure auditd Collects Information on Kernel Module Loading - init_module
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_kernel_module_loading_init
+Ident	CCE-90172-8
+Result	fail
+
+Title	Record Attempts to Alter Logon and Logout Events - faillock
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_login_events_faillock
+Ident	CCE-89479-0
+Result	fail
+
+Title	Record Attempts to Alter Logon and Logout Events - lastlog
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_login_events_lastlog
+Ident	CCE-88938-6
+Result	fail
+
+Title	Record Attempts to Alter Logon and Logout Events - tallylog
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_login_events_tallylog
+Ident	CCE-88948-5
+Result	fail
+
+Title	Ensure auditd Collects Information on the Use of Privileged Commands - chage
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_privileged_commands_chage
+Ident	CCE-90143-9
+Result	fail
+
+Title	Ensure auditd Collects Information on the Use of Privileged Commands - chsh
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_privileged_commands_chsh
+Ident	CCE-89551-6
+Result	fail
+
+Title	Ensure auditd Collects Information on the Use of Privileged Commands - crontab
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_privileged_commands_crontab
+Ident	CCE-89029-3
+Result	fail
+
+Title	Ensure auditd Collects Information on the Use of Privileged Commands - gpasswd
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_privileged_commands_gpasswd
+Ident	CCE-89403-0
+Result	fail
+
+Title	Ensure auditd Collects Information on the Use of Privileged Commands - newgrp
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_privileged_commands_newgrp
+Ident	CCE-88752-1
+Result	fail
+
+Title	Ensure auditd Collects Information on the Use of Privileged Commands - pam_timestamp_check
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_privileged_commands_pam_timestamp_check
+Ident	CCE-89521-9
+Result	fail
+
+Title	Ensure auditd Collects Information on the Use of Privileged Commands - passwd
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_privileged_commands_passwd
+Ident	CCE-89215-8
+Result	fail
+
+Title	Ensure auditd Collects Information on the Use of Privileged Commands - postdrop
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_privileged_commands_postdrop
+Ident	CCE-89394-1
+Result	fail
+
+Title	Ensure auditd Collects Information on the Use of Privileged Commands - postqueue
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_privileged_commands_postqueue
+Ident	CCE-87927-0
+Result	fail
+
+Title	Ensure auditd Collects Information on the Use of Privileged Commands - ssh-keysign
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_privileged_commands_ssh_keysign
+Ident	CCE-88874-3
+Result	fail
+
+Title	Ensure auditd Collects Information on the Use of Privileged Commands - su
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_privileged_commands_su
+Ident	CCE-89587-0
+Result	fail
+
+Title	Ensure auditd Collects Information on the Use of Privileged Commands - sudo
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_privileged_commands_sudo
+Ident	CCE-89698-5
+Result	fail
+
+Title	Ensure auditd Collects Information on the Use of Privileged Commands - sudoedit
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_privileged_commands_sudoedit
+Ident	CCE-89601-9
+Result	fail
+
+Title	Ensure auditd Collects Information on the Use of Privileged Commands - umount
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_privileged_commands_umount
+Ident	CCE-86962-8
+Result	fail
+
+Title	Ensure auditd Collects Information on the Use of Privileged Commands - unix2_chkpwd
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_privileged_commands_unix2_chkpwd
+Ident	CCE-88154-0
+Result	fail
+
+Title	Ensure auditd Collects Information on the Use of Privileged Commands - unix_chkpwd
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_privileged_commands_unix_chkpwd
+Ident	CCE-89529-2
+Result	fail
+
+Title	Ensure auditd Collects Information on the Use of Privileged Commands - userhelper
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_privileged_commands_userhelper
+Ident	CCE-90652-9
+Result	fail
+
+Title	Record attempts to alter time through adjtimex
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_time_adjtimex
+Ident	CCE-87633-4
+Result	fail
+
+Title	Record Attempts to Alter Time Through clock_settime
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_time_clock_settime
+Ident	CCE-88533-5
+Result	fail
+
+Title	Record attempts to alter time through settimeofday
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_time_settimeofday
+Ident	CCE-90548-9
+Result	fail
+
+Title	Record Attempts to Alter Time Through stime
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_time_stime
+Ident	CCE-89077-2
+Result	fail
+
+Title	Record Attempts to Alter the localtime File
+Rule	xccdf_org.ssgproject.content_rule_audit_rules_time_watch_localtime
+Ident	CCE-89928-6
+Result	fail
+
+Title	Configure auditd mail_acct Action on Low Disk Space
+Rule	xccdf_org.ssgproject.content_rule_auditd_data_retention_action_mail_acct
+Ident	CCE-89081-4
+Result	pass
+
+Title	Configure auditd admin_space_left Action on Low Disk Space
+Rule	xccdf_org.ssgproject.content_rule_auditd_data_retention_admin_space_left_action
+Ident	CCE-89040-0
+Result	fail
+
+Title	Configure auditd flush priority
+Rule	xccdf_org.ssgproject.content_rule_auditd_data_retention_flush
+Ident	CCE-88075-7
+Result	fail
+
+Title	Configure auditd max_log_file_action Upon Reaching Maximum Log Size
+Rule	xccdf_org.ssgproject.content_rule_auditd_data_retention_max_log_file_action
+Ident	CCE-86674-9
+Result	pass
+
+Title	Configure auditd max_log_file_action Upon Reaching Maximum Log Size
+Rule	xccdf_org.ssgproject.content_rule_auditd_data_retention_max_log_file_action_stig
+Ident	CCE-89533-4
+Result	pass
+
+Title	Configure auditd space_left Action on Low Disk Space
+Rule	xccdf_org.ssgproject.content_rule_auditd_data_retention_space_left_action
+Ident	CCE-88897-4
+Result	fail
+

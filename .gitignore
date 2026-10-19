@@ -39,3 +39,7 @@ __pycache__/
 
 # Site-specific values (addresses, host names); see site.env.example files
 site.env
+
+# STIG run logs and scan results (contain host addresses)
+locumview-stig-*.log
+stig-scan-*/

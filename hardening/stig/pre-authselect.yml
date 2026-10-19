@@ -1,0 +1,26 @@
+# Runs before the SSG playbook. SSG's authselect remediations (scap-security-guide
+# 0.1.82) create custom/hardening and `authselect select` it WITHOUT the current
+# features, then try to restore them with sudo. Dropping with-sudo removes the
+# IdM (SSSD) sudo rules, so that restore step fails and sudo is lost. Selecting
+# custom/hardening here, features kept, makes those SSG tasks skip.
+- hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Read the current authselect profile and features
+      ansible.builtin.command: authselect current -r
+      register: authselect_now
+      changed_when: false
+
+    - name: Switch to custom/hardening with the same features
+      when: authselect_now.stdout is not match("custom/")
+      block:
+        - name: Create custom/hardening from the current base profile
+          ansible.builtin.command:
+            cmd: authselect create-profile hardening -b {{ authselect_now.stdout.split()[0] }}
+            creates: /etc/authselect/custom/hardening
+
+        - name: Select custom/hardening, keeping the features
+          ansible.builtin.command: >-
+            authselect select custom/hardening {{ authselect_now.stdout.split()[1:] | join(' ') }}
+            --force --backup=before-locumview-stig

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  LocumView tailoring of the DISA STIG with GUI profile for RHEL 10
+  (scap-security-guide 0.1.82). Each deselected rule and changed value is
+  explained in README.md next to this file. Used for the reference VM now and
+  by oscap-im in the bootc image build (ADR 0007) later.
+-->
+<xccdf:Tailoring xmlns:xccdf="http://checklists.nist.gov/xccdf/1.2" id="xccdf_org.locumview_tailoring_stig_gui">
+  <xccdf:benchmark href="/usr/share/xml/scap/ssg/content/ssg-rhel10-ds.xml"/>
+  <xccdf:version time="2026-10-17T22:00:00-04:00">1</xccdf:version>
+  <xccdf:Profile id="xccdf_org.locumview_profile_stig_gui" extends="xccdf_org.ssgproject.content_profile_stig_gui">
+    <xccdf:title>LocumView: DISA STIG with GUI for RHEL 10</xccdf:title>
+    <xccdf:description>DISA STIG with GUI, tailored for a LocumView desktop reached over RDP through Guacamole. See hardening/stig/README.md.</xccdf:description>
+
+    <!-- Deferred to the bootc image: FIPS can only be enabled at install time on RHEL 10 -->
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_sysctl_crypto_fips_enabled" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_configure_crypto_policy" selected="false"/>
+
+    <!-- These four check for the FIPS cipher and MAC lists, which come with the FIPS policy -->
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_harden_sshd_ciphers_openssh_conf_crypto_policy" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_harden_sshd_ciphers_opensshserver_conf_crypto_policy" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_harden_sshd_macs_openssh_conf_crypto_policy" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_harden_sshd_macs_opensshserver_conf_crypto_policy" selected="false"/>
+    <!-- crypto_policy_not_overridden re-applies this policy, so it must not say FIPS until FIPS is on -->
+    <xccdf:set-value idref="xccdf_org.ssgproject.content_value_var_system_crypto_policy">DEFAULT</xccdf:set-value>
+
+    <!-- Deferred to the bootc image: separate file systems need a new disk layout -->
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_tmp" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_var" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_var_log" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_var_log_audit" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_var_tmp" selected="false"/>
+
+    <!-- Exception: MFA is Keycloak TOTP at the access layer; no smartcard reaches an RDP session -->
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_sssd_enable_smartcards" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_sssd_enable_certmap" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_sssd_certificate_verification" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_dconf_gnome_lock_screen_on_smartcard_removal" selected="false"/>
+
+    <!-- Exception (open item): no central log server yet -->
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_rsyslog_remote_loghost" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_rsyslog_remote_access_monitoring" selected="false"/>
+
+    <!-- Exception (open item): one resolver (AdGuard, which holds the internal rewrites); an IdM replica adds the second -->
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_network_configure_name_resolution" selected="false"/>
+
+    <!-- Deferred: confined administrators (sysadm_r) need IdM SELinux user maps, planned with the IdM password policy work -->
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_selinux_context_elevation_for_sudo" selected="false"/>
+
+    <!-- False positive: the OVAL check reads /etc/passwd and /etc/group only, so files of IdM (SSSD) users count as
+         unowned. Checked instead with find -nouser -nogroup, which resolves through NSS (README.md). -->
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_no_files_unowned_by_user" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_file_permissions_ungroupowned" selected="false"/>
+
+    <!-- Local accounts allowed to exist. The remediation DELETES any other local account,
+         so every system account on the image must be listed (gnome-remote-desktop above all). -->
+    <xccdf:set-value idref="xccdf_org.ssgproject.content_value_var_accounts_authorized_local_users_regex">^(root|bin|daemon|adm|lp|sync|shutdown|halt|mail|operator|games|ftp|nobody|tss|systemd-coredump|systemd-oom|dbus|polkitd|avahi|colord|rtkit|pipewire|clevis|sssd|geoclue|flatpak|setroubleshoot|fapolicyd|libstoragemgmt|gdm|gnome-initial-setup|gnome-remote-desktop|sshd|chrony|dnsmasq|postfix|tcpdump|rpc|rpcuser|pesign|unbound|wsdd|stapunpriv|yggdrasil|yggdrasil-worker|usbguard|lvadmin|demo)$</xccdf:set-value>
+
+    <!-- Neutral banner instead of the U.S. Government consent text.
+         *_text is the regex the check uses, *_contents the text the remediation writes. -->
+    <xccdf:set-value idref="xccdf_org.ssgproject.content_value_login_banner_text">^Authorized[\s\n]+users[\s\n]+only\.[\s\n]+All[\s\n]+activity[\s\n]+may[\s\n]+be[\s\n]+monitored[\s\n]+and[\s\n]+reported\.$</xccdf:set-value>
+    <xccdf:set-value idref="xccdf_org.ssgproject.content_value_dconf_login_banner_text">^Authorized[\s\n]+users[\s\n]+only\.[\s\n]+All[\s\n]+activity[\s\n]+may[\s\n]+be[\s\n]+monitored[\s\n]+and[\s\n]+reported\.$</xccdf:set-value>
+    <xccdf:set-value idref="xccdf_org.ssgproject.content_value_login_banner_contents">Authorized users only. All activity may be monitored and reported.</xccdf:set-value>
+    <xccdf:set-value idref="xccdf_org.ssgproject.content_value_dconf_login_banner_contents">Authorized users only. All activity may be monitored and reported.</xccdf:set-value>
+  </xccdf:Profile>
+</xccdf:Tailoring>
