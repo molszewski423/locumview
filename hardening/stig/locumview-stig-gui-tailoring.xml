@@ -69,18 +69,12 @@
   </xccdf:Profile>
   <xccdf:Profile id="xccdf_org.locumview_profile_stig_gui_image" extends="xccdf_org.locumview_profile_stig_gui">
     <xccdf:title>LocumView: DISA STIG with GUI for RHEL 10, bootc image</xccdf:title>
-    <xccdf:description>The LocumView profile for the bootc desktop image (oscap-im at build time): everything the hand-built desktop could not do comes back. FIPS mode and its crypto policy are set in the image, and the separate file systems come from the installer's disk layout.</xccdf:description>
-    <xccdf:select idref="xccdf_org.ssgproject.content_rule_sysctl_crypto_fips_enabled" selected="true"/>
-    <xccdf:select idref="xccdf_org.ssgproject.content_rule_configure_crypto_policy" selected="true"/>
-    <xccdf:select idref="xccdf_org.ssgproject.content_rule_harden_sshd_ciphers_openssh_conf_crypto_policy" selected="true"/>
-    <xccdf:select idref="xccdf_org.ssgproject.content_rule_harden_sshd_ciphers_opensshserver_conf_crypto_policy" selected="true"/>
-    <xccdf:select idref="xccdf_org.ssgproject.content_rule_harden_sshd_macs_openssh_conf_crypto_policy" selected="true"/>
-    <xccdf:select idref="xccdf_org.ssgproject.content_rule_harden_sshd_macs_opensshserver_conf_crypto_policy" selected="true"/>
+    <xccdf:description>The LocumView profile for the bootc desktop image (oscap-im at build time). Adds back the separate file systems, which the installer's disk layout provides. FIPS mode stays an exception, as on the hand-built desktop: GNOME Remote Desktop signs in only through NLA, whose NTLM needs MD4, which FIPS mode disables (ADR 0012).</xccdf:description>
+    <!-- Partition rules: satisfied by the disk layout at installation (image/desktop/README.md). -->
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_tmp" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_var" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_var_log" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_var_log_audit" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_var_tmp" selected="true"/>
-    <xccdf:set-value idref="xccdf_org.ssgproject.content_value_var_system_crypto_policy">FIPS</xccdf:set-value>
   </xccdf:Profile>
 </xccdf:Tailoring>

@@ -8,7 +8,7 @@ Version one is complete when all five items are Done. Nothing else is required f
 
 | # | Requirement | Status | Notes |
 |---|---|---|---|
-| 1 | One RHEL 10 desktop built as a bootc image from a Containerfile and provisioned on the reference hypervisor (libvirt) from a clean clone, with zero manual steps | **Open** | The image builds (image/desktop, changelog #51): the same desktop, STIG applied at build time with FIPS. Next: boot and compare it, provisioning code (disk encryption, IdM enrollment, credentials), registry and signing. ADR 0007. |
+| 1 | One RHEL 10 desktop built as a bootc image from a Containerfile and provisioned on the reference hypervisor (libvirt) from a clean clone, with zero manual steps | **Open** | The image builds and boots (image/desktop, changelog #51, #52): the same desktop, STIG applied at build time, separate file systems, updates with bootc upgrade; no FIPS mode (ADR 0012). Next: provisioning code (disk encryption, IdM enrollment, credentials), registry and signing. ADR 0007. |
 | 2 | Reached in a browser through Guacamole, Keycloak SSO with enforced MFA, no exposed RDP | **Done** | Live at login.locumview.com since 2026-10-02 (changelog #17 to #21). |
 | 3 | DISA STIG profile applied, OpenSCAP report committed, exceptions documented | **Done** | 2026-10-19 on the reference desktop: DISA STIG with GUI, tailored; 417 pass, 0 open failures; reports in docs/evidence/stig, exceptions in hardening/stig/README.md (changelog #47). FIPS mode and separate partitions are deferred to the bootc image (item 1). |
 | 4 | Encryption in transit everywhere | **Done** | 2026-10-19: every hop that crosses a network is encrypted. Browser to Cloudflare (TLS), the tunnel, pod traffic between cluster nodes (k3s WireGuard backend, changelog #49), Keycloak to IdM (LDAPS), and RDP to the desktop (TLS). Traffic between pods on the same node does not leave the host. |
@@ -47,6 +47,7 @@ Version one is complete when all five items are Done. Nothing else is required f
 
 ## Parked
 
+- **FIPS mode on desktops:** GNOME Remote Desktop's RDP sign-in uses NTLM, which FIPS mode disables (tested 2026-10-19). Revisited when LocumView targets sectors that require FIPS 140 validated cryptography in FIPS mode (federal and defense health, FedRAMP), or when the remote display stack gains a FIPS-compatible sign-in. ADR 0012.
 - **Clinical decision support in the EU:** requires MDR certification (Rule 11, Class IIa or higher; ISO 13485 QMS; notified body). Parked until there is a company with the capital and QMS to pursue it. In the EU, AI is limited to productivity verbs (draft, summarize, organize, retrieve). ADR 0008.
 
 ## Done so far (highlights)
@@ -61,3 +62,4 @@ Version one is complete when all five items are Done. Nothing else is required f
 - CI on every push, with the website preview following this roadmap (changelog #48).
 - Pod traffic between cluster nodes encrypted with WireGuard, closing the last unencrypted network hop (changelog #49).
 - README quick start and a HIPAA technical-safeguard mapping with its evidence (changelog #50).
+- The desktop as a bootc image: builds, boots with Secure Boot and the STIG's separate file systems, updates in place; FIPS mode tested and set aside (changelog #51, #52, ADR 0012).

@@ -20,7 +20,8 @@ Website: [locumview.com](https://locumview.com) · Sign in: [login.locumview.com
 - CI that re-runs every check on each push.
 
 **Not done yet (version one)**
-- The desktop is still built by documented scripts, not yet as a bootc image from code ([ADR 0007](docs/adr/0007-desktop-containerization-bootc.md)). Until then the quick start below covers the access layer, and the desktop is rebuilt from the build log.
+- The desktop builds and boots as a bootc image (`image/desktop/`), but provisioning it from a clean clone is not written yet ([ADR 0007](docs/adr/0007-desktop-containerization-bootc.md)). Until then the quick start below covers the access layer, and the running desktop is the hand-built one.
+- No FIPS mode on the desktop: RDP sign-in to GNOME Remote Desktop needs NTLM, which FIPS mode disables ([ADR 0012](docs/adr/0012-fips-mode-and-remote-display.md)).
 - Data at rest is not encrypted (see the HIPAA mapping).
 
 The full build history, with every command and its evidence, is in [notes/phase1-changelog.md](notes/phase1-changelog.md) and [docs/evidence/](docs/evidence/).
@@ -78,6 +79,7 @@ Each technical safeguard of 45 CFR 164.312 is mapped to the control that address
 | [0009](docs/adr/0009-v1-scope-integrate-dont-bundle.md) | Version-one scope, integrate don't bundle, hypervisor at deploy time |
 | [0010](docs/adr/0010-desktop-vm-sizing-memory.md) | Desktop VM sizing tiers and host memory overcommit (free page reporting, KSM) |
 | [0011](docs/adr/0011-agentic-linus.md) | Argus (was "agentic Linus") for LocumView engineering: local model, read-only scoped access, changes only as PRs from a fork, code in a sandbox; staged toward a platform agent |
+| [0012](docs/adr/0012-fips-mode-and-remote-display.md) | No FIPS mode on the desktop while GNOME Remote Desktop's RDP sign-in needs NTLM; revisited for sectors that require FIPS |
 
 ## Where it is going
 

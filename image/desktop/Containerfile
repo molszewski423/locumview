@@ -4,6 +4,8 @@
 #   podman build --secret id=rhsm,src=<file with RHSM_ORG=... and RHSM_KEY=...> \
 #     -f image/desktop/Containerfile -t <registry>/locumview/desktop:<tag> .
 #
+# No FIPS mode: GNOME Remote Desktop's RDP sign-in (NLA, NTLM) needs MD4, which FIPS mode disables (ADR 0012).
+#
 # Everything here is the same for every desktop. Per-desktop values (hostname, directory enrollment, RDP
 # credentials, the break-glass password, firewall sources, disk encryption) are applied at provisioning, never
 # baked in. The repository is bind-mounted at /src for the steps that need it, not copied into the image.
@@ -17,7 +19,7 @@ FROM ${BASE}
 #    gnome-tour stays installed: its entry is hidden, the LocumView Tour replaces it.
 RUN --mount=type=secret,id=rhsm --mount=type=bind,target=/src \
     set -euo pipefail; \
-    . /src/image/desktop/build/rhsm.sh; rhsm_on; \
+    . /src/image/desktop/scripts/rhsm.sh; rhsm_on; \
     dnf -y group install workstation-product-environment \
         container-management rpm-development-tools development smart-card security-tools; \
     dnf -y install \
@@ -36,20 +38,29 @@ RUN --mount=type=bind,target=/src \
     LV_IMAGE_BUILD=1 bash /tmp/packaging/install-desktop.sh; \
     rm -rf /tmp/packaging
 
-# 3. Image-only files: FIPS and STIG kernel arguments, the XDG override, the always-on headless session drop-in,
-#    the first-boot Flatpak installer.
-COPY image/desktop/files/ /
-RUN systemctl enable locumview-flatpaks.service
+# 3. Image-only files: the XDG override, the always-on headless session drop-in, the faillock directory, the
+#    first-boot Flatpak installer. Modes are normalized so the image does not depend on the builder's umask.
+RUN --mount=type=bind,target=/src \
+    set -euo pipefail; \
+    bash /src/image/desktop/scripts/install-files.sh /src/image/desktop/files; \
+    systemctl enable locumview-flatpaks.service
 
 # 4. DISA STIG with GUI, LocumView image profile (hardening/stig/README.md), applied at build time by oscap-im.
 #    It installs the packages some rules need (AIDE, fapolicyd, USBGuard, ...), so it gets the entitlement too.
 RUN --mount=type=secret,id=rhsm --mount=type=bind,target=/src \
     set -euo pipefail; \
-    . /src/image/desktop/build/rhsm.sh; rhsm_on; \
+    . /src/image/desktop/scripts/rhsm.sh; rhsm_on; \
     oscap-im --profile xccdf_org.locumview_profile_stig_gui_image \
         --tailoring-file /src/hardening/stig/locumview-stig-gui-tailoring.xml \
         /usr/share/xml/scap/ssg/content/ssg-rhel10-ds.xml; \
     rhsm_off
 
-# 5. Checks.
+# 5. What oscap-im cannot fix at build time: new users' dotfiles copied from /etc/skel no more permissive than
+#    0740 (file_permission_user_init_files), and chrony on server lines (chronyd_server_directive).
+RUN set -euo pipefail; \
+    find /etc/skel -maxdepth 1 -type f -name '.*' -exec chmod 0640 {} +; \
+    sed -i -E 's/^pool 2\.rhel\.pool\.ntp\.org iburst maxpoll 16$/server 0.rhel.pool.ntp.org iburst maxpoll 16\nserver 1.rhel.pool.ntp.org iburst maxpoll 16\nserver 2.rhel.pool.ntp.org iburst maxpoll 16/' /etc/chrony.conf; \
+    grep -q '^server 0.rhel.pool.ntp.org' /etc/chrony.conf
+
+# 6. Checks.
 RUN bootc container lint

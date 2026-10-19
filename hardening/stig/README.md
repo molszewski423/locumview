@@ -1,6 +1,8 @@
 # DISA STIG hardening
 
-Version-one item 3 (ADR 0009): the DISA STIG profile applied to the LocumView desktop, an OpenSCAP report committed, and every exception written down. This directory holds the tailoring and the two scripts that apply and check it. The same tailoring file is meant for `oscap-im` in the bootc image build (ADR 0007), so the hardening is written once.
+Version-one item 3 (ADR 0009): the DISA STIG profile applied to the LocumView desktop, an OpenSCAP report committed, and every exception written down. This directory holds the tailoring and the two scripts that apply and check it. The same tailoring file is used by `oscap-im` in the bootc image build (`image/desktop/`, ADR 0007), so the hardening is written once.
+
+The file has two profiles. `xccdf_org.locumview_profile_stig_gui` is for a running desktop (the hand-built reference VM). `xccdf_org.locumview_profile_stig_gui_image` extends it for the bootc image and turns the five partition rules back on, because the image's installer creates those file systems.
 
 | File | What it is |
 |---|---|
@@ -26,8 +28,8 @@ Four STIG items are not automated by SSG and were done by hand on the reference 
 
 | Rules | Decision | Reason |
 |---|---|---|
-| `sysctl_crypto_fips_enabled`, `configure_crypto_policy`, the four `harden_sshd_{ciphers,macs}_{openssh,opensshserver}_conf_crypto_policy` rules | **Deferred to the bootc image** | RHEL 10 can only enable FIPS mode at install time. The four SSH rules check for the FIPS-only cipher and MAC lists, which come with the FIPS policy. `var_system_crypto_policy` is set to `DEFAULT` until then, because `crypto_policy_not_overridden` re-applies whatever that variable says. Risk to test with FIPS: RDP sign-in (NLA) uses NTLM, which FIPS does not allow. |
-| `partition_for_tmp`, `partition_for_var`, `partition_for_var_log`, `partition_for_var_log_audit`, `partition_for_var_tmp` | **Deferred to the bootc image** | Needs a new disk layout; the image's layout will provide them. |
+| `sysctl_crypto_fips_enabled`, `configure_crypto_policy`, the four `harden_sshd_{ciphers,macs}_{openssh,opensshserver}_conf_crypto_policy` rules | **Exception, both profiles (ADR 0012)** | Tested on the bootc image in FIPS mode: GNOME Remote Desktop signs in only through NLA, its NLA uses NTLM, and NTLM needs MD4, which FIPS mode disables, so RDP sign-in fails (`docs/evidence/fips-rdp-20261019.md`). The four SSH rules check for the FIPS-only cipher and MAC lists. `var_system_crypto_policy` is `DEFAULT`, because `crypto_policy_not_overridden` re-applies whatever that variable says. Revisited when LocumView targets sectors that require FIPS mode. |
+| `partition_for_tmp`, `partition_for_var`, `partition_for_var_log`, `partition_for_var_log_audit`, `partition_for_var_tmp` | **Desktop profile only** | The hand-built desktop would need repartitioning. The image profile applies them: the installer creates the file systems, and they pass on the booted image. |
 | `sssd_enable_smartcards`, `sssd_enable_certmap`, `sssd_certificate_verification`, `dconf_gnome_lock_screen_on_smartcard_removal` | **Exception** | Multi-factor authentication is Keycloak TOTP at the access layer (ADR 0005). No smartcard reaches a desktop over RDP. |
 | `rsyslog_remote_loghost`, `rsyslog_remote_access_monitoring` | **Exception, open item** | No central log server yet. Logs stay local (auditd, journald). |
 | `network_configure_name_resolution` | **Exception, open item** | One resolver, the network's DNS server, which also holds the internal names. A second resolver comes with the IdM replica on node2. |
@@ -62,5 +64,6 @@ Several SSG 0.1.82 remediations create the authselect profile `custom/hardening`
 | Baseline, 2026-10-17, before any change | `stig_gui` (untailored) | 164 | 271 | `docs/evidence/stig/20261017-baseline/` |
 | Baseline, 2026-10-17 | `hipaa` | 38 | 121 | same directory |
 | After remediation, 2026-10-19 | LocumView tailoring (before the two false-positive rules were deselected) | 417 | 2 | `docs/evidence/stig/20261019-tailored/` |
+| bootc image, booted, 2026-10-19 | image profile | 402 | 4 | `docs/evidence/stig/20261019-image/` (the 4: the GRUB password and superuser, set per desktop at provisioning; the test account and its files) |
 
 The two remaining failures are the false positives above; with the current tailoring the result is 0 failures. Committed reports have the desktop's addresses replaced by placeholders. The full ARF result files (about 60 MB each) are not committed.

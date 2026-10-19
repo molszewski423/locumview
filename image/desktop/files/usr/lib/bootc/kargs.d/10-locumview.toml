@@ -1,4 +1,0 @@
-# FIPS mode (DISA STIG sysctl_crypto_fips_enabled; RHEL 10 enables it only at install or boot, never later).
-# The other STIG kernel arguments (audit, audit_backlog_limit, init_on_free, page_poison, pti, vsyscall) are
-# written by oscap-im itself during the build, one kargs.d file each.
-kargs = ["fips=1"]
