@@ -11,7 +11,7 @@ Version one is complete when all five items are Done. Nothing else is required f
 | 1 | One RHEL 10 desktop built as a bootc image from a Containerfile and provisioned on the reference hypervisor (libvirt) from a clean clone, with zero manual steps | **Open** | Today the desktop is built by documented scripts (changelog #11 to #23). Needs the Containerfile, a registry, signing, and provisioning code. ADR 0007. |
 | 2 | Reached in a browser through Guacamole, Keycloak SSO with enforced MFA, no exposed RDP | **Done** | Live at login.locumview.com since 2026-10-02 (changelog #17 to #21). |
 | 3 | DISA STIG profile applied, OpenSCAP report committed, exceptions documented | **Done** | 2026-10-19 on the reference desktop: DISA STIG with GUI, tailored; 417 pass, 0 open failures; reports in docs/evidence/stig, exceptions in hardening/stig/README.md (changelog #47). FIPS mode and separate partitions are deferred to the bootc image (item 1). |
-| 4 | Encryption in transit everywhere | **Open** | Browser to Cloudflare, the tunnel, and RDP are encrypted; the in-cluster hop between nodes is not (planned fix: k3s WireGuard backend). |
+| 4 | Encryption in transit everywhere | **Done** | 2026-10-19: every hop that crosses a network is encrypted. Browser to Cloudflare (TLS), the tunnel, pod traffic between cluster nodes (k3s WireGuard backend, changelog #49), Keycloak to IdM (LDAPS), and RDP to the desktop (TLS). Traffic between pods on the same node does not leave the host. |
 | 5 | README with architecture diagram, quick start, HIPAA technical-safeguard mapping, honest status | **Open** | Status section and current-state diagram done; quick start and HIPAA mapping not yet. |
 
 ### Version-one housekeeping (small, not scope items)
@@ -56,3 +56,5 @@ Version one is complete when all five items are Done. Nothing else is required f
 - Guacamole, Keycloak (TOTP), straight-to-desktop sessions, RDP firewalled to the cluster (changelog #17 to #19).
 - Branding, public access through the tunnel, guest demo, LocumView Tour, layout switch, marketing site and email (changelog #20 to #23).
 - DISA STIG with GUI applied to the reference desktop through a tailoring file reusable in the bootc build; 164 to 417 passing rules (changelog #47).
+- CI on every push, with the website preview following this roadmap (changelog #48).
+- Pod traffic between cluster nodes encrypted with WireGuard, closing the last unencrypted network hop (changelog #49).

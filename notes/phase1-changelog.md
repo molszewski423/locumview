@@ -652,3 +652,13 @@ Owner direction: keep the build log and the website current as work is completed
 - **Website:** a passing run on `main` asks the website repository to rebuild its preview (workflow dispatch, scoped token in Actions secrets), so the Status page and the Build log's progress line follow ROADMAP.md within minutes. Publishing to locumview.com stays a manual run with target `production`.
 - **Website build was broken since #46:** its safety filter rewrites internal names before publishing, and #46's role names (`node1`, `node2`) no longer matched, so the IdM domain would have been published; the build refused, as designed. The filter now handles the role names.
 
+## 49. Pod traffic between nodes encrypted: k3s WireGuard backend (2026-10-19)
+
+Version-one item 4 (ADR 0009), "encryption in transit everywhere". The last unencrypted network hop was pod traffic between the two cluster nodes (flannel VXLAN).
+
+- **Change:** `flannel-backend: wireguard-native` in node2's k3s server config (the agent on node1 takes the backend from the server); k3s restarted on node2, then node1; the old `flannel.1` VXLAN interface deleted on both. Both nodes now carry pod traffic on `flannel-wg` (MTU 1420, UDP 51820); both node objects report backend `wireguard`, a handshake was seen within seconds, and the VXLAN port (8472) no longer listens anywhere. The node firewalls already accepted the LAN, so no firewall change.
+- **MTU:** pods keep the MTU they were created with, so all 30 pod-network workloads were restarted in order (cluster DNS and Traefik first); every rollout completed. The CI runner's Docker networks already used 1400 (changelog #48). Check: three 839 KB downloads from a pod on node1 to Gitea on node2, complete, with the transfer visible on `flannel-wg`.
+- **Disruption:** about two minutes of failed traffic between nodes during the restarts. Afterwards login.locumview.com, locumview.com, Gitea and the other public sites answered normally. The restart had put both locumview tunnel connectors on node1 (their spread rule is a preference, not a requirement); one was moved back to node2.
+- **The hops, for the record:** browser to Cloudflare TLS; Cloudflare to the cluster through the outbound tunnel; between nodes WireGuard; Keycloak to IdM LDAPS (`configure-idm-federation.sh`); guacd to the desktop RDP over TLS. Traffic between pods on the same node (today the whole access layer runs on node1) does not leave the host and is not encrypted separately.
+- **Rollback:** remove the line from the server config and repeat the same steps.
+
