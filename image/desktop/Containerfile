@@ -26,6 +26,7 @@ RUN --mount=type=secret,id=rhsm --mount=type=bind,target=/src \
         gnome-shell-extension-dash-to-dock gnome-shell-extension-dash-to-panel \
         gnome-remote-desktop flatpak librsvg2-tools unzip \
         firewalld nftables cockpit ipa-client \
+        clevis clevis-luks clevis-dracut clevis-systemd tpm2-tools cloud-init \
         openscap-scanner openscap-utils scap-security-guide; \
     rhsm_off; \
     systemctl set-default graphical.target
@@ -44,6 +45,13 @@ RUN --mount=type=bind,target=/src \
     set -euo pipefail; \
     bash /src/image/desktop/scripts/install-files.sh /src/image/desktop/files; \
     systemctl enable locumview-flatpaks.service
+
+# 3b. Initramfs with clevis, so the LUKS volume unlocks with the vTPM at boot (the base image's initramfs has
+#     no clevis). The standard bootc pattern: one kernel in the image, rebuilt in place.
+RUN set -euo pipefail; \
+    kver=$(cd /usr/lib/modules && echo *); \
+    dracut -f --no-hostonly "/usr/lib/modules/$kver/initramfs.img" "$kver"; \
+    lsinitrd "/usr/lib/modules/$kver/initramfs.img" > /tmp/initrd.txt; grep -q clevis /tmp/initrd.txt; rm -f /tmp/initrd.txt
 
 # 4. DISA STIG with GUI, LocumView image profile (hardening/stig/README.md), applied at build time by oscap-im.
 #    It installs the packages some rules need (AIDE, fapolicyd, USBGuard, ...), so it gets the entitlement too.
