@@ -8,7 +8,7 @@ Version one is complete when all five items are Done. Nothing else is required f
 
 | # | Requirement | Status | Notes |
 |---|---|---|---|
-| 1 | One RHEL 10 desktop built as a bootc image from a Containerfile and provisioned on the reference hypervisor (libvirt) from a clean clone, with zero manual steps | **Open** | The image builds, boots and updates in place (changelog #51, #52); no FIPS mode (ADR 0012). Desktops install from an ISO with LUKS bound to the vTPM and provision themselves on first boot: IdM, RDP, break-glass, firewall (changelog #53). Next: SOPS files per desktop and the Guacamole connection, registry and signing, CI builds, the destroy-and-rebuild proof. ADR 0007. |
+| 1 | One RHEL 10 desktop built as a bootc image from a Containerfile and provisioned on the reference hypervisor (libvirt) from a clean clone, with zero manual steps | **Open** | The image builds, boots and updates in place (changelog #51, #52); no FIPS mode (ADR 0012). Desktops install from an ISO with LUKS bound to the vTPM and provision themselves on first boot: IdM, RDP, break-glass, firewall (changelog #53). OpenTofu module creates and destroys a desktop with its IdM host entry (changelog #54, ADR 0013). Next: the Guacamole connection, registry and signing, CI builds, the destroy-and-rebuild proof from a clean clone. ADR 0007. |
 | 2 | Reached in a browser through Guacamole, Keycloak SSO with enforced MFA, no exposed RDP | **Done** | Live at login.locumview.com since 2026-10-02 (changelog #17 to #21). |
 | 3 | DISA STIG profile applied, OpenSCAP report committed, exceptions documented | **Done** | 2026-10-19 on the reference desktop: DISA STIG with GUI, tailored; 417 pass, 0 open failures; reports in docs/evidence/stig, exceptions in hardening/stig/README.md (changelog #47). The bootc image applies the same profile at build time and has the separate file systems (changelog #51 to #53); FIPS mode is an exception (ADR 0012). |
 | 4 | Encryption in transit everywhere | **Done** | 2026-10-19: every hop that crosses a network is encrypted. Browser to Cloudflare (TLS), the tunnel, pod traffic between cluster nodes (k3s WireGuard backend, changelog #49), Keycloak to IdM (LDAPS), and RDP to the desktop (TLS). Traffic between pods on the same node does not leave the host. |
@@ -16,7 +16,7 @@ Version one is complete when all five items are Done. Nothing else is required f
 
 ### Version-one housekeeping (small, not scope items)
 
-- Remaining ADRs: GNOME, Guacamole, Terraform vs OpenTofu. **Open**
+- Remaining ADRs: GNOME, Guacamole. **Open** (Terraform vs OpenTofu: ADR 0013, OpenTofu.)
 - CI that re-runs the pre-commit checks on every push. **Done**
 - Scoped kubeconfig for operators; admin GDM connection credentials into SOPS; Tomcat error page; cluster-wide egress policies. **Open**
 - Backup procedure for desktop VMs on node1. **Open**
@@ -64,3 +64,4 @@ Version one is complete when all five items are Done. Nothing else is required f
 - README quick start and a HIPAA technical-safeguard mapping with its evidence (changelog #50).
 - The desktop as a bootc image: builds, boots with Secure Boot and the STIG's separate file systems, updates in place; FIPS mode tested and set aside (changelog #51, #52, ADR 0012).
 - Desktops install from an ISO with LUKS on the vTPM and provision themselves on first boot (IdM, RDP, break-glass), with no manual steps on the VM (changelog #53).
+- OpenTofu creates a desktop with its IdM host entry and removes all of it again; state encrypted (changelog #54, ADR 0013).

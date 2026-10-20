@@ -80,6 +80,7 @@ Each technical safeguard of 45 CFR 164.312 is mapped to the control that address
 | [0010](docs/adr/0010-desktop-vm-sizing-memory.md) | Desktop VM sizing tiers and host memory overcommit (free page reporting, KSM) |
 | [0011](docs/adr/0011-agentic-linus.md) | Argus (was "agentic Linus") for LocumView engineering: local model, read-only scoped access, changes only as PRs from a fork, code in a sandbox; staged toward a platform agent |
 | [0012](docs/adr/0012-fips-mode-and-remote-display.md) | No FIPS mode on the desktop while GNOME Remote Desktop's RDP sign-in needs NTLM; revisited for sectors that require FIPS |
+| [0013](docs/adr/0013-opentofu-for-infrastructure.md) | OpenTofu for the infrastructure around each desktop (VM, volumes, seed, IdM host entry), bootc for the operating system; state encrypted |
 
 ## Where it is going
 
@@ -117,7 +118,8 @@ Horizon is now owned by Omnissa after Broadcom divested VMware's end-user comput
 - `hardening/stig/`: the DISA STIG tailoring and the scripts that apply and scan it.
 - `docs/adr/`: architecture decisions. `docs/evidence/`: compliance evidence and worklogs. `docs/user-guide/`: end-user help. `docs/hipaa-technical-safeguards.md`: the HIPAA mapping.
 - `.gitea/workflows/`: CI.
-- `terraform/`, `ansible/`: provisioning (version one work, not populated yet).
+- `terraform/`: OpenTofu (ADR 0013): the libvirt desktop module and the node1 root configuration.
+- `ansible/`: not populated; the desktop is configured by its image and first-boot provisioning instead.
 
 ## License
 

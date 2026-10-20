@@ -1,0 +1,6 @@
+# Copy to site.auto.tfvars (git-ignored) and fill in.
+libvirt_uri        = "qemu+ssh://<user>@<node1>/system"
+installer_iso      = "<path to the installer ISO on node1>"
+idm_ca_certificate = "<path to the IdM CA certificate on this machine>"
+k3s_node_cidrs     = ["<node1-ip>/32", "<node2-ip>/32"]
+dns_ip             = "<LAN DNS server>"
