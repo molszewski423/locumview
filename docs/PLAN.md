@@ -127,15 +127,15 @@ Superseded by [ADR 0009](adr/0009-v1-scope-integrate-dont-bundle.md) (2026-10-03
 
 Everything below is optional until version one ships.
 
-**Phase 4, Custom packaging:** mock-built signed RPMs, own dnf repo or COPR. Stretch: RHEL image mode (bootc).
+**Phase 4, Packaging and supply chain:** signed images (cosign) and SBOMs (syft) verified before promotion; LocumView's own pieces (extensions, branding, tour) as mock-built signed RPMs via COPR; Fedora/EPEL packages for missing dependencies (FHIR libraries); an OpenSCAP scan attached to every image release. (RHEL image mode, once a stretch goal here, became the version-one desktop: ADR 0007.)
 
-**Phase 5, Cross-distro Ansible (last, skippable):** branch on ansible_os_family, test with Molecule on Fedora/Debian/Arch. Least aligned with Red Hat targeting; deprioritized.
+**Phase 5, Other distributions:** SUSE / openSUSE from the same desktop definition with equivalent hardening (in progress, not shipped), Debian later. Originally "cross-distro Ansible roles"; the desktop is now an image, so this is a build per distribution, not role branching.
 
-**Phase 6, Kubernetes:** KubeVirt + CDI on k3s, import RHEL guest image, apply same Ansible; Argo CD GitOps; Prometheus/Grafana. Set VM memory limits first (node1's 32 GB is shared with the AI stack).
+**Phase 6, On-premises hypervisors and Kubernetes:** Proxmox VE as the practical production target and KubeVirt on k3s as the scoped learning piece (ADR 0009), each with its own OpenTofu module over the same signed image (ADR 0013); GitOps (a merged pull request creates a desktop); Prometheus/Grafana. Set VM memory limits first (ADR 0010).
 
-**Phase 7, AWS:** budget alarm first; VPC with private subnets; S3 remote state; no public IPs; IAM roles; destroy after every session. Check Red Hat Cloud Access before using RHEL AMIs (pay-as-you-go RHEL adds hourly cost); otherwise record an ADR.
+**Phase 7, Public and sovereign cloud:** AWS alongside SAA-C03: budget alarm first; VPC with private subnets; no public IPs; IAM roles; encrypted remote OpenTofu state; the image as an AMI from bootc-image-builder; destroy after every session. Check Red Hat Cloud Access before using RHEL (pay-as-you-go RHEL adds hourly cost). European-owned clouds later.
 
-**Phase 8, Portfolio polish:** README, diagram, HIPAA mapping, 3 to 5 minute demo video, per-phase write-ups.
+**Phase 8, Documentation and portfolio:** README, diagram and HIPAA mapping (done with version one); 3 to 5 minute demo video; per-phase write-ups; architecture notes and platform documentation.
 
 Sequencing: Phases 0 to 3 in order, then Phase 8 lite, then Phase 7 alongside AWS SAA-C03 study, then Phases 4 and 6, then Phase 5 last or never.
 
