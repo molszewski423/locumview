@@ -787,3 +787,20 @@ Version-one item 1: desktops track the registry and verify every update against 
 - **Upgrade:** `bootc upgrade` on `lv-test10` pulled the next signed CI build (run 136), and after a reboot the desktop ran it with run 133 as the rollback. `lv-test10` was then destroyed; the subscription is back at 2 registered systems.
 - **Fixed:** `mcelog.service` failed on the virtual machine ("CPU is unsupported"), leaving the system degraded; a drop-in now skips it on virtual machines.
 - **Next:** replace the deprecated `--tlog-upload` flag with a signing-config file; then the destroy-and-rebuild proof from a clean clone.
+
+## 59. Destroy and rebuild from a clean clone; the STIG scan of the rebuilt desktop (2026-10-20)
+
+Version-one item 1, the last step: a desktop built from a fresh clone with nothing typed, then destroyed with nothing left behind.
+
+- **Inputs:** a fresh `git clone` (no untracked or ignored files), the age key on the operator machine (decrypts the committed SOPS files), and one git-ignored file kept out of the repository by design: `terraform/node1/site.auto.tfvars`, the site's values (hypervisor, addresses, paths), documented by `site.auto.tfvars.example`. The installer ISO is an input artifact on the hypervisor, built from a signed digest by `build-installer-iso.sh` (root).
+- **`lv-test11`:** `./secrets.sh desktop lv-test11`, `./tofu.sh init`, `./tofu.sh apply`: 8 minutes from clone to provisioned. Checked: IdM enrollment and the user's IdM account, the Red Hat registration under the desktop's name, Red Hat's Firefox ESR, the site time zone, LUKS on the vTPM, the policy default `reject` with the unsigned image refused, the signed CI build (run 140) staged and, after a reboot, booted with no failed units, RDP on 3390 reachable from guacd by host name, and its Guacamole connection by host name. `./tofu.sh destroy` removed all 10 resources: no domain, disks, Guacamole connection or DNS record left, state empty, the subscription back at 2.
+- **STIG and HIPAA on the rebuilt desktop:** a second clean-clone desktop, `lv-test12`, scanned after its reboot into the CI build. Image STIG profile: 400 pass / 6 fail (the 2026-10-19 image scan: 402 / 4; its GRUB failures are gone, provisioning sets the password). SSG HIPAA profile: 119 pass / 37 fail (reference desktop: 120 / 39). The 6 STIG failures were things that only happen on a provisioned desktop, which the build-time remediation cannot reach:
+  - `sshd_disable_gssapi_auth`: `ipa-client-install` writes `GSSAPIAuthentication yes` in its sshd drop-in. The STIG drop-in is read first and wins, so sshd ran with it off, but the files disagreed.
+  - `sssd_offline_cred_expiration`: `ipa-client-install` rewrites `sssd.conf` without the STIG's `offline_credentials_expiration`.
+  - `file_permissions_sshd_private_key`: sshd-keygen creates the host keys at first boot as `root:ssh_keys` 0600; SSG 0.1.82 accepts only `root:root` 0600.
+  - `aide_build_database`: the image builds AIDE's database at build time, in `/var`, which an installation does not carry over.
+  - `accounts_authorized_local_users`: a `dhcpcd` system account, new in the base image, not in the tailoring's list.
+  - `firewalld_sshd_port_enabled`: SSH is open only to the k3s nodes in their own zone, and the check wants it in the default zone.
+- **Fixes:** provisioning step 6b puts back the three enrollment settings and step 10 builds the AIDE database (about 13 minutes on a test VM; the provisioning service timeout is now 60 minutes); `dhcpcd` is in the tailoring's account list; `firewalld_sshd_port_enabled` is an image-profile exception (hardening/stig/README.md). Each fix was applied by hand on `lv-test12` first, and its rule passed; IdM logins kept working. `lv-test12` was then destroyed.
+- **Found:** first-boot provisioning runs from the image the ISO installed, not from the newer image it switches to, so a provisioning change reaches new desktops only through a new ISO.
+- **Next:** the ISO from the CI build with these fixes, then a third clean-clone desktop, scanned; the reports go in `docs/evidence/stig/`.
