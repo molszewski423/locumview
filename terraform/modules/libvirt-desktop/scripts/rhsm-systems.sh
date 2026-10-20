@@ -22,7 +22,7 @@ def call(r):
         except urllib.error.HTTPError as e:
             if e.code < 500 or wait is None:
                 raise
-        except urllib.error.URLError:
+        except (urllib.error.URLError, TimeoutError, ConnectionError):
             if wait is None:
                 raise
         print(f"Red Hat API not answering, retrying in {wait} s", file=sys.stderr)
