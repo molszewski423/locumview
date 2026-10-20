@@ -7,7 +7,9 @@
 #   RHSM_ORG / RHSM_ACTIVATION_KEY                    dnf during the build (build secret, never in a layer)
 #   REGISTRY_TOKEN                                    push to git.lan (Gitea token, package scope only)
 #   COSIGN_PRIVATE_KEY / COSIGN_PASSWORD              sign (public key: image/desktop/signing/cosign.pub)
-# Signing is offline (no public transparency log): verify with
+# Signatures and attestations use cosign's classic format (sha256-<digest>.sig and .att tags): RHEL's
+# containers/image, which bootc uses, does not read cosign 3's new bundle format. Signing is offline (no public
+# transparency log): verify with
 #   cosign verify --key image/desktop/signing/cosign.pub --insecure-ignore-tlog git.lan/mike/locumview-desktop@<digest>
 name: image
 "on":
@@ -90,7 +92,7 @@ jobs:
         run: |
           set -euo pipefail
           export DOCKER_CONFIG="$JOB/docker"
-          cosign sign --key env://COSIGN_PRIVATE_KEY --use-signing-config=false --tlog-upload=false -y \
+          cosign sign --key env://COSIGN_PRIVATE_KEY --new-bundle-format=false --use-signing-config=false --tlog-upload=false -y \
             -a "git.commit=$GITHUB_SHA" -a "ci.run=$GITHUB_RUN_NUMBER" "$IMAGE@$DIGEST"
 
       - name: SBOM
@@ -102,7 +104,7 @@ jobs:
           export DOCKER_CONFIG="$JOB/docker"
           syft scan "registry:$IMAGE@$DIGEST" -q -o "spdx-json=$JOB/sbom.spdx.json"
           python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print(len(d.get("packages",[])), "packages in the SBOM")' "$JOB/sbom.spdx.json"
-          cosign attest --key env://COSIGN_PRIVATE_KEY --use-signing-config=false --tlog-upload=false -y \
+          cosign attest --key env://COSIGN_PRIVATE_KEY --new-bundle-format=false --use-signing-config=false --tlog-upload=false -y \
             --type spdxjson --predicate "$JOB/sbom.spdx.json" "$IMAGE@$DIGEST"
 
       - name: Verify

@@ -215,6 +215,13 @@ if [ -n "$UPDATE_IMAGE" ]; then
 import json, os
 p = "/etc/containers/policy.json"
 pol = json.load(open(p))
+# bootc enforces signatures only when the default is not "accept anything" (it refuses otherwise, lv-test09):
+# reject by default; Red Hat's registries keep their own signature rules; images already on the machine (local
+# transports) stay usable; this repository must carry the LocumView signature. Pulls from any other registry
+# are refused on a desktop.
+pol["default"] = [{"type": "reject"}]
+for local in ("containers-storage", "docker-daemon", "oci", "oci-archive", "dir", "docker-archive"):
+    pol.setdefault("transports", {}).setdefault(local, {})[""] = [{"type": "insecureAcceptAnything"}]
 pol.setdefault("transports", {}).setdefault("docker", {})[os.environ["REPO"]] = [{
     "type": "sigstoreSigned",
     "keyPath": "/usr/share/locumview/signing/cosign.pub",
