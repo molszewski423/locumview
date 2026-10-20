@@ -784,4 +784,6 @@ Version-one item 1: desktops track the registry and verify every update against 
 - **Proven:**
   - On `lv-test09`, applied by hand: signed `:latest` staged, the unsigned image `:unsigned-test` refused ("A signature was required, but no signature exists").
   - On `lv-test10`, with no manual steps: OpenTofu installed it from the ISO built from CI run 130's signed digest, and first boot staged run 133's signed image. The unsigned image and `docker.io/library/fedora` were refused ("rejected by policy"). After a reboot it booted the registry image (the TPM unlocked the disk; the ISO image is the rollback), and `bootc upgrade --check` reports nothing newer. Firefox ESR from Red Hat and the site time zone were in place.
-- **Next:** a `bootc upgrade` to the next CI build on `lv-test10`; `mcelog.service` fails on virtual machines ("CPU is unsupported") and should be skipped there; replace the deprecated `--tlog-upload` flag with a signing-config file; then the destroy-and-rebuild proof from a clean clone.
+- **Upgrade:** `bootc upgrade` on `lv-test10` pulled the next signed CI build (run 136), and after a reboot the desktop ran it with run 133 as the rollback. `lv-test10` was then destroyed; the subscription is back at 2 registered systems.
+- **Fixed:** `mcelog.service` failed on the virtual machine ("CPU is unsupported"), leaving the system degraded; a drop-in now skips it on virtual machines.
+- **Next:** replace the deprecated `--tlog-upload` flag with a signing-config file; then the destroy-and-rebuild proof from a clean clone.
