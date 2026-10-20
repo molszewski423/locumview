@@ -35,7 +35,7 @@ podman build --secret id=rhsm,src=$HOME/.config/locumview/rhsm.env \
 
 ## Registry and signing
 
-CI builds the image on every change to `image/`, `packaging/` or `hardening/` (`.gitea/workflows/image.yml`), on a dedicated runner on node2: a host-mode act_runner as an unprivileged user with rootless podman, registered to this repository only. It pushes `git.lan/mike/locumview-desktop:<commit>` and `:latest`, signs the pushed digest with cosign, generates an SPDX SBOM with syft and attaches it as a signed attestation, then verifies both. Signing is offline: no public transparency log, so nothing about the image leaves the site. Verify with the committed public key:
+CI builds the image on every change to `image/`, `packaging/` or `hardening/` (`.gitea/workflows/image.yml`), on a dedicated runner on node2: a host-mode act_runner as an unprivileged user with rootless podman, registered to this repository only. It pushes `git.lan/mike/locumview-desktop:<commit>` and `:latest`, signs the pushed digest with cosign, generates an SPDX SBOM with syft (packages and their relationships; the per-file listing is left out, since it would exceed the 128 MiB attestation size cosign reads back) and attaches it as a signed attestation, then verifies both. Signing is offline: no public transparency log, so nothing about the image leaves the site. Verify with the committed public key:
 
 ```
 cosign verify --key image/desktop/signing/cosign.pub --insecure-ignore-tlog git.lan/mike/locumview-desktop@<digest>

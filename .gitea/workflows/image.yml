@@ -102,8 +102,20 @@ jobs:
         run: |
           set -euo pipefail
           export DOCKER_CONFIG="$JOB/docker"
-          syft scan "registry:$IMAGE@$DIGEST" -q -o "spdx-json=$JOB/sbom.spdx.json"
-          python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print(len(d.get("packages",[])), "packages in the SBOM")' "$JOB/sbom.spdx.json"
+          syft scan "registry:$IMAGE@$DIGEST" -q -o "spdx-json=$JOB/sbom-full.spdx.json"
+          # Packages only: the per-file listing (about 140,000 files) makes the attestation about 160 MB, over the
+          # 128 MiB that cosign will read back. Packages and their relationships are what vulnerability tracking uses.
+          python3 -I - "$JOB/sbom-full.spdx.json" "$JOB/sbom.spdx.json" <<'PY'
+          import json, sys
+          d = json.load(open(sys.argv[1]))
+          files = {f["SPDXID"] for f in d.pop("files", [])}
+          for p in d["packages"]:
+              p.pop("hasFiles", None)
+          d["relationships"] = [r for r in d.get("relationships", [])
+                                if r["spdxElementId"] not in files and r["relatedSpdxElement"] not in files]
+          json.dump(d, open(sys.argv[2], "w"), separators=(",", ":"))
+          print(len(d["packages"]), "packages in the SBOM")
+          PY
           cosign attest --key env://COSIGN_PRIVATE_KEY --new-bundle-format=false --use-signing-config=false --tlog-upload=false -y \
             --type spdxjson --predicate "$JOB/sbom.spdx.json" "$IMAGE@$DIGEST"
 
