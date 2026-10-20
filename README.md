@@ -20,7 +20,7 @@ Website: [locumview.com](https://locumview.com) · Sign in: [login.locumview.com
 - CI that re-runs every check on each push.
 
 **Not done yet (version one)**
-- The desktop builds as a bootc image (`image/desktop/`) and installs and provisions itself from an ISO: LUKS on the vTPM, IdM, RDP (changelog #53). CI builds, signs and attests the image (changelog #57), and desktops accept only images signed with the project key (changelog #58). Still open: the destroy-and-rebuild proof ([ADR 0007](docs/adr/0007-desktop-containerization-bootc.md)). The running reference desktop is still the hand-built one, and the quick start below covers the access layer.
+- The desktop builds as a bootc image (`image/desktop/`) and installs and provisions itself from an ISO: LUKS on the vTPM, IdM, RDP (changelog #53). CI builds, signs and attests the image (changelog #57), and desktops accept only images signed with the project key (changelog #58). The destroy-and-rebuild proof from a clean clone passed (changelog #59); still open: the STIG scan of the rebuilt desktop ([ADR 0007](docs/adr/0007-desktop-containerization-bootc.md)). The running reference desktop is still the hand-built one, and the quick start below covers the access layer.
 - No FIPS mode on the desktop: RDP sign-in to GNOME Remote Desktop needs NTLM, which FIPS mode disables ([ADR 0012](docs/adr/0012-fips-mode-and-remote-display.md)).
 - Data at rest: desktops installed from the bootc image are encrypted (LUKS on the vTPM); the hand-built reference desktop, the cluster nodes and the databases are not yet (see the HIPAA mapping).
 
