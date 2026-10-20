@@ -17,8 +17,10 @@ pw=''; while [ "${#pw}" -lt 32 ]; do pw+=$(head -c 64 /dev/urandom | LC_ALL=C tr
 echo "== kinit admin on the IdM server =="
 ssh -t "$IDM" kinit admin
 trap 'ssh "$IDM" kdestroy -A >/dev/null 2>&1 || true' EXIT
-# shellcheck disable=SC2029 # arguments are expanded here on purpose (quoted for the remote shell where needed)
-r() { ssh "$IDM" "$@"; }
+# Run one command on the server: every argument is quoted for the remote shell (printf %q), so descriptions and
+# names with spaces or parentheses arrive intact.
+# shellcheck disable=SC2029 # expanded here on purpose: cmd is already quoted for the remote shell
+r() { local cmd; cmd=$(printf '%q ' "$@"); ssh "$IDM" "$cmd"; }
 
 echo "== account =="
 if r ipa user-show "$U" >/dev/null 2>&1; then
@@ -26,19 +28,19 @@ if r ipa user-show "$U" >/dev/null 2>&1; then
   printf '%s\n%s\n' "$pw" "$pw" | r ipa passwd "$U" >/dev/null
 else
   printf '%s\n%s\n' "$pw" "$pw" | r ipa user-add "$U" --first=OpenTofu --last=Provisioning --shell=/sbin/nologin \
-    --desc="OpenTofu desktop provisioning (ADR 0013); no login" --password >/dev/null
+    --title="OpenTofu desktop provisioning (ADR 0013), no login" --password >/dev/null
 fi
 # An administrator-set password is expired at once in IdM; this one is rotated by rerunning this script instead.
-r ipa user-mod "$U" --setattr=krbPasswordExpiration=20991231235959Z >/dev/null 2>&1 || true
+r ipa user-mod "$U" --password-expiration=20991231235959Z >/dev/null
 printf 'ipa_password: %s\n' "$pw" | sops --encrypt --filename-override terraform/node1/idm.sops.yaml \
   --input-type yaml --output-type yaml /dev/stdin > idm.sops.yaml.tmp && mv idm.sops.yaml.tmp idm.sops.yaml
 unset pw
 
 echo "== role =="
-r ipa role-show "\"$ROLE\"" >/dev/null 2>&1 || r ipa role-add "\"$ROLE\"" --desc="\"Hosts, host groups and their DNS records (OpenTofu, ADR 0013)\"" >/dev/null
-r ipa role-add-privilege "\"$ROLE\"" --privileges="\"Host Administrators\"" --privileges="\"Host Group Administrators\"" --privileges="\"DNS Administrators\"" >/dev/null 2>&1 || true
-r ipa role-add-member "\"$ROLE\"" --users="$U" >/dev/null 2>&1 || true
-r ipa role-show "\"$ROLE\"" | grep -E 'Role name|Privileges|Member users'
+r ipa role-show "$ROLE" >/dev/null 2>&1 || r ipa role-add "$ROLE" --desc="Hosts, host groups and their DNS records (OpenTofu, ADR 0013)" >/dev/null
+r ipa role-add-privilege "$ROLE" --privileges="Host Administrators" --privileges="Host Group Administrators" --privileges="DNS Administrators" >/dev/null 2>&1 || true
+r ipa role-add-member "$ROLE" --users="$U" >/dev/null 2>&1 || true
+r ipa role-show "$ROLE" | grep -E 'Role name|Privileges|Member users'
 
 echo "== dynamic DNS updates for $ZONE =="
 r ipa dnszone-mod "$ZONE" --dynamic-update=TRUE >/dev/null 2>&1 || true
