@@ -25,7 +25,7 @@ ENV_FILE=$SEED/locumview/provision.env
 [ -f "$ENV_FILE" ] || die "seed has no locumview/provision.env"
 KEYS=" LV_FQDN IDM_DOMAIN IDM_REALM IDM_SERVER IDM_OTP LVADMIN_PASSWORD GRUB_PASSWORD LUKS_RECOVERY_PASSPHRASE"
 KEYS+=" K3S_NODE_CIDRS DNS_IP DESKTOP_USER DESKTOP_RDP_USER DESKTOP_RDP_PASSWORD DEMO_RDP_USER DEMO_RDP_PASSWORD"
-KEYS+=" RHSM_ORG RHSM_ACTIVATION_KEY "
+KEYS+=" RHSM_ORG RHSM_ACTIVATION_KEY TIMEZONE "
 for k in $KEYS; do declare "$k="; done
 # Parsed, not sourced: only the listed keys, values taken literally.
 while IFS= read -r line || [ -n "$line" ]; do
@@ -43,6 +43,15 @@ done
 log hostname
 [ "$(hostname)" = "$LV_FQDN" ] || hostnamectl set-hostname "$LV_FQDN"
 [ "$(hostname)" = "$LV_FQDN" ] || die "hostname is $(hostname), expected $LV_FQDN"
+
+# 1b. Time zone, a site value (TIMEZONE, an IANA name). The image ships none, and the kickstart's timezone command
+#     does not reach an image-mode install, so desktops showed UTC (lv-test06).
+log timezone
+if [ -n "$TIMEZONE" ]; then
+  [ -f "/usr/share/zoneinfo/$TIMEZONE" ] || die "unknown time zone: $TIMEZONE"
+  timedatectl set-timezone "$TIMEZONE"
+fi
+timedatectl show -p Timezone --value
 
 # 2. Disk encryption. The installer bound the LUKS volume to the vTPM with a one-time passphrase that is in the
 #    installer ISO's kickstart. Add the recovery passphrase (kept in SOPS by the operator), then remove every key

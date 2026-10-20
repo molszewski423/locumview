@@ -87,3 +87,9 @@ variable "rhsm_sops_file" {
   type        = string
   default     = "rhsm.sops.yaml"
 }
+
+variable "timezone" {
+  description = "Time zone of the desktops (IANA name)."
+  type        = string
+  default     = "America/New_York"
+}

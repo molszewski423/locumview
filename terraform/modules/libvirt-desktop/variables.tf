@@ -132,3 +132,9 @@ variable "rhsm_activation_key" {
   default     = ""
   sensitive   = true
 }
+
+variable "timezone" {
+  description = "The desktop's time zone, an IANA name (set at first boot)."
+  type        = string
+  default     = "America/New_York"
+}

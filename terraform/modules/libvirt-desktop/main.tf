@@ -91,6 +91,7 @@ resource "terraform_data" "seed" {
       DEMO_RDP_USER            = var.secrets.demo_rdp_user
       DEMO_RDP_PASSWORD        = var.secrets.demo_rdp_password
       RHSM_ORG                 = var.rhsm == null ? "" : var.rhsm.org
+      TIMEZONE                 = var.timezone
       RHSM_ACTIVATION_KEY      = var.rhsm == null ? "" : var.rhsm_activation_key
     }
   }

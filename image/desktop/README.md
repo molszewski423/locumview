@@ -62,11 +62,12 @@ Each default app is a slot: the image fills it with LocumView's default, and a d
 | `K3S_NODE_CIDRS`, `DNS_IP` | Sources allowed to reach RDP, SSH and Cockpit (the k3s nodes); the DNS server the demo fence allows |
 | `DESKTOP_USER`, `DESKTOP_RDP_USER`, `DESKTOP_RDP_PASSWORD` | The desktop's IdM user and the RDP credentials guacd uses for that user's session (port 3390) |
 | `DEMO_RDP_USER`, `DEMO_RDP_PASSWORD` | Optional: the demo (guest) session on 3391, with the egress fence |
+| `TIMEZONE` | The desktop's time zone (IANA name; the site value, default `America/New_York`) |
 | `RHSM_ORG`, `RHSM_ACTIVATION_KEY` | Optional: register the desktop with Red Hat under its host name (support, compliance, Red Hat's Flatpak remote) |
 
 On the desktop, `locumview-provision.service` (`/usr/libexec/locumview/provision`) reads that file straight from the read-only seed (cloud-init only reads the hostname, so no secret is copied to `/var/lib/cloud`) and, once:
 
-1. Checks the hostname.
+1. Checks the hostname and sets the time zone (the image ships none, and the kickstart's `timezone` does not reach an image-mode install).
 2. Sets the vTPM's dictionary-attack limits (32 failures, each expiring after 5 minutes; also set by the kickstart), adds the recovery passphrase to LUKS and removes every key slot except the TPM's and the recovery one. The TPM default (3 failures, about 17 minutes each) counts every unclean shutdown as a failure: three forced stops locked a test desktop's TPM, and it asked for the disk passphrase at boot.
 3. Creates `lvadmin` (in `wheel`).
 4. Sets the GRUB password with superuser `lvgrub`. bootc boots from bootupd's static `/boot/grub2/grub.cfg`, whose users block names `root`; the name is changed in place.

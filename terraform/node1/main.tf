@@ -18,6 +18,7 @@ module "desktop" {
   vcpus        = each.value.vcpus
 
   pool          = var.pool
+  timezone      = var.timezone
   bridge        = var.bridge
   installer_iso = var.installer_iso
   libvirt_uri   = var.libvirt_uri

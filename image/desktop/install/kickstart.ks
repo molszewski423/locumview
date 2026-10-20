@@ -15,6 +15,8 @@ text
 xconfig --startxonboot
 lang en_US.UTF-8
 keyboard us
+# Applies to the installer only: an image-mode install does not carry it over, so first-boot provisioning sets
+# the desktop's time zone from the site value TIMEZONE (lv-test06).
 timezone America/New_York --utc
 network --bootproto=dhcp --activate
 rootpw --lock
