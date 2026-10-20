@@ -33,6 +33,18 @@ podman build --secret id=rhsm,src=$HOME/.config/locumview/rhsm.env \
   -f image/desktop/Containerfile -t <registry>/locumview/desktop:dev .
 ```
 
+## Default apps
+
+Each default app is a slot: the image fills it with LocumView's default, and a deployment can fill it with the customer's standard instead (ADR 0016 for the browsers).
+
+| Slot | Default | Source | Swappable for |
+|---|---|---|---|
+| System browser | Firefox ESR | Red Hat's Flatpak remote (registered desktops); Mozilla's Firefox from Flathub otherwise | |
+| EHR browser | Google Chrome in app mode, managed policies, egress rules (planned, ADR 0016) | Google's RPM repository, in the image | Microsoft Edge, EPEL Chromium, or the customer's standard browser |
+| Office | ONLYOFFICE | Flathub, first boot | The customer's office suite |
+| Files, calculator | GNOME Files, Calculator | RHEL (AppStream) | |
+| Extensions manager | GNOME Extensions | Flathub, first boot | |
+
 ## Installing and provisioning
 
 `install/build-installer-iso.sh` (root) turns the image into an installer ISO: Anaconda with `install/kickstart.ks`, which lays out the STIG's separate file systems on LVM inside LUKS2 and binds the LUKS volume to the TPM (clevis, PCR 7), so the desktop unlocks at boot with no prompt. The kickstart holds a random one-time LUKS passphrase made for each ISO build, so the ISO is kept private (mode 0600) and first-boot provisioning removes that key slot.

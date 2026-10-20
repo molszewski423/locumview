@@ -83,6 +83,7 @@ Each technical safeguard of 45 CFR 164.312 is mapped to the control that address
 | [0013](docs/adr/0013-opentofu-for-infrastructure.md) | OpenTofu for the infrastructure around each desktop (VM, volumes, seed, IdM host entry), bootc for the operating system; state encrypted |
 | [0014](docs/adr/0014-gnome-desktop.md) | GNOME on Wayland as the desktop, reached through GNOME Remote Desktop; organization-set layouts |
 | [0015](docs/adr/0015-apache-guacamole-broker.md) | Apache Guacamole as the clientless browser broker in front of the desktops |
+| [0016](docs/adr/0016-browser-baseline.md) | Browser baseline: Firefox ESR as the system browser, hardened Google Chrome for web EHRs; the browser is a swappable slot |
 
 ## Where it is going
 
