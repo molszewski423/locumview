@@ -40,7 +40,8 @@ RUN --mount=type=bind,target=/src \
     rm -rf /tmp/packaging
 
 # 3. Image-only files: the XDG override, the always-on headless session drop-in, the faillock directory, the
-#    first-boot Flatpak installer and first-boot provisioning (with the remote-access scripts it runs). Modes are
+#    first-boot Flatpak installer and first-boot provisioning (with the remote-access scripts it runs), and the public
+#    key that image updates must be signed with (image/desktop/signing/cosign.pub). Modes are
 #    normalized so the image does not depend on the builder's umask.
 RUN --mount=type=bind,target=/src \
     set -euo pipefail; \
@@ -48,6 +49,7 @@ RUN --mount=type=bind,target=/src \
     install -d -m 0755 /usr/libexec/locumview/remote-access; \
     install -m 0755 /src/packaging/remote-access/user-mode-user.sh /src/packaging/remote-access/demo-user-root.sh \
         /usr/libexec/locumview/remote-access/; \
+    install -D -m 0644 /src/image/desktop/signing/cosign.pub /usr/share/locumview/signing/cosign.pub; \
     systemctl enable locumview-flatpaks.service locumview-provision.service
 
 # 3b. Initramfs with clevis, so the LUKS volume unlocks with the vTPM at boot (the base image's initramfs has

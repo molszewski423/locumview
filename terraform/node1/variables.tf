@@ -93,3 +93,21 @@ variable "timezone" {
   type        = string
   default     = "America/New_York"
 }
+
+variable "update_image" {
+  description = "Image the desktops track for signed updates (empty: no updates). Site value."
+  type        = string
+  default     = ""
+}
+
+variable "registry_ca_file" {
+  description = "Registry CA certificate (PEM) on the operator machine, for update_image (empty: publicly trusted)."
+  type        = string
+  default     = ""
+}
+
+variable "registry_sops_file" {
+  description = "SOPS file with registry_pull_user and registry_pull_token (registry-secrets.sh)."
+  type        = string
+  default     = "registry.sops.yaml"
+}

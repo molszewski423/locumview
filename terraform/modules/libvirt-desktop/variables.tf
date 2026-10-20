@@ -138,3 +138,25 @@ variable "timezone" {
   type        = string
   default     = "America/New_York"
 }
+
+variable "updates" {
+  description = <<-EOT
+    Image updates (null: none). The desktop switches to track image (for example
+    git.lan/mike/locumview-desktop:latest) and accepts only images from that repository signed with the key baked
+    into the image. ca_b64: the registry's CA certificate, base64 (empty if publicly trusted); pull_user with
+    registry_pull_token: read-only registry credentials.
+  EOT
+  type = object({
+    image     = string
+    ca_b64    = optional(string, "")
+    pull_user = optional(string, "")
+  })
+  default = null
+}
+
+variable "registry_pull_token" {
+  description = "Read-only registry token for var.updates (from SOPS)."
+  type        = string
+  default     = ""
+  sensitive   = true
+}

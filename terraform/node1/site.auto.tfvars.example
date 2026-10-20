@@ -5,3 +5,5 @@ idm_ca_certificate = "<path to the IdM CA certificate on this machine>"
 k3s_node_cidrs     = ["<node1-ip>/32", "<node2-ip>/32"]
 dns_ip             = "<LAN DNS server>"
 guacamole_kubeconfig = "<path to the operator kubeconfig, e.g. /home/<user>/.kube/locumview-operator.yaml>"
+update_image         = "<registry>/<owner>/locumview-desktop:latest"
+registry_ca_file     = "<path to the registry CA certificate, if not publicly trusted>"

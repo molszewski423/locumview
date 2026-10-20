@@ -11,7 +11,7 @@ umask 077
 mkdir -p "$T/seed/locumview"
 for k in LV_FQDN IDM_DOMAIN IDM_REALM IDM_SERVER IDM_OTP LVADMIN_PASSWORD GRUB_PASSWORD LUKS_RECOVERY_PASSPHRASE \
          K3S_NODE_CIDRS DNS_IP DESKTOP_USER DESKTOP_RDP_USER DESKTOP_RDP_PASSWORD DEMO_RDP_USER DEMO_RDP_PASSWORD \
-         RHSM_ORG RHSM_ACTIVATION_KEY TIMEZONE; do
+         RHSM_ORG RHSM_ACTIVATION_KEY TIMEZONE UPDATE_IMAGE REGISTRY_CA_B64 REGISTRY_PULL_USER REGISTRY_PULL_TOKEN; do
   printf '%s=%s\n' "$k" "${!k-}"
 done > "$T/seed/locumview/provision.env"
 printf 'instance-id: %s-%s\nlocal-hostname: %s\n' "$LV_NAME" "$(date +%Y%m%d%H%M%S)" "$LV_FQDN" > "$T/seed/meta-data"

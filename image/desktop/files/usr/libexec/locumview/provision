@@ -25,7 +25,8 @@ ENV_FILE=$SEED/locumview/provision.env
 [ -f "$ENV_FILE" ] || die "seed has no locumview/provision.env"
 KEYS=" LV_FQDN IDM_DOMAIN IDM_REALM IDM_SERVER IDM_OTP LVADMIN_PASSWORD GRUB_PASSWORD LUKS_RECOVERY_PASSPHRASE"
 KEYS+=" K3S_NODE_CIDRS DNS_IP DESKTOP_USER DESKTOP_RDP_USER DESKTOP_RDP_PASSWORD DEMO_RDP_USER DEMO_RDP_PASSWORD"
-KEYS+=" RHSM_ORG RHSM_ACTIVATION_KEY TIMEZONE "
+KEYS+=" RHSM_ORG RHSM_ACTIVATION_KEY TIMEZONE"
+KEYS+=" UPDATE_IMAGE REGISTRY_CA_B64 REGISTRY_PULL_USER REGISTRY_PULL_TOKEN "
 for k in $KEYS; do declare "$k="; done
 # Parsed, not sourced: only the listed keys, values taken literally.
 while IFS= read -r line || [ -n "$line" ]; do
@@ -189,6 +190,41 @@ if [ -n "$DEMO_RDP_USER" ]; then
   printf '%s\n%s\n' "$DEMO_RDP_USER" "$DEMO_RDP_PASSWORD" > "$cred"
   unset DEMO_RDP_PASSWORD
   LV_DEMO_CRED=$cred DNS_IP=$DNS_IP bash "$LIBEXEC/remote-access/demo-user-root.sh"
+fi
+
+# 9b. Image updates: track the signed image in the registry, and accept nothing unsigned. Optional (UPDATE_IMAGE).
+#     The registry's CA, a read-only pull token for bootc, a signature policy for that repository (cosign key
+#     baked into the image), sigstore attachments, then bootc switch with the policy enforced. The switch is
+#     staged: it takes effect at the next reboot, and updates after that are applied by an operator
+#     (bootc upgrade, then a planned reboot); the automatic update timer stays off.
+if [ -n "$UPDATE_IMAGE" ]; then
+  log image-updates
+  repo=${UPDATE_IMAGE%%@*}; repo=${repo%:*}; reg=${repo%%/*}
+  if [ -n "$REGISTRY_CA_B64" ]; then
+    printf '%s' "$REGISTRY_CA_B64" | base64 -d > /etc/pki/ca-trust/source/anchors/locumview-registry.pem
+    chmod 0644 /etc/pki/ca-trust/source/anchors/locumview-registry.pem
+    update-ca-trust
+  fi
+  if [ -n "$REGISTRY_PULL_TOKEN" ]; then
+    install -d -m 0700 /etc/ostree
+    install -m 0600 /dev/null /etc/ostree/auth.json
+    printf '{"auths":{"%s":{"auth":"%s"}}}\n' "$reg" "$(printf '%s:%s' "$REGISTRY_PULL_USER" "$REGISTRY_PULL_TOKEN" | base64 -w0)" > /etc/ostree/auth.json
+  fi
+  unset REGISTRY_PULL_TOKEN
+  REPO="$repo" python3 - <<'PY'
+import json, os
+p = "/etc/containers/policy.json"
+pol = json.load(open(p))
+pol.setdefault("transports", {}).setdefault("docker", {})[os.environ["REPO"]] = [{
+    "type": "sigstoreSigned",
+    "keyPath": "/usr/share/locumview/signing/cosign.pub",
+    "signedIdentity": {"type": "matchRepository"},
+}]
+json.dump(pol, open(p, "w"), indent=2)
+PY
+  printf 'docker:\n  %s:\n    use-sigstore-attachments: true\n' "$repo" > /etc/containers/registries.d/locumview.yaml
+  bootc switch --enforce-container-sigpolicy "$UPDATE_IMAGE"
+  bootc status --format humanreadable 2>/dev/null | grep -E "Staged|Booted|Image" | head -6 || true
 fi
 
 # 10. Done: mark it, and eject the seed (the operator deletes its copy once it sees the tray open).

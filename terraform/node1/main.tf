@@ -3,6 +3,11 @@ data "sops_file" "rhsm" {
   source_file = "${path.module}/${var.rhsm_sops_file}"
 }
 
+data "sops_file" "registry" {
+  count       = var.update_image == "" ? 0 : 1
+  source_file = "${path.module}/${var.registry_sops_file}"
+}
+
 data "sops_file" "desktop" {
   for_each    = var.desktops
   source_file = "${path.module}/desktops/${each.key}.sops.yaml"
@@ -32,6 +37,13 @@ module "desktop" {
     sops_file = "${path.module}/${var.rhsm_sops_file}"
   }
   rhsm_activation_key = var.rhsm_sops_file == "" ? "" : data.sops_file.rhsm[0].data["rhsm_activation_key"]
+
+  updates = var.update_image == "" ? null : {
+    image     = var.update_image
+    ca_b64    = var.registry_ca_file == "" ? "" : filebase64(var.registry_ca_file)
+    pull_user = nonsensitive(data.sops_file.registry[0].data["registry_pull_user"]) # a user name, not a secret
+  }
+  registry_pull_token = var.update_image == "" ? "" : data.sops_file.registry[0].data["registry_pull_token"]
 
   guacamole = var.guacamole_kubeconfig == "" ? null : {
     kubeconfig = var.guacamole_kubeconfig

@@ -74,6 +74,7 @@ Each default app is a slot: the image fills it with LocumView's default, and a d
 | `DESKTOP_USER`, `DESKTOP_RDP_USER`, `DESKTOP_RDP_PASSWORD` | The desktop's IdM user and the RDP credentials guacd uses for that user's session (port 3390) |
 | `DEMO_RDP_USER`, `DEMO_RDP_PASSWORD` | Optional: the demo (guest) session on 3391, with the egress fence |
 | `TIMEZONE` | The desktop's time zone (IANA name; the site value, default `America/New_York`) |
+| `UPDATE_IMAGE`, `REGISTRY_CA_B64`, `REGISTRY_PULL_USER`, `REGISTRY_PULL_TOKEN` | Optional: track the signed image in the registry for updates (the image, the registry's CA in base64, a read-only pull token) |
 | `RHSM_ORG`, `RHSM_ACTIVATION_KEY` | Optional: register the desktop with Red Hat under its host name (support, compliance, Red Hat's Flatpak remote) |
 
 On the desktop, `locumview-provision.service` (`/usr/libexec/locumview/provision`) reads that file straight from the read-only seed (cloud-init only reads the hostname, so no secret is copied to `/var/lib/cloud`) and, once:
@@ -88,6 +89,8 @@ On the desktop, `locumview-provision.service` (`/usr/libexec/locumview/provision
 7. Opens RDP, SSH and Cockpit to the k3s nodes only (`locumview-gateways` zone).
 8. Starts the user's always-on headless session with user-mode GNOME Remote Desktop and its RDP credentials.
 9. Optionally sets up the demo user.
+
+With `UPDATE_IMAGE`, provisioning also makes the desktop track that image and accept only images from its repository signed with the key in `/usr/share/locumview/signing/cosign.pub` (a `sigstoreSigned` rule in `/etc/containers/policy.json`, sigstore attachments in `registries.d`, `bootc switch --enforce-container-sigpolicy`). The switch takes effect at the next reboot. Updates are applied by an operator (`bootc upgrade`, then a planned reboot); the automatic update timer stays off, so a desktop never reboots under a clinician.
 
 Every step is safe to repeat; the service runs on each boot until it succeeds. When it succeeds it ejects the seed, which is the script's signal to detach and wipe it. On failure the seed stays attached: `journalctl -u locumview-provision` on the desktop.
 
