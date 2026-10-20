@@ -8,9 +8,13 @@ rhsm_on() {
   if [ -s /run/secrets/rhsm ]; then
     # shellcheck disable=SC1091
     . /run/secrets/rhsm
-    subscription-manager register --org="${RHSM_ORG:?}" --activationkey="${RHSM_KEY:?}" --force >/dev/null
+    # A fixed name, so a registration left by a build that died can be found and removed by name
+    # (terraform/modules/libvirt-desktop/scripts/rhsm-systems.sh remove locumview-image-build).
+    subscription-manager register --org="${RHSM_ORG:?}" --activationkey="${RHSM_KEY:?}" --name=locumview-image-build --force >/dev/null
     unset RHSM_ORG RHSM_KEY
     LV_RHSM_REGISTERED=1
+    # Unregister even when a later command in this RUN step fails (set -e): the subscription counts systems.
+    trap rhsm_off EXIT
   fi
 }
 rhsm_off() {
