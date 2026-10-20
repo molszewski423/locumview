@@ -1,6 +1,6 @@
 # LocumView roadmap
 
-Status as of 2026-10-19. Labels: **Done** (built and verified), **Open** (version-one work not finished), **In progress** (work has started outside version one, not finished or shipped), **Planned** (after version one, or alongside it only if it doesn't delay it), **Parked** (deliberately not pursued for now). The build log ([notes/phase1-changelog.md](notes/phase1-changelog.md)) and [docs/PLAN.md](docs/PLAN.md) hold the detail.
+Status as of 2026-10-20. Labels: **Done** (built and verified), **Open** (version-one work not finished), **In progress** (work has started outside version one, not finished or shipped), **Planned** (after version one, or alongside it only if it doesn't delay it), **Parked** (deliberately not pursued for now). The build log ([notes/phase1-changelog.md](notes/phase1-changelog.md)) and [docs/PLAN.md](docs/PLAN.md) hold the detail.
 
 ## Version one (scope locked by ADR 0009)
 
@@ -10,9 +10,9 @@ Version one is complete when all five items are Done. Nothing else is required f
 |---|---|---|---|
 | 1 | One RHEL 10 desktop built as a bootc image from a Containerfile and provisioned on the reference hypervisor (libvirt) from a clean clone, with zero manual steps | **Open** | The image builds, boots and updates in place (changelog #51, #52); no FIPS mode (ADR 0012). Desktops install from an ISO with LUKS bound to the vTPM and provision themselves on first boot: IdM, RDP, break-glass, firewall (changelog #53). Next: SOPS files per desktop and the Guacamole connection, registry and signing, CI builds, the destroy-and-rebuild proof. ADR 0007. |
 | 2 | Reached in a browser through Guacamole, Keycloak SSO with enforced MFA, no exposed RDP | **Done** | Live at login.locumview.com since 2026-10-02 (changelog #17 to #21). |
-| 3 | DISA STIG profile applied, OpenSCAP report committed, exceptions documented | **Done** | 2026-10-19 on the reference desktop: DISA STIG with GUI, tailored; 417 pass, 0 open failures; reports in docs/evidence/stig, exceptions in hardening/stig/README.md (changelog #47). FIPS mode and separate partitions are deferred to the bootc image (item 1). |
+| 3 | DISA STIG profile applied, OpenSCAP report committed, exceptions documented | **Done** | 2026-10-19 on the reference desktop: DISA STIG with GUI, tailored; 417 pass, 0 open failures; reports in docs/evidence/stig, exceptions in hardening/stig/README.md (changelog #47). The bootc image applies the same profile at build time and has the separate file systems (changelog #51 to #53); FIPS mode is an exception (ADR 0012). |
 | 4 | Encryption in transit everywhere | **Done** | 2026-10-19: every hop that crosses a network is encrypted. Browser to Cloudflare (TLS), the tunnel, pod traffic between cluster nodes (k3s WireGuard backend, changelog #49), Keycloak to IdM (LDAPS), and RDP to the desktop (TLS). Traffic between pods on the same node does not leave the host. |
-| 5 | README with architecture diagram, quick start, HIPAA technical-safeguard mapping, honest status | **Done** | 2026-10-19 (changelog #50): quick start for the checks and the access layer; HIPAA mapping in docs/hipaa-technical-safeguards.md with encryption at rest as the stated gap. The desktop part of the quick start points to the build log until item 1 makes it one image. |
+| 5 | README with architecture diagram, quick start, HIPAA technical-safeguard mapping, honest status | **Done** | 2026-10-19 (changelog #50): quick start for the checks and the access layer; HIPAA mapping in docs/hipaa-technical-safeguards.md, with its gaps stated (encryption at rest partly met since #53). The desktop part of the quick start points to the build log until item 1 is done. |
 
 ### Version-one housekeeping (small, not scope items)
 
