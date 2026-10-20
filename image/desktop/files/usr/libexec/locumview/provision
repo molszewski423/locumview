@@ -24,7 +24,8 @@ mountpoint -q "$SEED" || mount -o ro,nosuid,nodev,noexec "$dev" "$SEED"
 ENV_FILE=$SEED/locumview/provision.env
 [ -f "$ENV_FILE" ] || die "seed has no locumview/provision.env"
 KEYS=" LV_FQDN IDM_DOMAIN IDM_REALM IDM_SERVER IDM_OTP LVADMIN_PASSWORD GRUB_PASSWORD LUKS_RECOVERY_PASSPHRASE"
-KEYS+=" K3S_NODE_CIDRS DNS_IP DESKTOP_USER DESKTOP_RDP_USER DESKTOP_RDP_PASSWORD DEMO_RDP_USER DEMO_RDP_PASSWORD "
+KEYS+=" K3S_NODE_CIDRS DNS_IP DESKTOP_USER DESKTOP_RDP_USER DESKTOP_RDP_PASSWORD DEMO_RDP_USER DEMO_RDP_PASSWORD"
+KEYS+=" RHSM_ORG RHSM_ACTIVATION_KEY "
 for k in $KEYS; do declare "$k="; done
 # Parsed, not sourced: only the listed keys, values taken literally.
 while IFS= read -r line || [ -n "$line" ]; do
@@ -104,6 +105,24 @@ if [ "$(nmcli -g ipv6.ignore-auto-dns con show "$C")" != yes ]; then
 fi
 for _ in $(seq 30); do getent hosts "$IDM_SERVER" >/dev/null && break; sleep 2; done
 getent hosts "$IDM_SERVER" >/dev/null || die "cannot resolve $IDM_SERVER"
+
+# 5b. Red Hat subscription, if the seed carries an activation key: support and compliance for the desktop, and access
+#     to Red Hat's Flatpak remote (Firefox ESR, installed by locumview-flatpaks.service after this). Registered under
+#     the desktop's name, so OpenTofu can remove the registration on destroy (the subscription counts systems).
+log rhsm
+if [ -n "$RHSM_ORG" ] && [ -n "$RHSM_ACTIVATION_KEY" ]; then
+  if subscription-manager identity >/dev/null 2>&1; then
+    echo "already registered"
+  else
+    # subscription-manager takes the key only as an argument; it is visible to root on this machine for the
+    # moment the command runs, during first boot.
+    subscription-manager register --org="$RHSM_ORG" --activationkey="$RHSM_ACTIVATION_KEY" --name="$LV_FQDN" >/dev/null
+    subscription-manager identity | grep -E '^(name|system identity):'
+  fi
+else
+  echo "no activation key in the seed: not registered (Firefox comes from Flathub)"
+fi
+unset RHSM_ACTIVATION_KEY
 
 # 6. Join IdM with the one-time host password (the operator ran `ipa host-add --random`; no admin credentials
 #    on the desktop). ipa-client-install selects the stock sssd authselect profile; put back the STIG's

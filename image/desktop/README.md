@@ -50,6 +50,7 @@ podman build --secret id=rhsm,src=$HOME/.config/locumview/rhsm.env \
 | `K3S_NODE_CIDRS`, `DNS_IP` | Sources allowed to reach RDP, SSH and Cockpit (the k3s nodes); the DNS server the demo fence allows |
 | `DESKTOP_USER`, `DESKTOP_RDP_USER`, `DESKTOP_RDP_PASSWORD` | The desktop's IdM user and the RDP credentials guacd uses for that user's session (port 3390) |
 | `DEMO_RDP_USER`, `DEMO_RDP_PASSWORD` | Optional: the demo (guest) session on 3391, with the egress fence |
+| `RHSM_ORG`, `RHSM_ACTIVATION_KEY` | Optional: register the desktop with Red Hat under its host name (support, compliance, Red Hat's Flatpak remote) |
 
 On the desktop, `locumview-provision.service` (`/usr/libexec/locumview/provision`) reads that file straight from the read-only seed (cloud-init only reads the hostname, so no secret is copied to `/var/lib/cloud`) and, once:
 
@@ -58,6 +59,7 @@ On the desktop, `locumview-provision.service` (`/usr/libexec/locumview/provision
 3. Creates `lvadmin` (in `wheel`).
 4. Sets the GRUB password with superuser `lvgrub`. bootc boots from bootupd's static `/boot/grub2/grub.cfg`, whose users block names `root`; the name is changed in place.
 5. Ignores DNS servers from IPv6 router advertisements (changelog #15).
+5b. Registers with Red Hat if the seed has an activation key. `locumview-flatpaks.service` runs after provisioning: registered desktops get Red Hat's Firefox ESR through the image's preinstall declaration (`redhat-flatpak-preinstall-firefox`, as the RHEL installer does on a conventional install); others get Mozilla's Firefox from Flathub.
 6. Joins IdM with the one-time password, then selects `custom/hardening` again (with `with-faillock`, `without-nullok`, `with-sudo`, `with-mkhomedir`), because `ipa-client-install` switches to the stock `sssd` profile.
 7. Opens RDP, SSH and Cockpit to the k3s nodes only (`locumview-gateways` zone).
 8. Starts the user's always-on headless session with user-mode GNOME Remote Desktop and its RDP credentials.

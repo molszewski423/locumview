@@ -8,5 +8,13 @@ for app in $FLATPAKS; do
   if flatpak remote-info --system rhel "$app" >/dev/null 2>&1; then remote=rhel; else remote=flathub; fi
   flatpak install --system -y --noninteractive "$remote" "$app"
 done
+# The browser. Registered desktops run Red Hat's preinstall (/etc/flatpak/preinstall.d: Firefox ESR from the "rhel"
+# remote, as the RHEL installer does on a conventional install); otherwise Mozilla's Firefox from Flathub.
+if subscription-manager identity >/dev/null 2>&1; then
+  flatpak preinstall --system -y --noninteractive
+else
+  flatpak install --system -y --noninteractive flathub org.mozilla.firefox
+fi
+flatpak info --system org.mozilla.firefox >/dev/null
 install -d /var/lib/locumview
 touch /var/lib/locumview/flatpaks-installed

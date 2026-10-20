@@ -1,3 +1,8 @@
+data "sops_file" "rhsm" {
+  count       = var.rhsm_sops_file == "" ? 0 : 1
+  source_file = "${path.module}/${var.rhsm_sops_file}"
+}
+
 data "sops_file" "desktop" {
   for_each    = var.desktops
   source_file = "${path.module}/desktops/${each.key}.sops.yaml"
@@ -20,6 +25,12 @@ module "desktop" {
   idm            = var.idm
   k3s_node_cidrs = var.k3s_node_cidrs
   dns_ip         = var.dns_ip
+
+  rhsm = var.rhsm_sops_file == "" ? null : {
+    org       = nonsensitive(data.sops_file.rhsm[0].data["rhsm_org"]) # an organization ID, not a secret
+    sops_file = "${path.module}/${var.rhsm_sops_file}"
+  }
+  rhsm_activation_key = var.rhsm_sops_file == "" ? "" : data.sops_file.rhsm[0].data["rhsm_activation_key"]
 
   guacamole = var.guacamole_kubeconfig == "" ? null : {
     kubeconfig = var.guacamole_kubeconfig

@@ -81,3 +81,9 @@ variable "desktops" {
   }))
   default = {}
 }
+
+variable "rhsm_sops_file" {
+  description = "SOPS file with rhsm_org, rhsm_activation_key and rhsm_offline_token (rhsm-secrets.sh); empty: desktops are not registered with Red Hat."
+  type        = string
+  default     = "rhsm.sops.yaml"
+}

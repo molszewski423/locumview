@@ -11,6 +11,7 @@ On the operator machine: OpenTofu 1.10 or later, `sops` with the age key (ADR 00
 
 One-time setup:
 - `node1/idm-account.sh <ssh-user>@<idm-server>` (asks for the IdM admin password once): IdM account `svc-opentofu` with hosts, host groups and DNS privileges only, its password into `idm.sops.yaml`; dynamic DNS updates and a 60-second negative-caching time for the zone.
+- `node1/rhsm-secrets.sh` (once): the Red Hat organization, activation key and subscription API offline token into `rhsm.sops.yaml`. Desktops then register under their host name, and `modules/libvirt-desktop/scripts/rhsm-systems.sh` removes the registration before a desktop is created and after it is destroyed, so test desktops do not use up a subscription that counts systems (`rhsm-systems.sh list` shows what is registered).
 - `node1/operator-kubeconfig.sh | ssh <operator> 'umask 077; cat > ~/.kube/locumview-operator.yaml'` (where kubectl has cluster-admin): a kubeconfig for `locumview-operator`, which can only exec into the Guacamole database pod (`k8s/locumview/operator.yaml`). Set its path as `guacamole_kubeconfig`.
 
 ## Use

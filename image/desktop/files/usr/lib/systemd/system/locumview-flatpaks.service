@@ -1,7 +1,8 @@
 [Unit]
 Description=LocumView: install the desktop's Flatpak apps (first boot)
 Wants=network-online.target
-After=network-online.target
+# After provisioning, which registers the desktop with Red Hat when it has an activation key (Firefox source).
+After=network-online.target locumview-provision.service
 ConditionPathExists=!/var/lib/locumview/flatpaks-installed
 
 [Service]

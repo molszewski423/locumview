@@ -112,3 +112,23 @@ variable "guacamole" {
   })
   default = null
 }
+
+variable "rhsm" {
+  description = <<-EOT
+    Red Hat subscription for the desktop (null: not registered; Firefox then comes from Flathub). org goes on the
+    seed with rhsm_activation_key; sops_file holds rhsm_offline_token for the subscription API, which removes any
+    registration with this desktop's name before it is created and after it is destroyed.
+  EOT
+  type = object({
+    org       = string
+    sops_file = string
+  })
+  default = null
+}
+
+variable "rhsm_activation_key" {
+  description = "Activation key for var.rhsm.org (from SOPS)."
+  type        = string
+  default     = ""
+  sensitive   = true
+}

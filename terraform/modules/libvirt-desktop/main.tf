@@ -90,10 +90,38 @@ resource "terraform_data" "seed" {
       DESKTOP_RDP_PASSWORD     = var.secrets.rdp_password
       DEMO_RDP_USER            = var.secrets.demo_rdp_user
       DEMO_RDP_PASSWORD        = var.secrets.demo_rdp_password
+      RHSM_ORG                 = var.rhsm == null ? "" : var.rhsm.org
+      RHSM_ACTIVATION_KEY      = var.rhsm == null ? "" : var.rhsm_activation_key
     }
   }
 
-  depends_on = [freeipa_host_hostgroup_membership.desktop]
+  depends_on = [freeipa_host_hostgroup_membership.desktop, terraform_data.rhsm]
+}
+
+# Red Hat registrations by this desktop's name: none left from an earlier desktop of the same name before it is
+# created, and none left behind after it is destroyed (the developer subscription counts registered systems).
+# Destroy order: the VM goes first (it depends on the seed, which depends on this), then the registration.
+resource "terraform_data" "rhsm" {
+  count = var.rhsm == null ? 0 : 1
+
+  input = {
+    name      = local.fqdn
+    sops_file = abspath(var.rhsm.sops_file)
+    script    = abspath("${path.module}/scripts/rhsm-systems.sh")
+  }
+
+  provisioner "local-exec" {
+    command     = "${self.input.script} remove ${self.input.name}"
+    interpreter = ["bash", "-c"]
+    environment = { RHSM_SOPS_FILE = self.input.sops_file }
+  }
+
+  provisioner "local-exec" {
+    when        = destroy
+    command     = "${self.input.script} remove ${self.input.name}"
+    interpreter = ["bash", "-c"]
+    environment = { RHSM_SOPS_FILE = self.input.sops_file }
+  }
 }
 
 # --- The VM ----------------------------------------------------------------------------------------------------
