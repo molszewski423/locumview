@@ -1,6 +1,6 @@
 # LocumView Plan
 
-Owner: Michael Olszewski. Status: Phase 1 in progress.
+Owner: Michael Olszewski. Status (2026-10-20): Phases 1 and 2 complete; Phase 3, the end of version one, in progress (ROADMAP.md has the current state).
 
 LocumView is an open-source virtual desktop platform built on RHEL 10. It provisions hardened GNOME desktops with Terraform and Ansible, delivers them through the browser via Apache Guacamole behind Keycloak SSO and MFA, and never exposes a desktop directly to the internet. Every environment must be rebuildable identically from the repository. Beyond the base desktop, it is a platform for research and local LLM usage in regulated environments: desktops can carry agentic tooling and generative and agentic applications (clinical and research tooling to start) built on local models, so no regulated data leaves the endpoint, with the tooling layer customizable for any regulated workflow. It is a portfolio project aimed at solutions architecture and platform engineering roles, with Red Hat as a target employer.
 
