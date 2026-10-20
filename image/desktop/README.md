@@ -1,6 +1,6 @@
 # LocumView desktop image (bootc)
 
-Version-one item 1 (ADR 0007, ADR 0009): the desktop built as a RHEL 10 image-mode (bootc) container image from a Containerfile, and provisioned from a clean clone with zero manual steps. **Status: builds, boots (UEFI Secure Boot, vTPM, the STIG's separate file systems), updates in place with `bootc upgrade`, and installs and provisions itself from an ISO with no manual steps on the VM (changelog #53).** No FIPS mode (ADR 0012). This directory replaces, step by step, the scripts the hand-built reference desktop was made with (build log #11 to #36, then `hardening/stig/apply-stig.sh`).
+Version-one item 1 (ADR 0007, ADR 0009): the desktop built as a RHEL 10 image-mode (bootc) container image from a Containerfile, and provisioned from a clean clone with zero manual steps. **Status: builds, boots (UEFI Secure Boot, vTPM, the STIG's separate file systems), updates in place with `bootc upgrade`, installs and provisions itself from an ISO with no manual steps on the VM (changelog #53), and accepts only updates signed with the project key (changelog #58).** No FIPS mode (ADR 0012). This directory replaces, step by step, the scripts the hand-built reference desktop was made with (build log #11 to #36, then `hardening/stig/apply-stig.sh`).
 
 ## What goes where
 
