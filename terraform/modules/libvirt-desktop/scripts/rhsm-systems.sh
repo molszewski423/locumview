@@ -10,17 +10,30 @@ set -euo pipefail
 RHSM_OFFLINE_TOKEN=$(sops -d --extract '["rhsm_offline_token"]' "$RHSM_SOPS_FILE")
 export RHSM_OFFLINE_TOKEN
 exec python3 -I - "$@" <<'PY'
-import json, os, sys, urllib.parse, urllib.request
+import json, os, sys, time, urllib.error, urllib.parse, urllib.request
 api = "https://api.access.redhat.com/management/v1"
-tok = json.load(urllib.request.urlopen(urllib.request.Request(
+def call(r):
+    # Red Hat's API answers 502 now and then (seen 2026-10-20); retry server errors and network failures with
+    # backoff, so one bad moment does not fail a destroy and leave a registration behind.
+    for wait in (5, 15, 45, None):
+        try:
+            with urllib.request.urlopen(r, timeout=60) as resp:
+                return resp.read()
+        except urllib.error.HTTPError as e:
+            if e.code < 500 or wait is None:
+                raise
+        except urllib.error.URLError:
+            if wait is None:
+                raise
+        print(f"Red Hat API not answering, retrying in {wait} s", file=sys.stderr)
+        time.sleep(wait)
+tok = json.loads(call(urllib.request.Request(
     "https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token",
     data=urllib.parse.urlencode({"grant_type": "refresh_token", "client_id": "rhsm-api",
                                  "refresh_token": os.environ.pop("RHSM_OFFLINE_TOKEN")}).encode())))["access_token"]
 def req(method, path):
-    r = urllib.request.Request(api + path, method=method, headers={"Authorization": "Bearer " + tok, "Accept": "application/json"})
-    with urllib.request.urlopen(r) as resp:
-        body = resp.read()
-        return json.loads(body) if body else None
+    body = call(urllib.request.Request(api + path, method=method, headers={"Authorization": "Bearer " + tok, "Accept": "application/json"}))
+    return json.loads(body) if body else None
 systems, offset = [], 0
 while True:
     page = req("GET", f"/systems?limit=100&offset={offset}")
