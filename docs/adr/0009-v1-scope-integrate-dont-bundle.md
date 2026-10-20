@@ -60,3 +60,14 @@ Nothing in the desktop or the access layer may assume a specific hypervisor (no 
 - Each integration needs a documented interface (protocol, configuration, test) so a customer's own service can replace the homelab reference instance.
 - Provisioning code is split per hypervisor target, and the desktop image is tested on at least the reference target in CI once CI exists.
 - Clinical decision support is outside version one and, in the EU, outside the initial product altogether (ADR 0008).
+
+## Update 2026-10-20: why Proxmox VE is the production target
+
+Confirmed by the owner. Proxmox VE (open source, AGPL, Debian and KVM underneath) is where desktops run in a real deployment; libvirt on node1 stays the reference and test target, and KubeVirt the scoped learning piece for the OpenShift Virtualization story.
+
+- **VM-first.** A GNOME desktop with Secure Boot, a vTPM, audio and possibly GPU passthrough is a machine, not a process (ADR 0007); Proxmox runs it natively, where KubeVirt adds KubeVirt, CDI and storage and network plugins.
+- **Day-2 operations hospital IT already knows:** a web console, clusters with live migration and high availability, snapshots, and integrated backup and restore (Proxmox Backup Server: deduplicated, encrypted), which also answers the open item of backups for desktop VMs.
+- **Low barrier and cost,** with paid support available: a common destination for organizations leaving VMware since its licensing changes, the same market LocumView's Horizon comparison speaks to.
+- **Same image, different provider.** bootc-image-builder produces the disk from the same signed image, and an OpenTofu module for Proxmox (bpg/proxmox) replaces the libvirt one (ADR 0013). Host setup moves to an Ansible role at the same time (Phase 6).
+
+Kubernetes keeps the services (access layer, identity, databases); desktops run on a hypervisor. The two complement each other.
