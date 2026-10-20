@@ -81,6 +81,8 @@ Each technical safeguard of 45 CFR 164.312 is mapped to the control that address
 | [0011](docs/adr/0011-agentic-linus.md) | Argus (was "agentic Linus") for LocumView engineering: local model, read-only scoped access, changes only as PRs from a fork, code in a sandbox; staged toward a platform agent |
 | [0012](docs/adr/0012-fips-mode-and-remote-display.md) | No FIPS mode on the desktop while GNOME Remote Desktop's RDP sign-in needs NTLM; revisited for sectors that require FIPS |
 | [0013](docs/adr/0013-opentofu-for-infrastructure.md) | OpenTofu for the infrastructure around each desktop (VM, volumes, seed, IdM host entry), bootc for the operating system; state encrypted |
+| [0014](docs/adr/0014-gnome-desktop.md) | GNOME on Wayland as the desktop, reached through GNOME Remote Desktop; organization-set layouts |
+| [0015](docs/adr/0015-apache-guacamole-broker.md) | Apache Guacamole as the clientless browser broker in front of the desktops |
 
 ## Where it is going
 
