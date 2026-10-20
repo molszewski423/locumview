@@ -10,8 +10,10 @@ for app in $FLATPAKS; do
 done
 # The browser. Registered desktops run Red Hat's preinstall (/etc/flatpak/preinstall.d: Firefox ESR from the "rhel"
 # remote, as the RHEL installer does on a conventional install); otherwise Mozilla's Firefox from Flathub.
+# Red Hat's remote authenticates through a Flatpak authenticator reached over a D-Bus session bus, which a system
+# service does not have ("Cannot autolaunch D-Bus without X11 $DISPLAY", lv-test05): give it a private one.
 if subscription-manager identity >/dev/null 2>&1; then
-  flatpak preinstall --system -y --noninteractive
+  dbus-run-session -- flatpak preinstall --system -y --noninteractive
 else
   flatpak install --system -y --noninteractive flathub org.mozilla.firefox
 fi
