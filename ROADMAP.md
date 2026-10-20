@@ -37,6 +37,7 @@ Version one is complete when all five items are Done. Nothing else is required f
 | Desktop | Organization-set desktop layout (Mac, Windows or GNOME style), locked centrally | Built; Mac style and lock verified, Windows/GNOME not exercised | changelog #25, #28 |
 | Desktop | Separate, resettable demo desktop | Planned | First KubeVirt workload |
 | Hypervisors | Proxmox VE (practical production target) | Planned | ADR 0007, 0009 |
+| Hypervisors | A dedicated desktop network (own subnet or VLAN); guacd's RDP egress narrowed from the LAN to it | Planned | With Proxmox (Phase 6); today guacd may reach RDP ports on the LAN (changelog #55) |
 | Hypervisors | Host configuration as an Ansible role (bridge, nftables, libvirt, k3s prerequisites; node1, node2, then Proxmox hosts), replacing the shell scripts in hypervisor/ | Planned | With Proxmox (Phase 6); the desktop itself stays an image (ADR 0007) |
 | Hypervisors | KubeVirt / OpenShift Virtualization (scoped learning piece) | Planned | ADR 0007, 0009 |
 | Hypervisors | Public or sovereign cloud (AWS alongside SAA-C03) | Planned | ADR 0009 |
