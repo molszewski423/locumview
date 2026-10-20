@@ -78,8 +78,8 @@ jobs:
       - name: Push
         run: |
           set -euo pipefail
-          podman push --authfile "$JOB/auth.json" --digestfile "$JOB/digest" "$IMAGE:$TAG"
-          podman push --authfile "$JOB/auth.json" "$IMAGE:$TAG" "docker://$IMAGE:latest"
+          podman push --retry 3 --authfile "$JOB/auth.json" --digestfile "$JOB/digest" "$IMAGE:$TAG"
+          podman push --retry 3 --authfile "$JOB/auth.json" "$IMAGE:$TAG" "docker://$IMAGE:latest"
           echo "DIGEST=$(cat "$JOB/digest")" >> "$GITHUB_ENV"
           echo "pushed $IMAGE:$TAG as $(cat "$JOB/digest")"
 
