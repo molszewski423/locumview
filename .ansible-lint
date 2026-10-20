@@ -5,3 +5,5 @@ exclude_paths:
   - k8s/
   # OpenTofu configuration and its SOPS files (ADR 0013), not Ansible content.
   - terraform/
+  # SOPS-encrypted files anywhere (long encrypted lines by design; the sops-encrypted hook checks them).
+  - "**/*.sops.yaml"

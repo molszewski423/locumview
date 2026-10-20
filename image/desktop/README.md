@@ -33,6 +33,17 @@ podman build --secret id=rhsm,src=$HOME/.config/locumview/rhsm.env \
   -f image/desktop/Containerfile -t <registry>/locumview/desktop:dev .
 ```
 
+## Registry and signing
+
+CI builds the image on every change to `image/`, `packaging/` or `hardening/` (`.gitea/workflows/image.yml`), on a dedicated runner on node2: a host-mode act_runner as an unprivileged user with rootless podman, registered to this repository only. It pushes `git.lan/mike/locumview-desktop:<commit>` and `:latest`, signs the pushed digest with cosign, generates an SPDX SBOM with syft and attaches it as a signed attestation, then verifies both. Signing is offline: no public transparency log, so nothing about the image leaves the site. Verify with the committed public key:
+
+```
+cosign verify --key image/desktop/signing/cosign.pub --insecure-ignore-tlog git.lan/mike/locumview-desktop@<digest>
+cosign verify-attestation --key image/desktop/signing/cosign.pub --insecure-ignore-tlog --type spdxjson git.lan/mike/locumview-desktop@<digest>
+```
+
+The private key and its password are Actions secrets, with a SOPS backup in `signing/cosign.sops.yaml`.
+
 ## Default apps
 
 Each default app is a slot: the image fills it with LocumView's default, and a deployment can fill it with the customer's standard instead (ADR 0016 for the browsers).

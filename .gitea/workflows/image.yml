@@ -1,0 +1,125 @@
+# Build, push, sign and attest the desktop image (version-one item 1, ADR 0007).
+#
+# Runs on the image-build runner on node2 (label image-builder): a host-mode act_runner as an unprivileged user with
+# rootless podman, registered to this repository only. The cluster runner gives jobs no container engine on purpose,
+# and a bootc image build needs one. Credentials come from Actions secrets (each also kept in SOPS):
+#   REDHAT_REGISTRY_USER / REDHAT_REGISTRY_PASSWORD   pull the RHEL bootc base image
+#   RHSM_ORG / RHSM_ACTIVATION_KEY                    dnf during the build (build secret, never in a layer)
+#   REGISTRY_TOKEN                                    push to git.lan (Gitea token, package scope only)
+#   COSIGN_PRIVATE_KEY / COSIGN_PASSWORD              sign (public key: image/desktop/signing/cosign.pub)
+# Signing is offline (no public transparency log): verify with
+#   cosign verify --key image/desktop/signing/cosign.pub --insecure-ignore-tlog git.lan/mike/locumview-desktop@<digest>
+name: image
+"on":
+  push:
+    branches: [main]
+    paths:
+      - image/**
+      - packaging/**
+      - hardening/**
+      - .gitea/workflows/image.yml
+  workflow_dispatch:
+
+concurrency:
+  group: desktop-image
+  cancel-in-progress: false
+
+env:
+  IMAGE: git.lan/mike/locumview-desktop
+
+jobs:
+  build:
+    runs-on: image-builder
+    timeout-minutes: 150
+    steps:
+      - name: Check out
+        env:
+          TOKEN: ${{ gitea.token }}
+        run: |
+          set -euo pipefail
+          rm -rf src
+          git clone -q "https://x-access-token:${TOKEN}@git.lan/${GITHUB_REPOSITORY}.git" src
+          git -C src remote set-url origin "https://git.lan/${GITHUB_REPOSITORY}.git"
+          git -C src checkout -q "$GITHUB_SHA"
+          git -C src log -1 --format='%h %s'
+          # Job scratch for credentials: owner-only, removed by the last step.
+          install -d -m 0700 "$PWD/.job"
+          echo "JOB=$PWD/.job" >> "$GITHUB_ENV"
+          echo "TAG=${GITHUB_SHA:0:12}" >> "$GITHUB_ENV"
+
+      - name: Registry logins
+        env:
+          RH_USER: ${{ secrets.REDHAT_REGISTRY_USER }}
+          RH_PASS: ${{ secrets.REDHAT_REGISTRY_PASSWORD }}
+          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+        run: |
+          set -euo pipefail
+          A="$JOB/auth.json"; printf '{"auths":{}}' > "$A"; chmod 600 "$A"
+          printf '%s' "$RH_PASS" | podman login --authfile "$A" --username "$RH_USER" --password-stdin registry.redhat.io
+          printf '%s' "$REGISTRY_TOKEN" | podman login --authfile "$A" --username "${GITHUB_REPOSITORY_OWNER}" --password-stdin git.lan
+          # cosign and syft read registry credentials from a Docker config directory.
+          install -d -m 0700 "$JOB/docker"; ln -sf "$A" "$JOB/docker/config.json"
+
+      - name: Build
+        env:
+          RHSM_ORG: ${{ secrets.RHSM_ORG }}
+          RHSM_KEY: ${{ secrets.RHSM_ACTIVATION_KEY }}
+        run: |
+          set -euo pipefail
+          R="$JOB/rhsm.env"; umask 077
+          printf 'RHSM_ORG=%s\nRHSM_KEY=%s\n' "$RHSM_ORG" "$RHSM_KEY" > "$R"
+          trap 'shred -u "$R" 2>/dev/null || true' EXIT
+          cd src
+          podman build --authfile "$JOB/auth.json" --secret id=rhsm,src="$R" \
+            --label org.opencontainers.image.revision="$GITHUB_SHA" \
+            --label org.opencontainers.image.source="https://git.lan/${GITHUB_REPOSITORY}" \
+            -f image/desktop/Containerfile -t "$IMAGE:$TAG" .
+
+      - name: Push
+        run: |
+          set -euo pipefail
+          podman push --authfile "$JOB/auth.json" --digestfile "$JOB/digest" "$IMAGE:$TAG"
+          podman push --authfile "$JOB/auth.json" "$IMAGE:$TAG" "docker://$IMAGE:latest"
+          echo "DIGEST=$(cat "$JOB/digest")" >> "$GITHUB_ENV"
+          echo "pushed $IMAGE:$TAG as $(cat "$JOB/digest")"
+
+      - name: Sign
+        env:
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+        run: |
+          set -euo pipefail
+          export DOCKER_CONFIG="$JOB/docker"
+          cosign sign --key env://COSIGN_PRIVATE_KEY --use-signing-config=false --tlog-upload=false -y \
+            -a "git.commit=$GITHUB_SHA" -a "ci.run=$GITHUB_RUN_NUMBER" "$IMAGE@$DIGEST"
+
+      - name: SBOM
+        env:
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+        run: |
+          set -euo pipefail
+          export DOCKER_CONFIG="$JOB/docker"
+          syft scan "registry:$IMAGE@$DIGEST" -q -o "spdx-json=$JOB/sbom.spdx.json"
+          python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print(len(d.get("packages",[])), "packages in the SBOM")' "$JOB/sbom.spdx.json"
+          cosign attest --key env://COSIGN_PRIVATE_KEY --use-signing-config=false --tlog-upload=false -y \
+            --type spdxjson --predicate "$JOB/sbom.spdx.json" "$IMAGE@$DIGEST"
+
+      - name: Verify
+        run: |
+          set -euo pipefail
+          export DOCKER_CONFIG="$JOB/docker"
+          cosign verify --key src/image/desktop/signing/cosign.pub --insecure-ignore-tlog "$IMAGE@$DIGEST" >/dev/null
+          cosign verify-attestation --key src/image/desktop/signing/cosign.pub --insecure-ignore-tlog --type spdxjson \
+            "$IMAGE@$DIGEST" >/dev/null
+          echo "verified: signature and SBOM attestation for $IMAGE@$DIGEST ($IMAGE:$TAG)"
+
+      - name: Clean up
+        if: always()
+        run: |
+          set -uo pipefail
+          [ -n "${JOB:-}" ] && find "$JOB" -type f -exec shred -u {} + 2>/dev/null; rm -rf "${JOB:-/nonexistent}" src
+          # Keep the newest two desktop images locally (layer cache for the next build); drop the rest.
+          podman images --format '{{.ID}} {{.Repository}}' | awk -v r="$IMAGE" '$2==r {print $1}' | tail -n +3 | xargs -r podman rmi -f >/dev/null 2>&1 || true
+          podman image prune -f >/dev/null 2>&1 || true
+          df -h "$HOME" | tail -1
