@@ -58,7 +58,7 @@
 
     <!-- Local accounts allowed to exist. The remediation DELETES any other local account,
          so every system account on the image must be listed (gnome-remote-desktop above all). -->
-    <xccdf:set-value idref="xccdf_org.ssgproject.content_value_var_accounts_authorized_local_users_regex">^(root|bin|daemon|adm|lp|sync|shutdown|halt|mail|operator|games|ftp|nobody|tss|systemd-coredump|systemd-oom|dbus|polkitd|avahi|colord|rtkit|pipewire|clevis|sssd|geoclue|flatpak|setroubleshoot|fapolicyd|libstoragemgmt|gdm|gnome-initial-setup|gnome-remote-desktop|sshd|chrony|dnsmasq|postfix|tcpdump|rpc|rpcuser|pesign|unbound|wsdd|stapunpriv|yggdrasil|yggdrasil-worker|usbguard|lvadmin|demo)$</xccdf:set-value>
+    <xccdf:set-value idref="xccdf_org.ssgproject.content_value_var_accounts_authorized_local_users_regex">^(root|bin|daemon|adm|lp|sync|shutdown|halt|mail|operator|games|ftp|nobody|tss|systemd-coredump|systemd-oom|dbus|polkitd|avahi|colord|rtkit|pipewire|clevis|sssd|geoclue|flatpak|setroubleshoot|fapolicyd|libstoragemgmt|gdm|gnome-initial-setup|gnome-remote-desktop|sshd|chrony|dhcpcd|dnsmasq|postfix|tcpdump|rpc|rpcuser|pesign|unbound|wsdd|stapunpriv|yggdrasil|yggdrasil-worker|usbguard|lvadmin|demo)$</xccdf:set-value>
 
     <!-- Neutral banner instead of the U.S. Government consent text.
          *_text is the regex the check uses, *_contents the text the remediation writes. -->
@@ -76,5 +76,8 @@
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_var_log" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_var_log_audit" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_partition_for_var_tmp" selected="true"/>
+    <!-- SSH is open only to the k3s nodes, in their own zone (provisioning step 7); the check wants it in the
+         default zone, open to every source (hardening/stig/README.md). -->
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_firewalld_sshd_port_enabled" selected="false"/>
   </xccdf:Profile>
 </xccdf:Tailoring>

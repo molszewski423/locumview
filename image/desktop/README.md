@@ -86,9 +86,11 @@ On the desktop, `locumview-provision.service` (`/usr/libexec/locumview/provision
 5. Ignores DNS servers from IPv6 router advertisements (changelog #15).
 5b. Registers with Red Hat if the seed has an activation key. `locumview-flatpaks.service` runs after provisioning: registered desktops get Red Hat's Firefox ESR through the image's preinstall declaration (`redhat-flatpak-preinstall-firefox`, as the RHEL installer does on a conventional install); others get Mozilla's Firefox from Flathub.
 6. Joins IdM with the one-time password, then selects `custom/hardening` again (with `with-faillock`, `without-nullok`, `with-sudo`, `with-mkhomedir`), because `ipa-client-install` switches to the stock `sssd` profile.
+6b. Puts back the STIG settings that enrollment and first boot change: `GSSAPIAuthentication no` in `ipa-client-install`'s sshd drop-in, `offline_credentials_expiration = 1` in the `sssd.conf` it rewrites, and the SSH host keys (created at first boot) as `root:root` 0600 (changelog #59).
 7. Opens RDP, SSH and Cockpit to the k3s nodes only (`locumview-gateways` zone).
 8. Starts the user's always-on headless session with user-mode GNOME Remote Desktop and its RDP credentials.
 9. Optionally sets up the demo user.
+10. Builds the AIDE database, last, after every other change (about 13 minutes on a test VM). The image's own database is in `/var`, which an installation does not carry over (changelog #59). After an image update, AIDE reports the new `/usr` until `aide --update`.
 
 With `UPDATE_IMAGE`, provisioning also makes the desktop track that image and accept only images from its repository signed with the key in `/usr/share/locumview/signing/cosign.pub` (a `sigstoreSigned` rule in `/etc/containers/policy.json`, sigstore attachments in `registries.d`, `bootc switch --enforce-container-sigpolicy`). The policy's default becomes `reject`, which bootc requires before it enforces signatures: Red Hat's registries keep their own signature rules, images already on the machine stay usable, and pulls from any other registry are refused on a desktop. CI signs in cosign's classic format (`.sig` tags), the one RHEL's container tools read. The switch takes effect at the next reboot. Updates are applied by an operator (`bootc upgrade`, then a planned reboot); the automatic update timer stays off, so a desktop never reboots under a clinician.
 

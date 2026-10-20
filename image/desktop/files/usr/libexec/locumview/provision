@@ -152,6 +152,32 @@ authselect select custom/hardening with-faillock without-nullok with-sudo with-m
   die "authselect: $(authselect current --raw)"
 systemctl enable --now oddjobd.service
 
+# 6b. STIG settings that enrollment and first boot change after the image's build-time remediation (found by
+#     the scan of a desktop rebuilt from a clean clone, changelog #59):
+#     - ipa-client-install writes GSSAPIAuthentication yes (04-ipa.conf). The STIG drop-in, read first, already
+#       wins, so sshd runs with it off; the file is made to agree (sshd_disable_gssapi_auth). Users reach the
+#       desktop over RDP through Guacamole, not over SSH with Kerberos.
+#     - ipa-client-install rewrites sssd.conf without offline_credentials_expiration (sssd_offline_cred_expiration).
+#     - sshd-keygen creates the host keys at first boot as root:ssh_keys; the STIG check accepts root:root 0600
+#       (file_permissions_sshd_private_key). Host-based authentication, which needs ssh_keys, is not used.
+log stig-after-enrollment
+sed -i 's/^GSSAPIAuthentication yes/GSSAPIAuthentication no/' /etc/ssh/sshd_config.d/04-ipa.conf 2>/dev/null || true
+python3 -I - <<'SSSD'
+import re
+p = "/etc/sssd/sssd.conf"
+s = open(p).read()
+if re.search(r"(?m)^\s*offline_credentials_expiration\s*=", s) is None:
+    if re.search(r"(?m)^\[pam\]\s*$", s):
+        s = re.sub(r"(?m)^\[pam\]\s*$", "[pam]\noffline_credentials_expiration = 1", s, count=1)
+    else:
+        s = s.rstrip("\n") + "\n\n[pam]\noffline_credentials_expiration = 1\n"
+    open(p, "w").write(s)
+SSSD
+sssctl config-check >/dev/null || die "sssd.conf: sssctl config-check failed"
+systemctl restart sssd.service
+for k in /etc/ssh/ssh_host_*_key; do [ -f "$k" ] && { chgrp root "$k"; chmod 0600 "$k"; }; done
+systemctl reload sshd.service || systemctl restart sshd.service
+
 # 7. Firewall: RDP (3389 GDM admin fallback, 3390 the user's session), SSH and Cockpit only from the k3s nodes,
 #    where guacd runs (same rules as packaging/remote-access/user-mode-root.sh).
 log firewall
@@ -232,6 +258,16 @@ PY
   printf 'docker:\n  %s:\n    use-sigstore-attachments: true\n' "$repo" > /etc/containers/registries.d/locumview.yaml
   bootc switch --enforce-container-sigpolicy "$UPDATE_IMAGE"
   bootc status --format humanreadable 2>/dev/null | grep -E "Staged|Booted|Image" | head -6 || true
+fi
+
+# 9c. AIDE baseline (aide_build_database). The image builds AIDE's database at build time, but it is in /var,
+#     which an installation does not carry over, so each desktop builds its own here, after every other step
+#     changed what it will change. Takes several minutes. After an image update, AIDE reports the new /usr
+#     until the database is rebuilt (aide --update), part of applying an update.
+log aide
+if [ ! -s /var/lib/aide/aide.db.gz ]; then
+  aide --init >/dev/null
+  mv -f /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
 fi
 
 # 10. Done: mark it, and eject the seed (the operator deletes its copy once it sees the tray open).

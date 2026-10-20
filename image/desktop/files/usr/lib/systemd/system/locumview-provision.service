@@ -1,5 +1,5 @@
 [Unit]
-Description=LocumView: first-boot provisioning from the seed disk (hostname check, LUKS keys, IdM, RDP)
+Description=LocumView: first-boot provisioning from the seed disk (hostname check, LUKS keys, IdM, RDP, AIDE baseline)
 Documentation=file:///usr/libexec/locumview/provision
 # Runs once: until it succeeds, on every boot (the seed stays attached on failure).
 ConditionPathExists=!/var/lib/locumview/provisioned
@@ -12,7 +12,7 @@ After=network-online.target cloud-init.service firewalld.service gdm.service
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/libexec/locumview/provision
-TimeoutStartSec=30min
+TimeoutStartSec=60min
 # Progress and any failure also on the console, where the operator sees it without logging in.
 StandardOutput=journal+console
 StandardError=journal+console
