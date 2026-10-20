@@ -18,7 +18,8 @@ resource "random_password" "enroll" {
 resource "freeipa_host" "desktop" {
   name         = local.fqdn
   description  = "LocumView desktop (OpenTofu, terraform/modules/libvirt-desktop)"
-  force        = true # no DNS record: desktops take their address from DHCP
+  force        = true # no DNS record yet: the desktop registers its own at enrollment (--enable-dns-updates)
+  update_dns   = true # and on destroy its records are removed with the host
   userpassword = random_password.enroll.result
 
   lifecycle {
@@ -192,6 +193,41 @@ resource "terraform_data" "provisioned" {
       LV_SEED_TARGET = local.seed_target
       LV_SEED_VOLUME = libvirt_volume.seed.name
       LV_TIMEOUT_MIN = tostring(var.provision_timeout_minutes)
+    }
+  }
+}
+
+# --- Guacamole connection ----------------------------------------------------------------------------------------
+# By host name: the desktop registers itself in IdM DNS at enrollment, and the cluster resolves that zone.
+resource "terraform_data" "guacamole" {
+  count = var.guacamole == null ? 0 : 1
+
+  # Read by the destroy-time provisioner, which can only use self. Nothing secret here.
+  input = {
+    name       = var.name
+    kubeconfig = var.guacamole.kubeconfig
+    scripts    = abspath("${path.module}/../../../k8s/locumview/guacamole")
+  }
+  triggers_replace = [terraform_data.provisioned.id, var.guacamole.groups]
+
+  provisioner "local-exec" {
+    command     = "${self.input.scripts}/upsert-desktop-connection.sh ${var.name} - ${join(" ", var.guacamole.groups)}"
+    interpreter = ["bash", "-c"]
+    environment = {
+      KUBECONFIG        = var.guacamole.kubeconfig
+      GUAC_HOSTNAME     = local.fqdn
+      GUAC_PORT         = "3390"
+      GUAC_RDP_USER     = var.secrets.rdp_user
+      GUAC_RDP_PASSWORD = var.secrets.rdp_password
+    }
+  }
+
+  provisioner "local-exec" {
+    when        = destroy
+    command     = "${self.input.scripts}/delete-desktop-connection.sh ${self.input.name}"
+    interpreter = ["bash", "-c"]
+    environment = {
+      KUBECONFIG = self.input.kubeconfig
     }
   }
 }

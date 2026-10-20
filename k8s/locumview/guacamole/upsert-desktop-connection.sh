@@ -3,10 +3,18 @@
 #   k8s/locumview/guacamole/upsert-desktop-connection.sh <connection-name> <secret.sops.yaml> <user-group>...
 # The secret is decrypted in memory and sent to psql on stdin as \set lines: credentials never appear in
 # arguments, files or output. Permissions: READ for each listed Guacamole user group (others are revoked).
+# With "-" instead of a secret file, the values come from the environment (GUAC_HOSTNAME, GUAC_PORT,
+# GUAC_RDP_USER, GUAC_RDP_PASSWORD): how the OpenTofu desktop module calls it (ADR 0013). kubectl uses KUBECONFIG,
+# so the scoped operator account (k8s/locumview/operator.yaml) is enough.
 set -euo pipefail
-NAME=${1:?connection name}; SECRET=${2:?secret file}; shift 2
+NAME=${1:?connection name}; SECRET=${2:?secret file, or - for the environment}; shift 2
 [ $# -ge 1 ] || { echo "give at least one user group"; exit 1; }
-x() { sops -d --extract "[\"stringData\"][\"$1\"]" "$SECRET"; }
+if [ "$SECRET" = - ]; then
+  x() { case $1 in hostname) printf %s "${GUAC_HOSTNAME:?}" ;; port) printf %s "${GUAC_PORT:?}" ;;
+        rdp-username) printf %s "${GUAC_RDP_USER:?}" ;; rdp-password) printf %s "${GUAC_RDP_PASSWORD:?}" ;; esac; }
+else
+  x() { sops -d --extract "[\"stringData\"][\"$1\"]" "$SECRET"; }
+fi
 q() { printf "%s" "$1" | sed "s/'/''/g"; }   # SQL literal escaping for \set values
 groups_sql=$(printf "'%s'," "$@"); groups_sql=${groups_sql%,}
 {

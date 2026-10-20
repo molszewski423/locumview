@@ -21,6 +21,11 @@ module "desktop" {
   k3s_node_cidrs = var.k3s_node_cidrs
   dns_ip         = var.dns_ip
 
+  guacamole = var.guacamole_kubeconfig == "" ? null : {
+    kubeconfig = var.guacamole_kubeconfig
+    groups     = each.value.guacamole_groups
+  }
+
   secrets = {
     lvadmin_password         = data.sops_file.desktop[each.key].data["lvadmin_password"]
     grub_password            = data.sops_file.desktop[each.key].data["grub_password"]

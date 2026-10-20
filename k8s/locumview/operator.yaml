@@ -1,0 +1,48 @@
+# Scoped operator access (ROADMAP housekeeping "scoped kubeconfig for operators"; ADR 0013): the OpenTofu desktop
+# module writes each desktop's Guacamole connection with psql in the Guacamole database pod, and needs nothing
+# else in the cluster. This account can read that one pod and exec into it; no other pod, secret or namespace.
+# The token is minted into the Secret below; build an operator kubeconfig from it with
+# terraform/node1/operator-kubeconfig.sh (on a machine with cluster-admin), never commit the result.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: locumview-operator
+  namespace: locumview
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: locumview-operator-token
+  namespace: locumview
+  annotations:
+    kubernetes.io/service-account.name: locumview-operator
+type: kubernetes.io/service-account-token
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: locumview-operator
+  namespace: locumview
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    resourceNames: ["guacamole-db-0"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    resourceNames: ["guacamole-db-0"]
+    verbs: ["create", "get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: locumview-operator
+  namespace: locumview
+subjects:
+  - kind: ServiceAccount
+    name: locumview-operator
+    namespace: locumview
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: locumview-operator

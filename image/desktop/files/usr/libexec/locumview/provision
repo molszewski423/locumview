@@ -111,8 +111,10 @@ getent hosts "$IDM_SERVER" >/dev/null || die "cannot resolve $IDM_SERVER"
 log idm
 if [ ! -f /etc/ipa/default.conf ]; then
   [ -n "$IDM_OTP" ] || die "provision.env: IDM_OTP is empty and the desktop is not enrolled"
+  # --enable-dns-updates: the desktop registers its own address in IdM DNS (SSSD keeps it current when DHCP
+  # changes it), so the Guacamole connection and administrators use the host name, never a leased address.
   ipa-client-install --unattended --domain="$IDM_DOMAIN" --realm="$IDM_REALM" --server="$IDM_SERVER" \
-    --hostname="$LV_FQDN" --password="$IDM_OTP" --mkhomedir --no-ntp
+    --hostname="$LV_FQDN" --password="$IDM_OTP" --mkhomedir --no-ntp --enable-dns-updates
 fi
 unset IDM_OTP
 # The image's features (hardening/stig, oscap-im) are with-faillock and without-nullok.

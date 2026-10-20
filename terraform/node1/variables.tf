@@ -46,14 +46,21 @@ variable "idm_ca_certificate" {
 }
 
 variable "ipa_username" {
-  description = "IdM account allowed to add and delete hosts and host group members."
+  description = "IdM account for OpenTofu: role \"LocumView desktop provisioning\" (hosts and host groups only)."
   type        = string
-  default     = "admin"
+  default     = "svc-opentofu"
 }
 
 variable "ipa_password" {
-  type      = string
-  sensitive = true
+  description = "From idm.sops.yaml via ./tofu.sh."
+  type        = string
+  sensitive   = true
+}
+
+variable "guacamole_kubeconfig" {
+  description = "Kubeconfig for the scoped operator account (operator-kubeconfig.sh); empty: no Guacamole connections."
+  type        = string
+  default     = ""
 }
 
 variable "k3s_node_cidrs" {
@@ -67,9 +74,10 @@ variable "dns_ip" {
 # Desktops: desktops.auto.tfvars. Secrets per desktop: desktops/<name>.sops.yaml (./new-desktop-secrets.sh).
 variable "desktops" {
   type = map(object({
-    user       = string
-    memory_mib = optional(number, 6144)
-    vcpus      = optional(number, 4)
+    user             = string
+    memory_mib       = optional(number, 6144)
+    vcpus            = optional(number, 4)
+    guacamole_groups = optional(list(string), ["locumview-admins"])
   }))
   default = {}
 }
