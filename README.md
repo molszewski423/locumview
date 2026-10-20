@@ -20,9 +20,9 @@ Website: [locumview.com](https://locumview.com) · Sign in: [login.locumview.com
 - CI that re-runs every check on each push.
 
 **Not done yet (version one)**
-- The desktop builds and boots as a bootc image (`image/desktop/`), but provisioning it from a clean clone is not written yet ([ADR 0007](docs/adr/0007-desktop-containerization-bootc.md)). Until then the quick start below covers the access layer, and the running desktop is the hand-built one.
+- The desktop builds as a bootc image (`image/desktop/`) and installs and provisions itself from an ISO: LUKS on the vTPM, IdM, RDP (changelog #53). Still open: SOPS files per desktop, the Guacamole connection, registry and signing, and the destroy-and-rebuild proof ([ADR 0007](docs/adr/0007-desktop-containerization-bootc.md)). The running reference desktop is still the hand-built one, and the quick start below covers the access layer.
 - No FIPS mode on the desktop: RDP sign-in to GNOME Remote Desktop needs NTLM, which FIPS mode disables ([ADR 0012](docs/adr/0012-fips-mode-and-remote-display.md)).
-- Data at rest is not encrypted (see the HIPAA mapping).
+- Data at rest: desktops installed from the bootc image are encrypted (LUKS on the vTPM); the hand-built reference desktop, the cluster nodes and the databases are not yet (see the HIPAA mapping).
 
 The full build history, with every command and its evidence, is in [notes/phase1-changelog.md](notes/phase1-changelog.md) and [docs/evidence/](docs/evidence/).
 
@@ -62,7 +62,7 @@ The container-based hooks need `docker` (or podman with its `docker` shim).
 
 ## HIPAA technical safeguards
 
-Each technical safeguard of 45 CFR 164.312 is mapped to the control that addresses it and the evidence in this repository in [docs/hipaa-technical-safeguards.md](docs/hipaa-technical-safeguards.md). In short: access control, emergency access, authentication and transmission security are met; audit controls are partly met (no central log collection or session recording yet); **encryption at rest is a gap** (planned with the bootc image). HIPAA compliance itself belongs to the organization running the platform.
+Each technical safeguard of 45 CFR 164.312 is mapped to the control that addresses it and the evidence in this repository in [docs/hipaa-technical-safeguards.md](docs/hipaa-technical-safeguards.md). In short: access control, emergency access, authentication and transmission security are met; audit controls are partly met (no central log collection or session recording yet); encryption at rest is partly met (desktops installed from the bootc image are encrypted; **the cluster nodes, the databases and the hand-built reference desktop are not yet**). HIPAA compliance itself belongs to the organization running the platform.
 
 ## Architecture decisions
 

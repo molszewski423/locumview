@@ -1,6 +1,6 @@
 # LocumView desktop image (bootc)
 
-Version-one item 1 (ADR 0007, ADR 0009): the desktop built as a RHEL 10 image-mode (bootc) container image from a Containerfile, and provisioned from a clean clone with zero manual steps. **Status: builds, boots (UEFI Secure Boot, vTPM, the STIG's separate file systems) and updates in place with `bootc upgrade`; provisioning code not written yet.** No FIPS mode (ADR 0012). This directory replaces, step by step, the scripts the hand-built reference desktop was made with (build log #11 to #36, then `hardening/stig/apply-stig.sh`).
+Version-one item 1 (ADR 0007, ADR 0009): the desktop built as a RHEL 10 image-mode (bootc) container image from a Containerfile, and provisioned from a clean clone with zero manual steps. **Status: builds, boots (UEFI Secure Boot, vTPM, the STIG's separate file systems), updates in place with `bootc upgrade`, and installs and provisions itself from an ISO with no manual steps on the VM (changelog #53).** No FIPS mode (ADR 0012). This directory replaces, step by step, the scripts the hand-built reference desktop was made with (build log #11 to #36, then `hardening/stig/apply-stig.sh`).
 
 ## What goes where
 
@@ -72,6 +72,6 @@ Every step is safe to repeat; the service runs on each boot until it succeeds. W
 3. ~~Check FIPS with RDP sign-in.~~ Done: fails, so no FIPS mode (ADR 0012).
 
 Findings for the provisioning layout: `/var/tmp` needs more than 2 GiB (bootc unpacks local image archives there); the libvirt NAT network needed a host firewall rule on node1 for DHCP and DNS.
-4. Provisioning code: disk layout with the separate file systems and LUKS on the vTPM; firewall and demo fence from site values; IdM enrollment, RDP credentials and break-glass passwords from SOPS. Check that `ipa-client-install` keeps the STIG's authselect profile (`custom/hardening` with `with-sudo`) instead of selecting `sssd` again.
+4. ~~Provisioning code.~~ Done (changelog #53): installer ISO, first-boot provisioning, `hypervisor/new-desktop.sh`. Left: SOPS file per desktop and the Guacamole connection upsert in the operator script; system-mode RDP on 3389 for the GDM sign-in; GNOME Remote Desktop's credential store (key file, it cannot use the vTPM).
 5. Registry (Gitea's container registry), signing (cosign) and an SBOM (syft); CI builds the image.
 6. Proof: destroy the desktop, rebuild it from a clean clone, rerun the STIG and HIPAA scans.

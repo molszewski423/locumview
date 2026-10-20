@@ -19,7 +19,9 @@ BIB=registry.redhat.io/rhel10/bootc-image-builder:10.2@sha256:ceb3f1329b4849b46b
 U=${SUDO_USER:?run with sudo from your own account}
 UID_=$(id -u "$U")
 [[ $EUID -eq 0 ]] || { echo "run with sudo"; exit 1; }
-WORK=$(mktemp -d -p /var/tmp locumview-iso.XXXXXX)
+# Big scratch space (the image archive, osbuild's store, the ISO tree) goes next to the output ISO, not on /var/tmp:
+# the root file system filled up during an ISO build (2026-10-20).
+WORK=$(mktemp -d -p "$(dirname "$OUT_ISO")" locumview-iso.XXXXXX)
 ENT=""
 cleanup() {
   if [ -n "$ENT" ] && [ -d "$ENT/pki/consumer" ]; then
@@ -29,12 +31,15 @@ cleanup() {
   fi
   [ -n "$ENT" ] && rm -rf "$ENT"
   rm -rf "$WORK"
+  # Root's copy of the image is only for this build: drop it, and untagged copies from earlier builds.
+  podman rmi -f "$IMG" >/dev/null 2>&1 || true
+  podman image prune -f >/dev/null 2>&1 || true
 }
 trap cleanup EXIT
 chmod 700 "$WORK"
 
 echo "== copy $IMG into root's container storage =="
-SAVE=$(runuser -u "$U" -- mktemp -d -p /var/tmp locumview-img.XXXXXX)   # the invoking user's own directory
+SAVE=$(runuser -u "$U" -- mktemp -d -p "$(getent passwd "$U" | cut -d: -f6)" .locumview-img.XXXXXX)   # the user's own, on /home
 runuser -u "$U" -- podman save -q --format oci-archive -o "$SAVE/img.tar" "$IMG"
 podman load -q -i "$SAVE/img.tar"; rm -rf "$SAVE"
 
@@ -67,9 +72,9 @@ unset PASS
 chmod 600 "$WORK/config.toml"
 
 echo "== bootc-image-builder: anaconda-iso =="
-install -d -m 700 "$WORK/output"
+install -d -m 700 "$WORK/output" "$WORK/store"
 podman run --rm --privileged --pull=never --security-opt label=type:unconfined_t \
-  -v "$WORK/config.toml:/config.toml:ro" -v "$WORK/output:/output" \
+  -v "$WORK/config.toml:/config.toml:ro" -v "$WORK/output:/output" -v "$WORK/store:/store" \
   -v /var/lib/containers/storage:/var/lib/containers/storage "${SECRETS[@]}" \
   "$BIB" --type anaconda-iso --use-librepo=True "$IMG"
 install -m 600 "$WORK/output/bootiso/install.iso" "$OUT_ISO"
