@@ -1,0 +1,169 @@
+#!/bin/bash
+# LocumView first-boot provisioning (version-one item 1). Run once by locumview-provision.service.
+#
+# Per-desktop values come from the NoCloud seed disk (label CIDATA) the operator attaches for the first boot,
+# file locumview/provision.env (KEY=VALUE lines, see image/desktop/README.md). cloud-init reads only the seed's
+# meta-data (hostname); this file is read here, straight from the read-only mount, so no secret is copied to
+# /var/lib/cloud or anywhere else on disk. On success the seed is ejected: the operator's signal that
+# provisioning finished. On failure it stays in, and the log is in the journal (journalctl -u
+# locumview-provision).
+#
+# Every step is safe to run again. Values are never echoed or traced.
+set -euo pipefail
+umask 077
+log() { echo "--- $*"; }
+die() { echo "FAILED: $*" >&2; exit 1; }
+LIBEXEC=/usr/libexec/locumview
+DONE=/var/lib/locumview/provisioned
+
+# 0. Read the seed.
+SEED=/run/locumview/seed
+dev=$(blkid -L cidata 2>/dev/null || blkid -L CIDATA 2>/dev/null) || die "no seed disk (label CIDATA)"
+install -d -m 0700 /run/locumview "$SEED"
+mountpoint -q "$SEED" || mount -o ro,nosuid,nodev,noexec "$dev" "$SEED"
+ENV_FILE=$SEED/locumview/provision.env
+[ -f "$ENV_FILE" ] || die "seed has no locumview/provision.env"
+KEYS=" LV_FQDN IDM_DOMAIN IDM_REALM IDM_SERVER IDM_OTP LVADMIN_PASSWORD GRUB_PASSWORD LUKS_RECOVERY_PASSPHRASE"
+KEYS+=" K3S_NODE_CIDRS DNS_IP DESKTOP_USER DESKTOP_RDP_USER DESKTOP_RDP_PASSWORD DEMO_RDP_USER DEMO_RDP_PASSWORD "
+for k in $KEYS; do declare "$k="; done
+# Parsed, not sourced: only the listed keys, values taken literally.
+while IFS= read -r line || [ -n "$line" ]; do
+  case $line in ''|'#'*) continue ;; esac
+  k=${line%%=*}; v=${line#*=}
+  case $KEYS in *" $k "*) printf -v "$k" '%s' "$v" ;; *) die "unknown key in provision.env: $k" ;; esac
+done < "$ENV_FILE"
+umount "$SEED"
+for k in LV_FQDN IDM_DOMAIN IDM_REALM IDM_SERVER LVADMIN_PASSWORD GRUB_PASSWORD LUKS_RECOVERY_PASSPHRASE \
+         K3S_NODE_CIDRS DNS_IP DESKTOP_USER DESKTOP_RDP_USER DESKTOP_RDP_PASSWORD; do
+  [ -n "${!k}" ] || die "provision.env: $k is empty"
+done
+
+# 1. Hostname: set by cloud-init from the seed's meta-data. Checked here, because IdM enrollment depends on it.
+log hostname
+[ "$(hostname)" = "$LV_FQDN" ] || hostnamectl set-hostname "$LV_FQDN"
+[ "$(hostname)" = "$LV_FQDN" ] || die "hostname is $(hostname), expected $LV_FQDN"
+
+# 2. Disk encryption. The installer bound the LUKS volume to the vTPM with a one-time passphrase that is in the
+#    installer ISO's kickstart. Add the recovery passphrase (kept in SOPS by the operator), then remove every key
+#    slot except the vTPM's and the recovery one, so the installer passphrase opens nothing.
+log luks
+# vTPM dictionary-attack limits (also set by the kickstart): the TPM default (3 failures, 1000 s each to expire)
+# counts every unclean shutdown as a failure, and a locked-out TPM cannot unseal the disk key at boot.
+tpm2_dictionarylockout --clear-lockout
+tpm2_dictionarylockout --setup-parameters --max-tries=32 --recovery-time=300 --lockout-recovery-time=300
+luks=$(blkid -t TYPE=crypto_LUKS -o device | head -n 1)
+[ -n "$luks" ] || die "no LUKS device"
+cslot=$(clevis luks list -d "$luks" | awk -F: '/tpm2/{print $1; exit}')
+[ -n "$cslot" ] || die "LUKS volume not bound to the TPM"
+ckey=$(clevis luks pass -d "$luks" -s "$cslot")
+# Which slot a passphrase opens (empty if none: cryptsetup then exits 2, which must not end the script under
+# pipefail). Key material goes through /dev/fd pipes from printf, a bash builtin, so it never appears in a
+# process's arguments.
+slot_of() { { cryptsetup open --test-passphrase -v --key-file <(printf '%s' "$1") "$luks" 2>/dev/null || true; } |
+            sed -n 's/^Key slot \([0-9]*\) unlocked\.$/\1/p'; }
+rslot=$(slot_of "$LUKS_RECOVERY_PASSPHRASE")
+if [ -z "$rslot" ]; then
+  cryptsetup luksAddKey --key-file <(printf '%s' "$ckey") "$luks" <(printf '%s' "$LUKS_RECOVERY_PASSPHRASE")
+  rslot=$(slot_of "$LUKS_RECOVERY_PASSPHRASE")
+  [ -n "$rslot" ] || die "recovery passphrase was not added"
+fi
+for s in $(cryptsetup luksDump "$luks" | sed -n 's/^  \([0-9]*\): luks2$/\1/p'); do
+  [ "$s" = "$cslot" ] || [ "$s" = "$rslot" ] || cryptsetup luksKillSlot -q --key-file <(printf '%s' "$ckey") "$luks" "$s"
+done
+[ "$(slot_of "$ckey")" = "$cslot" ] || die "vTPM key no longer opens the volume"
+echo "key slots: $(cryptsetup luksDump "$luks" | sed -n 's/^  \([0-9]*\): luks2$/\1/p' | tr '\n' ' ')(vTPM $cslot, recovery $rslot)"
+unset ckey LUKS_RECOVERY_PASSPHRASE
+
+# 3. Break-glass local administrator (outside IdM; docs/break-glass.md). chpasswd hashes with the STIG's settings.
+log lvadmin
+id lvadmin >/dev/null 2>&1 || useradd -m -c "LocumView break-glass admin (local)" -G wheel lvadmin
+printf 'lvadmin:%s\n' "$LVADMIN_PASSWORD" | chpasswd
+unset LVADMIN_PASSWORD
+
+# 4. GRUB password, superuser lvgrub (grub2_password, grub2_admin_username). bootc boots from bootupd's static
+#    /boot/grub2/grub.cfg, whose users block names the superuser root and reads the hash from user.cfg
+#    (as grub2-setpassword writes it); the name is changed in place. bootupd does not rewrite grub.cfg on image
+#    upgrades; after a `bootupctl update` that migrates it, run this script's GRUB step again.
+log grub
+hash=$(printf '%s\n%s\n' "$GRUB_PASSWORD" "$GRUB_PASSWORD" | grub2-mkpasswd-pbkdf2 | sed -n 's/.* is \(grub\.pbkdf2\..*\)$/\1/p')
+[ -n "$hash" ] || die "grub2-mkpasswd-pbkdf2 gave no hash"
+unset GRUB_PASSWORD
+install -m 0600 /dev/null /boot/grub2/user.cfg
+echo "GRUB2_PASSWORD=$hash" > /boot/grub2/user.cfg
+sed -i -e 's/^\(\s*set superusers=\)"root"$/\1"lvgrub"/' -e 's/^\(\s*password_pbkdf2\) root /\1 lvgrub /' /boot/grub2/grub.cfg
+grep -q '^\s*set superusers="lvgrub"$' /boot/grub2/grub.cfg || die "grub.cfg has no superusers line to change"
+grep -q '^\s*password_pbkdf2 lvgrub ' /boot/grub2/grub.cfg || die "grub.cfg has no password_pbkdf2 line to change"
+
+# 5. DNS from DHCPv4 only: router advertisements can add resolvers that do not know the IdM domain (changelog #15).
+log dns
+C=$(nmcli -t -f NAME,DEVICE con show --active | awk -F: '$2 ~ /^(enp|eth)/{print $1; exit}')
+[ -n "$C" ] || die "no active wired connection"
+if [ "$(nmcli -g ipv6.ignore-auto-dns con show "$C")" != yes ]; then
+  nmcli con mod "$C" ipv6.ignore-auto-dns yes
+  nmcli con up "$C" >/dev/null
+fi
+for _ in $(seq 30); do getent hosts "$IDM_SERVER" >/dev/null && break; sleep 2; done
+getent hosts "$IDM_SERVER" >/dev/null || die "cannot resolve $IDM_SERVER"
+
+# 6. Join IdM with the one-time host password (the operator ran `ipa host-add --random`; no admin credentials
+#    on the desktop). ipa-client-install selects the stock sssd authselect profile; put back the STIG's
+#    custom/hardening with its features, plus sudo rules and home directories from IdM.
+log idm
+if [ ! -f /etc/ipa/default.conf ]; then
+  [ -n "$IDM_OTP" ] || die "provision.env: IDM_OTP is empty and the desktop is not enrolled"
+  ipa-client-install --unattended --domain="$IDM_DOMAIN" --realm="$IDM_REALM" --server="$IDM_SERVER" \
+    --hostname="$LV_FQDN" --password="$IDM_OTP" --mkhomedir --no-ntp
+fi
+unset IDM_OTP
+# The image's features (hardening/stig, oscap-im) are with-faillock and without-nullok.
+authselect select custom/hardening with-faillock without-nullok with-sudo with-mkhomedir --force
+[ "$(authselect current --raw)" = "custom/hardening with-faillock without-nullok with-sudo with-mkhomedir" ] ||
+  die "authselect: $(authselect current --raw)"
+systemctl enable --now oddjobd.service
+
+# 7. Firewall: RDP (3389 GDM admin fallback, 3390 the user's session), SSH and Cockpit only from the k3s nodes,
+#    where guacd runs (same rules as packaging/remote-access/user-mode-root.sh).
+log firewall
+ZONE=locumview-gateways
+firewall-cmd --permanent --get-zones | tr ' ' '\n' | grep -qx "$ZONE" || firewall-cmd --permanent --new-zone="$ZONE"
+for src in $K3S_NODE_CIDRS; do firewall-cmd --permanent --zone="$ZONE" --add-source="$src" >/dev/null; done
+firewall-cmd --permanent --zone="$ZONE" --add-port=3389/tcp --add-port=3390/tcp >/dev/null
+firewall-cmd --permanent --zone="$ZONE" --add-service=ssh --add-service=cockpit >/dev/null
+for svc in rdp ssh cockpit; do firewall-cmd --permanent --zone=public --remove-service="$svc" >/dev/null || true; done
+firewall-cmd --reload >/dev/null
+firewall-cmd --zone="$ZONE" --list-all
+
+# 8. The desktop's user (an IdM account): an always-on headless GNOME session with user-mode GNOME Remote
+#    Desktop on 3390 and its own RDP credentials, which only guacd uses (changelog #19).
+log desktop-user
+for _ in $(seq 30); do id "$DESKTOP_USER" >/dev/null 2>&1 && break; sss_cache -E || true; sleep 2; done
+id "$DESKTOP_USER" >/dev/null || die "IdM user $DESKTOP_USER not found"
+home=$(getent passwd "$DESKTOP_USER" | cut -d: -f6)
+[ -d "$home" ] || { mkhomedir_helper "$DESKTOP_USER" 0077; restorecon -R "$home"; }
+systemctl enable --now "gnome-headless-session@$DESKTOP_USER.service"
+uidn=$(id -u "$DESKTOP_USER")
+for _ in $(seq 60); do [ -S "/run/user/$uidn/bus" ] && break; sleep 2; done
+[ -S "/run/user/$uidn/bus" ] || die "no session bus for $DESKTOP_USER"
+as_user() { runuser -u "$1" -- env XDG_RUNTIME_DIR="/run/user/$2" DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$2/bus" "${@:3}"; }
+printf '%s\n%s\n' "$DESKTOP_RDP_USER" "$DESKTOP_RDP_PASSWORD" |
+  as_user "$DESKTOP_USER" "$uidn" bash "$LIBEXEC/remote-access/user-mode-user.sh"
+unset DESKTOP_RDP_PASSWORD
+as_user "$DESKTOP_USER" "$uidn" systemctl --user restart gnome-remote-desktop-headless.service
+for _ in $(seq 30); do grep -q ':3390 ' <(ss -ltn) && break; sleep 2; done
+grep -q ':3390 ' <(ss -ltn) || die "nothing listens on 3390"
+
+# 9. Optional demo (guest) desktop: local user demo on 3391 with the egress fence (changelog #22).
+if [ -n "$DEMO_RDP_USER" ]; then
+  log demo
+  cred=/run/locumview/demo-rdp
+  printf '%s\n%s\n' "$DEMO_RDP_USER" "$DEMO_RDP_PASSWORD" > "$cred"
+  unset DEMO_RDP_PASSWORD
+  LV_DEMO_CRED=$cred DNS_IP=$DNS_IP bash "$LIBEXEC/remote-access/demo-user-root.sh"
+fi
+
+# 10. Done: mark it, and eject the seed (the operator deletes its copy once it sees the tray open).
+log finish
+install -d -m 0755 /var/lib/locumview
+date -Is > "$DONE"
+eject "$dev" || echo "could not eject the seed; detach it from the host"
+echo "PROVISIONED $LV_FQDN"

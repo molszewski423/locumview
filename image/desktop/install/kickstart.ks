@@ -10,6 +10,9 @@
 # %post binds the volume to the vTPM (clevis, PCR 7 = Secure Boot state), so it unlocks without a prompt; first
 # boot adds the desktop's recovery passphrase from SOPS and removes this one.
 text
+# A text install would otherwise set the installed system's default target to multi-user (no GDM, no headless
+# sessions); found on lv-test01.
+xconfig --startxonboot
 lang en_US.UTF-8
 keyboard us
 timezone America/New_York --utc
@@ -35,6 +38,10 @@ reboot
 set -euo pipefail
 dev=$(blkid -t TYPE=crypto_LUKS -o device | head -n 1)
 [ -n "$dev" ] || { echo "no LUKS device found"; exit 1; }
+# vTPM dictionary-attack limits: the default (3 failures, 1000 s each to expire) counts every unclean shutdown
+# as a failure, so three forced stops lock the TPM and the disk asks for a passphrase (lv-test01).
+tpm2_dictionarylockout --clear-lockout
+tpm2_dictionarylockout --setup-parameters --max-tries=32 --recovery-time=300 --lockout-recovery-time=300
 printf '%s' '@LUKS_INSTALL_PASSPHRASE@' | clevis luks bind -y -k - -d "$dev" tpm2 '{"pcr_ids":"7"}'
 clevis luks list -d "$dev"
 %end

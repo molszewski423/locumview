@@ -33,6 +33,38 @@ podman build --secret id=rhsm,src=$HOME/.config/locumview/rhsm.env \
   -f image/desktop/Containerfile -t <registry>/locumview/desktop:dev .
 ```
 
+## Installing and provisioning
+
+`install/build-installer-iso.sh` (root) turns the image into an installer ISO: Anaconda with `install/kickstart.ks`, which lays out the STIG's separate file systems on LVM inside LUKS2 and binds the LUKS volume to the TPM (clevis, PCR 7), so the desktop unlocks at boot with no prompt. The kickstart holds a random one-time LUKS passphrase made for each ISO build, so the ISO is kept private (mode 0600) and first-boot provisioning removes that key slot.
+
+`hypervisor/new-desktop.sh <name>` (node1, group libvirt) installs a desktop from that ISO with a NoCloud seed disk attached and waits for first boot to finish. The per-desktop values come on its stdin, one `KEY=VALUE` per line, normally straight from SOPS:
+
+| Key | What it is |
+|---|---|
+| `LV_FQDN` | Host name in the IdM domain (cloud-init sets it from the seed's meta-data) |
+| `IDM_DOMAIN`, `IDM_REALM`, `IDM_SERVER` | The IdM domain, realm and server |
+| `IDM_OTP` | One-time enrollment password from `ipa host-add <fqdn> --random` (not kept in SOPS) |
+| `LVADMIN_PASSWORD` | Break-glass local administrator `lvadmin` |
+| `GRUB_PASSWORD` | GRUB superuser `lvgrub` |
+| `LUKS_RECOVERY_PASSPHRASE` | The disk's recovery passphrase, used if the TPM cannot unlock it |
+| `K3S_NODE_CIDRS`, `DNS_IP` | Sources allowed to reach RDP, SSH and Cockpit (the k3s nodes); the DNS server the demo fence allows |
+| `DESKTOP_USER`, `DESKTOP_RDP_USER`, `DESKTOP_RDP_PASSWORD` | The desktop's IdM user and the RDP credentials guacd uses for that user's session (port 3390) |
+| `DEMO_RDP_USER`, `DEMO_RDP_PASSWORD` | Optional: the demo (guest) session on 3391, with the egress fence |
+
+On the desktop, `locumview-provision.service` (`/usr/libexec/locumview/provision`) reads that file straight from the read-only seed (cloud-init only reads the hostname, so no secret is copied to `/var/lib/cloud`) and, once:
+
+1. Checks the hostname.
+2. Sets the vTPM's dictionary-attack limits (32 failures, each expiring after 5 minutes; also set by the kickstart), adds the recovery passphrase to LUKS and removes every key slot except the TPM's and the recovery one. The TPM default (3 failures, about 17 minutes each) counts every unclean shutdown as a failure: three forced stops locked a test desktop's TPM, and it asked for the disk passphrase at boot.
+3. Creates `lvadmin` (in `wheel`).
+4. Sets the GRUB password with superuser `lvgrub`. bootc boots from bootupd's static `/boot/grub2/grub.cfg`, whose users block names `root`; the name is changed in place.
+5. Ignores DNS servers from IPv6 router advertisements (changelog #15).
+6. Joins IdM with the one-time password, then selects `custom/hardening` again (with `with-faillock`, `without-nullok`, `with-sudo`, `with-mkhomedir`), because `ipa-client-install` switches to the stock `sssd` profile.
+7. Opens RDP, SSH and Cockpit to the k3s nodes only (`locumview-gateways` zone).
+8. Starts the user's always-on headless session with user-mode GNOME Remote Desktop and its RDP credentials.
+9. Optionally sets up the demo user.
+
+Every step is safe to repeat; the service runs on each boot until it succeeds. When it succeeds it ejects the seed, which is the script's signal to detach and wipe it. On failure the seed stays attached: `journalctl -u locumview-provision` on the desktop.
+
 ## Open (in order)
 
 1. ~~First build; pin the base image by digest.~~ Done (changelog #51). Left: clear the `bootc container lint` warnings (content in `/var` from the package and authselect steps).

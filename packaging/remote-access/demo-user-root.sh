@@ -2,13 +2,14 @@
 # LocumView demo/guest desktop on the reference VM (changelog #22). Run as root on the desktop VM:
 #   sudo bash demo-user-root.sh        (expects ~molszewski/.locumview-demo-rdp: 2 lines, RDP user + password,
 #                                       staged by the operator from SOPS; shredded here after use)
+# In the bootc image, first-boot provisioning runs it with LV_DEMO_CRED and DNS_IP set (no site.env).
 # Creates local user "demo": same system-wide desktop as everyone (branding, apps, extensions), its own
 # headless GNOME session with user-mode GNOME Remote Desktop on port 3391; no sudo, locked password,
 # no screen lock, and an egress fence (nftables, by uid): internet yes, home LAN / cluster / VPN ranges no.
 set -euo pipefail
 SITE=${SITE_ENV:-$(cd "$(dirname "$0")/.." && pwd)/site.env}; [ -f "$SITE" ] && . "$SITE"   # see site.env.example
 U=demo PORT=3391 DNS=${DNS_IP:?set DNS_IP in site.env}
-CRED=/home/molszewski/.locumview-demo-rdp
+CRED=${LV_DEMO_CRED:-/home/molszewski/.locumview-demo-rdp}
 HERE=$(cd "$(dirname "$0")" && pwd)
 [ "$(id -u)" = 0 ] || { echo "run as root"; exit 1; }
 [ -s "$CRED" ] || { echo "missing $CRED"; exit 1; }
