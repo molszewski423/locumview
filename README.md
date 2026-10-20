@@ -58,7 +58,7 @@ The container-based hooks need `docker` (or podman with its `docker` shim).
 5. Configure Keycloak and Guacamole with the idempotent scripts, each documented in its header: `keycloak/configure-realm.sh`, `keycloak/create-user.sh`, `guacamole/upsert-desktop-connection.sh`, and `keycloak/configure-idm-federation.sh` if you use IdM.
 6. Without a Cloudflare tunnel, reach Guacamole and Keycloak with `kubectl port-forward`.
 
-**The desktop** is built today by the documented scripts in `packaging/` (desktop, remote access, IdM enrollment), in the order of [the build log](notes/phase1-changelog.md) entries #11 to #36, then hardened with `hardening/stig/apply-stig.sh`. Version-one item 1 replaces all of this with one bootc image built from a Containerfile.
+**The desktop** is built today by the documented scripts in `packaging/` (desktop, remote access, IdM enrollment), in the order of [the build log](notes/phase1-changelog.md) entries #11 to #36, then hardened with `hardening/stig/apply-stig.sh` (the SSG Ansible playbook). Its replacement already works: the bootc image (`image/desktop/`) hardened at build time, installed and provisioned by OpenTofu (`terraform/`) with no manual steps (changelog #51 to #55). The live reference desktop moves to it once version-one item 1 is done.
 
 ## HIPAA technical safeguards
 
@@ -121,7 +121,6 @@ Horizon is now owned by Omnissa after Broadcom divested VMware's end-user comput
 - `docs/adr/`: architecture decisions. `docs/evidence/`: compliance evidence and worklogs. `docs/user-guide/`: end-user help. `docs/hipaa-technical-safeguards.md`: the HIPAA mapping.
 - `.gitea/workflows/`: CI.
 - `terraform/`: OpenTofu (ADR 0013): the libvirt desktop module and the node1 root configuration.
-- `ansible/`: not populated; the desktop is configured by its image and first-boot provisioning instead.
 
 ## License
 

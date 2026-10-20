@@ -5,7 +5,8 @@
 # Creates user svc-opentofu (no login anywhere: no HBAC rule includes it) in role "LocumView desktop
 # provisioning" with only the Host Administrators, Host Group Administrators and DNS Administrators privileges,
 # with a random password that goes straight into idm.sops.yaml and to the server on stdin (never printed, never
-# in plain text on disk). Also turns on dynamic DNS updates for the zone, so desktops register themselves.
+# in plain text on disk). Also turns on dynamic DNS updates for the zone, so desktops register themselves, and
+# sets its negative-caching time to 60 seconds.
 set -euo pipefail
 cd "$(dirname "$0")"
 IDM=${1:?usage: idm-account.sh <ssh-user>@<idm-server>}
@@ -44,7 +45,10 @@ r ipa role-show "$ROLE" | grep -E 'Role name|Privileges|Member users'
 
 echo "== dynamic DNS updates for $ZONE =="
 r ipa dnszone-mod "$ZONE" --dynamic-update=TRUE >/dev/null 2>&1 || true
-r ipa dnszone-show "$ZONE" | grep -i 'Dynamic update'
+# Negative-caching time (SOA minimum) 60 s instead of 3600: a desktop's name is looked up (NXDOMAIN) just before
+# it registers itself, and resolvers in front of IdM would otherwise keep that answer for an hour (lv-test04).
+r ipa dnszone-mod "$ZONE" --setattr=idnssoaminimum=60 >/dev/null 2>&1 || true
+r ipa dnszone-show "$ZONE" --all | grep -i -E 'Dynamic update|SOA minimum'
 
 echo "== leftover test host =="
 r ipa host-del lv-test01.corp.locumview.com --updatedns >/dev/null 2>&1 && echo "lv-test01 removed" || echo "lv-test01: not there"

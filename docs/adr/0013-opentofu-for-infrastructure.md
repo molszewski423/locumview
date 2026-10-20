@@ -32,5 +32,6 @@ What remained by hand or by script is everything around the image: the VM itself
 
 - The platform ladder of ADR 0009 keeps its shape: bootc-image-builder turns the same image into a qcow2 or an AMI, and only the OpenTofu module changes per target (libvirt now; Proxmox and AWS later).
 - Losing the state passphrase means losing the state, not the desktops: they keep running, and resources can be imported again.
-- The FreeIPA provider currently signs in as an IdM administrator, typed in at each run. A dedicated IdM account limited to host and host group administration is a follow-up.
+- The FreeIPA provider signs in as `svc-opentofu`, an IdM account in the role "LocumView desktop provisioning" with only the Host Administrators, Host Group Administrators and DNS Administrators privileges (DNS so that destroy can remove a desktop's records; broader than ideal, narrowed when needed). Its password is in SOPS; no HBAC rule includes it, so it can log in nowhere (`terraform/node1/idm-account.sh`, changelog #55).
+- The Guacamole connection is written through the existing SQL script with a cluster account that can only exec into the Guacamole database pod (`k8s/locumview/operator.yaml`), not through the community Guacamole provider, which has had no release since 2023.
 - Provider quirks found on the first run are recorded in the module: disks referenced by path (AppArmor on Debian hosts), the seed volume's reported format ignored, enrollment-time changes to the IdM host ignored.

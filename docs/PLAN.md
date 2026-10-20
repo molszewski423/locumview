@@ -95,7 +95,7 @@ See [README.md](../README.md) for the Horizon comparison table.
 
 **Phase 0, Foundations:**
 - [x] Developer subscription active
-- [x] Repo layout: terraform/, ansible/roles/, packaging/, docs/adr/, docs/evidence/, notes/
+- [x] Repo layout: terraform/, ansible/roles/, packaging/, docs/adr/, docs/evidence/, notes/ (ansible/roles/ removed unused on 2026-10-20: the desktop is an image, ADR 0007; Ansible for the hosts is planned with Phase 6)
 - [x] Pre-commit: ansible-lint, detect-secrets, gitleaks (podman, pinned by digest), tflint (podman, pinned by digest, no-ops until terraform/ has content). `terraform fmt`/`tofu fmt` deferred until the Terraform vs OpenTofu ADR lands. See [notes/phase1-changelog.md](../notes/phase1-changelog.md).
   - Local hooks are bypassable with `git commit --no-verify`; they are convenience, not enforcement. The same checks must also run in CI (Gitea Actions) once it exists.
 - [x] Secrets: SOPS + age for Kubernetes (ADR 0003, changelog #16); Ansible Vault for Phase 3 Ansible-only secrets. Nothing sensitive in plain text, ever
@@ -131,7 +131,7 @@ Everything below is optional until version one ships.
 
 **Phase 5, Other distributions:** SUSE / openSUSE from the same desktop definition with equivalent hardening (in progress, not shipped), Debian later. Originally "cross-distro Ansible roles"; the desktop is now an image, so this is a build per distribution, not role branching.
 
-**Phase 6, On-premises hypervisors and Kubernetes:** Proxmox VE as the practical production target and KubeVirt on k3s as the scoped learning piece (ADR 0009), each with its own OpenTofu module over the same signed image (ADR 0013); GitOps (a merged pull request creates a desktop); Prometheus/Grafana. Set VM memory limits first (ADR 0010).
+**Phase 6, On-premises hypervisors and Kubernetes:** Proxmox VE as the practical production target and KubeVirt on k3s as the scoped learning piece (ADR 0009), each with its own OpenTofu module over the same signed image (ADR 0013); GitOps (a merged pull request creates a desktop); Prometheus/Grafana. Set VM memory limits first (ADR 0010). Host configuration (bridge, nftables, libvirt, k3s prerequisites on node1 and node2, then Proxmox hosts) as an Ansible role, replacing the shell scripts in hypervisor/.
 
 **Phase 7, Public and sovereign cloud:** AWS alongside SAA-C03: budget alarm first; VPC with private subnets; no public IPs; IAM roles; encrypted remote OpenTofu state; the image as an AMI from bootc-image-builder; destroy after every session. Check Red Hat Cloud Access before using RHEL (pay-as-you-go RHEL adds hourly cost). European-owned clouds later.
 

@@ -7,7 +7,9 @@ repos:
         # development machines have. Use the system python3 instead: 3.12 on RHEL 10.2,
         # 3.13 on openSUSE Leap 16 (dev-laptop-1), Fedora's current version on the laptop.
         language_version: python3
-        files: ^ansible/.*\.(yml|yaml)$
+        # The project's Ansible content is the STIG playbook support for the hand-built reference desktop; the
+        # desktop itself is an image (ADR 0007) and the infrastructure OpenTofu (ADR 0013).
+        files: ^hardening/.*\.(yml|yaml)$
 
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.5.0
