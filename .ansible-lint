@@ -3,3 +3,5 @@
 # Kubernetes manifests get their own validation (kubeconform) when the first workload lands.
 exclude_paths:
   - k8s/
+  # OpenTofu configuration and its SOPS files (ADR 0013), not Ansible content.
+  - terraform/

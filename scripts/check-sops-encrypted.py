@@ -3,7 +3,8 @@
 
 detect-secrets skips *.sops.yaml (encrypted values are false positives), so this check makes sure
 such a file can't hold plain text: each document needs a `sops:` metadata block with an age
-recipient, and every value under data/stringData must be an ENC[AES256_GCM,...] string.
+recipient, and every value under data/stringData must be an ENC[AES256_GCM,...] string. Files that are not
+Kubernetes manifests (no data/stringData, e.g. terraform/) must have every top-level value encrypted.
 """
 import sys
 
@@ -22,10 +23,16 @@ def check(path):
         if not isinstance(meta, dict) or not meta.get("age"):
             errors.append(f"{where}: no sops metadata with an age recipient; encrypt with `sops --encrypt --in-place`")
             continue
-        for section in ("data", "stringData"):
-            for key, value in (doc.get(section) or {}).items():
-                if not (isinstance(value, str) and value.startswith("ENC[AES256_GCM,")):
-                    errors.append(f"{where}: {section}.{key} is not encrypted")
+        sections = [s for s in ("data", "stringData") if s in doc]
+        if sections:
+            items = [(f"{s}.{k}", v) for s in sections for k, v in (doc.get(s) or {}).items()]
+        else:
+            items = [(k, v) for k, v in doc.items() if k != "sops"]
+            if not items:
+                errors.append(f"{where}: no values")
+        for key, value in items:
+            if not (isinstance(value, str) and value.startswith("ENC[AES256_GCM,")):
+                errors.append(f"{where}: {key} is not encrypted")
     return errors
 
 
