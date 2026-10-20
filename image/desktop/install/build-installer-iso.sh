@@ -2,8 +2,10 @@
 # Build the LocumView installer ISO: bootc-image-builder's Anaconda ISO with the desktop image embedded and
 # kickstart.ks. Root is needed for bootc-image-builder. Run on the build host:
 #   sudo image/desktop/install/build-installer-iso.sh <image> <output.iso>
-# The image is copied from the invoking user's podman storage; the registry login for the builder image is
-# reused from that user's podman. The LUKS installer passphrase is random, used only inside this ISO, and
+# <image> is either a signed image in the registry by digest (git.lan/mike/locumview-desktop@sha256:..., from CI),
+# which is verified with cosign against image/desktop/signing/cosign.pub before anything else and refused if the
+# signature does not check out, or a local image name for development. The image is copied from the invoking
+# user's podman storage; the registry logins are reused from that user's podman. The LUKS installer passphrase is random, used only inside this ISO, and
 # replaced at each desktop's first boot.
 #
 # The installer is built from RHEL packages, so the builder needs RHEL repositories. A subscribed RHEL host
@@ -37,6 +39,24 @@ cleanup() {
 }
 trap cleanup EXIT
 chmod 700 "$WORK"
+
+if [[ $IMG == *@sha256:* ]]; then
+  echo "== verify the signature of $IMG =="
+  HOME_U=$(getent passwd "$U" | cut -d: -f6)
+  COSIGN=$(command -v cosign || true); [ -n "$COSIGN" ] || COSIGN="$HOME_U/.local/bin/cosign"
+  [ -x "$COSIGN" ] || { echo "cosign not found"; exit 1; }
+  DCFG=$(runuser -u "$U" -- mktemp -d)
+  runuser -u "$U" -- ln -s "/run/user/$UID_/containers/auth.json" "$DCFG/config.json"
+  runuser -u "$U" -- env DOCKER_CONFIG="$DCFG" "$COSIGN" verify --key "$HERE/../signing/cosign.pub" --insecure-ignore-tlog \
+    "$IMG" >/dev/null || { rm -rf "$DCFG"; echo "SIGNATURE CHECK FAILED: not building from $IMG"; exit 1; }
+  rm -rf "$DCFG"
+  echo "signature verified"
+  runuser -u "$U" -- podman pull -q "$IMG" >/dev/null
+  # A digest reference does not survive save and load; give the verified image a local name.
+  LOCAL="localhost/locumview/desktop:iso-$(echo "${IMG##*@sha256:}" | cut -c1-12)"
+  runuser -u "$U" -- podman tag "$IMG" "$LOCAL"
+  IMG=$LOCAL
+fi
 
 echo "== copy $IMG into root's container storage =="
 SAVE=$(runuser -u "$U" -- mktemp -d -p "$(getent passwd "$U" | cut -d: -f6)" .locumview-img.XXXXXX)   # the user's own, on /home
