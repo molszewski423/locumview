@@ -13,7 +13,8 @@ while IFS=: read -r uuid type; do
   changed=1
 done < <(nmcli -t -f UUID,TYPE connection show)
 if [ "$changed" = 1 ]; then
+  # An if, not "[ ] &&": a false test on the last device (often loopback) would be the script's exit status (#61).
   while IFS=: read -r dev type; do
-    [ "$type" = ethernet ] && nmcli device reapply "$dev" >/dev/null && echo "reapplied $dev"
+    if [ "$type" = ethernet ]; then nmcli device reapply "$dev" >/dev/null && echo "reapplied $dev"; fi
   done < <(nmcli -t -f DEVICE,TYPE device status)
 fi
