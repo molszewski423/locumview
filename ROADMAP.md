@@ -1,6 +1,6 @@
 # LocumView roadmap
 
-Status as of 2026-10-20. Labels: **Done** (built and verified), **Open** (version-one work not finished), **In progress** (work has started outside version one, not finished or shipped), **Planned** (after version one, or alongside it only if it doesn't delay it), **Parked** (deliberately not pursued for now). The build log ([notes/phase1-changelog.md](notes/phase1-changelog.md)) and [docs/PLAN.md](docs/PLAN.md) hold the detail.
+Status as of 2026-10-21. Labels: **Done** (built and verified), **Open** (version-one work not finished), **In progress** (work has started outside version one, not finished or shipped), **Planned** (after version one, or alongside it only if it doesn't delay it), **Parked** (deliberately not pursued for now). The build log ([notes/phase1-changelog.md](notes/phase1-changelog.md)) and [docs/PLAN.md](docs/PLAN.md) hold the detail.
 
 ## Version one (scope locked by ADR 0009)
 
@@ -25,6 +25,8 @@ Status as of 2026-10-20. Labels: **Done** (built and verified), **Open** (versio
 
 ## Planned after version one
 
+Order after version one: move the live demo to an image-built desktop; Phase 4 (packaging and supply chain); Phase 9 lite (clinical AI demo, ADR 0017); Phase 8 lite (demo video and first write-ups); Phase 7 (AWS, alongside SAA-C03). Phase 5 (SUSE) keeps running in parallel. The phases are described in [docs/PLAN.md](docs/PLAN.md).
+
 | Area | Item | Status | Reference |
 |---|---|---|---|
 | Identity | Red Hat IdM directory (`corp.locumview.com`, first server on node1), Keycloak federation, organizational login on desktops; Keycloak stays the MFA authority | **Built** 2026-10-05, ahead of version one by owner decision (#32 to #36): idm01, read-only federation, owner's account in IdM, reference desktop enrolled (GNOME login, lock screen, sudo via IdM), nightly encrypted backups. Open: replica on node2, password policy, backup alerting | ADR 0006 |
@@ -36,6 +38,7 @@ Status as of 2026-10-20. Labels: **Done** (built and verified), **Open** (versio
 | Desktop | Browser baseline (ADR 0016): Google Chrome for web EHRs in the image, managed policies following the DISA Chrome STIG, a default EHR launcher, Firefox ESR policies following the DISA Firefox STIG; an audit of Chrome's outbound traffic, published | **Built** 2026-10-20 (changelog #60): with the EHR launcher open for 15 minutes no DNS query or HTTPS connection left the desktop (docs/evidence/browser/). Open: a 24-hour capture (Safe Browsing), egress rules on the desktop firewall | ADR 0016 |
 | Desktop | Image signing (cosign), SBOMs (syft), registry and build pipeline | **Built** (changelog #57); desktops accept only signed images (changelog #58) | ADR 0007 |
 | Desktop | Organization-set desktop layout (Mac, Windows or GNOME style), locked centrally | Built; Mac style and lock verified, Windows/GNOME not exercised | changelog #25, #28 |
+| Desktop | The live demo (login.locumview.com) on an image-built desktop, replacing the hand-built reference desktop | Planned | First step after version one |
 | Desktop | Separate, resettable demo desktop | Planned | First KubeVirt workload |
 | Hypervisors | Proxmox VE (practical production target) | Planned | ADR 0007, 0009 |
 | Hypervisors | A dedicated desktop network (own subnet or VLAN); guacd's RDP egress narrowed from the LAN to it | Planned | With Proxmox (Phase 6); today guacd may reach RDP ports on the LAN (changelog #55) |
@@ -44,7 +47,7 @@ Status as of 2026-10-20. Labels: **Done** (built and verified), **Open** (versio
 | Hypervisors | Public or sovereign cloud (AWS alongside SAA-C03) | Planned | ADR 0009 |
 | Integrations | Nextcloud (files) via Keycloak OIDC, as a reference integration | Planned | ADR 0009 |
 | Integrations | Synthetic FHIR server, Matrix messaging | Planned | ADR 0009 |
-| Clinical AI | Detachable clinical AI module (US first, FDA CDS design principles), antimicrobial stewardship as the lead agent | Planned | ADR 0008 |
+| Clinical AI | Detachable clinical AI module (US only, FDA CDS design principles): one web app in the hardened Chrome, launched from the desktop and as a SMART on FHIR app from the EHR; deterministic rules flag, a local model explains; Antimicrobial Stewardship, IV to PO and ADE Monitoring queues. First, Phase 9 lite: a clinical AI demo on OpenEMR with synthetic patients, showing a stewardship and an IV to PO finding; then the full Phase 9 | Planned | ADR 0008, 0017 |
 | Distributions | SUSE / openSUSE build from the same definitions | **In progress, not shipped** | Infrastructure work has begun and runs largely in parallel with the RHEL build; not supported or shipped yet |
 | Distributions | Debian build from the same definitions | Planned | |
 

@@ -1,6 +1,6 @@
 # LocumView Plan
 
-Owner: Michael Olszewski. Status (2026-10-20): Phases 1, 2 and 3 complete: version one done 2026-10-20, and Phase 3's browser baseline the same day (ROADMAP.md has the current state).
+Owner: Michael Olszewski. Status (2026-10-21): Phases 1, 2 and 3 complete: version one done 2026-10-20, and Phase 3's browser baseline the same day. Next: the live demo moves to an image-built desktop, then Phase 4 and Phase 9 lite (ROADMAP.md has the current state).
 
 LocumView is an open-source virtual desktop platform built on RHEL 10. It provisions hardened GNOME desktops with Terraform and Ansible, delivers them through the browser via Apache Guacamole behind Keycloak SSO and MFA, and never exposes a desktop directly to the internet. Every environment must be rebuildable identically from the repository. Beyond the base desktop, it is a platform for research and local LLM usage in regulated environments: desktops can carry agentic tooling and generative and agentic applications (clinical and research tooling to start) built on local models, so no regulated data leaves the endpoint, with the tooling layer customizable for any regulated workflow. It is a portfolio project aimed at solutions architecture and platform engineering roles, with Red Hat as a target employer.
 
@@ -129,6 +129,8 @@ Everything below is optional until version one ships.
 
 **Phase 4, Packaging and supply chain:** signed images (cosign) and SBOMs (syft) verified before promotion; LocumView's own pieces (extensions, branding, tour) as mock-built signed RPMs via COPR; Fedora/EPEL packages for missing dependencies (FHIR libraries); an OpenSCAP scan attached to every image release. (RHEL image mode, once a stretch goal here, became the version-one desktop: ADR 0007.)
 
+**Phase 9 lite, Clinical AI demo** (planned, right after Phase 4; ADR 0017): the first slice of the clinical AI module (ADR 0008, US only). One web app (React, Vite, TypeScript, FHIR R4 types) served from k3s behind Keycloak and opened in the hardened Chrome (ADR 0016) in app mode, from a launcher with its own icon baked into the image and pinned in the locked layout; the managed Chrome policies allow the app's internal address. A home dashboard with a cross-module triage panel, module queues (Antimicrobial Stewardship, IV to PO, ADE Monitoring) and a patient view. A Python (FastAPI) agent service where deterministic rules decide what is flagged and a local model (Ollama) explains, with the reasoning and source data shown. OpenEMR as the mock EHR, loaded with Synthea patients and hand-built demo cases by an import script, launching the app as a SMART on FHIR app. Done when a pharmacist signs in at the LocumView desktop, opens the clinical app from its icon, launches it from an OpenEMR chart in patient context, and sees at least one stewardship and one IV to PO finding with the agent's explanation, all running on synthetic data and local models. Portability tests against the Epic and Oracle Health (Cerner) sandboxes follow once OpenEMR works; MEDITECH's Greenfield Workspace later, pending approval.
+
 **Phase 5, Other distributions:** SUSE / openSUSE from the same desktop definition with equivalent hardening (in progress, not shipped), Debian later. Originally "cross-distro Ansible roles"; the desktop is now an image, so this is a build per distribution, not role branching.
 
 **Phase 6, On-premises hypervisors and Kubernetes:** Proxmox VE as the practical production target and KubeVirt on k3s as the scoped learning piece (ADR 0009), each with its own OpenTofu module over the same signed image (ADR 0013); GitOps (a merged pull request creates a desktop); Prometheus/Grafana. Set VM memory limits first (ADR 0010). Host configuration (bridge, nftables, libvirt, k3s prerequisites on node1 and node2, then Proxmox hosts) as an Ansible role, replacing the shell scripts in hypervisor/.
@@ -137,7 +139,9 @@ Everything below is optional until version one ships.
 
 **Phase 8, Documentation and portfolio:** README, diagram and HIPAA mapping (done with version one); 3 to 5 minute demo video; per-phase write-ups; architecture notes and platform documentation.
 
-Sequencing: Phases 0 to 3 in order, then Phase 8 lite, then Phase 7 alongside AWS SAA-C03 study, then Phases 4 and 6, then Phase 5 last or never.
+**Phase 9, Clinical AI on synthetic EHR data** (planned, after Phase 9 lite): the full module on the stable platform: Synthea population plus 10 to 20 hand-built stewardship scenarios with expected answers; SMART on FHIR OAuth with scoped, revocable tokens; recommendations written back as FHIR Communication or Task resources; delivery to the provider queue, messaging and dashboard with a complete audit log; no PHI anywhere. ADRs 0008 and 0017.
+
+Sequencing (revised 2026-10-21): Phases 0 to 3 in order (version one, done 2026-10-20). Then: move the live demo to an image-built desktop; Phase 4; Phase 9 lite; Phase 8 lite; Phase 7 alongside AWS SAA-C03 study. Phases 6 and the full Phase 9 come after, once the platform is stable. Phase 5 (SUSE) runs in parallel and never delays the RHEL work. An Electron wrapper for the clinical app is optional and not on the roadmap (ADR 0017): LocumView's priority is the AI-native, hardened, integrated desktop, not delivery to Windows endpoints.
 
 ## 6. Follow-on ideas
 

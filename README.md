@@ -90,12 +90,15 @@ Each technical safeguard of 45 CFR 164.312 is mapped to the control that address
 | [0014](docs/adr/0014-gnome-desktop.md) | GNOME on Wayland as the desktop, reached through GNOME Remote Desktop; organization-set layouts |
 | [0015](docs/adr/0015-apache-guacamole-broker.md) | Apache Guacamole as the clientless browser broker in front of the desktops |
 | [0016](docs/adr/0016-browser-baseline.md) | Browser baseline: Firefox ESR as the system browser, hardened Google Chrome for web EHRs; the browser is a swappable slot |
+| [0017](docs/adr/0017-clinical-ai-workspace-architecture.md) | Clinical AI workspace (planned): one web app in the hardened Chrome, launched as a SMART on FHIR app; deterministic rules flag, a local model explains; OpenEMR with synthetic patients as the mock EHR |
 
 ## Where it is going
 
 Beyond the base desktop, LocumView is meant to host research tooling and local LLM applications inside regulated environments, so regulated data never leaves the boundary. The desktop, hardening and delivery path stay the same; only the application layer changes. Clinical and life sciences come first because of the author's domain expertise; the same pattern applies to other regulated domains.
 
 LocumView **integrates rather than bundles**: it works with the identity provider, directory, file storage and clinical systems an organization already runs, through open standards. The homelab instances (Keycloak, IdM, Nextcloud, a synthetic FHIR server) demonstrate those integrations; they are not product components. Clinical decision support is a detachable module: outside version one, and outside the initial EU product, which needs medical-device certification for it ([ADR 0008](docs/adr/0008-eu-regulatory-posture.md)).
+
+Planned next, in order: the live demo moves to an image-built desktop; packaging and supply chain (Phase 4); a clinical AI demo on synthetic data and local models (Phase 9 lite, [ADR 0017](docs/adr/0017-clinical-ai-workspace-architecture.md)); a demo video and write-ups (Phase 8 lite); then AWS (Phase 7). None of the clinical AI work is built yet.
 
 These are plans, listed with their status in [ROADMAP.md](ROADMAP.md).
 
