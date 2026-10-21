@@ -101,7 +101,7 @@ These are plans, listed with their status in [ROADMAP.md](ROADMAP.md).
 
 ## Vision
 
-In healthcare, a locum clinician steps in wherever care is needed, ready to work on day one. LocumView applies that idea to infrastructure: a trusted, compliant workspace that appears wherever an authorized user signs in, and disappears cleanly when the work is done. The aim is to show that the capabilities of commercial VDI suites like VMware Horizon (originally VMware View) can be delivered with open, auditable, reproducible tooling.
+In healthcare, a locum clinician steps in wherever care is needed, ready to work on day one. LocumView applies that idea to infrastructure: a trusted, hardened workspace that appears wherever an authorized user signs in, and disappears cleanly when the work is done. The aim is to show that the capabilities of commercial VDI suites like VMware Horizon (originally VMware View) can be delivered with open, auditable, reproducible tooling.
 
 ## Why I built it
 
