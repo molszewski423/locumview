@@ -1,6 +1,6 @@
 # HIPAA technical safeguards: how LocumView maps to 45 CFR 164.312
 
-Version-one item 5 (ADR 0009). This maps each technical safeguard of the HIPAA Security Rule to what the LocumView reference deployment does today, with the evidence in this repository and the gaps stated plainly. Status as of 2026-10-19.
+Version-one item 5 (ADR 0009). This maps each technical safeguard of the HIPAA Security Rule to what the LocumView reference deployment does today, with the evidence in this repository and the gaps stated plainly. Status as of 2026-10-20.
 
 **What this is not.** HIPAA compliance belongs to an organization, not to software: it also needs the administrative and physical safeguards (164.308, 164.310), risk analysis, policies, training and business associate agreements. LocumView can make the technical safeguards easier to meet and to evidence; it cannot make anyone compliant. The public demo holds no PHI and must not be used with PHI.
 
@@ -23,14 +23,15 @@ R = required implementation specification, A = addressable (implement it, or doc
 
 ## Scanner evidence
 
-`scap-security-guide` ships a HIPAA profile for RHEL 10, which checks system settings that support the safeguards above (it does not and cannot check the rest of this table). Results on the reference desktop:
+`scap-security-guide` ships a HIPAA profile for RHEL 10, which checks system settings that support the safeguards above (it does not and cannot check the rest of this table). Results on the reference desktop, and on a desktop built from the bootc image:
 
 | Scan | Pass | Fail | Report |
 |---|---|---|---|
 | 2026-10-17, before hardening | 38 | 121 | [docs/evidence/stig/20261017-baseline/](evidence/stig/20261017-baseline/) |
 | 2026-10-19, after the DISA STIG tailoring (changelog #47) | 120 | 39 | [docs/evidence/stig/20261019-hipaa/](evidence/stig/20261019-hipaa/) |
+| 2026-10-20, a desktop built from the bootc image from a clean clone (changelog #59) | 119 | 37 | [docs/evidence/stig/20261020-hipaa/](evidence/stig/20261020-hipaa/) |
 
-Most of the 39 remaining failures are rules the HIPAA profile has and the DISA STIG does not: more audit rules (time changes, `utmp`/`wtmp`/`btmp`, failed file creation and deletion, network configuration and SELinux policy changes) and a few settings (`sshd_disable_compression`, `sysctl_fs_suid_dumpable`, `sebool_selinuxuser_execstack`, `selinux_confinement_of_daemons`, `no_direct_root_logins`, removing the `telnet` client, `ensure_gpgcheck_repo_metadata`, `rpm_verify_permissions`). Remote logging (`rsyslog_remote_loghost`) is the same open item as in the STIG exceptions. These are open items, not exceptions: they have not been assessed one by one yet.
+Most of the remaining failures are rules the HIPAA profile has and the DISA STIG does not: more audit rules (time changes, `utmp`/`wtmp`/`btmp`, failed file creation and deletion, network configuration and SELinux policy changes) and a few settings (`sshd_disable_compression`, `sysctl_fs_suid_dumpable`, `sebool_selinuxuser_execstack`, `selinux_confinement_of_daemons`, `no_direct_root_logins`, removing the `telnet` client, `ensure_gpgcheck_repo_metadata`, `rpm_verify_permissions`). Remote logging (`rsyslog_remote_loghost`) is the same open item as in the STIG exceptions. These are open items, not exceptions: they have not been assessed one by one yet.
 
 ## Open items that would change this table
 
@@ -39,4 +40,4 @@ Most of the 39 remaining failures are rules the HIPAA profile has and the DISA S
 - Idle logout for the guest demo, and per-evaluator demo accounts with an expiry date.
 - IdM password policy (IdM users currently follow IdM's defaults).
 - WebAuthn / passkeys for staff.
-- The 39 rules the SSG HIPAA profile still fails: apply them through the tailoring or document each as an exception.
+- The rules the SSG HIPAA profile still fails (39 on the reference desktop; 37 on an image-built one, which has `/var/log/audit` on its own file system and passes `rpm_verify_permissions`): apply them through the tailoring or document each as an exception.

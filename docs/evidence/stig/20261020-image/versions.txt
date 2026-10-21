@@ -1,0 +1,2 @@
+openscap-scanner-1.4.4-1.el10_2.x86_64
+scap-security-guide-0.1.82-2.el10_2.noarch

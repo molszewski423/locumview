@@ -6,7 +6,7 @@ Website: [locumview.com](https://locumview.com) · Sign in: [login.locumview.com
 
 ## Status
 
-**Version one is not complete.** Its scope is locked by [ADR 0009](docs/adr/0009-v1-scope-integrate-dont-bundle.md); [ROADMAP.md](ROADMAP.md) has the live status of each item and what is planned after it.
+**Version one is complete** (2026-10-20): all five items in [ROADMAP.md](ROADMAP.md) are Done. Its scope is locked by [ADR 0009](docs/adr/0009-v1-scope-integrate-dont-bundle.md); [ROADMAP.md](ROADMAP.md) has the live status of each item and what is planned after it.
 
 **Live today**
 - A RHEL 10 GNOME desktop reached at login.locumview.com: Keycloak SSO with TOTP enforced, then straight onto the desktop (no second login screen).
@@ -18,9 +18,10 @@ Website: [locumview.com](https://locumview.com) · Sign in: [login.locumview.com
 - The reference desktop hardened to the DISA STIG with GUI profile: 417 OpenSCAP rules pass, and every rule not applied is documented ([hardening/stig/](hardening/stig/README.md)).
 - Encryption on every network hop, including WireGuard between cluster nodes.
 - CI that re-runs every check on each push.
+- The desktop as code: a bootc image built, signed (cosign) and attested (SBOM) by CI, installed from an ISO with LUKS on the vTPM, and provisioned by OpenTofu from a clean clone with zero manual steps (IdM, RDP, break-glass, the Guacamole connection, the Red Hat registration). Desktops accept only images signed with the project key. Destroyed and rebuilt from a clean clone, the rebuilt desktop passes the image STIG profile with 0 failures (405 rules, [docs/evidence/stig/20261020-image](docs/evidence/stig/20261020-image/)); changelog #51 to #59, [ADR 0007](docs/adr/0007-desktop-containerization-bootc.md).
 
-**Not done yet (version one)**
-- The desktop builds as a bootc image (`image/desktop/`) and installs and provisions itself from an ISO: LUKS on the vTPM, IdM, RDP (changelog #53). CI builds, signs and attests the image (changelog #57), and desktops accept only images signed with the project key (changelog #58). The destroy-and-rebuild proof from a clean clone passed (changelog #59); still open: the STIG scan of the rebuilt desktop ([ADR 0007](docs/adr/0007-desktop-containerization-bootc.md)). The running reference desktop is still the hand-built one, and the quick start below covers the access layer.
+**Known gaps**
+- The running reference desktop (the one login.locumview.com opens) is still the hand-built one; it moves to the bootc image next, and the quick start below covers the access layer.
 - No FIPS mode on the desktop: RDP sign-in to GNOME Remote Desktop needs NTLM, which FIPS mode disables ([ADR 0012](docs/adr/0012-fips-mode-and-remote-display.md)).
 - Data at rest: desktops installed from the bootc image are encrypted (LUKS on the vTPM); the hand-built reference desktop, the cluster nodes and the databases are not yet (see the HIPAA mapping).
 
@@ -58,7 +59,7 @@ The container-based hooks need `docker` (or podman with its `docker` shim).
 5. Configure Keycloak and Guacamole with the idempotent scripts, each documented in its header: `keycloak/configure-realm.sh`, `keycloak/create-user.sh`, `guacamole/upsert-desktop-connection.sh`, and `keycloak/configure-idm-federation.sh` if you use IdM.
 6. Without a Cloudflare tunnel, reach Guacamole and Keycloak with `kubectl port-forward`.
 
-**The desktop** is built today by the documented scripts in `packaging/` (desktop, remote access, IdM enrollment), in the order of [the build log](notes/phase1-changelog.md) entries #11 to #36, then hardened with `hardening/stig/apply-stig.sh` (the SSG Ansible playbook). Its replacement already works: the bootc image (`image/desktop/`) hardened at build time, installed and provisioned by OpenTofu (`terraform/`) with no manual steps (changelog #51 to #55). The live reference desktop moves to it once version-one item 1 is done.
+**The desktop** is built today by the documented scripts in `packaging/` (desktop, remote access, IdM enrollment), in the order of [the build log](notes/phase1-changelog.md) entries #11 to #36, then hardened with `hardening/stig/apply-stig.sh` (the SSG Ansible playbook). Its replacement is done: the bootc image (`image/desktop/`) hardened at build time, installed and provisioned by OpenTofu (`terraform/`) from a clean clone with no manual steps (changelog #51 to #59, how to run it in [image/desktop/README.md](image/desktop/README.md)). The live reference desktop moves to it next.
 
 ## HIPAA technical safeguards
 
@@ -109,7 +110,7 @@ After two decades as a critical care and infectious disease pharmacist, I've wor
 | Connection Server | Apache Guacamole | Live |
 | Blast / HTML Access | RDP via guacd, in the browser | Live |
 | Identity / MFA | Keycloak with TOTP; WebAuthn next | Live (TOTP) |
-| Instant-clone pools | bootc desktop images, provisioned per hypervisor | Planned (version one: one desktop) |
+| Instant-clone pools | bootc desktop images, provisioned per hypervisor by OpenTofu | One desktop per entry (version one); pools planned |
 
 Horizon is now owned by Omnissa after Broadcom divested VMware's end-user computing business. Horizon was originally named VMware View, which the LocumView name nods to.
 

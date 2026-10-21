@@ -104,5 +104,5 @@ Every step is safe to repeat; the service runs on each boot until it succeeds. W
 
 Findings for the provisioning layout: `/var/tmp` needs more than 2 GiB (bootc unpacks local image archives there); the libvirt NAT network needed a host firewall rule on node1 for DHCP and DNS.
 4. ~~Provisioning code.~~ Done (changelog #53): installer ISO, first-boot provisioning, `hypervisor/new-desktop.sh`. Left: SOPS file per desktop and the Guacamole connection upsert in the operator script; system-mode RDP on 3389 for the GDM sign-in; GNOME Remote Desktop's credential store (key file, it cannot use the vTPM).
-5. Registry (Gitea's container registry), signing (cosign) and an SBOM (syft); CI builds the image.
-6. Proof: destroy the desktop, rebuild it from a clean clone, rerun the STIG and HIPAA scans.
+5. ~~Registry (Gitea's container registry), signing (cosign) and an SBOM (syft); CI builds the image.~~ Done (changelog #57, #58): CI builds, signs and attests the image; desktops accept only images signed with the project key.
+6. ~~Proof: destroy the desktop, rebuild it from a clean clone, rerun the STIG and HIPAA scans.~~ Done (changelog #59): rebuilt from a clean clone and destroyed with nothing left behind; image STIG profile 405 pass / 0 fail, HIPAA 119 / 37 (docs/evidence/stig/20261020-image, 20261020-hipaa). Version-one item 1 is done.

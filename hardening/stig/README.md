@@ -66,5 +66,7 @@ Several SSG 0.1.82 remediations create the authselect profile `custom/hardening`
 | Baseline, 2026-10-17 | `hipaa` | 38 | 121 | same directory |
 | After remediation, 2026-10-19 | LocumView tailoring (before the two false-positive rules were deselected) | 417 | 2 | `docs/evidence/stig/20261019-tailored/` |
 | bootc image, booted, 2026-10-19 | image profile | 402 | 4 | `docs/evidence/stig/20261019-image/` (the 4: the GRUB password and superuser, set per desktop at provisioning; the test account and its files) |
+| Desktop rebuilt from a clean clone by OpenTofu, 2026-10-20 (lv-test12) | image profile | 400 | 6 | not committed; the 6 were settings that IdM enrollment and first boot change after the build, fixed in provisioning (changelog #59) |
+| The same, installed from an ISO with those fixes, 2026-10-20 (lv-test13) | image profile | 405 | 0 | `docs/evidence/stig/20261020-image/`; `hipaa` on the same desktop: 119 pass, 37 fail, `docs/evidence/stig/20261020-hipaa/` |
 
 The two remaining failures are the false positives above; with the current tailoring the result is 0 failures. Committed reports have the desktop's addresses replaced by placeholders. The full ARF result files (about 60 MB each) are not committed.
