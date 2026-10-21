@@ -31,6 +31,30 @@ RUN --mount=type=secret,id=rhsm --mount=type=bind,target=/src \
     rhsm_off; \
     systemctl set-default graphical.target
 
+# 1b. Google Chrome, the EHR browser (ADR 0016), from Google's RPM repository. The repository metadata and every
+#     package are checked against Google's signing key pinned in this repository (vendor-keys/README.md), whose
+#     primary fingerprint is checked first. The repository file is removed afterwards: Chrome updates arrive with
+#     the image (/opt is part of the read-only image); /etc/default/google-chrome stops Chrome's daily cron job from
+#     adding its repository back. Chrome's own menu entry is hidden through the override directory (no package
+#     file edited); the EHR launcher (step 3) opens it.
+RUN --mount=type=secret,id=rhsm --mount=type=bind,target=/src \
+    set -euo pipefail; \
+    install -m 0644 /src/image/desktop/vendor-keys/google-linux-signing-key.pub /etc/pki/rpm-gpg/RPM-GPG-KEY-google-linux; \
+    gpg --show-keys --with-colons /etc/pki/rpm-gpg/RPM-GPG-KEY-google-linux \
+        | grep -qx 'fpr:::::::::EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796:'; \
+    printf '%s\n' '[google-chrome]' 'name=Google Chrome' \
+        'baseurl=https://dl.google.com/linux/chrome/rpm/stable/x86_64' 'enabled=1' 'gpgcheck=1' 'repo_gpgcheck=1' \
+        'gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-google-linux' > /etc/yum.repos.d/google-chrome.repo; \
+    . /src/image/desktop/scripts/rhsm.sh; rhsm_on; \
+    dnf -y install google-chrome-stable; \
+    rhsm_off; \
+    rm -f /etc/yum.repos.d/google-chrome.repo; \
+    printf '%s\n' 'repo_add_once="false"' 'repo_reenable_on_distupgrade="false"' > /etc/default/google-chrome; \
+    install -d -m 0755 /usr/share/locumview/override/applications; \
+    sed '/^\[Desktop Entry\]/a NoDisplay=true' /usr/share/applications/google-chrome.desktop \
+        > /usr/share/locumview/override/applications/google-chrome.desktop; \
+    rpm -q google-chrome-stable
+
 # 2. The LocumView desktop: extensions, Papirus, branding, wallpapers, tour, system dconf defaults and the
 #    organization layout (mac, locked). Same script as the hand-built desktop, in image mode (installs to /usr).
 RUN --mount=type=bind,target=/src \
@@ -40,8 +64,9 @@ RUN --mount=type=bind,target=/src \
     rm -rf /tmp/packaging
 
 # 3. Image-only files: the XDG override, the always-on headless session drop-in, the faillock directory, the
-#    first-boot Flatpak installer and first-boot provisioning (with the remote-access scripts it runs), and the public
-#    key that image updates must be signed with (image/desktop/signing/cosign.pub). Modes are
+#    first-boot Flatpak installer and first-boot provisioning (with the remote-access scripts it runs), the public
+#    key that image updates must be signed with (image/desktop/signing/cosign.pub), and the browsers (ADR 0016):
+#    Chrome's managed policies and the EHR launcher, pinned in the dock (dconf), and Firefox's enterprise policies. Modes are
 #    normalized so the image does not depend on the builder's umask.
 RUN --mount=type=bind,target=/src \
     set -euo pipefail; \
@@ -50,7 +75,8 @@ RUN --mount=type=bind,target=/src \
     install -m 0755 /src/packaging/remote-access/user-mode-user.sh /src/packaging/remote-access/demo-user-root.sh \
         /usr/libexec/locumview/remote-access/; \
     install -D -m 0644 /src/image/desktop/signing/cosign.pub /usr/share/locumview/signing/cosign.pub; \
-    systemctl enable locumview-flatpaks.service locumview-provision.service
+    systemctl enable locumview-flatpaks.service locumview-provision.service; \
+    dconf update
 
 # 3b. Initramfs with clevis, so the LUKS volume unlocks with the vTPM at boot (the base image's initramfs has
 #     no clevis). The standard bootc pattern: one kernel in the image, rebuilt in place.

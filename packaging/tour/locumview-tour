@@ -62,13 +62,15 @@ STATIC_PAGES = [
 
 STYLE_NAMES = {"mac": "Mac style", "windows": "Windows style", "gnome": "GNOME style"}
 DOCK_TEXT = {
-    "mac": ("The dock", "Files, Calculator, ONLYOFFICE and Firefox are pinned in the dock at the bottom; the last button "
-            "shows every app. The dock steps aside when a window needs the room: move the pointer to the bottom "
-            "edge to bring it back."),
-    "windows": ("The taskbar", "Files, Calculator, ONLYOFFICE and Firefox are pinned in the taskbar along the bottom, "
-                "next to your open windows; the apps button shows everything else."),
+    "mac": ("The dock", "Files, Calculator, ONLYOFFICE and Firefox (and the EHR, where it is set up) are pinned in "
+            "the dock at the bottom; the last button shows every app. The dock steps aside when a window needs the "
+            "room: move the pointer to the bottom edge to bring it back."),
+    "windows": ("The taskbar", "Files, Calculator, ONLYOFFICE and Firefox (and the EHR, where it is set up) are "
+                "pinned in the taskbar along the bottom, next to your open windows; the apps button shows everything "
+                "else."),
     "gnome": ("The overview", "Click the LocumView logo at the top left to open the overview: your pinned apps "
-              "(Files, Calculator, ONLYOFFICE and Firefox) are in the dash, and the grid button shows every app."),
+              "(Files, Calculator, ONLYOFFICE, Firefox, and the EHR where it is set up) are in the dash, and the grid "
+              "button shows every app."),
 }
 LAYOUT_TEXT = {
     "mac": "the dock at the bottom and window buttons on the left",

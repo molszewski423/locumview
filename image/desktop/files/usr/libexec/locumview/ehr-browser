@@ -1,0 +1,8 @@
+#!/bin/sh
+# The EHR browser slot (ADR 0016): opens the organization's EHR in Google Chrome in app mode (one window, no
+# address bar). The address is EHR_URL in /etc/locumview/ehr.conf; Chrome's managed policies
+# (/etc/opt/chrome/policies/managed/) allow only the EHR's sites and apply the DISA Chrome STIG settings.
+EHR_URL=file:///usr/share/locumview/ehr/index.html
+# shellcheck source=/dev/null
+[ -r /etc/locumview/ehr.conf ] && . /etc/locumview/ehr.conf
+exec /usr/bin/google-chrome-stable --app="$EHR_URL" --class=locumview-ehr --no-first-run --no-default-browser-check "$@"

@@ -1,0 +1,42 @@
+{
+  "policies": {
+    "SSLVersionMin": "tls1.2",
+    "ExtensionUpdate": false,
+    "DisableFormHistory": true,
+    "PasswordManagerEnabled": false,
+    "OfferToSaveLogins": false,
+    "PopupBlocking": { "Default": true, "Locked": true },
+    "ExtensionSettings": { "*": { "installation_mode": "blocked" } },
+    "InstallAddonsPermission": { "Default": false },
+    "DisableTelemetry": true,
+    "DisableForgetButton": true,
+    "DisablePrivateBrowsing": true,
+    "SearchSuggestEnabled": false,
+    "NetworkPrediction": false,
+    "EnableTrackingProtection": { "Value": true, "Locked": true, "Cryptomining": true, "Fingerprinting": true },
+    "UserMessaging": { "ExtensionRecommendations": false, "FeatureRecommendations": false, "SkipOnboarding": true, "MoreFromMozilla": false, "Locked": true },
+    "FirefoxHome": { "TopSites": false, "SponsoredTopSites": false, "Highlights": false, "Pocket": false, "SponsoredPocket": false, "Snippets": false, "Locked": true },
+    "DNSOverHTTPS": { "Enabled": false, "Locked": true },
+    "DisableFirefoxAccounts": true,
+    "DisableFeedbackCommands": true,
+    "EncryptedMediaExtensions": { "Enabled": false, "Locked": true },
+    "SanitizeOnShutdown": { "Cache": false, "Cookies": false, "Downloads": false, "FormData": false, "History": false, "Sessions": false, "SiteSettings": false, "OfflineApps": false, "Locked": true },
+    "DisableFirefoxStudies": true,
+    "DisableDeveloperTools": true,
+    "Permissions": {
+      "Autoplay": { "Default": "block-audio-video", "Locked": true },
+      "Location": { "BlockNewRequests": true, "Locked": true },
+      "Notifications": { "BlockNewRequests": true, "Locked": true }
+    },
+    "DisablePocket": true,
+    "DontCheckDefaultBrowser": true,
+    "Preferences": {
+      "security.default_personal_cert": { "Value": "Ask Every Time", "Status": "locked" },
+      "browser.search.update": { "Value": false, "Status": "locked" },
+      "dom.disable_window_move_resize": { "Value": true, "Status": "locked" },
+      "dom.disable_window_flip": { "Value": true, "Status": "locked" },
+      "extensions.htmlaboutaddons.recommendations.enabled": { "Value": false, "Status": "locked" },
+      "security.ssl3.deprecated.rsa_des_ede3_sha": { "Value": false, "Status": "locked" }
+    }
+  }
+}

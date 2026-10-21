@@ -1,0 +1,4 @@
+# Image-built desktops: the EHR launcher (ADR 0016) pinned first. Overrides favorite-apps from
+# 10-locumview-branding (packaging/install-desktop.sh); keep the rest of the list the same as there.
+[org/gnome/shell]
+favorite-apps=['locumview-ehr.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Calculator.desktop', 'org.onlyoffice.desktopeditors.desktop', 'org.mozilla.firefox.desktop']

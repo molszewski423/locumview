@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=EHR
+GenericName=Electronic health record
+Comment=Open the organization's EHR
+Exec=/usr/libexec/locumview/ehr-browser
+Icon=google-chrome
+Terminal=false
+Categories=Network;WebBrowser;
+StartupWMClass=locumview-ehr
+StartupNotify=true
