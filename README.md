@@ -4,6 +4,10 @@ An open-source virtual desktop platform for regulated environments, built in the
 
 Website: [locumview.com](https://locumview.com) · Sign in: [login.locumview.com](https://login.locumview.com)
 
+## The problem
+
+Clinical desktops sit in front of patient data all day, yet they are often hand-built VDI images: assembled by one person, customized over time, and reproducible only by the person who made them. When an auditor asks "show me that this desktop was built the way you say it was", the answer is too often a screenshot and someone's memory. There is no signed image, no machine-readable evidence that the hardening was applied, and no way to rebuild the same desktop from scratch. LocumView closes that gap. Every desktop is a signed RHEL 10 image, built by CI and provisioned by OpenTofu from a clean clone with no manual steps, hardened to the DISA STIG with the OpenSCAP results committed beside the code, and reachable only through the browser behind single sign-on and MFA. The desktop is not just hardened, it is provably hardened, and it can be destroyed and rebuilt from the repository in about 20 minutes.
+
 ## Status
 
 **Version one is complete** (2026-10-20): all five items in [ROADMAP.md](ROADMAP.md) are Done. Its scope is locked by [ADR 0009](docs/adr/0009-v1-scope-integrate-dont-bundle.md); [ROADMAP.md](ROADMAP.md) has the live status of each item and what is planned after it.
