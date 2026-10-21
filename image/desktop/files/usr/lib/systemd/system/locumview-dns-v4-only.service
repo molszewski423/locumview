@@ -1,0 +1,11 @@
+[Unit]
+Description=LocumView: DNS from DHCPv4 only on every wired connection (no resolvers from router advertisements)
+After=NetworkManager.service
+Wants=NetworkManager.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/locumview/dns-v4-only
+
+[Install]
+WantedBy=multi-user.target

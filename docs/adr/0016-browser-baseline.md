@@ -17,6 +17,10 @@ A clinical workspace spends most of its time in a browser, and for a web-deliver
 - **Safe Browsing stays on at the standard level** (`SafeBrowsingProtectionLevel` = 1), because the STIG requires it (DTBC-0038). It is the one deliberate connection to Google: Chrome downloads Google's list of dangerous sites and checks partial hashes of URLs against it. A deployment that must have no Google traffic at all can set it to 0 and record a STIG exception.
 - **Proof, planned:** Chrome's outbound traffic is captured and audited with these policies in place, and the result is published in this repository. Until then the claim is a design goal, not a verified fact. Pitch line, once verified: "We use the browser your EHR vendor certifies, and we've verifiably cut it off from Google."
 
+## Implementation (2026-10-20, changelog #60)
+
+Built in the image: Chrome from Google's repository against a pinned key, the managed policies (`hardening/browser/README.md` maps each DISA check), the EHR launcher, and Firefox ESR's policies through the Flatpak's systemconfig extension. Measured on a desktop built from a clean clone: with the EHR launcher open for 15 minutes, no DNS query and no HTTPS connection left the desktop, while the same Chrome without the policies reached about ten Google services within 90 seconds (`docs/evidence/browser/20261020-chrome-egress.md`). Safe Browsing's updates were not seen in that window; a 24-hour capture is the next step before the pitch line is used. Egress rules on the desktop's own firewall are not built yet: they come with the cluster-wide egress policies, and until then the URL allowlist is what limits where the EHR browser goes.
+
 ## Rationale
 
 - Web-delivered EHRs are validated almost entirely on Chromium browsers: Epic's web Hyperspace, Oracle Health's web Millennium, and MEDITECH Expanse (Chrome and Edge, plus Safari on iPad). Firefox usually isn't on these vendors' supported lists.

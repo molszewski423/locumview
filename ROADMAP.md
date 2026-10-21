@@ -4,7 +4,7 @@ Status as of 2026-10-20. Labels: **Done** (built and verified), **Open** (versio
 
 ## Version one (scope locked by ADR 0009)
 
-Version one is complete when all five items are Done. Nothing else is required for it, and changing this list needs a new ADR.
+**Version one is complete: all five items Done, 2026-10-20** (changelog #59). The list below is locked; changing it needs a new ADR.
 
 | # | Requirement | Status | Notes |
 |---|---|---|---|
@@ -33,7 +33,7 @@ Version one is complete when all five items are Done. Nothing else is required f
 | Access | Per-evaluator demo accounts with an expiry date (disabled at expiry, deleted later) | Planned | When real evaluators exist; until then the shared guest password is rotated after each evaluation (docs/runbooks.md) |
 | Access | Close abandoned demo connections: idle logout or screen lock on the demo desktop | Planned | Guacamole keeps a session alive while a desktop connection is open, and the demo desktop has no screen lock (#42) |
 | Access | Clipboard DLP: copy-out blocked, 5-minute clipboard clear in sessions | Built; lock-screen fix in #28, live clipboard tests pending | changelog #26, #28 |
-| Desktop | Browser baseline (ADR 0016): Google Chrome for web EHRs in the image, managed policies following the DISA Chrome STIG, a default EHR launcher, egress rules, Firefox ESR policies; an audit of Chrome's outbound traffic, published | Planned | Alongside version one if it does not delay it (ADR 0009) |
+| Desktop | Browser baseline (ADR 0016): Google Chrome for web EHRs in the image, managed policies following the DISA Chrome STIG, a default EHR launcher, Firefox ESR policies following the DISA Firefox STIG; an audit of Chrome's outbound traffic, published | **Built** 2026-10-20 (changelog #60): with the EHR launcher open for 15 minutes no DNS query or HTTPS connection left the desktop (docs/evidence/browser/). Open: a 24-hour capture (Safe Browsing), egress rules on the desktop firewall | ADR 0016 |
 | Desktop | Image signing (cosign), SBOMs (syft), registry and build pipeline | **Built** (changelog #57); desktops accept only signed images (changelog #58) | ADR 0007 |
 | Desktop | Organization-set desktop layout (Mac, Windows or GNOME style), locked centrally | Built; Mac style and lock verified, Windows/GNOME not exercised | changelog #25, #28 |
 | Desktop | Separate, resettable demo desktop | Planned | First KubeVirt workload |
@@ -70,4 +70,5 @@ Version one is complete when all five items are Done. Nothing else is required f
 - OpenTofu creates a desktop with its IdM host entry and removes all of it again; state encrypted (changelog #54, ADR 0013).
 - CI builds, signs and attests the desktop image on a dedicated runner; the installer is built only from the signed image (changelog #57).
 - Desktops accept only signed updates: the signature policy rejects unsigned images and other registries; a desktop installed by OpenTofu moved to the signed CI build on first boot and booted it (changelog #58).
+- Browser baseline: Chrome for the EHR and Firefox ESR, both locked down to the DISA STIG settings; Chrome measured silent for 15 minutes (changelog #60, ADR 0016).
 - Version one complete, 2026-10-20: a desktop built from a clean clone with zero manual steps, destroyed with nothing left behind, and rebuilt; its STIG scan passes 405 rules with 0 failures (changelog #59).

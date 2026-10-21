@@ -1,4 +1,4 @@
 {
   "URLBlocklist": ["*", "javascript://*"],
-  "URLAllowlist": ["file:///usr/share/locumview/ehr/*"]
+  "URLAllowlist": ["file:///usr/share/locumview/ehr/*", "chrome://policy"]
 }

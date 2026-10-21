@@ -35,7 +35,7 @@ RUN --mount=type=secret,id=rhsm --mount=type=bind,target=/src \
 #     package are checked against Google's signing key pinned in this repository (vendor-keys/README.md), whose
 #     primary fingerprint is checked first. The repository file is removed afterwards: Chrome updates arrive with
 #     the image (/opt is part of the read-only image); /etc/default/google-chrome stops Chrome's daily cron job from
-#     adding its repository back. Chrome's own menu entry is hidden through the override directory (no package
+#     adding its repository back. Chrome's own menu entries are hidden through the override directory (no package
 #     file edited); the EHR launcher (step 3) opens it.
 RUN --mount=type=secret,id=rhsm --mount=type=bind,target=/src \
     set -euo pipefail; \
@@ -51,8 +51,9 @@ RUN --mount=type=secret,id=rhsm --mount=type=bind,target=/src \
     rm -f /etc/yum.repos.d/google-chrome.repo; \
     printf '%s\n' 'repo_add_once="false"' 'repo_reenable_on_distupgrade="false"' > /etc/default/google-chrome; \
     install -d -m 0755 /usr/share/locumview/override/applications; \
-    sed '/^\[Desktop Entry\]/a NoDisplay=true' /usr/share/applications/google-chrome.desktop \
-        > /usr/share/locumview/override/applications/google-chrome.desktop; \
+    for f in google-chrome.desktop com.google.Chrome.desktop; do \
+        sed '/^\[Desktop Entry\]/a NoDisplay=true' "/usr/share/applications/$f" > "/usr/share/locumview/override/applications/$f"; \
+    done; \
     rpm -q google-chrome-stable
 
 # 2. The LocumView desktop: extensions, Papirus, branding, wallpapers, tour, system dconf defaults and the
@@ -75,7 +76,7 @@ RUN --mount=type=bind,target=/src \
     install -m 0755 /src/packaging/remote-access/user-mode-user.sh /src/packaging/remote-access/demo-user-root.sh \
         /usr/libexec/locumview/remote-access/; \
     install -D -m 0644 /src/image/desktop/signing/cosign.pub /usr/share/locumview/signing/cosign.pub; \
-    systemctl enable locumview-flatpaks.service locumview-provision.service; \
+    systemctl enable locumview-flatpaks.service locumview-provision.service locumview-dns-v4-only.service; \
     dconf update
 
 # 3b. Initramfs with clevis, so the LUKS volume unlocks with the vTPM at boot (the base image's initramfs has

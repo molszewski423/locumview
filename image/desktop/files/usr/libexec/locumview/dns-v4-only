@@ -1,0 +1,19 @@
+#!/bin/bash
+# DNS from DHCPv4 only, on every wired connection, at every boot (locumview-dns-v4-only.service). Router
+# advertisements can add resolvers outside the organization, such as an ISP's, which also do not know the IdM
+# domain (changelog #15). Provisioning sets this once at first boot, but cloud-init generated a second connection
+# at the next boot without it (changelog #60), so the image checks every boot.
+set -euo pipefail
+changed=0
+while IFS=: read -r uuid type; do
+  [ "$type" = 802-3-ethernet ] || continue
+  [ "$(nmcli -g ipv6.ignore-auto-dns connection show "$uuid")" = yes ] && continue
+  nmcli connection modify "$uuid" ipv6.ignore-auto-dns yes
+  echo "ipv6.ignore-auto-dns set on $(nmcli -g connection.id connection show "$uuid")"
+  changed=1
+done < <(nmcli -t -f UUID,TYPE connection show)
+if [ "$changed" = 1 ]; then
+  while IFS=: read -r dev type; do
+    [ "$type" = ethernet ] && nmcli device reapply "$dev" >/dev/null && echo "reapplied $dev"
+  done < <(nmcli -t -f DEVICE,TYPE device status)
+fi

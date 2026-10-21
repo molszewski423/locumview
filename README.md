@@ -19,6 +19,7 @@ Website: [locumview.com](https://locumview.com) · Sign in: [login.locumview.com
 - Encryption on every network hop, including WireGuard between cluster nodes.
 - CI that re-runs every check on each push.
 - The desktop as code: a bootc image built, signed (cosign) and attested (SBOM) by CI, installed from an ISO with LUKS on the vTPM, and provisioned by OpenTofu from a clean clone with zero manual steps (IdM, RDP, break-glass, the Guacamole connection, the Red Hat registration). Desktops accept only images signed with the project key. Destroyed and rebuilt from a clean clone, the rebuilt desktop passes the image STIG profile with 0 failures (405 rules, [docs/evidence/stig/20261020-image](docs/evidence/stig/20261020-image/)); changelog #51 to #59, [ADR 0007](docs/adr/0007-desktop-containerization-bootc.md).
+- Two browsers on image-built desktops ([ADR 0016](docs/adr/0016-browser-baseline.md)): Google Chrome for the EHR and Firefox ESR, both locked down to the DISA STIG settings ([hardening/browser/](hardening/browser/README.md)). With the EHR launcher open for 15 minutes, Chrome sent nothing at all; without its policies it reached about ten Google services in 90 seconds ([docs/evidence/browser/](docs/evidence/browser/20261020-chrome-egress.md), changelog #60).
 
 **Known gaps**
 - The running reference desktop (the one login.locumview.com opens) is still the hand-built one; it moves to the bootc image next, and the quick start below covers the access layer.
