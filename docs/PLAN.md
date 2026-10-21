@@ -1,6 +1,6 @@
 # LocumView Plan
 
-Owner: Michael Olszewski. Status (2026-10-21): Phases 1, 2 and 3 complete: version one done 2026-10-20, and Phase 3's browser baseline the same day. Next: the live demo moves to an image-built desktop, then Phase 4 and Phase 9 lite (ROADMAP.md has the current state).
+Owner: Michael Olszewski. Status (2026-10-21): Phases 1, 2 and 3 complete: version one done 2026-10-20, and Phase 3's browser baseline the same day. The live demo moved to an image-built desktop on 2026-10-21. Next: Phase 4 and Phase 9 lite (ROADMAP.md has the current state).
 
 LocumView is an open-source virtual desktop platform built on RHEL 10. It provisions hardened GNOME desktops with Terraform and Ansible, delivers them through the browser via Apache Guacamole behind Keycloak SSO and MFA, and never exposes a desktop directly to the internet. Every environment must be rebuildable identically from the repository. Beyond the base desktop, it is a platform for research and local LLM usage in regulated environments: desktops can carry agentic tooling and generative and agentic applications (clinical and research tooling to start) built on local models, so no regulated data leaves the endpoint, with the tooling layer customizable for any regulated workflow. It is a portfolio project aimed at solutions architecture and platform engineering roles, with Red Hat as a target employer.
 
@@ -141,7 +141,7 @@ Everything below is optional until version one ships.
 
 **Phase 9, Clinical AI on synthetic EHR data** (planned, after Phase 9 lite): the full module on the stable platform: Synthea population plus 10 to 20 hand-built stewardship scenarios with expected answers; SMART on FHIR OAuth with scoped, revocable tokens; recommendations written back as FHIR Communication or Task resources; delivery to the provider queue, messaging and dashboard with a complete audit log; no PHI anywhere. ADRs 0008 and 0017.
 
-Sequencing (revised 2026-10-21): Phases 0 to 3 in order (version one, done 2026-10-20). Then: move the live demo to an image-built desktop; Phase 4; Phase 9 lite; Phase 8 lite; Phase 7 alongside AWS SAA-C03 study. Phases 6 and the full Phase 9 come after, once the platform is stable. Phase 5 (SUSE) runs in parallel and never delays the RHEL work. An Electron wrapper for the clinical app is optional and not on the roadmap (ADR 0017): LocumView's priority is the AI-native, hardened, integrated desktop, not delivery to Windows endpoints.
+Sequencing (revised 2026-10-21): Phases 0 to 3 in order (version one, done 2026-10-20). Then: move the live demo to an image-built desktop (done 2026-10-21); Phase 4; Phase 9 lite; Phase 8 lite; Phase 7 alongside AWS SAA-C03 study. Phases 6 and the full Phase 9 come after, once the platform is stable. Phase 5 (SUSE) runs in parallel and never delays the RHEL work. An Electron wrapper for the clinical app is optional and not on the roadmap (ADR 0017): LocumView's priority is the AI-native, hardened, integrated desktop, not delivery to Windows endpoints.
 
 ## 6. Follow-on ideas
 

@@ -26,9 +26,9 @@ Clinical desktops sit in front of patient data all day, yet they are often hand-
 - Two browsers on image-built desktops ([ADR 0016](docs/adr/0016-browser-baseline.md)): Google Chrome for the EHR and Firefox ESR, both locked down to the DISA STIG settings ([hardening/browser/](hardening/browser/README.md)). With the EHR launcher open for 15 minutes, Chrome sent nothing at all; without its policies it reached about ten Google services in 90 seconds ([docs/evidence/browser/](docs/evidence/browser/20261020-chrome-egress.md), changelog #60).
 
 **Known gaps**
-- The running reference desktop (the one login.locumview.com opens) is still the hand-built one; it moves to the bootc image next, and the quick start below covers the access layer.
+- The hand-built reference desktop still runs, for administrators only, as a fallback for about a week; login.locumview.com's demo has opened an image-built desktop since 2026-10-21 (changelog #61).
 - No FIPS mode on the desktop: RDP sign-in to GNOME Remote Desktop needs NTLM, which FIPS mode disables ([ADR 0012](docs/adr/0012-fips-mode-and-remote-display.md)).
-- Data at rest: desktops installed from the bootc image are encrypted (LUKS on the vTPM); the hand-built reference desktop, the cluster nodes and the databases are not yet (see the HIPAA mapping).
+- Data at rest: desktops installed from the bootc image are encrypted (LUKS on the vTPM); the hand-built reference desktop (retiring), the cluster nodes and the databases are not yet (see the HIPAA mapping).
 
 The full build history, with every command and its evidence, is in [notes/phase1-changelog.md](notes/phase1-changelog.md) and [docs/evidence/](docs/evidence/).
 
@@ -98,7 +98,7 @@ Beyond the base desktop, LocumView is meant to host research tooling and local L
 
 LocumView **integrates rather than bundles**: it works with the identity provider, directory, file storage and clinical systems an organization already runs, through open standards. The homelab instances (Keycloak, IdM, Nextcloud, a synthetic FHIR server) demonstrate those integrations; they are not product components. Clinical decision support is a detachable module: outside version one, and outside the initial EU product, which needs medical-device certification for it ([ADR 0008](docs/adr/0008-eu-regulatory-posture.md)).
 
-Planned next, in order: the live demo moves to an image-built desktop; packaging and supply chain (Phase 4); a clinical AI demo on synthetic data and local models (Phase 9 lite, [ADR 0017](docs/adr/0017-clinical-ai-workspace-architecture.md)); a demo video and write-ups (Phase 8 lite); then AWS (Phase 7). None of the clinical AI work is built yet.
+Planned next, in order: packaging and supply chain (Phase 4); a clinical AI demo on synthetic data and local models (Phase 9 lite, [ADR 0017](docs/adr/0017-clinical-ai-workspace-architecture.md)); a demo video and write-ups (Phase 8 lite); then AWS (Phase 7). None of the clinical AI work is built yet.
 
 These are plans, listed with their status in [ROADMAP.md](ROADMAP.md).
 

@@ -25,7 +25,7 @@ Status as of 2026-10-21. Labels: **Done** (built and verified), **Open** (versio
 
 ## Planned after version one
 
-Order after version one: move the live demo to an image-built desktop; Phase 4 (packaging and supply chain); Phase 9 lite (clinical AI demo, ADR 0017); Phase 8 lite (demo video and first write-ups); Phase 7 (AWS, alongside SAA-C03). Phase 5 (SUSE) keeps running in parallel. The phases are described in [docs/PLAN.md](docs/PLAN.md).
+Order after version one: move the live demo to an image-built desktop (done 2026-10-21); Phase 4 (packaging and supply chain); Phase 9 lite (clinical AI demo, ADR 0017); Phase 8 lite (demo video and first write-ups); Phase 7 (AWS, alongside SAA-C03). Phase 5 (SUSE) keeps running in parallel. The phases are described in [docs/PLAN.md](docs/PLAN.md).
 
 | Area | Item | Status | Reference |
 |---|---|---|---|
@@ -38,7 +38,7 @@ Order after version one: move the live demo to an image-built desktop; Phase 4 (
 | Desktop | Browser baseline (ADR 0016): Google Chrome for web EHRs in the image, managed policies following the DISA Chrome STIG, a default EHR launcher, Firefox ESR policies following the DISA Firefox STIG; an audit of Chrome's outbound traffic, published | **Built** 2026-10-20 (changelog #60): with the EHR launcher open for 15 minutes no DNS query or HTTPS connection left the desktop (docs/evidence/browser/). Open: a 24-hour capture (Safe Browsing), egress rules on the desktop firewall | ADR 0016 |
 | Desktop | Image signing (cosign), SBOMs (syft), registry and build pipeline | **Built** (changelog #57); desktops accept only signed images (changelog #58) | ADR 0007 |
 | Desktop | Organization-set desktop layout (Mac, Windows or GNOME style), locked centrally | Built; Mac style and lock verified, Windows/GNOME not exercised | changelog #25, #28 |
-| Desktop | The live demo (login.locumview.com) on an image-built desktop, replacing the hand-built reference desktop | Planned | First step after version one |
+| Desktop | The live demo (login.locumview.com) on an image-built desktop, replacing the hand-built reference desktop | Done (2026-10-21) | Changelog #61; the reference desktop stays as a fallback for about a week, then retires |
 | Desktop | Separate, resettable demo desktop | Planned | First KubeVirt workload |
 | Hypervisors | Proxmox VE (practical production target) | Planned | ADR 0007, 0009 |
 | Hypervisors | A dedicated desktop network (own subnet or VLAN); guacd's RDP egress narrowed from the LAN to it | Planned | With Proxmox (Phase 6); today guacd may reach RDP ports on the LAN (changelog #55) |

@@ -819,3 +819,28 @@ ADR 0016, the last Phase 3 item. Built in the image (no new installer: desktops 
 - **Found: DNS from the internet provider.** The desktop's resolvers included the provider's IPv6 DNS servers from router advertisements: provisioning had set "DNS from DHCPv4 only" (#15) on the installer's connection, and cloud-init generated a second connection at the next boot without it. Fixed in the image: cloud-init no longer configures the network, and `locumview-dns-v4-only.service` sets the rule on every wired connection at every boot (tested by hand on `lv-test14`: the provider's resolvers gone, IdM still resolving).
 - **Found: headless Chrome and the STIG.** `DeveloperToolsAvailability` = 2 also blocks the DevTools protocol, so headless Chrome cannot take a screenshot or dump a page with the policies in place; checks of the real thing happen in the user's session.
 - **Next:** the 24-hour egress capture; an EHR's real sites in the allowlist when there is one to test; desktop-wide egress rules with the cluster-wide egress policies.
+
+## 61. The live demo moves to an image-built desktop (2026-10-21)
+
+The first step after version one (ROADMAP.md). login.locumview.com's demo used to open the hand-built reference desktop; it now opens `lv-demo01`, built by OpenTofu from the signed image like every test desktop since #57.
+
+- **The desktop:** `lv-demo01` in `terraform/node1/desktops.auto.tfvars` (8 GiB, 4 vCPUs), its secrets in `desktops/lv-demo01.sops.yaml` (`./secrets.sh desktop lv-demo01 --demo`, which adds the guest's RDP account). Provisioning enrolls it in IdM, registers it with Red Hat, sets up the guest demo user on port 3391 with its egress fence (#38), switches it to the signed image and records the AIDE baseline.
+- **Found: the STIG locks the guest's screen lock on.** The first build stopped at the guest step with "The key is not writable": the STIG locks `lock-enabled`, `lock-delay` and `idle-delay` in the system dconf database, and the guest step turns the screen lock off. The guest knows no Linux password, so a locked guest session would stay locked for every later guest. Fix (2b999c1): the image builds a second dconf database, `locumview-demo`, a copy of the STIG database whose only differences are the screen lock off and the lock screen disabled, both locked so a guest cannot turn them back on (`image/desktop/scripts/demo-dconf.sh`). Only the demo user's session uses it (`DCONF_PROFILE` through `environment.d`); every other account keeps the STIG profile, and provisioning now checks both. The exception is recorded in `hardening/stig/README.md`.
+- **Found: an interrupted apply loses its state.** The operator laptop went to sleep during the first build, the SSH session running `tofu apply` dropped, and OpenTofu died without writing state: a running VM, an IdM host, a Red Hat registration and a lock file that no state knew about. Cleaned up by hand (Red Hat registration removed, IdM host deleted with its DNS records, VM and disks removed, the seed volume with the desktop's secrets wiped first). Long applies now run as a user service under `systemd-inhibit`, logging to a file, so neither sleep nor a dropped session stops them.
+- **Found: `dns-v4-only` reported failure after succeeding.** On the first boot after the image switch, `locumview-dns-v4-only.service` (#60) set the rule and reapplied the connection, then exited 1: its last line was a `[ ] &&` test that was false for the loopback device. Fixed in e8e765d. The resolver list was correct throughout (the LAN resolver only).
+- **Found: the image switch needs a reboot.** Provisioning queues the switch to the signed registry image; until the next boot the desktop runs the installer's copy (same digest) and would not take signed updates. `lv-demo01` was rebooted and now boots the registry image under the signature policy. The test desktops had the same step, done by their test reboots.
+- **Checked** on `lv-demo01`:
+  - the guest's session runs with the `locumview-demo` profile: screen lock off and not writable, lock screen disabled and not writable;
+  - the owner's session keeps the STIG lock (the lock screen came up after the idle delay);
+  - the egress fence: the guest reaches the internet but no private address, the owner reaches the LAN;
+  - the EHR launcher pinned first, the LocumView Tour at the guest's first sign-in;
+  - both RDP accounts sign in, a wrong password is refused;
+  - full sessions through guacd for both accounts, screenshots taken through the Guacamole protocol;
+  - no failed units after the reboot.
+- **Noted:** bootc's image pull logs four SELinux `mac_admin` denials for `chcon` on a temporary directory; the pull and the switch succeed. Left as is for now.
+- **Noted:** the desktop's name resolves to IPv6 addresses too (the provider's prefix and a ULA, registered in IdM DNS by the client); guacd connects over IPv4. Use `getent ahostsv4` when an IPv4 address is needed.
+- **The switch** (Guacamole):
+  - "LocumView Demo" (groups locumview-admins, locumview-demo) now points at `lv-demo01` port 3391;
+  - the owner connection `lv-demo01` is open to locumview-users, set through OpenTofu (`guacamole_groups`);
+  - locumview-users no longer sees the reference desktop. It stays running, for administrators only, for about a week as a fallback, then retires.
+- **Next:** retire the reference desktop; Phase 4.
