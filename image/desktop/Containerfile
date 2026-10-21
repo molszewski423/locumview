@@ -99,7 +99,10 @@ RUN --mount=type=secret,id=rhsm --mount=type=bind,target=/src \
 # 5. What oscap-im cannot fix at build time: new users' dotfiles copied from /etc/skel no more permissive than
 #    0740 (file_permission_user_init_files), and chrony on server lines (chronyd_server_directive). Also no GNOME
 #    Initial Setup: until provisioning creates the first account GDM would start it on the console (lv-test01).
-RUN set -euo pipefail; \
+#    And the guest demo user's dconf database, a copy of the STIG's with the screen lock locked off (changelog #61).
+RUN --mount=type=bind,target=/src \
+    set -euo pipefail; \
+    bash /src/image/desktop/scripts/demo-dconf.sh; \
     sed -i 's/^AutomaticLoginEnable=False$/&\nInitialSetupEnable=False/' /etc/gdm/custom.conf; \
     grep -qx 'InitialSetupEnable=False' /etc/gdm/custom.conf; \
     find /etc/skel -maxdepth 1 -type f -name '.*' -exec chmod 0640 {} +; \

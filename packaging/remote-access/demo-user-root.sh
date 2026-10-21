@@ -20,6 +20,16 @@ id "$U" >/dev/null 2>&1 || useradd -m -c "LocumView demo (guest)" -s /bin/bash "
 passwd -l "$U"
 chmod 700 "/home/$U"
 id "$U"; ! id -nG "$U" | grep -qw wheel
+# In the bootc image the STIG locks the screen lock on, so the guest uses its own dconf profile, built into the
+# image by image/desktop/scripts/demo-dconf.sh (changelog #61). Set before the session starts. Root-owned; a guest
+# who removed it would only get the STIG screen lock back.
+if [ -f /etc/dconf/profile/locumview-demo ]; then
+  install -d -o "$U" -g "$U" -m 0700 "/home/$U/.config"
+  install -d -o root -g root -m 0755 "/home/$U/.config/environment.d"
+  printf 'DCONF_PROFILE=locumview-demo\n' > "/home/$U/.config/environment.d/10-locumview-dconf.conf"   # pragma: allowlist secret (a profile name)
+  chmod 0644 "/home/$U/.config/environment.d/10-locumview-dconf.conf"
+  restorecon -R "/home/$U/.config" || true
+fi
 
 # 2. Egress fence for the demo uid (outbound only; replies on established flows allowed).
 cat > /etc/nftables/locumview-demo.nft <<NFT
@@ -67,9 +77,16 @@ UIDN=$(id -u "$U")
 for _ in $(seq 60); do [ -S "/run/user/$UIDN/bus" ] && break; sleep 2; done
 as_demo() { runuser -u "$U" -- env XDG_RUNTIME_DIR="/run/user/$UIDN" DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$UIDN/bus" "$@"; }
 
-# 5. No screen lock for guests (they know no Linux password); front-door timeouts apply instead.
-as_demo gsettings set org.gnome.desktop.screensaver lock-enabled false
-as_demo gsettings set org.gnome.desktop.lockdown disable-lock-screen true
+# 5. No screen lock for guests (they know no Linux password); front-door timeouts apply instead. In the bootc
+#    image the guest's dconf profile (step 1) sets this; on the hand-built desktop it is a user setting.
+if [ -f /etc/dconf/profile/locumview-demo ]; then
+  as_demo systemctl --user show-environment | grep -qx DCONF_PROFILE=locumview-demo
+  [ "$(as_demo env DCONF_PROFILE=locumview-demo gsettings get org.gnome.desktop.screensaver lock-enabled)" = false ]
+  as_demo env DCONF_PROFILE=locumview-demo gsettings writable org.gnome.desktop.session idle-delay | grep -qx false   # other STIG locks stay
+else
+  as_demo gsettings set org.gnome.desktop.screensaver lock-enabled false
+  as_demo gsettings set org.gnome.desktop.lockdown disable-lock-screen true
+fi
 # Each guest connection starts with the LocumView Tour (unit installed by install-desktop.sh).
 as_demo systemctl --user enable --now locumview-tour-on-connect.service || true
 
