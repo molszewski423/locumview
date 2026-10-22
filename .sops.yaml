@@ -7,6 +7,6 @@ creation_rules:
     # Public key (not a secret): Michael Olszewski, ThinkPad operator key, created 2026-10-02.
     age: age1rtd08pu892une8jknwex6ey2rxdp76j3w67gstrd5vpvep24ussscpr59n  # pragma: allowlist secret
   # OpenTofu secrets (ADR 0013): every value encrypted (plain YAML files, not Kubernetes manifests).
-  - path_regex: (terraform|image)/.*\.sops\.ya?ml$
+  - path_regex: (terraform|image|packaging)/.*\.sops\.ya?ml$
     # Public key (not a secret): Michael Olszewski, ThinkPad operator key, created 2026-10-02.
     age: age1rtd08pu892une8jknwex6ey2rxdp76j3w67gstrd5vpvep24ussscpr59n  # pragma: allowlist secret
