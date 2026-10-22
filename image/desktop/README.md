@@ -28,8 +28,14 @@ The base image and the RHEL repositories need Red Hat credentials:
 - `podman login registry.redhat.io` with a registry service account (https://access.redhat.com/terms-based-registry/).
 - On a host that is not a subscribed RHEL system, an activation key as a build secret. `scripts/rhsm.sh` registers the build container for the package steps only and unregisters it again; the key is never written to a layer.
 
-```
-podman build --secret id=rhsm,src=$HOME/.config/locumview/rhsm.env \
+The four LocumView RPMs must already be published at the exact version selected from the image commit. See
+[RPM version selection](../../packaging/rpm/README.md#pinning-rpms-to-an-image-commit). Supply the registry's public
+CA as a build secret as well as the owner's Red Hat registration secret. Run from a clean committed checkout.
+
+```fish
+set -l rpm_evr (python3 packaging/rpm/resolve-version.py | python3 -c 'import json,sys; print(json.load(sys.stdin)["evr"])')
+podman build --network host --secret id=rhsm,src=<owner-provided-rhsm-file> \
+  --secret id=lanca,src=<registry-ca-file> --build-arg LOCUMVIEW_RPM_EVR=$rpm_evr \
   -f image/desktop/Containerfile -t <registry>/locumview/desktop:dev .
 ```
 

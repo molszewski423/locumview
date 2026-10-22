@@ -19,10 +19,12 @@ name: image
   push:
     branches: [main]
     paths:
+      - LICENSE
       - image/**
       - packaging/**
       - hardening/**
       - .gitea/workflows/image.yml
+      - .gitea/workflows/rpms.yml
   workflow_dispatch:
 
 concurrency:
@@ -67,6 +69,14 @@ jobs:
           # cosign and syft read registry credentials from a Docker config directory.
           install -d -m 0700 "$JOB/docker"; ln -sf "$A" "$JOB/docker/config.json"
 
+      - name: Resolve pinned RPM version
+        run: |
+          set -euo pipefail
+          cd src
+          read -r SOURCE VERSION RELEASE EVR < <(python3 packaging/rpm/resolve-version.py "$GITHUB_SHA" --check-inputs --format tsv)
+          echo "RPM source: $SOURCE; required version-release: $EVR"
+          echo "LOCUMVIEW_RPM_EVR=$EVR" >> "$GITHUB_ENV"
+
       - name: Build
         env:
           RHSM_ORG: ${{ secrets.RHSM_ORG }}
@@ -81,6 +91,7 @@ jobs:
           # rootless container network cannot reach on this host; lanca is the registry's CA (public).
           podman build --network host --authfile "$JOB/auth.json" --secret id=rhsm,src="$R" \
             --secret id=lanca,src="$LAN_CA" \
+            --build-arg "LOCUMVIEW_RPM_EVR=$LOCUMVIEW_RPM_EVR" \
             --label org.opencontainers.image.revision="$GITHUB_SHA" \
             --label org.opencontainers.image.source="https://git.lan/${GITHUB_REPOSITORY}" \
             -f image/desktop/Containerfile -t "$IMAGE:$TAG" .

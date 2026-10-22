@@ -11,15 +11,12 @@ name: rpms
   push:
     branches: [main]
     paths:
+      - LICENSE
       - packaging/rpm/**
       - packaging/extensions/**
       - packaging/branding/**
       - packaging/tour/**
-      - image/desktop/files/usr/libexec/locumview/ehr-browser
-      - image/desktop/files/usr/share/applications/locumview-ehr.desktop
-      - image/desktop/files/etc/locumview/ehr.conf
-      - image/desktop/files/usr/share/locumview/**
-      - image/desktop/files/usr/lib/environment.d/**
+      - image/desktop/files/**
       - .gitea/workflows/rpms.yml
   workflow_dispatch:
 
@@ -49,6 +46,7 @@ jobs:
         run: |
           set -euo pipefail
           cd src
+          python3 packaging/rpm/resolve-version.py --check-inputs
           packaging/rpm/build-rpms.sh "$JOB/rpms"
 
       - name: Sign

@@ -20,7 +20,7 @@ CI does all three on every change to the packaged files (`.gitea/workflows/rpms.
 key comes from Actions secrets). By hand:
 
 ```
-packaging/rpm/build-rpms.sh build/rpms            # HEAD; release 1.<commit time, UTC>git<commit>
+packaging/rpm/build-rpms.sh build/rpms            # newest RPM input commit reachable from HEAD's first-parent history
 sops -d packaging/rpm/signing/rpm-signing.sops.yaml | packaging/rpm/sign-rpms.sh build/rpms
 REGISTRY_USER=<owner> REGISTRY_TOKEN=<token> packaging/rpm/publish-rpms.sh build/rpms
 ```
@@ -33,6 +33,42 @@ REGISTRY_USER=<owner> REGISTRY_TOKEN=<token> packaging/rpm/publish-rpms.sh build
   container. Every package is then checked against the committed public key, `signing/RPM-GPG-KEY-locumview`.
 - **Publish** refuses any package not signed with that key, then uploads to `https://git.lan/api/packages/<owner>/rpm/el10`.
 - **Install** with `locumview.repo` and the public key in `/etc/pki/rpm-gpg/RPM-GPG-KEY-locumview`.
+
+## Pinning RPMs to an image commit
+
+`python3 packaging/rpm/resolve-version.py <commit>` reports the RPM source commit, spec version, release and
+exact version-release including `.el10`. Both workflows use this resolver. Full Git history is required;
+shallow clones fail explicitly. The source is the last commit on the requested revision's first-parent history
+that touched a path in `inputs.txt`. For a merge that introduces package changes, it is the merge commit, so
+the package source represents the combined tree. Later documentation-only or unrelated commits reuse that
+release. Moving registry tags or publishing packages from a newer commit cannot change the selection.
+
+The release is `1.<source committer time in UTC>git<first 10 source hash characters>`. The hash length is fixed
+so adding objects to the repository cannot lengthen an abbreviation and change the version. The archive and
+spec are read from the resolved source commit. This pins package identities; it does not establish identical
+RPM bytes or image digests across rebuilds, and a published package must remain available in the registry.
+
+`inputs.txt` deliberately covers the entire desktop files tree, plus package sources, build/sign/publish
+scripts, the builder pin, signing metadata, the license and the RPM workflow. The RPM workflow's `push.paths`
+must match that list; `test-resolve-version.py` checks this in pre-commit and CI. Update both when adding an
+input. The image workflow also runs when the RPM workflow or license changes.
+
+The image requires `LOCUMVIEW_RPM_EVR` as a build argument, installs all four exact noarch versions with both
+signature checks enabled, and verifies the installed version-release. It never falls back to a newer package.
+If an image build runs before the matching RPM publication, it fails with the required version in the error.
+Check that RPM publication succeeded, then rerun the image workflow for the same commit. The jobs have separate
+concurrency groups; there is no guarantee the RPM job runs first.
+
+Local checks without signing keys, registry access or a container build:
+
+```fish
+python3 packaging/rpm/test-resolve-version.py
+python3 packaging/rpm/resolve-version.py --check-inputs
+```
+
+CI proof still required after merging: build the same commit twice, verify both signed SBOM attestations, and
+compare the four `locumview-*` NEVRAs. They must equal the resolver's version-release in both builds. This is
+package-version repeatability, separate from whole-image reproducibility.
 
 ## Checked on the first build
 
