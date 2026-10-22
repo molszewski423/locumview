@@ -1,0 +1,83 @@
+# Build, sign and publish LocumView's desktop RPMs (Phase 4, changelog #62; packaging/rpm/README.md).
+#
+# Runs on the image-build runner on node2 (rootless podman): rpmbuild in a CentOS Stream 10 container pinned by
+# digest, signing with the LocumView RPM signing key, publishing to the Gitea RPM registry (el10). Each commit gives
+# a new release (1.<date>git<commit>); publishing a release that is already there is not an error.
+# Credentials come from Actions secrets (each also kept in SOPS, packaging/rpm/signing/rpm-signing.sops.yaml):
+#   RPM_SIGNING_KEY / RPM_SIGNING_PASSPHRASE   sign (public key: packaging/rpm/signing/RPM-GPG-KEY-locumview)
+#   REGISTRY_TOKEN                             upload to the registry (Gitea token, package scope only)
+name: rpms
+"on":
+  push:
+    branches: [main]
+    paths:
+      - packaging/rpm/**
+      - packaging/extensions/**
+      - packaging/branding/**
+      - packaging/tour/**
+      - image/desktop/files/usr/libexec/locumview/ehr-browser
+      - image/desktop/files/usr/share/applications/locumview-ehr.desktop
+      - image/desktop/files/etc/locumview/ehr.conf
+      - image/desktop/files/usr/share/locumview/**
+      - image/desktop/files/usr/lib/environment.d/**
+      - .gitea/workflows/rpms.yml
+  workflow_dispatch:
+
+concurrency:
+  group: desktop-rpms
+  cancel-in-progress: false
+
+jobs:
+  rpms:
+    runs-on: image-builder
+    timeout-minutes: 30
+    steps:
+      - name: Check out
+        env:
+          TOKEN: ${{ gitea.token }}
+        run: |
+          set -euo pipefail
+          rm -rf src
+          git clone -q "https://x-access-token:${TOKEN}@git.lan/${GITHUB_REPOSITORY}.git" src
+          git -C src remote set-url origin "https://git.lan/${GITHUB_REPOSITORY}.git"
+          git -C src checkout -q "$GITHUB_SHA"
+          git -C src log -1 --format='%h %s'
+          install -d -m 0700 "$PWD/.job"
+          echo "JOB=$PWD/.job" >> "$GITHUB_ENV"
+
+      - name: Build
+        run: |
+          set -euo pipefail
+          cd src
+          packaging/rpm/build-rpms.sh "$JOB/rpms"
+
+      - name: Sign
+        env:
+          RPM_SIGNING_KEY: ${{ secrets.RPM_SIGNING_KEY }}
+          RPM_SIGNING_PASSPHRASE: ${{ secrets.RPM_SIGNING_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          cd src
+          FPR=$(gpg --batch --with-colons --show-keys packaging/rpm/signing/RPM-GPG-KEY-locumview | awk -F: '/^fpr/{print $10; exit}')
+          # The same fields as the SOPS file, built in memory and handed over on stdin (as JSON, which is YAML:
+          # the runner host has no PyYAML).
+          python3 -I - "$FPR" <<'PY' | packaging/rpm/sign-rpms.sh "$JOB/rpms"
+          import json, os, sys
+          json.dump({"rpm_signing_fingerprint": sys.argv[1],
+                          "rpm_signing_passphrase": os.environ["RPM_SIGNING_PASSPHRASE"],
+                          "rpm_signing_private_key": os.environ["RPM_SIGNING_KEY"]}, sys.stdout)
+          PY
+
+      - name: Publish
+        env:
+          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+        run: |
+          set -euo pipefail
+          cd src
+          REGISTRY_USER="${GITHUB_REPOSITORY_OWNER}" packaging/rpm/publish-rpms.sh "$JOB/rpms"
+
+      - name: Clean up
+        if: always()
+        run: |
+          set -uo pipefail
+          rm -rf "${JOB:-/nonexistent}" src

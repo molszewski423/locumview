@@ -16,6 +16,9 @@ the image use, so nothing moved. Dconf defaults, the organization's layout, the 
 
 ## Build, sign, publish
 
+CI does all three on every change to the packaged files (`.gitea/workflows/rpms.yml`, on the image-build runner; the
+key comes from Actions secrets). By hand:
+
 ```
 packaging/rpm/build-rpms.sh build/rpms            # HEAD; release 1.<date>git<commit>
 sops -d packaging/rpm/signing/rpm-signing.sops.yaml | packaging/rpm/sign-rpms.sh build/rpms
