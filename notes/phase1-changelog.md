@@ -909,3 +909,50 @@ Planning and documentation; nothing built, deployed or provisioned. Phase 4 stay
   retires. After the reference desktop retires and the release test desktop is destroyed, node1 at 32 GB
   holds two concurrent reviewer desktops tightly and three not at all (plan, section 5).
 - **Checked:** `pre-commit run --all-files`; no em dashes; role names only; no employer, person or institution named.
+
+## 66. Phase 4: the first promotions to `:stable`, and the image installs signed RPMs (2026-10-22, in progress)
+
+The release sequence in `notes/release-integrity-report.md`.
+
+- **Image A promoted, the first promotion ever.** Image build 107 (7f88b06, with the scan-output fix of #62, PR #1)
+  promoted by the owner: signature, SBOM and scan verified by the workflow; previous `:stable` none.
+  A = `sha256:c5ec1e64044dfd2f2de2bc486fda86dc55d61a82c66cca6cc4f3407b81c5d61b`.
+- **A canary desktop, `lv-test15`,** created by OpenTofu from operator-laptop (saved plan: 10 to add, 0 to change, 0
+  to destroy; applied under `systemd-inhibit`, #61). It installed from the ISO, provisioned itself, and after one
+  reboot boots A from `:stable` with the installer as rollback, its update timer masked and no failed units.
+  - **Found: provisioning was building the initial AIDE database,** not stalled on an image pull; it takes several
+    minutes on a fresh desktop.
+  - **Found: the update timer was active although its unit file was disabled,** because it is enabled by the vendor
+    preset under `/usr`. Masked by the owner (as on lv-demo01, step 0).
+- **PR #2 merged: the image installs LocumView's RPMs** (Containerfile step 1c) instead of copying the files. Gitea's
+  merge button could not sign the merge, so it was made as a signed merge commit locally (aca7d81) and pushed.
+- **Image B built and verified** (image build 111, aca7d81, about 29 minutes).
+  B = `sha256:50c14768c9440fd03e737c67d74e99cc736ce31fc961639640115f12b6800f5d`.
+  - Signature, SBOM attestation and scan attestation verified against `image/desktop/signing/cosign.pub`.
+  - Image scan: pass; 361 pass; the 26 fail and 14 error are exactly the 40 rules only an installed desktop can judge;
+    nothing unexpected.
+  - The four packages, from the SBOM and in the image, each `0.1.0-1.20261022003250gitd34d3646cb.el10.noarch`
+    (locumview-shell-extensions, -branding, -tour, -ehr-launcher), signed RSA/SHA256 with key ID 0f02a990167ea18e
+    (the pinned LocumView key, fingerprint F265 A948 9197 3976 7055 AD28 0F02 A990 167E A18E); `rpm -V` clean on all
+    four; the build's temporary repository file and CA are gone. Checked in a container of B with no network.
+- **Image B promoted** (promote run 232): the workflow verified all three attachments again; `:stable` is now B, byte
+  for byte (the manifest at `:stable` hashes to B's digest). Previous `:stable`: A; to roll back, run the workflow
+  with A's digest.
+- **Kept:** `:latest` (`sha256:137e69fa…`) while lv-demo01 boots it and its rollback entry will still track it
+  (report step 18).
+- **Noted:** lv-demo01's `plocate-updatedb.service` has failed since 00:49 on 2026-10-22, before any of these steps;
+  unrelated to the images, left as is for now.
+- **Open:** report steps 10 to 15 on lv-test15 (upgrade, full STIG scan, local and fleet rollback tests, re-promotion,
+  destruction); step 16, lv-demo01 to `:stable` (owner run); step 18, `:latest`.
+- **Next Phase 4 task, planned: pin the RPM versions into the image build,** so a rebuild of the same commit installs
+  the same packages. Today the image installs the newest build in the registry, which can change between two builds
+  of one commit. Plan:
+  1. The image build computes the release that `packaging/rpm/build-rpms.sh` would give the newest commit, at or
+     before the image's commit, that touched the RPM inputs (`1.<commit time>git<commit>`), and passes the exact
+     NEVR to the Containerfile as a build argument.
+  2. The Containerfile installs `name-version-release` for the four packages and fails if any is missing.
+  3. One list of RPM input paths, shared by `rpms.yml` and the image build, with a check that the two stay in step.
+  4. When one push changes both the RPM inputs and the image, the image build waits for the RPM publication, or
+     fails with a clear message.
+  5. Check: two builds of one commit record identical package NEVRAs in their SBOMs. Identical image digests are a
+     separate goal: build 106 and 107 of one commit already differed.
