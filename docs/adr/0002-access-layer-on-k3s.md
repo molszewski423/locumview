@@ -29,4 +29,4 @@ Run the whole access layer on the existing k3s cluster, in a dedicated `locumvie
 
 ## Update 2026-10-04
 
-The cluster is now two nodes: node1 (control plane) and node2, both Debian 13. node3 was reinstalled as `dev-laptop-1`, an openSUSE Leap 16.0 machine for developing the SUSE variant of LocumView, and is no longer a k3s node. The decision is unchanged. The homelab deviation is now Debian only. guacd, Guacamole and Keycloak were rescheduled onto the remaining nodes, and the desktop firewall allowlist drops <dev-laptop-1-ip> (changelog #29).
+The cluster is now two nodes: node1 (control plane) and node2, both Debian 13. node3 was reinstalled as `suse-laptop`, an openSUSE Leap 16.0 machine for developing the SUSE variant of LocumView, and is no longer a k3s node. The decision is unchanged. The homelab deviation is now Debian only. guacd, Guacamole and Keycloak were rescheduled onto the remaining nodes, and the desktop firewall allowlist drops <suse-laptop-ip> (changelog #29).

@@ -1,7 +1,7 @@
 + date -Is
 2026-10-02T12:05:51-04:00
 + hostname
-dev-laptop-2
+operator-laptop
 + rpm -q libvirt-daemon qemu-kvm-core edk2-ovmf swtpm
 libvirt-daemon-12.6.0-2.fc45.x86_64
 qemu-kvm-core-11.1.2-1.fc45.x86_64
