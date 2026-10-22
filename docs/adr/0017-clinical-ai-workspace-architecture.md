@@ -65,3 +65,13 @@ All of it runs on synthetic data and local models. The full Phase 9 (scenario va
 - Each rule set needs test cases with expected answers before its findings are shown, starting with the demo cases.
 - The regulatory analysis (ADR 0008) still applies: before any use beyond a demo, check how the triage panel's "urgent" framing and each module's outputs sit with FDA's CDS guidance.
 - Nothing here is built. Status lives in ROADMAP.md.
+
+## Future considerations
+
+**Epic Connectors (watch only; Planned).** Epic announced Connectors on 2026-10-21 ([Epic](https://www.epic.com/epic/post/introducing-connectors-a-new-way-for-apps-to-communicate-with-epic/)): apps can bring information into Epic, and Epic's AI (Art, Emmie, Penny, and custom agents built in Agent Factory) can complete tasks in other apps. Listings on Epic Showroom are expected from March 2027, and organizations review what each Connector can read and change before enabling it. What it means here:
+
+- It supports the governance thesis behind this module: agent permissions that are scoped and reviewable.
+- A possible later delivery path: stewardship findings exposed as a read-only Epic Connector, with the rules and the explanations staying in the LocumView agent service.
+- Positioning does not change: LocumView stays EHR-neutral (Epic, Oracle Health, MEDITECH) with local models inside the boundary.
+
+Nothing is built or committed to. Revisit when Epic publishes developer documentation for Connectors.

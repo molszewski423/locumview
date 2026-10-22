@@ -47,7 +47,7 @@ Order after version one: move the live demo to an image-built desktop (done 2026
 | Hypervisors | Public or sovereign cloud (AWS alongside SAA-C03) | Planned | ADR 0009 |
 | Integrations | Nextcloud (files) via Keycloak OIDC, as a reference integration | Planned | ADR 0009 |
 | Integrations | Synthetic FHIR server, Matrix messaging | Planned | ADR 0009 |
-| Clinical AI | Detachable clinical AI module (US only, FDA CDS design principles): one web app in the hardened Chrome, launched from the desktop and as a SMART on FHIR app from the EHR; deterministic rules flag, a local model explains; Antimicrobial Stewardship, IV to PO and ADE Monitoring queues. First, Phase 9 lite: a clinical AI demo on OpenEMR with synthetic patients, showing a stewardship and an IV to PO finding; then the full Phase 9 | Planned | ADR 0008, 0017 |
+| Clinical AI | Detachable clinical AI module (US only, FDA CDS design principles): one web app in the hardened Chrome, launched from the desktop and as a SMART on FHIR app from the EHR; deterministic rules flag, a local model explains; Antimicrobial Stewardship, IV to PO and ADE Monitoring queues. First, Phase 9 lite: a clinical AI demo on OpenEMR with synthetic patients, showing a stewardship and an IV to PO finding; then the full Phase 9. Watch item: Epic Connectors (announced 2026-10-21) as a possible read-only delivery path for stewardship findings; revisit when Epic publishes developer documentation | Planned | ADR 0008, 0017 |
 | Distributions | SUSE / openSUSE build from the same definitions | **In progress, not shipped** | Infrastructure work has begun and runs largely in parallel with the RHEL build; not supported or shipped yet |
 | Distributions | Debian build from the same definitions | Planned | |
 
