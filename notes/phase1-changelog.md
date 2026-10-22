@@ -909,3 +909,87 @@ Planning and documentation; nothing built, deployed or provisioned. Phase 4 stay
   retires. After the reference desktop retires and the release test desktop is destroyed, node1 at 32 GB
   holds two concurrent reviewer desktops tightly and three not at all (plan, section 5).
 - **Checked:** `pre-commit run --all-files`; no em dashes; role names only; no employer, person or institution named.
+
+## 66. Phase 4: the first promotions to `:stable`, and the image installs signed RPMs (2026-10-22, in progress)
+
+The release sequence in `notes/release-integrity-report.md`.
+
+- **Image A promoted, the first promotion ever.** Image build 107 (7f88b06, with the scan-output fix of #62, PR #1)
+  promoted by the owner: signature, SBOM and scan verified by the workflow; previous `:stable` none.
+  A = `sha256:c5ec1e64044dfd2f2de2bc486fda86dc55d61a82c66cca6cc4f3407b81c5d61b`.
+- **A canary desktop, `lv-test15`,** created by OpenTofu from operator-laptop (saved plan: 10 to add, 0 to change, 0
+  to destroy; applied under `systemd-inhibit`, #61). It installed from the ISO, provisioned itself, and after one
+  reboot boots A from `:stable` with the installer as rollback, its update timer masked and no failed units.
+  - **Found: provisioning was building the initial AIDE database,** not stalled on an image pull; it takes several
+    minutes on a fresh desktop.
+  - **Found: the update timer was active although its unit file was disabled,** because it is enabled by the vendor
+    preset under `/usr`. Masked by the owner (as on lv-demo01, step 0).
+- **PR #2 merged: the image installs LocumView's RPMs** (Containerfile step 1c) instead of copying the files. Gitea's
+  merge button could not sign the merge, so it was made as a signed merge commit locally (aca7d81) and pushed.
+- **Image B built and verified** (image build 111, aca7d81, about 29 minutes).
+  B = `sha256:50c14768c9440fd03e737c67d74e99cc736ce31fc961639640115f12b6800f5d`.
+  - Signature, SBOM attestation and scan attestation verified against `image/desktop/signing/cosign.pub`.
+  - Image scan: pass; 361 pass; the 26 fail and 14 error are exactly the 40 rules only an installed desktop can judge;
+    nothing unexpected.
+  - The four packages, from the SBOM and in the image, each `0.1.0-1.20261022003250gitd34d3646cb.el10.noarch`
+    (locumview-shell-extensions, -branding, -tour, -ehr-launcher), signed RSA/SHA256 with key ID 0f02a990167ea18e
+    (the pinned LocumView key, fingerprint F265 A948 9197 3976 7055 AD28 0F02 A990 167E A18E); `rpm -V` clean on all
+    four; the build's temporary repository file and CA are gone. Checked in a container of B with no network.
+  - As published: the four RPM files downloaded from the RPM registry pass `rpmkeys -K` (header signature with key ID
+    167ea18e, header and payload digests) against a throwaway keyring holding only the committed key, and fail without
+    it. Run on lv-test15 without root.
+- **Image B promoted** (promote run 232): the workflow verified all three attachments again; `:stable` is now B, byte
+  for byte (the manifest at `:stable` hashes to B's digest). Previous `:stable`: A; to roll back, run the workflow
+  with A's digest.
+- **Kept:** `:latest` (`sha256:137e69fa…`) while lv-demo01 boots it and its rollback entry will still track it
+  (report step 18).
+- **Noted:** lv-demo01's `plocate-updatedb.service` has failed since 00:49 on 2026-10-22, before any of these steps;
+  unrelated to the images, left as is for now.
+- **Image B on the test desktop `lv-test15`** (steps 10 to 12; owner runs from one reviewed script, agent checks
+  read-only):
+  - **Upgrade (step 10):** `bootc upgrade` staged exactly B from `:stable`; after the reboot lv-test15 booted B, with A
+    as rollback, nothing staged, the update timer masked and no failed units. The four LocumView RPMs are installed
+    (A has none); `rpm -V` on the deployed desktop reports only file times (`T`, all 81 files), because ostree
+    deploys every file with the time set to the epoch; sizes, digests, modes and owners match.
+  - **Full STIG scan (step 11):** `scan-stig.sh` reports 405 pass / 1 fail; the fail is `firewalld_sshd_port_enabled`,
+    the documented exception for image-built desktops. **#59's 405 / 0 and this 405 / 1 come from two profiles:**
+    `scan-stig.sh` always uses the reference desktop's profile, `stig_gui`, which includes that rule; #59 used the image
+    profile, `stig_gui_image`, which deselects it and adds the five partition rules (not applicable in #59). On the
+    447 rules the two share, every result is identical. #59's committed report (`docs/evidence/stig/20261020-image/`) had the
+    desktop's IPv6 addresses (including the global prefix) and MAC address; replaced with the same placeholders. Against the image profile, the release gate, B would
+    stand at 405 / 0 like #59, if the five partition rules (not evaluated in this run) are again not applicable. Evidence and the comparison: `docs/evidence/stig/20261022-image-B/` (the report's
+    addresses replaced with placeholders).
+  - **Local rollback (step 12):** `bootc rollback` and a reboot booted A with no failed units; a second rollback and
+    reboot booted B again, with A as rollback. The fleet rollback test (step 13) and re-promotion (step 14) were
+    skipped by the owner's decision: B was already `:stable`.
+- **ROADMAP.md:** two Supply chain rows, Built: the per-image scan with verified promotion, and the signed RPMs (pinned
+  versions and a COPR mirror Planned). Checked with the website's roadmap generator.
+- **Live demo switched (step 16, owner run):** the reviewed script staged exactly B with signature policy
+  enforced; the owner approved the reboot. After reboot the deployment origin tracks `:stable`, all four B RPMs
+  are installed, no units are failed, and the update timer is masked and inactive. Both owner and guest headless
+  remote-desktop processes are running under `gnome-remote-desktop-headless.service`; guacd reaches ports 3390
+  and 3391. The rollback deployment origin still tracks `:latest`. The owner supplied fresh post-reboot `bootc status`: booted B
+  (`sha256:50c14768c9440fd03e737c67d74e99cc736ce31fc961639640115f12b6800f5d`) from `:stable`,
+  nothing staged, rollback `:latest` at
+  `sha256:137e69fa630505997e3e3b911c5151f9cc4334c5f788e2bc725fd42668b08edc`.
+  A fresh browser sign-in was not tested.
+- **Test desktop destroyed (step 15, owner run):** the saved plan was checked for exactly ten deletions under
+  the test desktop module and applied by the owner: 0 added, 0 changed, 10 destroyed. Read-only checks confirm no
+  test domain or volumes in libvirt, no resolving host address, and no Guacamole connection. The apply log reports
+  removal of one Red Hat registration and the IdM host resource. Those external records were not independently
+  queried with credentials. The operator desktop configuration matches main.
+- **Open:** local encrypted test-secret and saved destroy-plan cleanup (owner decision);
+  `:latest` until the demo rollback tracks `:stable` (step 18).
+  Follow-up: `scan-stig.sh` takes the profile as an argument. Fleet rollback remains untested by owner decision.
+- **Next Phase 4 task, planned: pin the RPM versions into the image build,** so a rebuild of the same commit installs
+  the same packages. Today the image installs the newest build in the registry, which can change between two builds
+  of one commit. Plan:
+  1. The image build computes the release that `packaging/rpm/build-rpms.sh` would give the newest commit, at or
+     before the image's commit, that touched the RPM inputs (`1.<commit time>git<commit>`), and passes the exact
+     NEVR to the Containerfile as a build argument.
+  2. The Containerfile installs `name-version-release` for the four packages and fails if any is missing.
+  3. One list of RPM input paths, shared by `rpms.yml` and the image build, with a check that the two stay in step.
+  4. When one push changes both the RPM inputs and the image, the image build waits for the RPM publication, or
+     fails with a clear message.
+  5. Check: two builds of one commit record identical package NEVRAs in their SBOMs. Identical image digests are a
+     separate goal: build 106 and 107 of one commit already differed.

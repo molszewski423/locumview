@@ -20,6 +20,7 @@ Status as of 2026-10-22. Labels: **Done** (built and verified), **Open** (versio
 - CI that re-runs the pre-commit checks on every push. **Done**
 - Scoped kubeconfig for operators; admin GDM connection credentials into SOPS; Tomcat error page; cluster-wide egress policies. **Open**
 - Backup procedure for desktop VMs on node1. **Open**
+- `scan-stig.sh` takes the profile as an argument, defaulting to the image profile on image-built desktops, so a deployed-desktop scan reports on the release gate's profile directly (changelog #66). **Planned**
 - Encryption at rest for desktop disks and cluster nodes. Desktops installed from the bootc image: LUKS bound to the vTPM (changelog #53). The hand-built reference desktop (until it is replaced) and the cluster nodes: **Open**
 - The rules the SSG HIPAA profile still fails: 39 on the reference desktop, 37 on desktops built from the bootc image (2026-10-20, which pass partition_for_var_log_audit and rpm_verify_permissions): applied through the tailoring or documented. **Open**
 
@@ -37,6 +38,8 @@ Order after version one (revised 2026-10-22): move the live demo to an image-bui
 | Access | Clipboard DLP: copy-out blocked, 5-minute clipboard clear in sessions | Built; lock-screen fix in #28, live clipboard tests pending | changelog #26, #28 |
 | Desktop | Browser baseline (ADR 0016): Google Chrome for web EHRs in the image, managed policies following the DISA Chrome STIG, a default EHR launcher, Firefox ESR policies following the DISA Firefox STIG; an audit of Chrome's outbound traffic, published | **Built** 2026-10-20 (changelog #60): with the EHR launcher open for 15 minutes no DNS query or HTTPS connection left the desktop (docs/evidence/browser/). Open: a 24-hour capture (Safe Browsing), egress rules on the desktop firewall | ADR 0016 |
 | Desktop | Image signing (cosign), SBOMs (syft), registry and build pipeline | **Built** (changelog #57); desktops accept only signed images (changelog #58) | ADR 0007 |
+| Supply chain | Every image build scanned against the STIG image profile before it is pushed, the result attached as a signed attestation; verified promotion: builds go to `:testing`, desktops follow `:stable`, which moves only after the signature, SBOM and scan are verified | **Built** in Phase 4 (changelog #62, #66): first promotions 2026-10-22; the second tested on a test desktop first (upgrade, full STIG scan, rollback and forward). Open: the live demo moved to `:stable` | ADR 0007 |
+| Supply chain | LocumView's own pieces (shell extensions, branding, tour, EHR launcher) as signed RPMs, built and published by CI; the image installs them and checks every signature | **Built** in Phase 4 (changelog #62, #66). Planned: package versions pinned to the image build; a public COPR mirror | |
 | Desktop | Organization-set desktop layout (Mac, Windows or GNOME style), locked centrally | Built; Mac style and lock verified, Windows/GNOME not exercised | changelog #25, #28 |
 | Desktop | The live demo (login.locumview.com) on an image-built desktop, replacing the hand-built reference desktop | Done (2026-10-21) | Changelog #61; the reference desktop stays as a fallback for about a week, then retires |
 | Desktop | Separate, resettable demo desktop | Planned | First KubeVirt workload |
