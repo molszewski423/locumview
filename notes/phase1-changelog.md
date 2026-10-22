@@ -955,7 +955,8 @@ The release sequence in `notes/release-integrity-report.md`.
     the documented exception for image-built desktops. **#59's 405 / 0 and this 405 / 1 come from two profiles:**
     `scan-stig.sh` always uses the reference desktop's profile, `stig_gui`, which includes that rule; #59 used the image
     profile, `stig_gui_image`, which deselects it and adds the five partition rules (not applicable in #59). On the
-    447 rules the two share, every result is identical. Against the image profile, the release gate, B would
+    447 rules the two share, every result is identical. #59's committed report (`docs/evidence/stig/20261020-image/`) had the
+    desktop's IPv6 addresses (including the global prefix) and MAC address; replaced with the same placeholders. Against the image profile, the release gate, B would
     stand at 405 / 0 like #59, if the five partition rules (not evaluated in this run) are again not applicable. Evidence and the comparison: `docs/evidence/stig/20261022-image-B/` (the report's
     addresses replaced with placeholders).
   - **Local rollback (step 12):** `bootc rollback` and a reboot booted A with no failed units; a second rollback and
