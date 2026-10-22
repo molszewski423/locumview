@@ -101,7 +101,40 @@ On the desktop, `locumview-provision.service` (`/usr/libexec/locumview/provision
 9. Optionally sets up the demo user.
 10. Builds the AIDE database, last, after every other change (about 13 minutes on a test VM). The image's own database is in `/var`, which an installation does not carry over (changelog #59). After an image update, AIDE reports the new `/usr` until `aide --update`.
 
-With `UPDATE_IMAGE`, provisioning also makes the desktop track that image and accept only images from its repository signed with the key in `/usr/share/locumview/signing/cosign.pub` (a `sigstoreSigned` rule in `/etc/containers/policy.json`, sigstore attachments in `registries.d`, `bootc switch --enforce-container-sigpolicy`). The policy's default becomes `reject`, which bootc requires before it enforces signatures: Red Hat's registries keep their own signature rules, images already on the machine stay usable, and pulls from any other registry are refused on a desktop. CI signs in cosign's classic format (`.sig` tags), the one RHEL's container tools read. The switch takes effect at the next reboot. Updates are applied by an operator (`bootc upgrade`, then a planned reboot); the automatic update timer stays off, so a desktop never reboots under a clinician.
+With `UPDATE_IMAGE`, provisioning also makes the desktop track that image and accept only images from its repository signed with the key in `/usr/share/locumview/signing/cosign.pub` (a `sigstoreSigned` rule in `/etc/containers/policy.json`, sigstore attachments in `registries.d`, `bootc switch --enforce-container-sigpolicy`). The policy's default becomes `reject`, which bootc requires before it enforces signatures: Red Hat's registries keep their own signature rules, images already on the machine stay usable, and pulls from any other registry are refused on a desktop. CI signs in cosign's classic format (`.sig` tags), the one RHEL's container tools read. The switch takes effect at the next reboot.
+
+### Background updates stage only
+
+The image ships a vendor service drop-in at
+`/usr/lib/systemd/system/bootc-fetch-apply-updates.service.d/20-locumview-stage-only.conf`. It resets the inherited
+`ExecStart` and uses `/usr/bin/bootc upgrade`, without `--apply`. The vendor timer keeps its schedule, but its
+job only downloads and stages an update. It does not initiate a reboot. The drop-in waits for the first-boot
+provisioning service and requires its success marker before an automatic update can start.
+
+On the tested bootc 1.16.4, a staged update becomes the booted image at the next reboot. This includes an
+unexpected reboot: the policy prevents the update job from requesting a reboot, not other causes of reboot.
+The operator inspects `bootc status` and schedules the restart. `--download-only` is deliberately not used,
+because it requires a separate apply action before a reboot can activate the downloaded image. Upstream:
+[bootc upgrade](https://bootc.dev/bootc/man/bootc-upgrade.8.html).
+
+Existing local masks in `/etc/systemd/system` remain in force. In particular, the live demo's containment mask
+is not removed by this image change. No fleet-wide unmask or restart is part of building or promoting an image.
+Other local service overrides can take precedence too; inspect the effective unit before enabling staging.
+An operator may also leave the timer masked and run `bootc upgrade` manually in a maintenance window.
+
+After building this change, verify it on a disposable desktop before enabling the timer anywhere else:
+
+- The booted image contains the drop-in; the effective service has one `ExecStart`, `bootc upgrade`, with no
+  `--apply`, and preserves the vendor's `/run/ostree-booted` condition.
+- First-boot provisioning completes before automatic staging. No timer override removes its conditions.
+- With a separately approved newer signed candidate, start the update service as an owner run. Confirm the
+  newer digest is staged while boot ID, booted digest and session uptime stay unchanged. A successful service
+  invocation alone, with no newer image, does not prove staging behavior.
+- Perform an operator-approved reboot and verify that exact staged digest boots, rollback exists and no units
+  failed. Check the timer mask and effective service again. A live-demo mask stays until a separate owner decision.
+
+These deployed-desktop checks are pending until the updated image is built and exercised. Do not infer that
+current desktops have adopted the policy just because the source or build checks pass.
 
 Every step is safe to repeat; the service runs on each boot until it succeeds. When it succeeds it ejects the seed, which is the script's signal to detach and wipe it. On failure the seed stays attached: `journalctl -u locumview-provision` on the desktop.
 

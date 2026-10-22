@@ -222,7 +222,8 @@ fi
 #     The registry's CA, a read-only pull token for bootc, a signature policy for that repository (cosign key
 #     baked into the image), sigstore attachments, then bootc switch with the policy enforced. The switch is
 #     staged: it takes effect at the next reboot, and updates after that are applied by an operator
-#     (bootc upgrade, then a planned reboot); the automatic update timer stays off.
+#     (bootc upgrade, then a planned reboot). The image overrides the vendor update service to stage only;
+#     its timer may download updates after provisioning, but never requests a reboot. Local timer masks stay.
 if [ -n "$UPDATE_IMAGE" ]; then
   log image-updates
   repo=${UPDATE_IMAGE%%@*}; repo=${repo%:*}; reg=${repo%%/*}
