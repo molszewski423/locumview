@@ -47,7 +47,7 @@ re-checked today; see the pending owner runs), **ASSUMPTION** (inferred, not obs
 | 3.7 | The `sha256-<digest>` package versions without `.sig`/`.att` suffix are cosign or OCI side artifacts, not desktop images | not inspected | ASSUMPTION |
 | 4.1 | Repo references to `:stable`: `image.yml:15`, `promote.yml:1,9,10,100,102`, `image/desktop/README.md:46`, `hardening/stig/README.md:13`, `terraform/modules/libvirt-desktop/variables.tf:145`, `terraform/node1/site.auto.tfvars.example:8`; changelog | `git grep` on main | VERIFIED |
 | 4.2 | No reference to `:latest` remains in workflows, terraform, image or docs on main (the changelog mentions it historically) | `git grep` on main and branches | VERIFIED |
-| 4.3 | The git-ignored site values file on dev-laptop-2: key `update_image` ends in `:stable` (count 1), none in `:latest` | `grep -c` on the key line, value not printed | VERIFIED |
+| 4.3 | The git-ignored site values file on operator-laptop: key `update_image` ends in `:stable` (count 1), none in `:latest` | `grep -c` on the key line, value not printed | VERIFIED |
 | 4.4 | Provisioning passes `UPDATE_IMAGE` into the seed and runs `bootc switch --enforce-container-sigpolicy "$UPDATE_IMAGE"` under `set -euo pipefail` | `seed.sh:14`; `provision:12, 226-259` | VERIFIED |
 | 4.5 | **The clean-clone path is broken until `:stable` exists**: a desktop created today would switch to `:stable` at provisioning step 9b, which fails while the tag is absent, and `set -e` stops the script | 4.3 + 4.4 + 3.2 | ASSUMPTION (not run) |
 | 4.6 | `claude/rpm-image-install` changes nothing that provisioning executes: no difference to main in `usr/libexec/locumview/`, the provisioning unit, `packaging/remote-access/`, `image/desktop/install/` or `seed.sh`. The one RPM-owned file provisioning uses, the guest's `locumview-tour-on-connect.service` (enabled by `demo-user-root.sh`), keeps its path and content. **No ISO rebuild is needed for it** | `git diff --stat origin/main origin/claude/rpm-image-install -- <those paths>`: empty; RPM contents byte-compared with the image on 2026-10-21 | VERIFIED |
@@ -105,7 +105,7 @@ continue, and the failure is recorded as a finding.
    **One-way:** the first promotion has no previous digest to return to. If A proves bad, stop all new provisioning
    and investigate; never delete `:stable` as a rollback (desktops following it would fail to update, and new
    desktops would fail to provision).
-5. **Create a disposable test desktop following `:stable`.** Owner, P4 on dev-laptop-2: its secrets, an entry in
+5. **Create a disposable test desktop following `:stable`.** Owner, P4 on operator-laptop: its secrets, an entry in
    `terraform/node1/desktops.auto.tfvars` (for example `lv-test15`, default size, owner connection only), then
    `./tofu.sh plan -out` to a file; the owner reviews that **only `module.desktop["lv-test15"]` resources are added and
    nothing else changes or is destroyed**, that the summary is exactly `Plan: 10 to add, 0 to change, 0 to destroy.`
@@ -143,7 +143,7 @@ continue, and the failure is recorded as a finding.
 14. **[E] Re-promote B and upgrade forward.** Owner runs `promote` with digest DB. Check (agent): the log prints
     "previous :stable was DA"; `:stable` before = DA, after = **DB**. Owner, P10 again on the test desktop. Check:
     booted DB tracking `:stable`, rollback DA. This leaves `:stable` = DB for step 16. Undo: none needed (the restore).
-15. **Destroy the test desktop.** Owner, P11 on dev-laptop-2: remove its entry, `./tofu.sh plan -out` to a file, review
+15. **Destroy the test desktop.** Owner, P11 on operator-laptop: remove its entry, `./tofu.sh plan -out` to a file, review
     that **only `module.desktop["lv-test15"]` resources are destroyed and nothing else changes**, that the summary is
    exactly `Plan: 0 to add, 0 to change, 10 to destroy.` (finding 6.6), and reads the whole plan output; any other count is
    a hard stop. Then apply that saved plan;
@@ -201,7 +201,7 @@ CentOS Stream 10 container (as `packaging/rpm/publish-rpms.sh` does).
 
 Desktops accept SSH only from the k3s nodes, so desktop commands run from node1. The owner logs in with the owner's
 IdM account (key served by IdM) and types the owner's password for sudo; no desktop credential is decrypted.
-`<owner>` is the owner's IdM user. OpenTofu runs on dev-laptop-2, which holds the age key.
+`<owner>` is the owner's IdM user. OpenTofu runs on operator-laptop, which holds the age key.
 
 ```fish
 # P-status (every [E] gate, before and after): booted, staged and rollback, each with its image reference and digest
@@ -226,7 +226,7 @@ ssh -t <owner>@<lv-demo01-address> 'sudo journalctl -u bootc-fetch-apply-updates
 # P3 (step 16): switch lv-demo01 to :stable, then reboot (P-status before and after)
 ssh -t <owner>@<lv-demo01-address> 'sudo bootc switch --enforce-container-sigpolicy <registry>/mike/locumview-desktop:stable && sudo bootc status && sudo systemctl reboot'
 
-# P4 (step 5), on dev-laptop-2: secrets, the entry, a saved plan to review, then apply exactly that plan
+# P4 (step 5), on operator-laptop: secrets, the entry, a saved plan to review, then apply exactly that plan
 cd ~/Projects/locumview/terraform/node1
 ./secrets.sh desktop lv-test15
 #   add to desktops.auto.tfvars:   "lv-test15" = { user = "<owner>" }
@@ -266,7 +266,7 @@ ssh -t <owner>@<test-desktop-address> 'sudo bootc switch --enforce-container-sig
 #   verify booted DA; after step 14's promotion, switch back and verify booted DB tracking :stable:
 ssh -t <owner>@<test-desktop-address> 'sudo bootc switch --enforce-container-sigpolicy <registry>/mike/locumview-desktop:stable && sudo bootc status && sudo systemctl reboot'
 
-# P11 (step 15), on dev-laptop-2: remove the "lv-test15" entry from desktops.auto.tfvars, then a reviewed plan
+# P11 (step 15), on operator-laptop: remove the "lv-test15" entry from desktops.auto.tfvars, then a reviewed plan
 ./tofu.sh plan -input=false -no-color -out=lv-test15-destroy.tfplan | tee lv-test15-destroy-plan.txt
 grep -E '^  # ' lv-test15-destroy-plan.txt | grep -v 'module.desktop\["lv-test15"\]'
 #   expect: no output
