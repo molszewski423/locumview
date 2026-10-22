@@ -945,8 +945,24 @@ The release sequence in `notes/release-integrity-report.md`.
   (report step 18).
 - **Noted:** lv-demo01's `plocate-updatedb.service` has failed since 00:49 on 2026-10-22, before any of these steps;
   unrelated to the images, left as is for now.
-- **Open:** report steps 10 to 15 on lv-test15 (upgrade, full STIG scan, local and fleet rollback tests, re-promotion,
-  destruction); step 16, lv-demo01 to `:stable` (owner run); step 18, `:latest`.
+- **Image B on the test desktop `lv-test15`** (steps 10 to 12; owner runs from one reviewed script, agent checks
+  read-only):
+  - **Upgrade (step 10):** `bootc upgrade` staged exactly B from `:stable`; after the reboot lv-test15 booted B, with A
+    as rollback, nothing staged, the update timer masked and no failed units. The four LocumView RPMs are installed
+    (A has none); `rpm -V` on the deployed desktop reports only file times (`T`, all 81 files), because ostree
+    deploys every file with the time set to the epoch; sizes, digests, modes and owners match.
+  - **Full STIG scan (step 11):** `scan-stig.sh` reports 405 pass / 1 fail; the fail is `firewalld_sshd_port_enabled`,
+    the documented exception for image-built desktops. **#59's 405 / 0 and this 405 / 1 come from two profiles:**
+    `scan-stig.sh` always uses the reference desktop's profile, `stig_gui`, which includes that rule; #59 used the image
+    profile, `stig_gui_image`, which deselects it and adds the five partition rules (not applicable in #59). On the
+    447 rules the two share, every result is identical. Against the image profile, the release gate, B would
+    stand at 405 / 0 like #59, if the five partition rules (not evaluated in this run) are again not applicable. Evidence and the comparison: `docs/evidence/stig/20261022-image-B/` (the report's
+    addresses replaced with placeholders).
+  - **Local rollback (step 12):** `bootc rollback` and a reboot booted A with no failed units; a second rollback and
+    reboot booted B again, with A as rollback. The fleet rollback test (step 13) and re-promotion (step 14) were
+    skipped by the owner's decision: B was already `:stable`.
+- **Open:** destroying lv-test15 (step 15, plan to be reviewed first); lv-demo01 to `:stable` (step 16, owner run);
+  `:latest` until lv-demo01's next upgrade (step 18). Follow-up: `scan-stig.sh` takes the profile as an argument.
 - **Next Phase 4 task, planned: pin the RPM versions into the image build,** so a rebuild of the same commit installs
   the same packages. Today the image installs the newest build in the registry, which can change between two builds
   of one commit. Plan:
