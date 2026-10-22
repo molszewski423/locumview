@@ -964,8 +964,23 @@ The release sequence in `notes/release-integrity-report.md`.
     skipped by the owner's decision: B was already `:stable`.
 - **ROADMAP.md:** two Supply chain rows, Built: the per-image scan with verified promotion, and the signed RPMs (pinned
   versions and a COPR mirror Planned). Checked with the website's roadmap generator.
-- **Open:** destroying lv-test15 (step 15, plan to be reviewed first); lv-demo01 to `:stable` (step 16, owner run);
-  `:latest` until lv-demo01's next upgrade (step 18). Follow-up: `scan-stig.sh` takes the profile as an argument.
+- **Live demo switched (step 16, owner run):** the reviewed script staged exactly B with signature policy
+  enforced; the owner approved the reboot. After reboot the deployment origin tracks `:stable`, all four B RPMs
+  are installed, no units are failed, and the update timer is masked and inactive. Both owner and guest headless
+  remote-desktop processes are running under `gnome-remote-desktop-headless.service`; guacd reaches ports 3390
+  and 3391. The rollback deployment origin still tracks `:latest`. The owner supplied fresh post-reboot `bootc status`: booted B
+  (`sha256:50c14768c9440fd03e737c67d74e99cc736ce31fc961639640115f12b6800f5d`) from `:stable`,
+  nothing staged, rollback `:latest` at
+  `sha256:137e69fa630505997e3e3b911c5151f9cc4334c5f788e2bc725fd42668b08edc`.
+  A fresh browser sign-in was not tested.
+- **Test desktop destroyed (step 15, owner run):** the saved plan was checked for exactly ten deletions under
+  the test desktop module and applied by the owner: 0 added, 0 changed, 10 destroyed. Read-only checks confirm no
+  test domain or volumes in libvirt, no resolving host address, and no Guacamole connection. The apply log reports
+  removal of one Red Hat registration and the IdM host resource. Those external records were not independently
+  queried with credentials. The operator desktop configuration matches main.
+- **Open:** local encrypted test-secret and saved destroy-plan cleanup (owner decision);
+  `:latest` until the demo rollback tracks `:stable` (step 18).
+  Follow-up: `scan-stig.sh` takes the profile as an argument. Fleet rollback remains untested by owner decision.
 - **Next Phase 4 task, planned: pin the RPM versions into the image build,** so a rebuild of the same commit installs
   the same packages. Today the image installs the newest build in the registry, which can change between two builds
   of one commit. Plan:
