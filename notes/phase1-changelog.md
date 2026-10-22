@@ -863,3 +863,17 @@ Phase 4 (packaging and supply chain). Owner's choices: promotion and the per-ima
 - **Clinical AI planning (Part A, Planned, nothing built):** ADR 0017 (clinical AI workspace architecture: one React/FHIR app in the hardened Chrome, rules flag and a local model explains, OpenEMR with Synthea and SMART on FHIR, then the Epic and Oracle Health sandboxes; Electron rejected for now), Phase 9 lite right after Phase 4 with its done-when, and the order after version one. Committed earlier the same day (0c0aeb4).
 - **Epic Connectors (Part B, Planned, watch only):** Epic announced Connectors on 2026-10-21. Recorded under ADR 0017 "Future considerations" and in the Phase 9 notes: it supports the governance thesis (scoped, reviewable agent permissions); a read-only Connector for stewardship findings is a possible later delivery path, with rules and explanations kept in the LocumView agent service; LocumView stays EHR-neutral. Revisit when Epic publishes developer documentation.
 - **Shared agent context (Part C):** the owner's conventions and a session protocol now live in one global `AGENTS.md` in the owner's private memory repository, linked into each coding agent's global location (Claude Code, Codex). Every repository has its own `AGENTS.md` as the canonical project file, with `CLAUDE.md` reduced to `@AGENTS.md`; this repository's is new. The protocol: start with `git status`, `git fetch` and the latest handoff; work on `<agent>/<topic>` branches that the owner reviews and merges; sign commits and name the agent in an `Agent:` trailer; end with a handoff note in `notes/handoff/`. The owner's assistant (Linus) reads the same files read-only through its existing knowledge sync.
+
+## 64. PHP "php2shell" (CVE-2026-109618, CVE-2026-109619): not exposed (2026-10-22)
+
+The PHP project fixed two critical, actively exploited remote code execution flaws in the PHP interpreter on
+2026-10-21 (CVSS v4.0 9.2; fixed in 8.5.12, 8.4.27, 8.3.36, 8.2.35). LocumView was checked the next day, read-only.
+
+- **Not exposed:** no PHP in the desktop image in production or on the running desktops, on node1, node2, idm01,
+  dev-laptop-1 or dev-laptop-2, in any of the 38 images running on the k3s cluster, in the images of deployments
+  scaled to zero, or in the website. No patch or mitigation was needed. Method and table: `docs/evidence/security/20261022-php2shell.md`.
+- **For the plan:** OpenEMR, Phase 9 lite's mock EHR, is a PHP application; it must run on a fixed PHP release, and its
+  image is covered by the same check (`docs/PLAN.md`).
+- **Why it is recorded:** a clinical platform has to show that it tracks security advisories that could reach it,
+  including the ones that turn out not to apply, and how that was established.
+
