@@ -20,6 +20,7 @@ Status as of 2026-10-22. Labels: **Done** (built and verified), **Open** (versio
 - CI that re-runs the pre-commit checks on every push. **Done**
 - Scoped kubeconfig for operators; admin GDM connection credentials into SOPS; Tomcat error page; cluster-wide egress policies. **Open**
 - Backup procedure for desktop VMs on node1. **Open**
+- `scan-stig.sh` takes the profile as an argument, defaulting to the image profile on image-built desktops, so a deployed-desktop scan reports on the release gate's profile directly (changelog #66). **Planned**
 - Encryption at rest for desktop disks and cluster nodes. Desktops installed from the bootc image: LUKS bound to the vTPM (changelog #53). The hand-built reference desktop (until it is replaced) and the cluster nodes: **Open**
 - The rules the SSG HIPAA profile still fails: 39 on the reference desktop, 37 on desktops built from the bootc image (2026-10-20, which pass partition_for_var_log_audit and rpm_verify_permissions): applied through the tailoring or documented. **Open**
 
