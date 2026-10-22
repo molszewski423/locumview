@@ -56,13 +56,34 @@ RUN --mount=type=secret,id=rhsm --mount=type=bind,target=/src \
     done; \
     rpm -q google-chrome-stable
 
-# 2. The LocumView desktop: extensions, Papirus, branding, wallpapers, tour, system dconf defaults and the
-#    organization layout (mac, locked). Same script as the hand-built desktop, in image mode (installs to /usr).
+# 1c. LocumView's own pieces as RPMs (packaging/rpm/, changelog #62): the shell extensions, branding, the Tour and
+#     the EHR launcher, the newest build in the registry. Every package must carry the LocumView signature (key
+#     pinned in this repository, fingerprint checked first) and the repository metadata the registry's. The
+#     registry's CA is a build secret (lanca, a public certificate); the build runs with the host network, where
+#     the registry is. The repository file is removed afterwards, as for Chrome: updates arrive with the image.
+RUN --mount=type=secret,id=lanca --mount=type=bind,target=/src \
+    set -euo pipefail; \
+    install -m 0644 /src/packaging/rpm/signing/RPM-GPG-KEY-locumview /etc/pki/rpm-gpg/RPM-GPG-KEY-locumview; \
+    gpg --show-keys --with-colons /etc/pki/rpm-gpg/RPM-GPG-KEY-locumview \
+        | grep -qx 'fpr:::::::::F265A948919739767055AD280F02A990167EA18E:'; \
+    install -m 0644 /run/secrets/lanca /etc/pki/ca-trust/source/anchors/locumview-registry-build.crt; \
+    update-ca-trust; \
+    install -m 0644 /src/packaging/rpm/locumview.repo /etc/yum.repos.d/locumview.repo; \
+    dnf -y --disablerepo='*' --enablerepo=locumview install \
+        locumview-shell-extensions locumview-branding locumview-tour locumview-ehr-launcher; \
+    rm -f /etc/yum.repos.d/locumview.repo /etc/pki/ca-trust/source/anchors/locumview-registry-build.crt; \
+    update-ca-trust; \
+    rpm -q locumview-shell-extensions locumview-branding locumview-tour locumview-ehr-launcher
+
+# 2. The rest of the LocumView desktop: third-party extensions, Papirus, the hidden GNOME Tour entry, system dconf
+#    defaults and the organization layout (mac, locked). Same script as the hand-built desktop, in image mode
+#    (installs to /usr); LV_RPMS=1 skips what the RPMs above provide.
 RUN --mount=type=bind,target=/src \
     set -euo pipefail; \
     cp -a /src/packaging /tmp/packaging; \
-    LV_IMAGE_BUILD=1 bash /tmp/packaging/install-desktop.sh; \
-    rm -rf /tmp/packaging
+    LV_IMAGE_BUILD=1 LV_RPMS=1 bash /tmp/packaging/install-desktop.sh; \
+    rm -rf /tmp/packaging; \
+    rpm -V locumview-shell-extensions locumview-branding locumview-tour locumview-ehr-launcher
 
 # 3. Image-only files: the XDG override, the always-on headless session drop-in, the faillock directory, the
 #    first-boot Flatpak installer and first-boot provisioning (with the remote-access scripts it runs), the public
@@ -72,6 +93,7 @@ RUN --mount=type=bind,target=/src \
 RUN --mount=type=bind,target=/src \
     set -euo pipefail; \
     bash /src/image/desktop/scripts/install-files.sh /src/image/desktop/files; \
+    rpm -V locumview-ehr-launcher locumview-branding; \
     install -d -m 0755 /usr/libexec/locumview/remote-access; \
     install -m 0755 /src/packaging/remote-access/user-mode-user.sh /src/packaging/remote-access/demo-user-root.sh \
         /usr/libexec/locumview/remote-access/; \

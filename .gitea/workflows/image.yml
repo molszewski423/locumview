@@ -32,6 +32,7 @@ concurrency:
 env:
   IMAGE: git.lan/mike/locumview-desktop
   SCAN_TYPE: https://locumview.org/attestations/image-stig-scan/v1
+  LAN_CA: /usr/local/share/ca-certificates/mkcert-node1.crt
 
 jobs:
   build:
@@ -76,7 +77,10 @@ jobs:
           printf 'RHSM_ORG=%s\nRHSM_KEY=%s\n' "$RHSM_ORG" "$RHSM_KEY" > "$R"
           trap 'shred -u "$R" 2>/dev/null || true' EXIT
           cd src
-          podman build --authfile "$JOB/auth.json" --secret id=rhsm,src="$R" \
+          # Host network: the LocumView RPMs come from the registry on the LAN (Containerfile step 1c), which a
+          # rootless container network cannot reach on this host; lanca is the registry's CA (public).
+          podman build --network host --authfile "$JOB/auth.json" --secret id=rhsm,src="$R" \
+            --secret id=lanca,src="$LAN_CA" \
             --label org.opencontainers.image.revision="$GITHUB_SHA" \
             --label org.opencontainers.image.source="https://git.lan/${GITHUB_REPOSITORY}" \
             -f image/desktop/Containerfile -t "$IMAGE:$TAG" .

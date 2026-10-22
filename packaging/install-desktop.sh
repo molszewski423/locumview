@@ -12,6 +12,9 @@
 set -euo pipefail
 SRC=$(cd "$(dirname "$0")" && pwd)/branding
 IMAGE=${LV_IMAGE_BUILD:-0}
+# LV_RPMS=1 (image build, changelog #62): the locumview-* RPMs already provide our extensions, the logo, the login
+# logo, the Tour and the wallpapers; those steps are skipped.
+RPMS=${LV_RPMS:-0}
 if [ "$IMAGE" = 1 ]; then SHARE=/usr/share; OVERRIDE=/usr/share/locumview/override; BIN=/usr/bin; USERUNITS=/usr/lib/systemd/user
 else SHARE=/usr/local/share; OVERRIDE=/usr/local/share; BIN=/usr/local/bin; USERUNITS=/etc/systemd/user; fi
 relabel() { [ "$IMAGE" = 1 ] || restorecon "$@"; }   # the image is labelled when it is deployed
@@ -70,14 +73,18 @@ rm -rf "$EXT_DIR/blur-my-shell@aunetx"
 install -d "$EXT_DIR/blur-my-shell@aunetx"
 unzip -q "$BZIP" -d "$EXT_DIR/blur-my-shell@aunetx"; rm -f "$BZIP"
 glib-compile-schemas "$EXT_DIR/blur-my-shell@aunetx/schemas"
+if [ "$RPMS" != 1 ]; then
 rm -rf "$EXT_DIR/locumview-activities@locumview.org"
 cp -r "$SRC/../extensions/locumview-activities@locumview.org" "$EXT_DIR/"
 rm -rf "$EXT_DIR/locumview-clipboard-guard@locumview.org"
 cp -r "$SRC/../extensions/locumview-clipboard-guard@locumview.org" "$EXT_DIR/"   # clears the clipboard after a timeout (PHI)
+fi
 install -d -m 755 /etc/locumview
 [ -f /etc/locumview/clipboard.conf ] || printf '# Seconds before copied content is cleared from the clipboard (organization policy; PHI).\nCLIPBOARD_TTL_SECONDS=300\n' > /etc/locumview/clipboard.conf
+if [ "$RPMS" != 1 ]; then
 rm -rf "$EXT_DIR/locumview-layout@locumview.org"
 cp -r "$SRC/../extensions/locumview-layout@locumview.org" "$EXT_DIR/"   # Mac/Windows layout switch (Quick Settings)
+fi
 chmod -R u=rwX,go=rX "$EXT_DIR"
 
 # 3. Papirus icon theme from the pinned upstream release (not packaged in RHEL; EPEL avoided, see changelog #10).
@@ -105,6 +112,8 @@ for t in Papirus Papirus-Dark Papirus-Light; do
 done
 XDG_DATA_DIRS=$SHARE "$SRC/../vendor/papirus-folders" -o -C teal --theme Papirus
 
+GDM_LOGO=$SHARE/pixmaps/locumview-gdm-logo.png   # used by the dconf defaults below, from the RPM or step 4
+if [ "$RPMS" != 1 ]; then
 # 4. Top-bar logo. gnome-shell shows the icon named by LOGO= in /etc/os-release ("fedora-logo-icon" on RHEL).
 #    The override directory precedes /usr/share in XDG_DATA_DIRS, so same-named hicolor icons there win.
 for s in 16 22 24 32 36 48 64 96 128 256; do
@@ -121,7 +130,6 @@ gtk-update-icon-cache -f -t "$ICONS"
 
 # GDM greeter + lock-screen logo (org.gnome.login-screen logo; RHEL default is the Red Hat mark).
 # Rendered at 2x: GDM scales it to a fixed 48px logical height.
-GDM_LOGO=$SHARE/pixmaps/locumview-gdm-logo.png
 install -d "$SHARE/pixmaps"
 rsvg-convert -h 96 "$SRC/locumview-gdm-logo.svg" -o "$GDM_LOGO"
 chmod 644 "$GDM_LOGO"
@@ -130,7 +138,7 @@ chmod 644 "$GDM_LOGO"
 #     first login (autostart, --first-run marker in ~/.local/state/locumview), and from the app grid any time.
 #     GNOME's own welcome dialog is suppressed below (welcome-dialog-last-shown-version) and GNOME Tour hidden.
 TOUR=$SRC/../tour
-install -d "$SHARE/locumview-tour" "$SHARE/applications" "$OVERRIDE/applications" /etc/xdg/autostart
+install -d "$SHARE/locumview-tour" "$SHARE/applications" /etc/xdg/autostart
 install -m 644 "$TOUR"/art/*.svg "$SHARE/locumview-tour/"
 sed "s|/usr/local/share/locumview-tour|$SHARE/locumview-tour|g" "$TOUR/locumview-tour" > "$BIN/locumview-tour"; chmod 755 "$BIN/locumview-tour"
 sed "s|/usr/local/bin/|$BIN/|g" "$TOUR/org.locumview.Tour.desktop" > "$SHARE/applications/org.locumview.Tour.desktop"
@@ -140,14 +148,17 @@ chmod 644 "$SHARE/applications/org.locumview.Tour.desktop" /etc/xdg/autostart/or
 sed "s|/usr/local/bin/|$BIN/|g" "$TOUR/locumview-tour-on-connect" > "$BIN/locumview-tour-on-connect"; chmod 755 "$BIN/locumview-tour-on-connect"
 install -d "$USERUNITS"
 sed "s|/usr/local/bin/|$BIN/|g" "$TOUR/locumview-tour-on-connect.service" > "$USERUNITS/locumview-tour-on-connect.service"; chmod 644 "$USERUNITS/locumview-tour-on-connect.service"
+fi
 # The override directory precedes /usr/share in XDG_DATA_DIRS: this copy hides GNOME Tour from the app grid.
+install -d "$OVERRIDE/applications"
 sed '/^\[Desktop Entry\]/a NoDisplay=true' /usr/share/applications/org.gnome.Tour.desktop > "$OVERRIDE/applications/org.gnome.Tour.desktop"
 update-desktop-database -q "$SHARE/applications" || true
 update-desktop-database -q "$OVERRIDE/applications" || true
-relabel -R "$BIN/locumview-tour" "$BIN/locumview-tour-on-connect" "$SHARE/locumview-tour" "$SHARE/applications" /etc/xdg/autostart "$USERUNITS/locumview-tour-on-connect.service"
+[ "$RPMS" = 1 ] || relabel -R "$BIN/locumview-tour" "$BIN/locumview-tour-on-connect" "$SHARE/locumview-tour" "$SHARE/applications" /etc/xdg/autostart "$USERUNITS/locumview-tour-on-connect.service"
 
 # 5. Wallpapers: every wallpapers/<name>-{light,dark}.svg pair (text pre-outlined, see branding/README), rendered to PNG (no font dependency at
 #    runtime) and listed in Settings > Appearance. Stale PNGs from earlier runs are removed.
+if [ "$RPMS" != 1 ]; then
 rm -rf "$BG"; install -d "$BG"
 install -d "$(dirname "$PROPS")"
 {
@@ -172,6 +183,7 @@ install -d "$(dirname "$PROPS")"
   echo '</wallpapers>'
 } > "$PROPS"
 chmod 644 "$BG"/*.png "$PROPS"
+fi
 
 # 6. System-wide defaults via the "local" dconf db (already in /etc/dconf/profile/user).
 #    picture-uri / picture-uri-dark switch automatically with the light/dark color-scheme.
