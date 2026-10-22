@@ -23,3 +23,19 @@ source) when it comes back.
 4. **US clinical decision support.** Check the stewardship agent's outputs against FDA's 2022 final Clinical
    Decision Support guidance (non-directive, not time-critical, independently reviewable), not only the
    statutory exemption.
+
+## Clinical evaluation (ADR 0018, 2026-10-22)
+
+5. **IRB exemption for published reviewer assessments.** External clinicians will score a research prototype's
+   findings on synthetic patient cases (no patients, no patient data). The individual assessments are kept
+   pseudonymized and may be published in aggregate (a conference abstract or a journal article). Does publishing
+   them need an IRB exemption determination (for example under 45 CFR 46.104), or are the reviewers not human
+   subjects because they are assessing a system rather than being studied? Would a journal require a determination
+   letter regardless, and from what kind of board, given there is no institution?
+6. **Reviewer data across the US and the EU.** Reviewer profiles hold professional name, designation, specialty,
+   board certifications, years of experience, a conflict-of-interest declaration, consent records and an email
+   address; no license numbers (`docs/plans/phase9-lite-and-review-workspace.md`, section 6). Which lawful basis
+   applies to each purpose for an EU-based reviewer (consent or legitimate interests), are the proposed retention
+   and deletion terms adequate, does recruiting EU reviewers deliberately change the Article 27 answer (question 1),
+   and does any US state privacy law apply to US reviewers at this scale? Until this is answered, only US-based
+   reviewers are invited.

@@ -1,6 +1,6 @@
 # LocumView roadmap
 
-Status as of 2026-10-21. Labels: **Done** (built and verified), **Open** (version-one work not finished), **In progress** (work has started outside version one, not finished or shipped), **Planned** (after version one, or alongside it only if it doesn't delay it), **Parked** (deliberately not pursued for now). The build log ([notes/phase1-changelog.md](notes/phase1-changelog.md)) and [docs/PLAN.md](docs/PLAN.md) hold the detail.
+Status as of 2026-10-22. Labels: **Done** (built and verified), **Open** (version-one work not finished), **In progress** (work has started outside version one, not finished or shipped), **Planned** (after version one, or alongside it only if it doesn't delay it), **Parked** (deliberately not pursued for now). The build log ([notes/phase1-changelog.md](notes/phase1-changelog.md)) and [docs/PLAN.md](docs/PLAN.md) hold the detail.
 
 ## Version one (scope locked by ADR 0009)
 
@@ -25,7 +25,7 @@ Status as of 2026-10-21. Labels: **Done** (built and verified), **Open** (versio
 
 ## Planned after version one
 
-Order after version one: move the live demo to an image-built desktop (done 2026-10-21); Phase 4 (packaging and supply chain); Phase 9 lite (clinical AI demo, ADR 0017); Phase 8 lite (demo video and first write-ups); Phase 7 (AWS, alongside SAA-C03). Phase 5 (SUSE) keeps running in parallel. The phases are described in [docs/PLAN.md](docs/PLAN.md).
+Order after version one (revised 2026-10-22): move the live demo to an image-built desktop (done 2026-10-21); Phase 4 (packaging and supply chain, in progress); Phase 9 lite (clinical AI demo ending in a frozen evaluation build, ADR 0017); Phase 8 lite (demo video and first write-ups); Phase 7 (AWS, alongside SAA-C03); the Clinical Review Workspace, the first slice of the full Phase 9 (ADR 0018); then Phase 6 and the full Phase 9. The Review Workspace must not delay Phase 8 lite. Phase 5 (SUSE) keeps running in parallel. The phases are described in [docs/PLAN.md](docs/PLAN.md); Phase 9 lite and the Review Workspace in [docs/plans/phase9-lite-and-review-workspace.md](docs/plans/phase9-lite-and-review-workspace.md), under the rules in [docs/policy/synthetic-data-and-independence.md](docs/policy/synthetic-data-and-independence.md).
 
 | Area | Item | Status | Reference |
 |---|---|---|---|
@@ -48,6 +48,9 @@ Order after version one: move the live demo to an image-built desktop (done 2026
 | Integrations | Nextcloud (files) via Keycloak OIDC, as a reference integration | Planned | ADR 0009 |
 | Integrations | Synthetic FHIR server, Matrix messaging | Planned | ADR 0009 |
 | Clinical AI | Detachable clinical AI module (US only, FDA CDS design principles): one web app in the hardened Chrome, launched from the desktop and as a SMART on FHIR app from the EHR; deterministic rules flag, a local model explains; Antimicrobial Stewardship, IV to PO and ADE Monitoring queues. First, Phase 9 lite: a clinical AI demo on OpenEMR with synthetic patients, showing a stewardship and an IV to PO finding; then the full Phase 9. Watch item: Epic Connectors (announced 2026-10-21) as a possible read-only delivery path for stewardship findings; revisit when Epic publishes developer documentation | Planned | ADR 0008, 0017 |
+| Clinical AI | Phase 9 lite: first a spike (a scenario loaded into OpenEMR reproducibly, cultures and susceptibilities read back through its FHIR API), then a versioned scenario library of 10 to 20 synthetic cases (20 to 30 for evaluation, with negative controls and ambiguous cases), the clinical app with EHR launch, rules and explanations, internal refinement; exit: a frozen, versioned evaluation build | Planned | ADR 0017 (update 2026-10-22), docs/plans/phase9-lite-and-review-workspace.md |
+| Clinical AI | Clinical Review Workspace: invited external clinicians assess the frozen build's findings on synthetic cases, through Keycloak with MFA, Guacamole and a short-lived desktop that opens the Review app; minimal reviewer data, no license numbers; first round three clinical pharmacists. A structured expert review, not clinical validation | Planned | ADR 0018 |
+| Clinical AI | Synthetic data and independence policy: synthetic patients only, no data from any employer, own resources only, not used in the owner's clinical work, no implied affiliation, reviewers recruited externally only | Adopted 2026-10-22 | docs/policy/synthetic-data-and-independence.md |
 | Distributions | SUSE / openSUSE build from the same definitions | **In progress, not shipped** | Infrastructure work has begun and runs largely in parallel with the RHEL build; not supported or shipped yet |
 | Distributions | Debian build from the same definitions | Planned | |
 
