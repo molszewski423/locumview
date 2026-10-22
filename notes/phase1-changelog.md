@@ -935,6 +935,9 @@ The release sequence in `notes/release-integrity-report.md`.
     (locumview-shell-extensions, -branding, -tour, -ehr-launcher), signed RSA/SHA256 with key ID 0f02a990167ea18e
     (the pinned LocumView key, fingerprint F265 A948 9197 3976 7055 AD28 0F02 A990 167E A18E); `rpm -V` clean on all
     four; the build's temporary repository file and CA are gone. Checked in a container of B with no network.
+  - As published: the four RPM files downloaded from the RPM registry pass `rpmkeys -K` (header signature with key ID
+    167ea18e, header and payload digests) against a throwaway keyring holding only the committed key, and fail without
+    it. Run on lv-test15 without root.
 - **Image B promoted** (promote run 232): the workflow verified all three attachments again; `:stable` is now B, byte
   for byte (the manifest at `:stable` hashes to B's digest). Previous `:stable`: A; to roll back, run the workflow
   with A's digest.
