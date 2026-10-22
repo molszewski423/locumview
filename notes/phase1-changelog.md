@@ -870,7 +870,7 @@ The PHP project fixed two critical, actively exploited remote code execution fla
 2026-10-21 (CVSS v4.0 9.2; fixed in 8.5.12, 8.4.27, 8.3.36, 8.2.35). LocumView was checked the next day, read-only.
 
 - **Not exposed:** no PHP in the desktop image in production or on the running desktops, on node1, node2, idm01,
-  dev-laptop-1 or dev-laptop-2, in any of the 38 images running on the k3s cluster, in the images of deployments
+  suse-laptop or operator-laptop, in any of the 38 images running on the k3s cluster, in the images of deployments
   scaled to zero, or in the website. No patch or mitigation was needed. Method and table: `docs/evidence/security/20261022-php2shell.md`.
 - **For the plan:** OpenEMR, Phase 9 lite's mock EHR, is a PHP application; it must run on a fixed PHP release, and its
   image is covered by the same check (`docs/PLAN.md`).
