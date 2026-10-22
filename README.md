@@ -98,7 +98,7 @@ Beyond the base desktop, LocumView is meant to host research tooling and local L
 
 LocumView **integrates rather than bundles**: it works with the identity provider, directory, file storage and clinical systems an organization already runs, through open standards. The homelab instances (Keycloak, IdM, Nextcloud, a synthetic FHIR server) demonstrate those integrations; they are not product components. Clinical decision support is a detachable module: outside version one, and outside the initial EU product, which needs medical-device certification for it ([ADR 0008](docs/adr/0008-eu-regulatory-posture.md)).
 
-Planned next, in order: packaging and supply chain (Phase 4); a clinical AI demo on synthetic data and local models (Phase 9 lite, [ADR 0017](docs/adr/0017-clinical-ai-workspace-architecture.md)); a demo video and write-ups (Phase 8 lite); then AWS (Phase 7). None of the clinical AI work is built yet.
+Planned next, in order: packaging and supply chain (Phase 4); a clinical AI demo on synthetic data and local models (Phase 9 lite, [ADR 0017](docs/adr/0017-clinical-ai-workspace-architecture.md)); a demo video and write-ups (Phase 8 lite); then AWS (Phase 7). None of the clinical AI work is built yet. Epic's Connectors (announced 2026-10-21) are on watch as a possible later delivery path, nothing more ([ADR 0017](docs/adr/0017-clinical-ai-workspace-architecture.md)).
 
 These are plans, listed with their status in [ROADMAP.md](ROADMAP.md).
 
