@@ -7,6 +7,8 @@ SRC=${1:?usage: install-files.sh <files-dir>}
 cd "$SRC"
 find . -mindepth 1 -type d -printf '%P\n' | while read -r d; do install -d -m 0755 "/$d"; done
 find . -type f -printf '%P\n' | while read -r f; do
+  # Files a LocumView RPM now owns (packaging/rpm/) come from the package; copying them again would change them.
+  if rpm -qf --qf '%{NAME}\n' "/$f" 2>/dev/null | grep -q '^locumview-'; then continue; fi
   case "$f" in usr/libexec/*) m=0755 ;; *) m=0644 ;; esac
   install -m "$m" "$f" "/$f"
 done
