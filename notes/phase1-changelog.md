@@ -961,6 +961,8 @@ The release sequence in `notes/release-integrity-report.md`.
   - **Local rollback (step 12):** `bootc rollback` and a reboot booted A with no failed units; a second rollback and
     reboot booted B again, with A as rollback. The fleet rollback test (step 13) and re-promotion (step 14) were
     skipped by the owner's decision: B was already `:stable`.
+- **ROADMAP.md:** two Supply chain rows, Built: the per-image scan with verified promotion, and the signed RPMs (pinned
+  versions and a COPR mirror Planned). Checked with the website's roadmap generator.
 - **Open:** destroying lv-test15 (step 15, plan to be reviewed first); lv-demo01 to `:stable` (step 16, owner run);
   `:latest` until lv-demo01's next upgrade (step 18). Follow-up: `scan-stig.sh` takes the profile as an argument.
 - **Next Phase 4 task, planned: pin the RPM versions into the image build,** so a rebuild of the same commit installs
