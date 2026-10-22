@@ -993,3 +993,27 @@ The release sequence in `notes/release-integrity-report.md`.
      fails with a clear message.
   5. Check: two builds of one commit record identical package NEVRAs in their SBOMs. Identical image digests are a
      separate goal: build 106 and 107 of one commit already differed.
+
+## 67. Pin LocumView RPM versions to the image commit (2026-10-22, In progress)
+
+- **Problem:** image builds installed the newest signed LocumView packages available in the registry, so two
+  builds of one image commit could install different RPM versions.
+- **Implemented on the review branch:** `packaging/rpm/resolve-version.py` selects the last commit on the image
+  revision's first-parent history that touched a path in `packaging/rpm/inputs.txt`. It derives the version from
+  that commit's spec and the release from its UTC committer time and fixed ten-character hash. Both RPM and image
+  workflows use this selection. The RPM builder reads its archive, spec and builder pin from the selected source.
+- **Input coverage:** one checked list covers package sources, all desktop image files, build/sign/publish tools,
+  builder and signing metadata, license and RPM workflow. The RPM workflow trigger paths must match; a pre-commit
+  check rejects drift. The broader desktop-file coverage favors rebuilding over missing a new packaged input.
+- **Exact installation:** the image requires a version-release build argument, requests all four noarch package
+  versions explicitly, retains package and metadata signature checks, and verifies installed version-release.
+  No fallback to a newer release. If publication is not ready, the image build fails with the required version
+  and a message to check RPM publication before retrying the same image commit. Job order is not guaranteed.
+- **Verified locally:** nine tests use temporary Git histories and the real installation shell step with mocked
+  package commands. They cover unrelated/future commits, input and spec changes, merge selection, UTC release
+  calculation, shallow-history rejection, trigger drift, missing build argument, exact package requests, and
+  missing-publication failure. Both workflow files parse; all sixteen workflow shell steps and the RPM builder
+  pass Bash syntax checks.
+- **Not yet verified:** signed package publication from this implementation, a full image build, or two builds'
+  four LocumView NEVRAs compared through verified SBOM attestations. This is version pinning, not a claim of
+  byte-identical RPMs or images. No promotion or desktop update is part of this change.

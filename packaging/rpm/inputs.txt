@@ -1,0 +1,8 @@
+# Changes to these paths select a new RPM source commit. Keep rpms.yml push.paths identical.
+LICENSE
+packaging/rpm/**
+packaging/extensions/**
+packaging/branding/**
+packaging/tour/**
+image/desktop/files/**
+.gitea/workflows/rpms.yml

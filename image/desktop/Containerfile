@@ -2,7 +2,8 @@
 #
 # Build from the repository root (see image/desktop/README.md):
 #   podman build --secret id=rhsm,src=<file with RHSM_ORG=... and RHSM_KEY=...> \
-#     -f image/desktop/Containerfile -t <registry>/locumview/desktop:<tag> .
+#     --secret id=lanca,src=<registry CA file> --build-arg LOCUMVIEW_RPM_EVR=<resolved version-release> \
+#     --network host -f image/desktop/Containerfile -t <registry>/locumview/desktop:<tag> .
 #
 # No FIPS mode: GNOME Remote Desktop's RDP sign-in (NLA, NTLM) needs MD4, which FIPS mode disables (ADR 0012).
 #
@@ -57,20 +58,32 @@ RUN --mount=type=secret,id=rhsm --mount=type=bind,target=/src \
     rpm -q google-chrome-stable
 
 # 1c. LocumView's own pieces as RPMs (packaging/rpm/, changelog #62): the shell extensions, branding, the Tour and
-#     the EHR launcher, the newest build in the registry. Every package must carry the LocumView signature (key
+#     the EHR launcher, pinned to the RPM source selected from the image commit's history. Every package must carry
+#     the LocumView signature (key
 #     pinned in this repository, fingerprint checked first) and the repository metadata the registry's. The
 #     registry's CA is a build secret (lanca, a public certificate); the build runs with the host network, where
 #     the registry is. The repository file is removed afterwards, as for Chrome: updates arrive with the image.
+ARG LOCUMVIEW_RPM_EVR
 RUN --mount=type=secret,id=lanca --mount=type=bind,target=/src \
     set -euo pipefail; \
+    : "${LOCUMVIEW_RPM_EVR:?pass the exact version-release from packaging/rpm/resolve-version.py}"; \
     install -m 0644 /src/packaging/rpm/signing/RPM-GPG-KEY-locumview /etc/pki/rpm-gpg/RPM-GPG-KEY-locumview; \
     gpg --show-keys --with-colons /etc/pki/rpm-gpg/RPM-GPG-KEY-locumview \
         | grep -qx 'fpr:::::::::F265A948919739767055AD280F02A990167EA18E:'; \
     install -m 0644 /run/secrets/lanca /etc/pki/ca-trust/source/anchors/locumview-registry-build.crt; \
     update-ca-trust; \
     install -m 0644 /src/packaging/rpm/locumview.repo /etc/yum.repos.d/locumview.repo; \
-    dnf -y --disablerepo='*' --enablerepo=locumview install \
-        locumview-shell-extensions locumview-branding locumview-tour locumview-ehr-launcher; \
+    if ! dnf -y --refresh --disablerepo='*' --enablerepo=locumview install \
+        "locumview-shell-extensions-${LOCUMVIEW_RPM_EVR}.noarch" \
+        "locumview-branding-${LOCUMVIEW_RPM_EVR}.noarch" \
+        "locumview-tour-${LOCUMVIEW_RPM_EVR}.noarch" \
+        "locumview-ehr-launcher-${LOCUMVIEW_RPM_EVR}.noarch"; then \
+        echo "Required LocumView RPMs ${LOCUMVIEW_RPM_EVR} could not be installed. Check the RPM publication job and repository, then rerun this image build; no newer-version fallback is allowed." >&2; \
+        exit 1; \
+    fi; \
+    for package in locumview-shell-extensions locumview-branding locumview-tour locumview-ehr-launcher; do \
+        test "$(rpm -q --qf '%{VERSION}-%{RELEASE}' "$package")" = "$LOCUMVIEW_RPM_EVR"; \
+    done; \
     rm -f /etc/yum.repos.d/locumview.repo /etc/pki/ca-trust/source/anchors/locumview-registry-build.crt; \
     update-ca-trust; \
     rpm -q locumview-shell-extensions locumview-branding locumview-tour locumview-ehr-launcher

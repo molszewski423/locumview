@@ -21,6 +21,13 @@ repos:
 
   - repo: local
     hooks:
+      - id: rpm-version-selection
+        name: RPM version selection and workflow input consistency
+        entry: python3 packaging/rpm/test-resolve-version.py
+        language: system
+        pass_filenames: false
+        files: ^(packaging/rpm/|image/desktop/Containerfile$|\.gitea/workflows/(rpms|image)\.yml$)
+
       - id: sops-encrypted
         name: SOPS files are encrypted (ADR 0003)
         entry: python3 scripts/check-sops-encrypted.py
