@@ -28,7 +28,6 @@ vault_pass*
 *.swp
 
 # Operator tooling notes, kept locally and on Gitea only, not on public mirrors
-CLAUDE.md
 
 # Generated brand kit (packaging/branding/build-web-assets.sh)
 build/
