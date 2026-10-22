@@ -877,3 +877,35 @@ The PHP project fixed two critical, actively exploited remote code execution fla
 - **Why it is recorded:** a clinical platform has to show that it tracks security advisories that could reach it,
   including the ones that turn out not to apply, and how that was established.
 
+
+## 65. Plan: Phase 9 lite and the Clinical Review Workspace (2026-10-22, planning only)
+
+Planning and documentation; nothing built, deployed or provisioned. Phase 4 stays the current priority.
+
+- **Sequence (ROADMAP.md, docs/PLAN.md):** Phase 4, then Phase 9 lite, Phase 8 lite, Phase 7 alongside SAA-C03, then the Clinical
+  Review Workspace as the first slice of the full Phase 9, then Phase 6 and the full Phase 9; Phase 5 in parallel. The
+  Review Workspace must not delay Phase 8 lite. Every new item is Planned.
+- **ADR 0017, update of 2026-10-22:** the architecture stands; Phase 9 lite gains a versioned scenario library (10 to
+  20 synthetic cases, 20 to 30 for evaluation, with negative controls and ambiguous cases, loaded from the repository
+  only), a first spike before any UI work, and an exit criterion: a frozen, versioned evaluation build.
+- **ADR 0018 (new): Clinical Review Workspace.** A subproject, not a product, on the existing image, OpenTofu,
+  Keycloak with TOTP, IdM, Guacamole and k3s. Invitation, reviewer entry point, Keycloak and MFA, Guacamole, a
+  short-lived desktop with the per-user headless session that opens the Review app. A browser-only fallback is
+  recorded as an option, not chosen. Reviewer data minimized; no license numbers.
+- **Plan:** `docs/plans/phase9-lite-and-review-workspace.md` (milestones M1 to M10 with acceptance criteria,
+  dependencies, evaluation methodology, reviewer workflow and app architecture, node1 capacity, reviewer data,
+  build-log milestones, proposed website disclosure text, open decisions).
+- **Policy:** `docs/policy/synthetic-data-and-independence.md`: LocumView's own rules: synthetic patients only; no data
+  from any employer, identified or de-identified; own resources only; not used in the owner's clinical work; no
+  implied affiliation; reviewers recruited externally only.
+- **Legal questions 5 and 6** added: an IRB exemption determination for publishing aggregated assessments; reviewer
+  data across the US and the EU.
+- **Found: OpenEMR's documented FHIR support is read and search.** Checked against OpenEMR's FHIR and API
+  documentation (release 8.0.0): it does not say which resources accept writes and does not mention microbiology or
+  susceptibility. The spike (M1) has to establish both the load path and whether cultures round-trip.
+- **Found: node1's k3s reservation is behind its VMs.** ADR 0010's rule (system-reserved covers every VM's maximum
+  plus 6 GiB) calls for 30 GiB with today's four VMs (24 GiB of maxima); it is still 16 GiB. The VMs fit physically
+  (about 13 GiB available, KSM saving about 5.4 GiB), the owner decides the correction after the reference desktop
+  retires. After the reference desktop retires and the release test desktop is destroyed, node1 at 32 GB
+  holds two concurrent reviewer desktops tightly and three not at all (plan, section 5).
+- **Checked:** `pre-commit run --all-files`; no em dashes; role names only; no employer, person or institution named.

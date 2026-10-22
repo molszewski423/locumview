@@ -75,3 +75,40 @@ All of it runs on synthetic data and local models. The full Phase 9 (scenario va
 - Positioning does not change: LocumView stays EHR-neutral (Epic, Oracle Health, MEDITECH) with local models inside the boundary.
 
 Nothing is built or committed to. Revisit when Epic publishes developer documentation for Connectors.
+
+## Update 2026-10-22: Phase 9 lite scope, the scenario library and the first spike
+
+Owner decision, 2026-10-22. The architecture above stands unchanged: one React and TypeScript app with a shared
+patient context and an alert queue; stewardship first, IV to PO second, ADE monitoring later; deterministic rules flag
+and a local model (the existing Ollama service) explains; no orders and no autonomous treatment changes; delivered in
+the managed Chrome app mode on the existing bootc desktop; OpenEMR with Synthea as the mock EHR, with SMART on FHIR
+EHR launch. This update adds scope and an exit criterion to Phase 9 lite. Plan, milestones and acceptance criteria:
+`docs/plans/phase9-lite-and-review-workspace.md`. Data rules: `docs/policy/synthetic-data-and-independence.md`.
+
+- **Scenario library.** 10 to 20 hand-built synthetic cases for internal work, growing to 20 to 30 for evaluation,
+  including negative controls (no intervention appropriate) and ambiguous cases. Each case is versioned in this
+  repository with its expected findings, clinical rationale, guideline citations and a reference answer, and is loaded
+  into OpenEMR reproducibly from the repository, never by manual chart entry. This moves the hand-built scenarios
+  that `docs/PLAN.md` lists under the full Phase 9 into Phase 9 lite.
+- **The first task after Phase 4 is a spike, not UI work.** It must show, against the OpenEMR version actually
+  deployed and that version's documentation:
+  1. a scenario can be loaded into OpenEMR reproducibly; and
+  2. cultures and susceptibility results come back out through OpenEMR's FHIR API faithfully enough for stewardship
+     rules (organism, specimen, collection time, each antibiotic's interpretation and, where present, the MIC).
+- **FHIR write support is not assumed.** Checked 2026-10-22 against OpenEMR's FHIR and API documentation on its main
+  branch (current release 8.0.0, February 2026): it lists SMART App Launch 2.2.0, FHIR R4, US Core 8.0, and
+  Observation (laboratory category), DiagnosticReport and Specimen among the resources; the operations it documents
+  are reads and searches, it does not say which resources accept create or update, and it does not mention
+  microbiology, cultures or susceptibility. Loading may therefore need C-CDA import, OpenEMR's HL7 lab-results path or
+  direct database seeding. This is to be confirmed by the spike, not taken from this summary.
+- **If microbiology cannot round-trip,** the spike records the options (for example, a side FHIR server holding the
+  microbiology resources next to OpenEMR) as an open decision for the owner. The spike does not choose one.
+- **Internal refinement.** After the first build, the owner reviews every case: false positives, misses, explanation
+  quality and the UI. Phase 9 lite ends with a **frozen, versioned evaluation build**: rules, model and its version,
+  prompts, knowledge base and scenario set all pinned and recorded. That freeze is Phase 9 lite's exit criterion; the
+  pharmacist walkthrough above remains its demo criterion.
+- **After Phase 9 lite,** the frozen build is assessed by external clinical reviewers in the Clinical Review Workspace
+  (ADR 0018), the first slice of the full Phase 9.
+
+Open, for the owner: whether this app is "AMS Intelligence" or AMS Intelligence is one module within it (listed with
+a recommendation in the plan document). Nothing in this update is built. Status lives in ROADMAP.md.
