@@ -9,7 +9,10 @@ set -euo pipefail
 IMG=${1:?image}; OUT=${2:?output directory}
 HERE=$(cd "$(dirname "$0")" && pwd)
 PROFILE=xccdf_org.locumview_profile_stig_gui_image
-install -d -m 0777 "$OUT"   # written by the container's root, which is the runner user's subordinate UID
+# 0755, not world-writable: rootless podman maps the container's root to this user, and the directory is mounted
+# into the scanned container, where a world-writable directory without the sticky bit fails
+# dir_perms_world_writable_sticky_bits (seen in CI on ext4; tmpfs is not checked, which hid it locally).
+install -d -m 0755 "$OUT"
 # No network: the scan needs none, and remote content (OVAL from the internet) must not be fetched.
 podman run --rm --network none -v "$HERE:/t:ro,Z" -v "$OUT:/out:Z" "$IMG" bash -c '
   oscap xccdf eval --profile '"$PROFILE"' --tailoring-file /t/locumview-stig-gui-tailoring.xml \
