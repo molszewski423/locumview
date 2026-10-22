@@ -2,7 +2,7 @@
 #
 # Runs on the image-build runner on node2 (rootless podman): rpmbuild in a CentOS Stream 10 container pinned by
 # digest, signing with the LocumView RPM signing key, publishing to the Gitea RPM registry (el10). Each commit gives
-# a new release (1.<date>git<commit>); publishing a release that is already there is not an error.
+# a new release (1.<commit time>git<commit>); publishing a release that is already there is not an error.
 # Credentials come from Actions secrets (each also kept in SOPS, packaging/rpm/signing/rpm-signing.sops.yaml):
 #   RPM_SIGNING_KEY / RPM_SIGNING_PASSPHRASE   sign (public key: packaging/rpm/signing/RPM-GPG-KEY-locumview)
 #   REGISTRY_TOKEN                             upload to the registry (Gitea token, package scope only)

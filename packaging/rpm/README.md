@@ -20,7 +20,7 @@ CI does all three on every change to the packaged files (`.gitea/workflows/rpms.
 key comes from Actions secrets). By hand:
 
 ```
-packaging/rpm/build-rpms.sh build/rpms            # HEAD; release 1.<date>git<commit>
+packaging/rpm/build-rpms.sh build/rpms            # HEAD; release 1.<commit time, UTC>git<commit>
 sops -d packaging/rpm/signing/rpm-signing.sops.yaml | packaging/rpm/sign-rpms.sh build/rpms
 REGISTRY_USER=<owner> REGISTRY_TOKEN=<token> packaging/rpm/publish-rpms.sh build/rpms
 ```
