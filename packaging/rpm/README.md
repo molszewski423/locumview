@@ -29,6 +29,7 @@ REGISTRY_USER=<owner> REGISTRY_TOKEN=<token> packaging/rpm/publish-rpms.sh build
   only in `signing/rpm-signing.sops.yaml`; the script takes them on stdin and keeps them in a tmpfs inside the
   container. Every package is then checked against the committed public key, `signing/RPM-GPG-KEY-locumview`.
 - **Publish** refuses any package not signed with that key, then uploads to `https://git.lan/api/packages/<owner>/rpm/el10`.
+- **Install** with `locumview.repo` and the public key in `/etc/pki/rpm-gpg/RPM-GPG-KEY-locumview`.
 
 ## Checked on the first build
 
@@ -38,3 +39,6 @@ REGISTRY_USER=<owner> REGISTRY_TOKEN=<token> packaging/rpm/publish-rpms.sh build
 - Installed into the image with `localpkg_gpgcheck=1` and no network: refused without the public key, installed
   with it, `rpm -V` clean.
 - Publishing refuses a package whose signature was removed.
+- Installed from the registry with `locumview.repo` (dnf, `gpgcheck` and `repo_gpgcheck` on): the metadata checked
+  against the registry's key, each package against the LocumView key. Gitea's own generated `.repo` file is not
+  used: it would check the packages against the registry's key, which did not sign them.
