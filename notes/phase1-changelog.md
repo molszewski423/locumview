@@ -994,7 +994,7 @@ The release sequence in `notes/release-integrity-report.md`.
   5. Check: two builds of one commit record identical package NEVRAs in their SBOMs. Identical image digests are a
      separate goal: build 106 and 107 of one commit already differed.
 
-## 67. Pin LocumView RPM versions to the image commit (2026-10-22, In progress)
+## 67. Pin LocumView RPM versions to the image commit (2026-10-22, Done)
 
 - **Problem:** image builds installed the newest signed LocumView packages available in the registry, so two
   builds of one image commit could install different RPM versions.
@@ -1017,3 +1017,21 @@ The release sequence in `notes/release-integrity-report.md`.
 - **Not yet verified:** signed package publication from this implementation, a full image build, or two builds'
   four LocumView NEVRAs compared through verified SBOM attestations. This is version pinning, not a claim of
   byte-identical RPMs or images. No promotion or desktop update is part of this change.
+
+### CI verification completed
+
+- Signed PR #5 merge `5f07e84` passed all seven local checks and was pushed to main by the owner.
+- The first image attempt started before its pinned packages were ready and was retried by the owner after
+  publication. Two successful attempts of image workflow run 125 then built the same source commit, taking
+  29m05s and 28m19s. Their manifests differ; both are recorded in
+  `docs/evidence/rpm-pinning/20261022/README.md`.
+- Agent verification by immutable digest passed for both image signatures, signed SBOMs and signed image scans.
+  Both signatures identify commit `5f07e84589f167cd51c333d7cf1170d8675eb00a`. All four LocumView RPMs occur
+  exactly once in each verified SBOM, with version-release
+  `0.1.0-1.20261022210028git5f07e84589.el10`, exactly as the shared resolver selected. Both scans: 361 pass,
+  no unexpected failures. This supersedes the local-only verification limitation above.
+- **Observed:** quiet SBOM generation took about eleven minutes per attempt. A read-only runner check during
+  the first successful attempt found Syft actively using CPU and about 8.5 GiB RAM, with active swapping.
+  It was slow, not idle. No runner or SBOM settings were changed.
+- **Done:** package-version repeatability for this source commit. No identical-image or identical-RPM-byte
+  claim. No promotion, desktop update or new deployed-desktop scan occurred.
