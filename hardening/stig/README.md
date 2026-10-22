@@ -10,6 +10,8 @@ The file has two profiles. `xccdf_org.locumview_profile_stig_gui` is for a runni
 | `apply-stig.sh` | Generates the Ansible remediation from the tailoring on the target (so it matches the installed SSG), then runs `pre-authselect.yml` and that playbook from the operator's machine. Asks for the target's sudo password once. |
 | `pre-authselect.yml` | Works around an SSG authselect problem that removes sudo for directory users (below). |
 | `scan-stig.sh` | Read-only scan against the tailoring; fetches the HTML report, ARF results and pass/fail list. |
+| `scan-image.sh` | Scans a desktop image against the image profile, inside the image, on every CI build; its summary is attached to the image as a signed attestation, which promotion to `:stable` requires (changelog #62). |
+| `image-scan-runtime-only.txt` | The rules an image scan cannot judge (kernel parameters, boot arguments, partitions, services), each with its reason. They are judged by `scan-stig.sh` on an installed desktop; any other failure in the image scan fails the build. |
 
 `stig_gui` is used rather than `stig`: the plain profile is for servers without a graphical target and would flag GNOME itself.
 

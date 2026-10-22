@@ -11,6 +11,9 @@
 # containers/image, which bootc uses, does not read cosign 3's new bundle format. Signing is offline (no public
 # transparency log): verify with
 #   cosign verify --key image/desktop/signing/cosign.pub --insecure-ignore-tlog git.lan/mike/locumview-desktop@<digest>
+# Each build is pushed as :<commit> and :testing, with three things attached to its digest: the signature, the SBOM
+# and the image STIG scan (hardening/stig/scan-image.sh). Desktops follow :stable, which only promote.yml moves,
+# after checking all three (changelog #62).
 name: image
 "on":
   push:
@@ -28,6 +31,7 @@ concurrency:
 
 env:
   IMAGE: git.lan/mike/locumview-desktop
+  SCAN_TYPE: https://locumview.org/attestations/image-stig-scan/v1
 
 jobs:
   build:
@@ -77,11 +81,19 @@ jobs:
             --label org.opencontainers.image.source="https://git.lan/${GITHUB_REPOSITORY}" \
             -f image/desktop/Containerfile -t "$IMAGE:$TAG" .
 
+      - name: Scan
+        run: |
+          set -euo pipefail
+          # The image STIG profile, scanned inside the image. A failure the image alone can judge stops the build
+          # before anything is pushed; rules only an installed desktop can judge are listed in
+          # hardening/stig/image-scan-runtime-only.txt.
+          src/hardening/stig/scan-image.sh "$IMAGE:$TAG" "$JOB/scan"
+
       - name: Push
         run: |
           set -euo pipefail
           podman push --retry 3 --authfile "$JOB/auth.json" --digestfile "$JOB/digest" "$IMAGE:$TAG"
-          podman push --retry 3 --authfile "$JOB/auth.json" "$IMAGE:$TAG" "docker://$IMAGE:latest"
+          podman push --retry 3 --authfile "$JOB/auth.json" "$IMAGE:$TAG" "docker://$IMAGE:testing"
           echo "DIGEST=$(cat "$JOB/digest")" >> "$GITHUB_ENV"
           echo "pushed $IMAGE:$TAG as $(cat "$JOB/digest")"
 
@@ -119,6 +131,16 @@ jobs:
           cosign attest --key env://COSIGN_PRIVATE_KEY --new-bundle-format=false --use-signing-config=false --tlog-upload=false -y \
             --type spdxjson --predicate "$JOB/sbom.spdx.json" "$IMAGE@$DIGEST"
 
+      - name: Attest the scan
+        env:
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+        run: |
+          set -euo pipefail
+          export DOCKER_CONFIG="$JOB/docker"
+          cosign attest --key env://COSIGN_PRIVATE_KEY --new-bundle-format=false --use-signing-config=false --tlog-upload=false -y \
+            --type "$SCAN_TYPE" --predicate "$JOB/scan/summary.json" "$IMAGE@$DIGEST"
+
       - name: Verify
         run: |
           set -euo pipefail
@@ -126,7 +148,10 @@ jobs:
           cosign verify --key src/image/desktop/signing/cosign.pub --insecure-ignore-tlog "$IMAGE@$DIGEST" >/dev/null
           cosign verify-attestation --key src/image/desktop/signing/cosign.pub --insecure-ignore-tlog --type spdxjson \
             "$IMAGE@$DIGEST" >/dev/null
-          echo "verified: signature and SBOM attestation for $IMAGE@$DIGEST ($IMAGE:$TAG)"
+          cosign verify-attestation --key src/image/desktop/signing/cosign.pub --insecure-ignore-tlog --type "$SCAN_TYPE" \
+            "$IMAGE@$DIGEST" >/dev/null
+          echo "verified: signature, SBOM and scan attestations for $IMAGE@$DIGEST ($IMAGE:$TAG, also :testing)"
+          echo "promote with the promote workflow (digest $DIGEST)"
 
       - name: Clean up
         if: always()

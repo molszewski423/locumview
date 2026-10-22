@@ -35,12 +35,15 @@ podman build --secret id=rhsm,src=$HOME/.config/locumview/rhsm.env \
 
 ## Registry and signing
 
-CI builds the image on every change to `image/`, `packaging/` or `hardening/` (`.gitea/workflows/image.yml`), on a dedicated runner on node2: a host-mode act_runner as an unprivileged user with rootless podman, registered to this repository only. It pushes `git.lan/mike/locumview-desktop:<commit>` and `:latest`, signs the pushed digest with cosign, generates an SPDX SBOM with syft (packages and their relationships; the per-file listing is left out, since it would exceed the 128 MiB attestation size cosign reads back) and attaches it as a signed attestation, then verifies both. Signing is offline: no public transparency log, so nothing about the image leaves the site. Verify with the committed public key:
+CI builds the image on every change to `image/`, `packaging/` or `hardening/` (`.gitea/workflows/image.yml`), on a dedicated runner on node2: a host-mode act_runner as an unprivileged user with rootless podman, registered to this repository only. It first scans the image against the image STIG profile, inside the image (`hardening/stig/scan-image.sh`): a failure the image alone can judge stops the build, and the rules only an installed desktop can judge (kernel parameters, boot arguments, partitions, services) are listed in `hardening/stig/image-scan-runtime-only.txt`. It then pushes `git.lan/mike/locumview-desktop:<commit>` and `:testing`, signs the pushed digest with cosign, generates an SPDX SBOM with syft (packages and their relationships; the per-file listing is left out, since it would exceed the 128 MiB attestation size cosign reads back) and attaches it and the scan summary as signed attestations, then verifies all three. Signing is offline: no public transparency log, so nothing about the image leaves the site. Verify with the committed public key:
 
 ```
 cosign verify --key image/desktop/signing/cosign.pub --insecure-ignore-tlog git.lan/mike/locumview-desktop@<digest>
 cosign verify-attestation --key image/desktop/signing/cosign.pub --insecure-ignore-tlog --type spdxjson git.lan/mike/locumview-desktop@<digest>
+cosign verify-attestation --key image/desktop/signing/cosign.pub --insecure-ignore-tlog --type https://locumview.org/attestations/image-stig-scan/v1 git.lan/mike/locumview-desktop@<digest>
 ```
+
+**Promotion.** Desktops follow `:stable`, which only the promote workflow (`.gitea/workflows/promote.yml`, run by hand) moves: it verifies the signature, the SBOM and a passing scan on the digest, then points `:stable` at the same manifest, byte for byte (`scripts/registry-tag.py`), and prints the previous `:stable` digest for a rollback. A build reaches desktops only after someone has tried `:testing` and promoted it.
 
 The private key and its password are Actions secrets, with a SOPS backup in `signing/cosign.sops.yaml`.
 

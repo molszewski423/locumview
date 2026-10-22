@@ -1,0 +1,21 @@
+# Rules of the image STIG profile that a scan of the image alone cannot judge (scan-image.sh, changelog #62).
+# The image is scanned inside a container: no systemd runs, the kernel is the scanning host's, and the boot
+# arguments, partitions and compiled policies exist only on an installed desktop. These rules are judged by the
+# scan of a deployed desktop (scan-stig.sh; docs/evidence/stig/), where the image profile passes with 0 failures.
+# A rule of the profile that fails or errors in the image scan and is NOT matched here fails the build.
+#
+# Format: <shell pattern on the rule id without xccdf_org.ssgproject.content_rule_>  <reason>
+
+sysctl_*                                 kernel parameters are read from the running kernel (the scanning host's)
+grub2_*_argument                         boot arguments come from bootc kargs.d at install, not a GRUB file in the image
+grub2_init_on_free                       a boot argument (init_on_free=1), likewise from kargs.d
+grub2_admin_username                     the GRUB superuser is set at provisioning (a per-desktop secret)
+grub2_password                           the GRUB password is set at provisioning (a per-desktop secret)
+bios_enable_execution_restrictions       firmware setting, checked on the running kernel
+service_*                                systemd does not run in the scan container
+socket_*                                 systemd does not run in the scan container
+fapolicy_default_deny                    fapolicyd compiles its rules at boot
+account_password_selinux_faillock_dir    needs SELinux, which the scan container does not have
+partition_for_*                          partitions are created by the installer
+mount_option_dev_shm_*                   /dev/shm is mounted at boot
+disable_ctrlaltdel_reboot                checked through systemd, which does not run in the scan container

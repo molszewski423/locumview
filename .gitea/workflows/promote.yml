@@ -1,0 +1,108 @@
+# Promote a desktop image to :stable, the tag desktops follow (Phase 4, changelog #62).
+#
+# Run by hand (Actions > promote > Run workflow) after the image has been tried on a desktop that follows :testing.
+# With no digest given, the digest :testing points at is promoted. Promotion happens only if the digest carries all
+# three attachments that image.yml makes, each verified against image/desktop/signing/cosign.pub:
+#   - the signature;
+#   - the SBOM attestation (SPDX);
+#   - the image STIG scan attestation, with no failure the image alone can judge (hardening/stig/scan-image.sh).
+# :stable is then pointed at the same manifest, byte for byte (image/desktop/scripts/registry-tag.py), and the
+# previous :stable digest is printed for a rollback (run again with that digest).
+name: promote
+"on":
+  workflow_dispatch:
+    inputs:
+      digest:
+        description: "sha256:... to promote (empty: whatever :testing points at)"
+        required: false
+        default: ""
+
+concurrency:
+  group: desktop-image
+  cancel-in-progress: false
+
+env:
+  IMAGE: git.lan/mike/locumview-desktop
+  SCAN_TYPE: https://locumview.org/attestations/image-stig-scan/v1
+
+jobs:
+  promote:
+    runs-on: image-builder
+    timeout-minutes: 15
+    steps:
+      - name: Check out
+        env:
+          TOKEN: ${{ gitea.token }}
+        run: |
+          set -euo pipefail
+          rm -rf src
+          git clone -q "https://x-access-token:${TOKEN}@git.lan/${GITHUB_REPOSITORY}.git" src
+          git -C src checkout -q "$GITHUB_SHA"
+          install -d -m 0700 "$PWD/.job"
+          echo "JOB=$PWD/.job" >> "$GITHUB_ENV"
+
+      - name: Registry login
+        env:
+          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+        run: |
+          set -euo pipefail
+          A="$JOB/auth.json"; printf '{"auths":{}}' > "$A"; chmod 600 "$A"
+          printf '%s' "$REGISTRY_TOKEN" | podman login --authfile "$A" --username "${GITHUB_REPOSITORY_OWNER}" --password-stdin git.lan
+          install -d -m 0700 "$JOB/docker"; ln -sf "$A" "$JOB/docker/config.json"
+
+      - name: Resolve the digest
+        env:
+          INPUT_DIGEST: ${{ inputs.digest }}
+          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+        run: |
+          set -euo pipefail
+          D="$INPUT_DIGEST"
+          [ -n "$D" ] || D=$(REGISTRY_USER="${GITHUB_REPOSITORY_OWNER}" python3 -I src/image/desktop/scripts/registry-tag.py --digest "$IMAGE:testing")
+          [[ "$D" =~ ^sha256:[0-9a-f]{64}$ ]] || { echo "not a digest: $D"; exit 1; }
+          echo "DIGEST=$D" >> "$GITHUB_ENV"
+          echo "candidate: $IMAGE@$D"
+
+      - name: Verify signature, SBOM and scan
+        run: |
+          set -euo pipefail
+          export DOCKER_CONFIG="$JOB/docker"
+          K=src/image/desktop/signing/cosign.pub
+          cosign verify --key "$K" --insecure-ignore-tlog "$IMAGE@$DIGEST" > "$JOB/sig.json"
+          cosign verify-attestation --key "$K" --insecure-ignore-tlog --type spdxjson "$IMAGE@$DIGEST" >/dev/null
+          cosign verify-attestation --key "$K" --insecure-ignore-tlog --type "$SCAN_TYPE" "$IMAGE@$DIGEST" > "$JOB/scan.att"
+          python3 -I - "$JOB/sig.json" "$JOB/scan.att" "$SCAN_TYPE" <<'PY'
+          import base64, json, sys
+          sig = json.load(open(sys.argv[1]))[0]["optional"]
+          print("signed: commit", sig.get("git.commit", "?")[:12], "CI run", sig.get("ci.run", "?"))
+          scans = []
+          for line in open(sys.argv[2]):
+              st = json.loads(base64.b64decode(json.loads(line)["payload"]))
+              if st.get("predicateType") != sys.argv[3]:
+                  continue
+              p = st["predicate"]
+              p = json.loads(p["Data"]) if isinstance(p, dict) and "Data" in p else p   # cosign's custom wrapper
+              scans.append(p)
+          if not scans:
+              sys.exit("no scan attestation")
+          bad = [s for s in scans if s.get("result") != "pass" or s.get("unexpected")]
+          for s in scans:
+              print("scan:", s["content"], "|", ", ".join(f"{v} {k}" for k, v in sorted(s["counts"].items())),
+                    "| unexpected:", s.get("unexpected") or "none")
+          sys.exit("a scan attestation reports failures" if bad else 0)
+          PY
+
+      - name: Promote
+        env:
+          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+        run: |
+          set -euo pipefail
+          export REGISTRY_USER="${GITHUB_REPOSITORY_OWNER}"
+          PREV=$(python3 -I src/image/desktop/scripts/registry-tag.py --digest "$IMAGE:stable")
+          python3 -I src/image/desktop/scripts/registry-tag.py "$IMAGE@$DIGEST" stable
+          echo "previous :stable was ${PREV:-none}; to roll back, run this workflow with that digest"
+
+      - name: Clean up
+        if: always()
+        run: |
+          set -uo pipefail
+          [ -n "${JOB:-}" ] && find "$JOB" -type f -exec shred -u {} + 2>/dev/null; rm -rf "${JOB:-/nonexistent}" src
