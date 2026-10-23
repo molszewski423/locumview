@@ -1036,7 +1036,7 @@ The release sequence in `notes/release-integrity-report.md`.
 - **Done:** package-version repeatability for this source commit. No identical-image or identical-RPM-byte
   claim. No promotion, desktop update or new deployed-desktop scan occurred.
 
-## 68. Background image updates stage without requesting a reboot (2026-10-22, In progress)
+## 68. Background image updates stage without requesting a reboot (2026-10-22 to 2026-10-23, service Done)
 
 - **Problem:** the vendor update service runs `bootc upgrade --apply --quiet`, which can reboot a desktop after
   fetching an update. Existing desktops have their timers masked as temporary containment (#66). Provisioning
@@ -1058,3 +1058,23 @@ The release sequence in `notes/release-integrity-report.md`.
   service staging of a newer signed candidate without a reboot (boot ID and booted digest unchanged), then an
   owner-approved reboot into the staged digest with rollback available. A no-update service run is insufficient
   evidence. Promotion, enabling any currently masked timer and live-demo changes each need owner approval.
+
+### Deployed service verification completed (2026-10-23)
+
+- Two signed candidates built from merged source `d2fd2aa` passed signature, SBOM and scan verification by
+  immutable digest. Exact digests, package versions and transitions:
+  `docs/evidence/update-policy/20261023/README.md`.
+- Disposable desktop created by an owner-run saved plan: ten additions, no changes/deletions, testing image
+  reference supplied consistently to plan and apply. The first apply stopped at variable validation because
+  the command omitted that override; retry used the same reviewed plan and matching variable, then succeeded.
+- Effective service command on the policy image: `bootc upgrade` without `--apply`. Owner masked the timer for
+  the controlled test. Starting the actual service staged exact T2 while T1 stayed booted, the installer stayed
+  as rollback, and boot ID/start time remained unchanged. No automatic reboot occurred during staging.
+- The harness initially stopped on post-checks involving transient unit state. Later `ConditionResult` is not
+  durable after a one-shot unit is unloaded. The owner supplied explicit status and agent checked unchanged
+  boot identity; the local harness no longer relies on that condition-result assertion.
+- Owner-approved reboot then booted exact T2, with T1 as rollback, nothing staged, a new boot ID, no failed units,
+  the stage-only command retained and timer still masked/inactive. Owner verification script printed PASS.
+- **Done:** deployed stage-only service behavior and activation at a planned reboot. Timer expiry and a forced
+  provisioning-guard failure were not independently tested. No full deployed STIG rescan of these candidates.
+  Test cleanup and production rollout remain separate owner decisions; no stable promotion or demo update.
