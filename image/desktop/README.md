@@ -133,8 +133,10 @@ After building this change, verify it on a disposable desktop before enabling th
 - Perform an operator-approved reboot and verify that exact staged digest boots, rollback exists and no units
   failed. Check the timer mask and effective service again. A live-demo mask stays until a separate owner decision.
 
-These deployed-desktop checks are pending until the updated image is built and exercised. Do not infer that
-current desktops have adopted the policy just because the source or build checks pass.
+The controlled service staging and planned-reboot checks passed on a disposable desktop on 2026-10-23:
+[evidence](../../docs/evidence/update-policy/20261023/README.md). The timer remained masked and the service was
+started explicitly; timer expiry and deliberate failure of the provisioning guard were not separately tested.
+Current desktops adopt this policy only after booting an image containing it; their existing masks remain.
 
 Every step is safe to repeat; the service runs on each boot until it succeeds. When it succeeds it ejects the seed, which is the script's signal to detach and wipe it. On failure the seed stays attached: `journalctl -u locumview-provision` on the desktop.
 
