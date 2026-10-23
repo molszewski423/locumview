@@ -9,7 +9,8 @@ The file has two profiles. `xccdf_org.locumview_profile_stig_gui` is for a runni
 | `locumview-stig-gui-tailoring.xml` | XCCDF tailoring of `xccdf_org.ssgproject.content_profile_stig_gui` (DISA STIG with GUI for RHEL 10, scap-security-guide 0.1.82). Profile ID `xccdf_org.locumview_profile_stig_gui`. |
 | `apply-stig.sh` | Generates the Ansible remediation from the tailoring on the target (so it matches the installed SSG), then runs `pre-authselect.yml` and that playbook from the operator's machine. Asks for the target's sudo password once. |
 | `pre-authselect.yml` | Works around an SSG authselect problem that removes sudo for directory users (below). |
-| `scan-stig.sh` | Read-only scan against the tailoring; fetches the HTML report, ARF results and pass/fail list. |
+| `scan-stig.sh` | Owner-run read-only scan; auto-selects the image profile on bootc desktops or the reference profile otherwise. Accepts an explicit profile override and fetches reports plus profile/exit metadata. |
+| `scan-stig-remote.sh` | Reviewed helper copied to a private temporary target directory and run by the owner with sudo. Preserves OpenSCAP's exit code; performs no remediation. |
 | `scan-image.sh` | Scans a desktop image against the image profile, inside the image, on every CI build; its summary is attached to the image as a signed attestation, which promotion to `:stable` requires (changelog #62). |
 | `image-scan-runtime-only.txt` | The rules an image scan cannot judge (kernel parameters, boot arguments, partitions, services), each with its reason. They are judged by `scan-stig.sh` on an installed desktop; any other failure in the image scan fails the build. |
 
@@ -19,10 +20,38 @@ The file has two profiles. `xccdf_org.locumview_profile_stig_gui` is for a runni
 
 ```
 hardening/stig/apply-stig.sh <user>@<ref-dev-ip>     # about 25 minutes, idempotent apart from a few SSG tasks that always report "changed"
-hardening/stig/scan-stig.sh  <user>@<ref-dev-ip>     # about 5 minutes
+hardening/stig/scan-stig.sh --profile reference <user>@<reference-desktop>  # about 5 minutes
 ```
 
-The user needs sudo on the target (an IdM administrator works). Take a snapshot first. A reboot is needed afterwards for the kernel arguments, the immutable audit rules and the `/home` mount options. Run logs and scan output are written to the current directory and are git-ignored because they contain addresses.
+### Selecting the scan profile
+
+Existing `scan-stig.sh user@host [output-dir]` calls remain valid. With the default `--profile auto`, a read-only
+SSH check for `/run/ostree-booted` selects `xccdf_org.locumview_profile_stig_gui_image` on a bootc desktop and
+`xccdf_org.locumview_profile_stig_gui` otherwise. A failed SSH check stops the run rather than choosing a fallback.
+Use an explicit override when comparing profiles on one desktop:
+
+```fish
+hardening/stig/scan-stig.sh --profile image <user>@<image-desktop> ./image-scan
+hardening/stig/scan-stig.sh --profile reference <user>@<image-desktop> ./reference-profile-scan
+```
+
+The two full tailoring profile IDs are also accepted. Other profiles are rejected before any remote operation.
+This command is an owner run: it uploads the tailoring and helper, then asks for sudo to execute OpenSCAP on
+the target. Review `scan-stig-remote.sh` before running it. Results remain on the target and are fetched into the
+local output directory, which may contain spaces. No reports are automatically committed or published.
+
+The selected full ID is printed and saved as `profile.txt`; `oscap-exit-code.txt` records the scanner exit,
+alongside `stdout.txt`, `versions.txt`, `arf.xml` and `report.html` when produced. The wrapper returns **0** for
+all checks passing, **2** for failed rules, and another nonzero code for scanner/transport errors. It fetches
+available diagnostics before returning a scan failure. Unlike the former wrapper, a failed scan does not return
+success merely because the later versions/ownership commands succeeded. Scripts calling it must handle exit 2.
+
+Profile selection changes the rule set: the image profile includes partition rules and excludes the documented
+SSH-zone exception. The reference profile does the opposite. Compare reports with their recorded profile IDs;
+do not infer equivalent coverage from pass/fail totals alone (changelog #66 and #69). Live OpenSCAP results for
+this revised wrapper are not yet recorded; local transport/scanner tests exercise selection and exit handling.
+
+The user needs sudo on the target (an IdM administrator works). For `apply-stig.sh`, take a snapshot first; remediation needs a reboot afterwards for kernel arguments, immutable audit rules and `/home` mount options. `scan-stig.sh` performs assessment only and does not request a reboot. Run logs and scan output are git-ignored because they contain addresses.
 
 Four STIG items are not automated by SSG and were done by hand on the reference desktop (changelog #47): the GRUB superuser name (`lvgrub`, in `/etc/grub.d/01_users`) and its password (`grub2-setpassword`; normal boots stay unattended), `pam_wheel.so use_uid` in `/etc/pam.d/su`, chrony `server` lines instead of `pool`, and re-setting local passwords so they are stored as SHA-512 (RHEL 10 defaults to yescrypt). In the bootc image these become part of the Containerfile.
 

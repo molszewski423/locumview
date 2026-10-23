@@ -21,6 +21,13 @@ repos:
 
   - repo: local
     hooks:
+      - id: stig-scan-profiles
+        name: STIG scan profile selection and exit propagation
+        entry: python3 hardening/stig/test-scan-stig.py
+        language: system
+        pass_filenames: false
+        files: ^hardening/stig/(scan-stig(-remote)?\.sh|test-scan-stig\.py|locumview-stig-gui-tailoring\.xml)$
+
       - id: rpm-version-selection
         name: RPM version selection and workflow input consistency
         entry: python3 packaging/rpm/test-resolve-version.py

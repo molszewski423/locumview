@@ -1078,3 +1078,21 @@ The release sequence in `notes/release-integrity-report.md`.
 - **Done:** deployed stage-only service behavior and activation at a planned reboot. Timer expiry and a forced
   provisioning-guard failure were not independently tested. No full deployed STIG rescan of these candidates.
   Test cleanup and production rollout remain separate owner decisions; no stable promotion or demo update.
+
+## 69. Select and record the deployed-desktop STIG scan profile (2026-10-23, Built)
+
+- **Problem:** the scan wrapper hardcoded the reference profile. The earlier image-B scan therefore included
+  the SSH-zone exception and omitted five partition checks, unlike the image release-gate profile (#66).
+- **Change:** `scan-stig.sh [--profile auto|image|reference|<full-id>] user@host [output-dir]`. Default auto uses
+  the image profile when `/run/ostree-booted` exists, otherwise reference. Explicit overrides permit intentional
+  comparisons. Failed detection stops the scan. Only the two profiles in the project tailoring are accepted.
+- **Evidence:** selected full profile ID is printed and saved with reports. OpenSCAP exit status is recorded
+  and propagated: failed rules (2) or scanner errors no longer disappear behind later successful commands.
+  Existing positional calls work; callers now need to handle nonzero scan results. A reviewed remote helper
+  bundles the owner-run sudo steps, and a private target temporary directory separates simultaneous scans.
+- **Verified locally:** seven tests mock SSH/scp and scanner binaries without network, root or remediation.
+  They cover both auto outcomes, aliases/full IDs, explicit override despite failed detection, SSH failure,
+  invalid profile/path rejection, quoted output paths, report retrieval on failed scans and real-helper exit
+  propagation. Both shell scripts pass `bash -n`.
+- **Pending:** an owner-run live scan with the revised wrapper. No new live scan or desktop configuration
+  change has occurred; earlier committed scan results are retained unchanged.
