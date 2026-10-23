@@ -1035,3 +1035,26 @@ The release sequence in `notes/release-integrity-report.md`.
   It was slow, not idle. No runner or SBOM settings were changed.
 - **Done:** package-version repeatability for this source commit. No identical-image or identical-RPM-byte
   claim. No promotion, desktop update or new deployed-desktop scan occurred.
+
+## 68. Background image updates stage without requesting a reboot (2026-10-22, In progress)
+
+- **Problem:** the vendor update service runs `bootc upgrade --apply --quiet`, which can reboot a desktop after
+  fetching an update. Existing desktops have their timers masked as temporary containment (#66). Provisioning
+  documentation incorrectly said that the automatic timer stays off.
+- **Prepared:** an image-owned drop-in under `/usr/lib/systemd/system` resets the vendor `ExecStart` and uses
+  `/usr/bin/bootc upgrade`. The vendor timer and its schedule are retained; the service waits for provisioning
+  and requires its success marker. Downloads do not request a reboot. Existing local masks stay in force and
+  are not removed by this change. No current desktop or timer has been changed.
+- **Behavior:** on the inspected bootc 1.16.4, a staged update activates on the next reboot, including an
+  unexpected reboot from another cause. This policy controls the background update job, not every possible
+  reboot. `--download-only` is intentionally excluded because it needs another apply action before activation.
+- **Checked locally:** read-only inspection of the installed vendor unit and `bootc upgrade --help` established
+  the existing command and staging behavior. `systemd-analyze verify --root` accepted the new drop-in with an
+  isolated fixture of that vendor unit and minimal dependencies. The fixture does not prove deployed behavior.
+- **Documentation:** image README records the policy, existing masks, maintenance workflow and canary acceptance
+  gates. Provisioning's comment now matches the intended policy. The roadmap no longer lists the live demo's
+  already-verified move to stable as open (#66).
+- **Pending:** CI image build and signed scan, effective-unit inspection on a disposable desktop, successful
+  service staging of a newer signed candidate without a reboot (boot ID and booted digest unchanged), then an
+  owner-approved reboot into the staged digest with rollback available. A no-update service run is insufficient
+  evidence. Promotion, enabling any currently masked timer and live-demo changes each need owner approval.
