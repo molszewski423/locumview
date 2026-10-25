@@ -26,5 +26,8 @@ OpenEMR 8.4.1 with LocumView's fix (`clinical/images/openemr/`), MariaDB, and th
 5. `sops -d k8s/clinical/secrets/clinical-gateway.sops.yaml | kubectl apply -f -`, then
    `kubectl -n clinical rollout restart deployment/gateway`.
 
-Nothing in these steps displays a password or the client secret. Loading the scenario library into this OpenEMR is a
-separate step (M3 step 2b).
+6. `scripts/clinical/load-scenarios.sh` loads the scenario library and the Synthea background patients (M3 step 2b).
+   It decrypts nothing: SQL runs inside the MariaDB pod and API calls inside the OpenEMR pod, each with its own
+   credentials (`clinical/scenarios/targets.py`). Running it again skips what is already loaded.
+
+Nothing in these steps displays a password or the client secret.

@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Phase 9 lite M1 spike: read a loaded scenario back through OpenEMR's FHIR API, as an API client sees it.
 
-    readback.py <family-name> <out-dir>
+    readback.py <family-name or patient number> <out-dir>     for example LV-uti-esbl-mismatch-01
+
+Every scenario case shares the family name Casebook, so read cases back by patient number (LV-<case id>). A family
+name that matches more than one patient is refused.
 
 Writes the raw search bundles and normalized.json: every resource with server-assigned values removed (ids, UUID
 references, meta.lastUpdated, bundle links) so two fresh instances can be compared with a plain diff. Prints a
@@ -50,10 +53,14 @@ def normalize(resources):
 
 
 def main():
-    family, out = sys.argv[1], Path(sys.argv[2])
+    who, out = sys.argv[1], Path(sys.argv[2])
     out.mkdir(parents=True, exist_ok=True)
-    status, bundle = fhir.call("GET", f"fhir/Patient?family={family}")
-    patient = bundle["entry"][0]["resource"]["id"]
+    search = "identifier" if who.startswith(("LV-", "SYN-")) else "family"
+    status, bundle = fhir.call("GET", f"fhir/Patient?{search}={who}")
+    matches = bundle.get("entry", [])
+    if len(matches) != 1:
+        raise SystemExit(f"{search} {who}: {len(matches)} patients match; give one patient number")
+    patient = matches[0]["resource"]["id"]
     resources = []
     for kind in TYPES:
         query = f"{kind}/{patient}" if kind == "Patient" else f"{kind}?patient={patient}"

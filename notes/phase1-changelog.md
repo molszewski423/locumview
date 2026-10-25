@@ -1345,6 +1345,27 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   worth watching on the shared runner.
 - Nothing applied to the cluster yet: the owner runs in `k8s/clinical/README.md` come next.
 
+## 79. Phase 9 lite M3 step 2b: loading the scenario library into the cluster's OpenEMR (2026-10-25)
+
+- `clinical/scenarios/load.py --target spike|cluster` (spike is the default). `targets.py` reaches both the same way:
+  SQL inside the database container with its own root password, and OpenEMR's API through a PHP helper inside the
+  OpenEMR container that reads the administrator credentials from that container's environment. No credential
+  reaches the machine running the loader, nothing is decrypted, and nothing but API responses is printed. For one
+  load it registers and enables a loader client and turns on the password grant; afterwards it deletes the client,
+  restores the grant's previous value and removes the helper directory, also on failure. The HL7 importer runs as
+  the web server user through the same helper. `--reset` is refused for the cluster.
+- Owner run: `scripts/clinical/load-scenarios.sh`, step 6 in `k8s/clinical/README.md`, after `register-gateway.sh`
+  (it checks that OpenEMR's API is on).
+- Verified on the local spike, which uses the same OpenEMR and MariaDB digests and the same patch as the cluster:
+  `--reset` loads the 20 background patients and all 14 cases in 1m43s; a second run skips everything; afterwards
+  only the spike's own API client remains, the password grant is back at its previous value and the helper
+  directory is gone. All 14 cases read back through FHIR by patient number and normalized are identical to a load
+  by main's loader on a fresh instance (14 distinct readbacks, compared file by file).
+- Found: `clinical/spike/readback.py` searched by family name and took the first match, and every case shares the
+  family name Casebook, so it read the first case for all of them (caught because 14 readbacks were byte-identical).
+  It now takes a patient number (`LV-<case id>`) and refuses a family name that matches more than one patient.
+- Not yet run against the cluster: that waits for the owner runs in `k8s/clinical/README.md` steps 1 to 5.
+
 ## 80. Desktop connection label: lv-demo01's owner connection becomes lv-dev (2026-10-25)
 
 - The owner could log in only to the guest "LocumView Demo" desktop. Two causes, neither in the access layer:
