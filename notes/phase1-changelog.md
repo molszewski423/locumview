@@ -1308,3 +1308,28 @@ Plan M3 step 1, local only. Evidence: `docs/evidence/clinical/20261025-m3-local-
 - **Open:** M3 steps 2 to 6 (cluster deployment, IdM names and certificates as an owner run, the Keycloak client,
   the desktop launcher and Chrome allowlist through the signed image, the desktop check); an OpenEMR image carrying
   the patch for the cluster; upstream submissions (owner decision).
+
+## 77. Phase 9 lite M3 step 2: clinical namespace manifests, images and owner secret scripts (2026-10-25, prepared)
+
+Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinical/README.md`.
+
+- **Manifests (`k8s/clinical/`):** namespace `clinical` (baseline enforced, restricted warned and audited), default-deny
+  network policies (Traefik to OpenEMR and the gateway, gateway to OpenEMR, OpenEMR to MariaDB, DNS; no internet
+  egress), MariaDB 12.3.3 as the mysql user with no capabilities (5 GiB), OpenEMR (1 GiB sites volume, waits for
+  MariaDB), and the gateway (non-root, read-only root filesystem, no capabilities, client secret mounted as a file).
+  Node from the git-ignored `site.env`, images by digest. kustomize renders 14 objects; kubeconform passes.
+- **Images:** `clinical/images/openemr/` applies `clinical/spike/patches/*.diff` in a separate stage with `--fuzz=0`
+  and copies only the patched file into the pinned upstream image, keeping its owner and mode;
+  `clinical/images/gateway/` builds the app (pinned Node 22, `npm ci`) and installs the gateway's hash-pinned
+  requirements into the pinned Python 3.13 slim image, running as UID 10001. Both built and checked locally (patch
+  present, PHP syntax clean; gateway 155 MB, non-root, serves the app, no session 401, no server header).
+  `.gitea/workflows/clinical-images.yml` builds, pushes (`:<commit>`, `:testing`), signs, attests an SBOM and
+  verifies both, as the desktop image does.
+- **Gateway:** optional `EHR_INTERNAL_URL` sends its own requests for the EHR's public origin to OpenEMR's Service;
+  launches are still checked against the public address. 11 tests.
+- **Secrets (owner runs):** `scripts/clinical/make-db-secret.sh` generates the database and administrator passwords
+  straight into SOPS; `scripts/clinical/register-gateway.sh` configures OpenEMR's API and registers the gateway,
+  encrypting the issued client secret straight into SOPS. Neither displays a value. The first was tested in a
+  throwaway repository with a throwaway age key.
+- **Open:** first CI build, then a commit pinning both digests; the owner runs above; loading the scenario library
+  into the cluster's OpenEMR (step 2b); IdM names and certificates (step 3).

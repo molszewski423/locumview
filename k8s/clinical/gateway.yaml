@@ -1,0 +1,65 @@
+# The clinical app and its SMART gateway (clinical/images/gateway/, signed by CI; the digest is set in
+# kustomization.yaml). Meets the restricted profile. The client id and secret come from the clinical-gateway Secret,
+# created after OpenEMR issues them (k8s/clinical/README.md); the secret is a file, never an environment variable.
+apiVersion: v1
+kind: Service
+metadata: {name: gateway, namespace: clinical}
+spec:
+  selector: {app: gateway}
+  ports: [{name: http, port: 8080, targetPort: 8080}]
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: gateway, namespace: clinical}
+data:
+  EHR_FHIR_BASE: https://emr.corp.locumview.com/apis/default/fhir
+  EHR_INTERNAL_URL: http://openemr.clinical.svc.cluster.local
+  PUBLIC_URL: https://clinical.corp.locumview.com
+  FRAME_ANCESTORS: https://emr.corp.locumview.com
+  CLIENT_SECRET_FILE: /run/gateway/client-secret
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: gateway, namespace: clinical}
+spec:
+  replicas: 1   # sessions live in memory
+  selector: {matchLabels: {app: gateway}}
+  template:
+    metadata: {labels: {app: gateway}}
+    spec:
+      nodeSelector: {kubernetes.io/hostname: CLINICAL_NODE}   # set from site.env
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: gateway
+          image: git.lan/mike/locumview-clinical-gateway   # digest set in kustomization.yaml (images)
+          envFrom: [{configMapRef: {name: gateway}}]
+          env:
+            - name: CLIENT_ID
+              valueFrom: {secretKeyRef: {name: clinical-gateway, key: client-id}}
+          ports: [{containerPort: 8080, name: http}]
+          readinessProbe:
+            httpGet: {path: /index.html, port: 8080}
+            periodSeconds: 10
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {memory: 96Mi, cpu: 50m}
+            limits: {memory: 256Mi}
+          volumeMounts:
+            - {name: client-secret, mountPath: /run/gateway, readOnly: true}
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: client-secret
+          secret:
+            secretName: clinical-gateway   # pragma: allowlist secret (the Secret's name, not a value)
+            items: [{key: client-secret, path: client-secret}]
+            defaultMode: 0400
+        - name: tmp
+          emptyDir: {sizeLimit: 16Mi}

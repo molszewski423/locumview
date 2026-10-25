@@ -1,0 +1,52 @@
+# MariaDB for OpenEMR: the digest OpenEMR 8.4.1's own production compose file pins. Runs as the image's mysql user
+# (999), which the upstream entrypoint supports without its root-to-mysql switch, so it meets the restricted profile.
+apiVersion: v1
+kind: Service
+metadata: {name: mariadb, namespace: clinical}
+spec:
+  selector: {app: mariadb}
+  ports: [{name: mysql, port: 3306, targetPort: 3306}]
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata: {name: mariadb, namespace: clinical}
+spec:
+  serviceName: mariadb
+  replicas: 1
+  selector: {matchLabels: {app: mariadb}}
+  template:
+    metadata: {labels: {app: mariadb}}
+    spec:
+      nodeSelector: {kubernetes.io/hostname: CLINICAL_NODE}   # set from site.env
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: mariadb
+          image: docker.io/library/mariadb@sha256:dd9b303aed4f4890ed09f766d8ca9ddfd176c0c6f6267feff53b3192ec65a979
+          args: ["mariadbd", "--character-set-server=utf8mb4"]
+          env:
+            - name: MARIADB_ROOT_PASSWORD
+              valueFrom: {secretKeyRef: {name: clinical-db, key: root}}
+          ports: [{containerPort: 3306, name: mysql}]
+          readinessProbe:
+            tcpSocket: {port: 3306}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {memory: 256Mi, cpu: 100m}
+            limits: {memory: 768Mi}
+          volumeMounts: [{name: data, mountPath: /var/lib/mysql}]
+  volumeClaimTemplates:
+    - metadata: {name: data}
+      spec:
+        accessModes: [ReadWriteOnce]
+        storageClassName: local-path
+        resources: {requests: {storage: 5Gi}}

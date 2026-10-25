@@ -1,0 +1,20 @@
+# OpenEMR 8.4.1 with LocumView's fixes (clinical/spike/patches/*.diff; docs/upstream/openemr-8.4.1.md), for the
+# clinical namespace. Built by .gitea/workflows/clinical-images.yml from the repository root:
+#   podman build -f clinical/images/openemr/Containerfile .
+# The upstream image is pinned by digest. Patches are applied in a separate stage (the upstream image has no patch
+# tool) with --fuzz=0, so a patch that no longer applies exactly fails the build; only patched files are copied in,
+# with the upstream owner and mode.
+FROM docker.io/openemr/openemr@sha256:786e7dd867ba82db408a56c9c0cf7336cfa7ac24644c9354bdd8a5a194e83c55 AS upstream
+
+FROM docker.io/library/python@sha256:073ffebb96ae4d0ed73ccad59f08c47bd84af8a79f5258130f8458ac50ad9ff4 AS patcher
+ARG FILE=src/RestControllers/Authorization/BearerTokenAuthorizationStrategy.php
+COPY --from=upstream /var/www/localhost/htdocs/openemr/${FILE} /w/${FILE}
+COPY clinical/spike/patches/ /patches/
+RUN cd /w && for p in /patches/*.diff; do patch -p1 --fuzz=0 --no-backup-if-mismatch < "$p"; done
+
+FROM docker.io/openemr/openemr@sha256:786e7dd867ba82db408a56c9c0cf7336cfa7ac24644c9354bdd8a5a194e83c55
+ARG FILE=src/RestControllers/Authorization/BearerTokenAuthorizationStrategy.php
+COPY --from=patcher --chown=apache:apache --chmod=400 /w/${FILE} /var/www/localhost/htdocs/openemr/${FILE}
+LABEL org.opencontainers.image.title="LocumView OpenEMR" \
+      org.opencontainers.image.description="OpenEMR 8.4.1 with LocumView's SMART launch fix" \
+      org.opencontainers.image.base.name="docker.io/openemr/openemr:8.4.1"
