@@ -4,51 +4,175 @@
   "version": "0.1.0",
   "title": "Improving pyelonephritis on ceftriaxone; only oral beta-lactam options remain",
   "kind": "ambiguous",
-  "modules": ["stewardship", "iv-to-po"],
+  "modules": [
+    "stewardship",
+    "iv-to-po"
+  ],
   "provenance": {
     "source": "synthetic",
     "author": "Claude Code (draft for owner review)",
     "created": "2026-10-25",
-    "clinical_review": {"status": "pending"}
+    "clinical_review": {
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-10-25",
+      "notes": "Owner clinical review: cases look good."
+    }
   },
   "story": "A 52-year-old woman with acute pyelonephritis is on IV ceftriaxone, hospital day 3. She has been afebrile for 36 hours, is eating and drinking, and her vital signs are normal. The urine E. coli is susceptible to ceftriaxone and to cefazolin at the urinary surrogate breakpoint, but resistant to trimethoprim-sulfamethoxazole and ciprofloxacin.",
-  "patient": {"family": "Casebook", "given": "Cora", "birth_date": "1974-11-23", "sex": "female"},
-  "encounter": {"class_code": "IMP", "start": "2026-10-19T19:00:00-04:00", "reason": "Fever, flank pain"},
-  "problems": [{"title": "Acute pyelonephritis", "diagnosis": "ICD10:N10", "begdate": "2026-10-19"}],
+  "patient": {
+    "family": "Casebook",
+    "given": "Cora",
+    "birth_date": "1974-11-23",
+    "sex": "female"
+  },
+  "encounter": {
+    "class_code": "IMP",
+    "start": "2026-10-19T19:00:00-04:00",
+    "reason": "Fever, flank pain"
+  },
+  "problems": [
+    {
+      "title": "Acute pyelonephritis",
+      "diagnosis": "ICD10:N10",
+      "begdate": "2026-10-19"
+    }
+  ],
   "prescriptions": [
-    {"drug": "ceftriaxone 1000 MG Injection", "rxnorm": "1665021", "start": "2026-10-19", "route": "IV",
-     "instructions": "1 g IV every 24 hours"}
+    {
+      "drug": "ceftriaxone 1000 MG Injection",
+      "rxnorm": "1665021",
+      "start": "2026-10-19",
+      "route": "IV",
+      "instructions": "1 g IV every 24 hours"
+    }
   ],
   "vitals": [
-    {"taken": "2026-10-19T19:10:00-04:00", "temperature_f": 101.9, "pulse": 106, "bps": 118, "bpd": 72, "respiration": 18, "oxygen_saturation": 98},
-    {"taken": "2026-10-22T08:00:00-04:00", "temperature_f": 98.4, "pulse": 78, "bps": 124, "bpd": 76, "respiration": 14, "oxygen_saturation": 99}
+    {
+      "taken": "2026-10-19T19:10:00-04:00",
+      "temperature_f": 101.9,
+      "pulse": 106,
+      "bps": 118,
+      "bpd": 72,
+      "respiration": 18,
+      "oxygen_saturation": 98
+    },
+    {
+      "taken": "2026-10-22T08:00:00-04:00",
+      "temperature_f": 98.4,
+      "pulse": 78,
+      "bps": 124,
+      "bpd": 76,
+      "respiration": 14,
+      "oxygen_saturation": 99
+    }
   ],
   "labs": [
-    {"order_code": "LV-BMP", "order_text": "Basic labs", "collected": "2026-10-19T19:30:00-04:00",
-     "resulted": "2026-10-19T20:25:00-04:00", "results": [
-       {"loinc": "2160-0", "text": "Creatinine [Mass/volume] in Serum or Plasma", "value": "0.9", "units": "mg/dL", "range": "0.5-1.0", "flag": "N"},
-       {"loinc": "6690-2", "text": "Leukocytes [#/volume] in Blood by Automated count", "value": "13.1", "units": "10*3/uL", "range": "4.0-11.0", "flag": "H"}
-     ]}
+    {
+      "order_code": "LV-BMP",
+      "order_text": "Basic labs",
+      "collected": "2026-10-19T19:30:00-04:00",
+      "resulted": "2026-10-19T20:25:00-04:00",
+      "results": [
+        {
+          "loinc": "2160-0",
+          "text": "Creatinine [Mass/volume] in Serum or Plasma",
+          "value": "0.9",
+          "units": "mg/dL",
+          "range": "0.5-1.0",
+          "flag": "N"
+        },
+        {
+          "loinc": "6690-2",
+          "text": "Leukocytes [#/volume] in Blood by Automated count",
+          "value": "13.1",
+          "units": "10*3/uL",
+          "range": "4.0-11.0",
+          "flag": "H"
+        }
+      ]
+    }
   ],
   "cultures": [
-    {"order_code": "630-4", "order_text": "Bacteria identified in Urine by Culture",
-     "specimen": {"snomed": "122575003", "text": "Urine specimen"},
-     "collected": "2026-10-19T19:40:00-04:00", "resulted": "2026-10-21T11:15:00-04:00",
-     "organism": {"snomed": "112283007", "text": "Escherichia coli"},
-     "colony_count": {"loinc": "19090-0", "text": "Colony count [#/volume] in Urine", "value": ">100000", "units": "CFU/mL"},
-     "susceptibilities": [
-       {"loinc": "28-1", "drug": "Ampicillin", "mic": ">=32", "units": "ug/mL", "interpretation": "R"},
-       {"loinc": "85422-4", "drug": "Cefazolin (urinary surrogate)", "mic": "<=4", "units": "ug/mL", "interpretation": "S"},
-       {"loinc": "141-2", "drug": "Ceftriaxone", "mic": "<=1", "units": "ug/mL", "interpretation": "S"},
-       {"loinc": "185-9", "drug": "Ciprofloxacin", "mic": ">=4", "units": "ug/mL", "interpretation": "R"},
-       {"loinc": "516-5", "drug": "Trimethoprim+Sulfamethoxazole", "mic": ">=320", "units": "ug/mL", "interpretation": "R"},
-       {"loinc": "363-2", "drug": "Nitrofurantoin", "mic": "<=16", "units": "ug/mL", "interpretation": "S"},
-       {"loinc": "267-5", "drug": "Gentamicin", "mic": "<=1", "units": "ug/mL", "interpretation": "S"}
-     ]}
+    {
+      "order_code": "630-4",
+      "order_text": "Bacteria identified in Urine by Culture",
+      "specimen": {
+        "snomed": "122575003",
+        "text": "Urine specimen"
+      },
+      "collected": "2026-10-19T19:40:00-04:00",
+      "resulted": "2026-10-21T11:15:00-04:00",
+      "organism": {
+        "snomed": "112283007",
+        "text": "Escherichia coli"
+      },
+      "colony_count": {
+        "loinc": "19090-0",
+        "text": "Colony count [#/volume] in Urine",
+        "value": ">100000",
+        "units": "CFU/mL"
+      },
+      "susceptibilities": [
+        {
+          "loinc": "28-1",
+          "drug": "Ampicillin",
+          "mic": ">=32",
+          "units": "ug/mL",
+          "interpretation": "R"
+        },
+        {
+          "loinc": "85422-4",
+          "drug": "Cefazolin (urinary surrogate)",
+          "mic": "<=4",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "141-2",
+          "drug": "Ceftriaxone",
+          "mic": "<=1",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "185-9",
+          "drug": "Ciprofloxacin",
+          "mic": ">=4",
+          "units": "ug/mL",
+          "interpretation": "R"
+        },
+        {
+          "loinc": "516-5",
+          "drug": "Trimethoprim+Sulfamethoxazole",
+          "mic": ">=320",
+          "units": "ug/mL",
+          "interpretation": "R"
+        },
+        {
+          "loinc": "363-2",
+          "drug": "Nitrofurantoin",
+          "mic": "<=16",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "267-5",
+          "drug": "Gentamicin",
+          "mic": "<=1",
+          "units": "ug/mL",
+          "interpretation": "S"
+        }
+      ]
+    }
   ],
   "expected_findings": [
-    {"module": "iv-to-po", "type": "iv-to-po-switch", "drug": "Ceftriaxone",
-     "summary": "Clinical criteria for an oral switch are met, but the only susceptible oral options for pyelonephritis are beta-lactams."}
+    {
+      "module": "iv-to-po",
+      "type": "iv-to-po-switch",
+      "drug": "Ceftriaxone",
+      "summary": "Clinical criteria for an oral switch are met, but the only susceptible oral options for pyelonephritis are beta-lactams."
+    }
   ],
   "acceptable_answers": [
     "Switch to an oral cephalosporin the cefazolin surrogate supports (for example cefpodoxime), completing a longer total course than with a fluoroquinolone, and document the reasoning.",
@@ -58,9 +182,21 @@
   "reference_answer": "Flag the patient as meeting clinical IV to PO criteria and present both options: an oral cephalosporin with a longer total duration, or completing IV therapy. Either is defensible; the finding should not claim a single correct choice.",
   "rationale": "An ambiguous case: reasonable pharmacists differ. She meets clinical switch criteria, but the susceptible oral agents are beta-lactams, which the 2011 IDSA guideline considers less effective for pyelonephritis, recommending a longer course if used. Nitrofurantoin does not reach renal tissue. The newer IDSA complicated UTI guideline may change this balance; the owner reviews it before this case is approved.",
   "citations": [
-    {"ref": "idsa-uti-2011", "supports": "Oral beta-lactams for pyelonephritis: less effective than other agents, longer duration when used."},
-    {"ref": "idsa-cuti-2025", "supports": "Current guidance on oral step-down for complicated UTI and pyelonephritis; owner to confirm."},
-    {"ref": "clsi-m100", "supports": "Cefazolin as a surrogate for oral cephalosporins in urinary isolates."},
-    {"ref": "idsa-shea-asp-2016", "supports": "Stewardship programs promoting timely IV to oral transition once criteria are met."}
+    {
+      "ref": "idsa-uti-2011",
+      "supports": "Oral beta-lactams for pyelonephritis: less effective than other agents, longer duration when used."
+    },
+    {
+      "ref": "idsa-cuti-2025",
+      "supports": "Current guidance on oral step-down for complicated UTI and pyelonephritis; owner to confirm."
+    },
+    {
+      "ref": "clsi-m100",
+      "supports": "Cefazolin as a surrogate for oral cephalosporins in urinary isolates."
+    },
+    {
+      "ref": "idsa-shea-asp-2016",
+      "supports": "Stewardship programs promoting timely IV to oral transition once criteria are met."
+    }
   ]
 }

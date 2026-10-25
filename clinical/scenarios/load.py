@@ -34,6 +34,9 @@ def module(name, path):
 fhir = module("fhir", SPIKE / "fhir.py")
 checker = module("check_cases", HERE / "check_cases.py")
 LAB = "LocumView Scenario Laboratory"
+# OpenEMR stores a prescription's route as an id in its drug_route list, which carries the NCI code FHIR emits;
+# free text such as "IV" matches no entry and is dropped from MedicationRequest.dosageInstruction.route.
+ROUTES = {"IV": "11", "PO": "1", "IM": "10", "SC": "9"}
 PANEL = ("29576-6", "Bacterial susceptibility panel")
 IMPORT_PHP = r"""<?php
 // Runs OpenEMR's own HL7 results importer on one message, without a browser session.
@@ -187,7 +190,7 @@ def load(case):
     for x in case.get("allergies", []):
         ok("allergy", *fhir.call("POST", f"api/patient/{puuid}/allergy", x))
     for x in case.get("prescriptions", []):
-        rx = {"drug": x["drug"], "rxnorm_drugcode": x["rxnorm"], "start_date": x["start"], "route": x["route"],
+        rx = {"drug": x["drug"], "rxnorm_drugcode": x["rxnorm"], "start_date": x["start"], "route": ROUTES[x["route"]],
               "drug_dosage_instructions": x["instructions"], "patient_id": pid, "encounter": encounter}
         if "end" in x:
             rx["end_date"] = x["end"]

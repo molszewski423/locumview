@@ -4,62 +4,222 @@
   "version": "0.1.0",
   "title": "Pyelonephritis on ceftriaxone; urine E. coli resistant to ceftriaxone",
   "kind": "finding",
-  "modules": ["stewardship", "iv-to-po"],
+  "modules": [
+    "stewardship",
+    "iv-to-po"
+  ],
   "provenance": {
     "source": "synthetic",
     "author": "Claude Code (draft for owner review), from the M1 spike scenario",
     "created": "2026-10-25",
-    "clinical_review": {"status": "pending"}
+    "clinical_review": {
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-10-25",
+      "notes": "Owner clinical review: cases look good."
+    }
   },
   "story": "A 68-year-old woman admitted with acute pyelonephritis is started on IV ceftriaxone. On hospital day 3 she is still febrile, and the urine culture grows E. coli resistant to ceftriaxone, cefepime susceptible-dose dependent, resistant to trimethoprim-sulfamethoxazole and ciprofloxacin, and susceptible to the carbapenems: an ESBL-like pattern.",
-  "patient": {"family": "Casebook", "given": "Ada", "birth_date": "1958-03-14", "sex": "female"},
-  "encounter": {"class_code": "IMP", "start": "2026-10-20T14:00:00-04:00", "reason": "Fever, flank pain, dysuria"},
-  "problems": [{"title": "Acute pyelonephritis", "diagnosis": "ICD10:N10", "begdate": "2026-10-20"}],
+  "patient": {
+    "family": "Casebook",
+    "given": "Ada",
+    "birth_date": "1958-03-14",
+    "sex": "female"
+  },
+  "encounter": {
+    "class_code": "IMP",
+    "start": "2026-10-20T14:00:00-04:00",
+    "reason": "Fever, flank pain, dysuria"
+  },
+  "problems": [
+    {
+      "title": "Acute pyelonephritis",
+      "diagnosis": "ICD10:N10",
+      "begdate": "2026-10-20"
+    }
+  ],
   "prescriptions": [
-    {"drug": "ceftriaxone 1000 MG Injection", "rxnorm": "1665021", "start": "2026-10-20", "route": "IV",
-     "instructions": "1 g IV every 24 hours"}
+    {
+      "drug": "ceftriaxone 1000 MG Injection",
+      "rxnorm": "1665021",
+      "start": "2026-10-20",
+      "route": "IV",
+      "instructions": "1 g IV every 24 hours"
+    }
   ],
   "vitals": [
-    {"taken": "2026-10-20T14:20:00-04:00", "temperature_f": 102.4, "pulse": 112, "bps": 104, "bpd": 62, "respiration": 20, "oxygen_saturation": 96},
-    {"taken": "2026-10-22T08:00:00-04:00", "temperature_f": 100.9, "pulse": 104, "bps": 112, "bpd": 68, "respiration": 18, "oxygen_saturation": 97}
+    {
+      "taken": "2026-10-20T14:20:00-04:00",
+      "temperature_f": 102.4,
+      "pulse": 112,
+      "bps": 104,
+      "bpd": 62,
+      "respiration": 20,
+      "oxygen_saturation": 96
+    },
+    {
+      "taken": "2026-10-22T08:00:00-04:00",
+      "temperature_f": 100.9,
+      "pulse": 104,
+      "bps": 112,
+      "bpd": 68,
+      "respiration": 18,
+      "oxygen_saturation": 97
+    }
   ],
   "labs": [
-    {"order_code": "LV-BMP", "order_text": "Basic labs", "collected": "2026-10-20T15:00:00-04:00",
-     "resulted": "2026-10-20T16:05:00-04:00", "results": [
-       {"loinc": "2160-0", "text": "Creatinine [Mass/volume] in Serum or Plasma", "value": "1.1", "units": "mg/dL", "range": "0.5-1.0", "flag": "H"},
-       {"loinc": "6690-2", "text": "Leukocytes [#/volume] in Blood by Automated count", "value": "14.2", "units": "10*3/uL", "range": "4.0-11.0", "flag": "H"}
-     ]}
+    {
+      "order_code": "LV-BMP",
+      "order_text": "Basic labs",
+      "collected": "2026-10-20T15:00:00-04:00",
+      "resulted": "2026-10-20T16:05:00-04:00",
+      "results": [
+        {
+          "loinc": "2160-0",
+          "text": "Creatinine [Mass/volume] in Serum or Plasma",
+          "value": "1.1",
+          "units": "mg/dL",
+          "range": "0.5-1.0",
+          "flag": "H"
+        },
+        {
+          "loinc": "6690-2",
+          "text": "Leukocytes [#/volume] in Blood by Automated count",
+          "value": "14.2",
+          "units": "10*3/uL",
+          "range": "4.0-11.0",
+          "flag": "H"
+        }
+      ]
+    }
   ],
   "cultures": [
-    {"order_code": "630-4", "order_text": "Bacteria identified in Urine by Culture",
-     "specimen": {"snomed": "122575003", "text": "Urine specimen"},
-     "collected": "2026-10-20T15:10:00-04:00", "resulted": "2026-10-22T09:40:00-04:00",
-     "organism": {"snomed": "112283007", "text": "Escherichia coli"},
-     "colony_count": {"loinc": "19090-0", "text": "Colony count [#/volume] in Urine", "value": ">100000", "units": "CFU/mL"},
-     "susceptibilities": [
-       {"loinc": "28-1", "drug": "Ampicillin", "mic": ">=32", "units": "ug/mL", "interpretation": "R"},
-       {"loinc": "32-3", "drug": "Ampicillin+Sulbactam", "mic": "16", "units": "ug/mL", "interpretation": "I"},
-       {"loinc": "412-7", "drug": "Piperacillin+Tazobactam", "mic": "<=4", "units": "ug/mL", "interpretation": "S"},
-       {"loinc": "141-2", "drug": "Ceftriaxone", "mic": ">=64", "units": "ug/mL", "interpretation": "R"},
-       {"loinc": "6644-9", "drug": "Cefepime", "mic": "4", "units": "ug/mL", "interpretation": "SDD"},
-       {"loinc": "35801-0", "drug": "Ertapenem", "mic": "<=0.25", "units": "ug/mL", "interpretation": "S"},
-       {"loinc": "6652-2", "drug": "Meropenem", "mic": "<=0.25", "units": "ug/mL", "interpretation": "S"},
-       {"loinc": "185-9", "drug": "Ciprofloxacin", "mic": ">=4", "units": "ug/mL", "interpretation": "R"},
-       {"loinc": "516-5", "drug": "Trimethoprim+Sulfamethoxazole", "mic": ">=320", "units": "ug/mL", "interpretation": "R"},
-       {"loinc": "363-2", "drug": "Nitrofurantoin", "mic": "<=16", "units": "ug/mL", "interpretation": "S"},
-       {"loinc": "267-5", "drug": "Gentamicin", "mic": "<=1", "units": "ug/mL", "interpretation": "S"}
-     ]}
+    {
+      "order_code": "630-4",
+      "order_text": "Bacteria identified in Urine by Culture",
+      "specimen": {
+        "snomed": "122575003",
+        "text": "Urine specimen"
+      },
+      "collected": "2026-10-20T15:10:00-04:00",
+      "resulted": "2026-10-22T09:40:00-04:00",
+      "organism": {
+        "snomed": "112283007",
+        "text": "Escherichia coli"
+      },
+      "colony_count": {
+        "loinc": "19090-0",
+        "text": "Colony count [#/volume] in Urine",
+        "value": ">100000",
+        "units": "CFU/mL"
+      },
+      "susceptibilities": [
+        {
+          "loinc": "28-1",
+          "drug": "Ampicillin",
+          "mic": ">=32",
+          "units": "ug/mL",
+          "interpretation": "R"
+        },
+        {
+          "loinc": "32-3",
+          "drug": "Ampicillin+Sulbactam",
+          "mic": "16",
+          "units": "ug/mL",
+          "interpretation": "I"
+        },
+        {
+          "loinc": "412-7",
+          "drug": "Piperacillin+Tazobactam",
+          "mic": "<=4",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "141-2",
+          "drug": "Ceftriaxone",
+          "mic": ">=64",
+          "units": "ug/mL",
+          "interpretation": "R"
+        },
+        {
+          "loinc": "6644-9",
+          "drug": "Cefepime",
+          "mic": "4",
+          "units": "ug/mL",
+          "interpretation": "SDD"
+        },
+        {
+          "loinc": "35801-0",
+          "drug": "Ertapenem",
+          "mic": "<=0.25",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "6652-2",
+          "drug": "Meropenem",
+          "mic": "<=0.25",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "185-9",
+          "drug": "Ciprofloxacin",
+          "mic": ">=4",
+          "units": "ug/mL",
+          "interpretation": "R"
+        },
+        {
+          "loinc": "516-5",
+          "drug": "Trimethoprim+Sulfamethoxazole",
+          "mic": ">=320",
+          "units": "ug/mL",
+          "interpretation": "R"
+        },
+        {
+          "loinc": "363-2",
+          "drug": "Nitrofurantoin",
+          "mic": "<=16",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "267-5",
+          "drug": "Gentamicin",
+          "mic": "<=1",
+          "units": "ug/mL",
+          "interpretation": "S"
+        }
+      ]
+    }
   ],
   "expected_findings": [
-    {"module": "stewardship", "type": "bug-drug-mismatch", "drug": "Ceftriaxone",
-     "summary": "The urine E. coli is resistant to ceftriaxone, the patient's current therapy, and she remains febrile."}
+    {
+      "module": "stewardship",
+      "type": "bug-drug-mismatch",
+      "drug": "Ceftriaxone",
+      "summary": "The urine E. coli is resistant to ceftriaxone, the patient's current therapy, and she remains febrile."
+    }
   ],
   "reference_answer": "Change ceftriaxone to a carbapenem the isolate is susceptible to, for example ertapenem 1 g IV every 24 hours (renal function permitting). Fluoroquinolone and trimethoprim-sulfamethoxazole are not options (resistant), nitrofurantoin does not treat pyelonephritis, and cefepime reported susceptible-dose dependent is not a preferred choice for this phenotype. No IV to PO switch yet: she is febrile and no susceptible oral agent suitable for pyelonephritis is available.",
   "rationale": "Ceftriaxone resistance with cefepime SDD and carbapenem susceptibility suggests an ESBL-producing E. coli. For ESBL-producing Enterobacterales pyelonephritis, IDSA guidance prefers trimethoprim-sulfamethoxazole or a fluoroquinolone when susceptible, and a carbapenem otherwise. Both oral options are resistant here. The IV to PO module should not fire: she is febrile with tachycardia on day 3.",
   "citations": [
-    {"ref": "idsa-amr-gn-2024", "supports": "Treatment of ESBL-producing Enterobacterales pyelonephritis and complicated UTI: preferred agents, and carbapenems when TMP-SMX and fluoroquinolones are resistant."},
-    {"ref": "idsa-amr-gn-2026", "supports": "Current version of the same guidance; owner to confirm the recommendation is unchanged."},
-    {"ref": "clsi-m100", "supports": "Enterobacterales MIC breakpoints behind the S, I, R and SDD interpretations."},
-    {"ref": "idsa-shea-asp-2016", "supports": "Prospective audit and feedback of antibiotic therapy against culture results as a stewardship intervention."}
+    {
+      "ref": "idsa-amr-gn-2024",
+      "supports": "Treatment of ESBL-producing Enterobacterales pyelonephritis and complicated UTI: preferred agents, and carbapenems when TMP-SMX and fluoroquinolones are resistant."
+    },
+    {
+      "ref": "idsa-amr-gn-2026",
+      "supports": "Current version of the same guidance; owner to confirm the recommendation is unchanged."
+    },
+    {
+      "ref": "clsi-m100",
+      "supports": "Enterobacterales MIC breakpoints behind the S, I, R and SDD interpretations."
+    },
+    {
+      "ref": "idsa-shea-asp-2016",
+      "supports": "Prospective audit and feedback of antibiotic therapy against culture results as a stewardship intervention."
+    }
   ]
 }

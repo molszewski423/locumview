@@ -1,0 +1,235 @@
+{
+  "schema": "locumview-case/1",
+  "id": "cystitis-enterobacter-negative-01",
+  "version": "0.1.0",
+  "title": "Enterobacter cloacae cystitis on ceftriaxone, no fever or upper tract signs, nothing by mouth",
+  "kind": "negative-control",
+  "modules": [
+    "stewardship",
+    "iv-to-po"
+  ],
+  "provenance": {
+    "source": "synthetic",
+    "author": "Claude Code (draft for owner review), case list approved by the owner",
+    "created": "2026-10-25",
+    "clinical_review": {
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-10-25",
+      "notes": "Owner clinical review: cases look good."
+    }
+  },
+  "story": "A 74-year-old woman on postoperative day 2 after hip fracture repair develops dysuria and frequency without fever, flank pain or bacteremia. She has an ileus and takes nothing by mouth. Urine grows Enterobacter cloacae complex, resistant to the usual oral agents; she is on IV ceftriaxone.",
+  "patient": {
+    "family": "Casebook",
+    "given": "Fern",
+    "birth_date": "1952-01-30",
+    "sex": "female"
+  },
+  "encounter": {
+    "class_code": "IMP",
+    "start": "2026-10-21T09:00:00-04:00",
+    "reason": "Hip fracture after a fall"
+  },
+  "problems": [
+    {
+      "title": "Closed fracture of the femoral neck",
+      "diagnosis": "ICD10:S72.0",
+      "begdate": "2026-10-21"
+    },
+    {
+      "title": "Acute cystitis",
+      "diagnosis": "ICD10:N30.0",
+      "begdate": "2026-10-23"
+    },
+    {
+      "title": "Postoperative ileus",
+      "diagnosis": "ICD10:K56.7",
+      "begdate": "2026-10-23"
+    }
+  ],
+  "prescriptions": [
+    {
+      "drug": "ceftriaxone 1000 MG Injection",
+      "rxnorm": "1665021",
+      "route": "IV",
+      "instructions": "1 g IV every 24 hours",
+      "start": "2026-10-23"
+    }
+  ],
+  "vitals": [
+    {
+      "taken": "2026-10-23T08:00:00-04:00",
+      "temperature_f": 98.9,
+      "pulse": 84,
+      "bps": 128,
+      "bpd": 74,
+      "respiration": 16,
+      "oxygen_saturation": 97
+    },
+    {
+      "taken": "2026-10-24T20:00:00-04:00",
+      "temperature_f": 98.6,
+      "pulse": 80,
+      "bps": 126,
+      "bpd": 72,
+      "respiration": 16,
+      "oxygen_saturation": 98
+    }
+  ],
+  "labs": [
+    {
+      "order_code": "LV-BMP",
+      "order_text": "Basic labs",
+      "collected": "2026-10-23T06:00:00-04:00",
+      "resulted": "2026-10-23T07:00:00-04:00",
+      "results": [
+        {
+          "loinc": "2160-0",
+          "text": "Creatinine [Mass/volume] in Serum or Plasma",
+          "value": "0.9",
+          "units": "mg/dL",
+          "range": "0.5-1.0",
+          "flag": "N"
+        },
+        {
+          "loinc": "6690-2",
+          "text": "Leukocytes [#/volume] in Blood by Automated count",
+          "value": "9.8",
+          "units": "10*3/uL",
+          "range": "4.0-11.0",
+          "flag": "N"
+        }
+      ]
+    }
+  ],
+  "cultures": [
+    {
+      "order_code": "630-4",
+      "order_text": "Bacteria identified in Urine by Culture",
+      "specimen": {
+        "snomed": "122575003",
+        "text": "Urine specimen"
+      },
+      "collected": "2026-10-23T08:30:00-04:00",
+      "resulted": "2026-10-24T16:00:00-04:00",
+      "organism": {
+        "snomed": "414102007",
+        "text": "Enterobacter cloacae complex"
+      },
+      "colony_count": {
+        "loinc": "19090-0",
+        "text": "Colony count [#/volume] in Urine",
+        "value": ">100000",
+        "units": "CFU/mL"
+      },
+      "susceptibilities": [
+        {
+          "loinc": "28-1",
+          "drug": "Ampicillin",
+          "mic": ">=32",
+          "units": "ug/mL",
+          "interpretation": "R"
+        },
+        {
+          "loinc": "32-3",
+          "drug": "Ampicillin+Sulbactam",
+          "mic": ">=32",
+          "units": "ug/mL",
+          "interpretation": "R"
+        },
+        {
+          "loinc": "76-0",
+          "drug": "Cefazolin",
+          "mic": ">=64",
+          "units": "ug/mL",
+          "interpretation": "R"
+        },
+        {
+          "loinc": "141-2",
+          "drug": "Ceftriaxone",
+          "mic": "<=1",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "6644-9",
+          "drug": "Cefepime",
+          "mic": "<=1",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "412-7",
+          "drug": "Piperacillin+Tazobactam",
+          "mic": "<=4",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "35801-0",
+          "drug": "Ertapenem",
+          "mic": "<=0.25",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "6652-2",
+          "drug": "Meropenem",
+          "mic": "<=0.25",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "267-5",
+          "drug": "Gentamicin",
+          "mic": "<=1",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "185-9",
+          "drug": "Ciprofloxacin",
+          "mic": ">=4",
+          "units": "ug/mL",
+          "interpretation": "R"
+        },
+        {
+          "loinc": "516-5",
+          "drug": "Trimethoprim+Sulfamethoxazole",
+          "mic": ">=320",
+          "units": "ug/mL",
+          "interpretation": "R"
+        },
+        {
+          "loinc": "363-2",
+          "drug": "Nitrofurantoin",
+          "mic": ">=128",
+          "units": "ug/mL",
+          "interpretation": "R"
+        }
+      ]
+    }
+  ],
+  "expected_findings": [],
+  "reference_answer": "No intervention. Ceftriaxone is a reasonable choice for uncomplicated cystitis even with an AmpC-risk organism; the oral options are resistant, and she cannot take oral medication. The AmpC rule must not fire for cystitis without upper tract or bloodstream involvement.",
+  "rationale": "The negative pair of the Enterobacter bacteremia case. IDSA guidance limits its caution about ceftriaxone for moderate to high AmpC-risk organisms to invasive infections; for uncomplicated cystitis ceftriaxone may be reasonable. A rule that fires on organism and drug alone, ignoring the site, fails this case. IV to PO does not apply: she is not taking anything by mouth and no susceptible oral agent exists.",
+  "citations": [
+    {
+      "ref": "idsa-amr-gn-2024",
+      "supports": "AmpC-producing Enterobacterales: ceftriaxone for uncomplicated cystitis versus invasive infections; cefepime when the MIC is 2 or lower."
+    },
+    {
+      "ref": "idsa-amr-gn-2026",
+      "supports": "Current version of the same guidance; owner to confirm the AmpC recommendations are unchanged."
+    },
+    {
+      "ref": "clsi-m100",
+      "supports": "Enterobacterales breakpoints behind the panel."
+    },
+    {
+      "ref": "idsa-shea-asp-2016",
+      "supports": "Prospective audit and feedback of antibiotic therapy as a stewardship intervention."
+    }
+  ]
+}

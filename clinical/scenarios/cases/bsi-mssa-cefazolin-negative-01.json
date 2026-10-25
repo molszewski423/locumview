@@ -1,0 +1,231 @@
+{
+  "schema": "locumview-case/1",
+  "id": "bsi-mssa-cefazolin-negative-01",
+  "version": "0.1.0",
+  "title": "MSSA catheter-related bacteremia already on cefazolin",
+  "kind": "negative-control",
+  "modules": [
+    "stewardship",
+    "iv-to-po"
+  ],
+  "provenance": {
+    "source": "synthetic",
+    "author": "Claude Code (draft for owner review), case list approved by the owner",
+    "created": "2026-10-25",
+    "clinical_review": {
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-10-25",
+      "notes": "Owner clinical review: cases look good."
+    }
+  },
+  "story": "A 58-year-old man receiving home parenteral nutrition through a tunneled catheter is admitted with fever and rigors. Blood cultures grow methicillin-susceptible Staphylococcus aureus; empiric vancomycin was changed to cefazolin 2 g IV every 8 hours on day 2 and the catheter removed. On day 3 he is still febrile; repeat blood cultures are pending.",
+  "patient": {
+    "family": "Casebook",
+    "given": "Hal",
+    "birth_date": "1968-08-04",
+    "sex": "male"
+  },
+  "encounter": {
+    "class_code": "IMP",
+    "start": "2026-10-21T16:00:00-04:00",
+    "reason": "Fever and rigors with a tunneled central catheter"
+  },
+  "problems": [
+    {
+      "title": "Catheter-related bloodstream infection",
+      "diagnosis": "ICD10:T80.211A",
+      "begdate": "2026-10-21"
+    },
+    {
+      "title": "Short bowel syndrome on parenteral nutrition",
+      "diagnosis": "ICD10:K91.2",
+      "begdate": "2021-03-15"
+    }
+  ],
+  "prescriptions": [
+    {
+      "drug": "vancomycin 1000 MG Injection",
+      "rxnorm": "1807513",
+      "route": "IV",
+      "instructions": "Loading dose then 15 to 20 mg/kg IV every 8 to 12 hours, pharmacy to dose",
+      "start": "2026-10-21",
+      "end": "2026-10-22"
+    },
+    {
+      "drug": "cefazolin 2000 MG Injection",
+      "rxnorm": "1665060",
+      "start": "2026-10-22",
+      "route": "IV",
+      "instructions": "2 g IV every 8 hours"
+    }
+  ],
+  "vitals": [
+    {
+      "taken": "2026-10-21T16:10:00-04:00",
+      "temperature_f": 103.0,
+      "pulse": 120,
+      "bps": 98,
+      "bpd": 60,
+      "respiration": 22,
+      "oxygen_saturation": 95
+    },
+    {
+      "taken": "2026-10-23T08:00:00-04:00",
+      "temperature_f": 100.7,
+      "pulse": 98,
+      "bps": 118,
+      "bpd": 70,
+      "respiration": 18,
+      "oxygen_saturation": 97
+    }
+  ],
+  "labs": [
+    {
+      "order_code": "LV-BMP",
+      "order_text": "Basic labs",
+      "collected": "2026-10-21T16:20:00-04:00",
+      "resulted": "2026-10-21T17:10:00-04:00",
+      "results": [
+        {
+          "loinc": "2160-0",
+          "text": "Creatinine [Mass/volume] in Serum or Plasma",
+          "value": "1.0",
+          "units": "mg/dL",
+          "range": "0.7-1.3",
+          "flag": "N"
+        },
+        {
+          "loinc": "6690-2",
+          "text": "Leukocytes [#/volume] in Blood by Automated count",
+          "value": "15.2",
+          "units": "10*3/uL",
+          "range": "4.0-11.0",
+          "flag": "H"
+        }
+      ]
+    }
+  ],
+  "cultures": [
+    {
+      "order_code": "600-7",
+      "order_text": "Bacteria identified in Blood by Culture",
+      "specimen": {
+        "snomed": "119297000",
+        "text": "Blood specimen"
+      },
+      "collected": "2026-10-21T16:30:00-04:00",
+      "resulted": "2026-10-22T14:00:00-04:00",
+      "organism": {
+        "snomed": "417943000",
+        "text": "Methicillin susceptible Staphylococcus aureus"
+      },
+      "susceptibilities": [
+        {
+          "loinc": "6932-8",
+          "drug": "Penicillin",
+          "mic": ">=0.5",
+          "units": "ug/mL",
+          "interpretation": "R"
+        },
+        {
+          "loinc": "383-0",
+          "drug": "Oxacillin",
+          "mic": "<=0.25",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "524-9",
+          "drug": "Vancomycin",
+          "mic": "1",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "193-3",
+          "drug": "Clindamycin",
+          "mic": "<=0.25",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "233-7",
+          "drug": "Erythromycin",
+          "mic": "<=0.25",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "516-5",
+          "drug": "Trimethoprim+Sulfamethoxazole",
+          "mic": "<=10",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "496-0",
+          "drug": "Tetracycline",
+          "mic": "<=1",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "20396-8",
+          "drug": "Levofloxacin",
+          "mic": "<=0.12",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "29254-0",
+          "drug": "Linezolid",
+          "mic": "2",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "35788-9",
+          "drug": "Daptomycin",
+          "mic": "0.5",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "267-5",
+          "drug": "Gentamicin",
+          "mic": "<=0.5",
+          "units": "ug/mL",
+          "interpretation": "S"
+        }
+      ]
+    },
+    {
+      "order_code": "600-7",
+      "order_text": "Bacteria identified in Blood by Culture",
+      "specimen": {
+        "snomed": "119297000",
+        "text": "Blood specimen"
+      },
+      "collected": "2026-10-23T07:00:00-04:00",
+      "status": "pending"
+    }
+  ],
+  "expected_findings": [],
+  "reference_answer": "No intervention: cefazolin is a preferred agent for MSSA bacteremia, the catheter is out, and repeat cultures are pending. No oral switch this early in S. aureus bacteremia.",
+  "rationale": "A negative control for de-escalation and IV to PO: therapy is already the preferred beta-lactam. Early oral step-down is not a standard recommendation for S. aureus bacteremia while febrile with clearance unconfirmed.",
+  "citations": [
+    {
+      "ref": "idsa-crbsi-2009",
+      "supports": "MSSA catheter-related bacteremia: a beta-lactam (nafcillin, oxacillin or cefazolin) rather than vancomycin; catheter removal; duration from the first negative culture."
+    },
+    {
+      "ref": "clsi-m100",
+      "supports": "Staphylococcus aureus breakpoints, oxacillin predicting beta-lactam activity."
+    },
+    {
+      "ref": "idsa-shea-asp-2016",
+      "supports": "Stewardship programs promoting timely IV to oral transition once criteria are met."
+    }
+  ]
+}

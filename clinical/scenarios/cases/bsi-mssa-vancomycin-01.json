@@ -1,0 +1,215 @@
+{
+  "schema": "locumview-case/1",
+  "id": "bsi-mssa-vancomycin-01",
+  "version": "0.1.0",
+  "title": "MSSA bacteremia still on vancomycin after susceptibilities",
+  "kind": "finding",
+  "modules": [
+    "stewardship",
+    "iv-to-po"
+  ],
+  "provenance": {
+    "source": "synthetic",
+    "author": "Claude Code (draft for owner review), case list approved by the owner",
+    "created": "2026-10-25",
+    "clinical_review": {
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-10-25",
+      "notes": "Owner clinical review: cases look good."
+    }
+  },
+  "story": "A 63-year-old woman with a peripherally inserted central catheter for home antibiotics is admitted with fever. Blood cultures grow methicillin-susceptible Staphylococcus aureus, oxacillin susceptible, on day 2; she remains on the empiric vancomycin started at admission. The PICC has been removed.",
+  "patient": {
+    "family": "Casebook",
+    "given": "Iris",
+    "birth_date": "1963-04-27",
+    "sex": "female"
+  },
+  "encounter": {
+    "class_code": "IMP",
+    "start": "2026-10-22T11:30:00-04:00",
+    "reason": "Fever with a peripherally inserted central catheter"
+  },
+  "problems": [
+    {
+      "title": "Catheter-related bloodstream infection",
+      "diagnosis": "ICD10:T80.211A",
+      "begdate": "2026-10-22"
+    }
+  ],
+  "prescriptions": [
+    {
+      "drug": "vancomycin 1000 MG Injection",
+      "rxnorm": "1807513",
+      "route": "IV",
+      "instructions": "Loading dose then 15 to 20 mg/kg IV every 8 to 12 hours, pharmacy to dose",
+      "start": "2026-10-22"
+    }
+  ],
+  "vitals": [
+    {
+      "taken": "2026-10-22T11:40:00-04:00",
+      "temperature_f": 102.2,
+      "pulse": 112,
+      "bps": 110,
+      "bpd": 66,
+      "respiration": 20,
+      "oxygen_saturation": 96
+    },
+    {
+      "taken": "2026-10-24T08:00:00-04:00",
+      "temperature_f": 100.4,
+      "pulse": 96,
+      "bps": 122,
+      "bpd": 72,
+      "respiration": 18,
+      "oxygen_saturation": 97
+    }
+  ],
+  "labs": [
+    {
+      "order_code": "LV-BMP",
+      "order_text": "Basic labs",
+      "collected": "2026-10-22T11:50:00-04:00",
+      "resulted": "2026-10-22T12:40:00-04:00",
+      "results": [
+        {
+          "loinc": "2160-0",
+          "text": "Creatinine [Mass/volume] in Serum or Plasma",
+          "value": "0.8",
+          "units": "mg/dL",
+          "range": "0.5-1.0",
+          "flag": "N"
+        },
+        {
+          "loinc": "6690-2",
+          "text": "Leukocytes [#/volume] in Blood by Automated count",
+          "value": "14.4",
+          "units": "10*3/uL",
+          "range": "4.0-11.0",
+          "flag": "H"
+        }
+      ]
+    }
+  ],
+  "cultures": [
+    {
+      "order_code": "600-7",
+      "order_text": "Bacteria identified in Blood by Culture",
+      "specimen": {
+        "snomed": "119297000",
+        "text": "Blood specimen"
+      },
+      "collected": "2026-10-22T12:00:00-04:00",
+      "resulted": "2026-10-24T07:00:00-04:00",
+      "organism": {
+        "snomed": "417943000",
+        "text": "Methicillin susceptible Staphylococcus aureus"
+      },
+      "susceptibilities": [
+        {
+          "loinc": "6932-8",
+          "drug": "Penicillin",
+          "mic": ">=0.5",
+          "units": "ug/mL",
+          "interpretation": "R"
+        },
+        {
+          "loinc": "383-0",
+          "drug": "Oxacillin",
+          "mic": "<=0.25",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "524-9",
+          "drug": "Vancomycin",
+          "mic": "1",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "193-3",
+          "drug": "Clindamycin",
+          "mic": "<=0.25",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "233-7",
+          "drug": "Erythromycin",
+          "mic": "<=0.25",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "516-5",
+          "drug": "Trimethoprim+Sulfamethoxazole",
+          "mic": "<=10",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "496-0",
+          "drug": "Tetracycline",
+          "mic": "<=1",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "20396-8",
+          "drug": "Levofloxacin",
+          "mic": "<=0.12",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "29254-0",
+          "drug": "Linezolid",
+          "mic": "2",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "35788-9",
+          "drug": "Daptomycin",
+          "mic": "0.5",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "267-5",
+          "drug": "Gentamicin",
+          "mic": "<=0.5",
+          "units": "ug/mL",
+          "interpretation": "S"
+        }
+      ]
+    }
+  ],
+  "expected_findings": [
+    {
+      "module": "stewardship",
+      "type": "de-escalation",
+      "drug": "Vancomycin",
+      "summary": "MSSA bacteremia on vancomycin: an anti-staphylococcal beta-lactam (cefazolin, nafcillin or oxacillin) is preferred once oxacillin susceptibility is known."
+    }
+  ],
+  "reference_answer": "Change vancomycin to cefazolin 2 g IV every 8 hours (or nafcillin or oxacillin 2 g IV every 4 hours), adjusted for renal function. Repeat blood cultures to document clearance. No oral switch yet.",
+  "rationale": "Beta-lactams are more effective than vancomycin for MSSA bacteremia, and the switch also narrows therapy. The finding needs the organism, its oxacillin result and the current drug together. The IV to PO module should stay silent in early S. aureus bacteremia.",
+  "citations": [
+    {
+      "ref": "idsa-crbsi-2009",
+      "supports": "MSSA catheter-related bacteremia: a beta-lactam rather than vancomycin."
+    },
+    {
+      "ref": "clsi-m100",
+      "supports": "Oxacillin susceptibility predicting beta-lactam activity in S. aureus."
+    },
+    {
+      "ref": "idsa-shea-asp-2016",
+      "supports": "Prospective audit and feedback of antibiotic therapy as a stewardship intervention."
+    }
+  ]
+}

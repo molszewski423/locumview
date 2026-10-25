@@ -53,4 +53,6 @@ newer than the drafting agent's knowledge and are marked for the owner to read.
 One organism per culture until OpenEMR links susceptibilities to organisms (M1 decision, option 4). Through FHIR the
 organism arrives as text with its SNOMED code inside (`"414102007 (Enterobacter cloacae complex)"`), MICs with a
 qualifier as text (`"<= 1"`), and lab ServiceRequests stay `active` after results arrive: the rules read results, not
-order status. Details: [docs/evidence/clinical/20261025-openemr-m1-spike/](../../docs/evidence/clinical/20261025-openemr-m1-spike/README.md).
+order status. Prescriptions: the loader maps `IV`, `PO`, `IM` and `SC` to OpenEMR's `drug_route` list ids, so
+`MedicationRequest.dosageInstruction.route` carries the NCI code (C38276 IV, C38288 oral); stopped prescriptions read
+back as `completed`. Details: [docs/evidence/clinical/20261025-openemr-m1-spike/](../../docs/evidence/clinical/20261025-openemr-m1-spike/README.md).
