@@ -10,6 +10,10 @@ repos:
         # The project's Ansible content is the STIG playbook support for the hand-built reference desktop; the
         # desktop itself is an image (ADR 0007) and the infrastructure OpenTofu (ADR 0013).
         files: ^hardening/.*\.(yml|yaml)$
+        # Upstream sets always_run, which ignores the files filter and runs the hook on every commit. Off, so a
+        # commit with no Ansible content does not depend on ansible-core supporting the machine's python3 (Fedora's
+        # 3.15 is newer than ansible-core 2.21 supports).
+        always_run: false
 
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.5.0

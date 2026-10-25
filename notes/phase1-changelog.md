@@ -1405,3 +1405,13 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   there so the machine that applies the manifests also verifies them.
 - Verified on a workstation with cosign: both pinned images (OpenEMR, gateway) pass; with one digest altered by a
   character, that image is reported FAILED and the script exits 1.
+
+## 83. Clinical owner run: namespace before the first Secret, ansible-lint only on Ansible changes (2026-10-25)
+
+- README step 2 applied the `clinical-db` Secret before anything had created the `clinical` namespace (step 3's
+  `kubectl apply -k` does that), so the apply would fail with NotFound. Step 2 now applies `namespace.yaml` first.
+- Committing the encrypted secret on operator-laptop failed in the ansible-lint hook: upstream's hook sets
+  `always_run: true`, which overrides our `files: ^hardening/` filter, and the laptop's `python3` is now 3.15, newer
+  than ansible-core 2.21.5 supports (`module 'dataclasses' has no attribute '_is_type'`). The hook now sets
+  `always_run: false`, so it runs only when Ansible content changes. Linting `hardening/` on that laptop still needs
+  an ansible-core release that supports 3.15; other machines are unaffected. No hook was skipped or bypassed.
