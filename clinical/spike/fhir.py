@@ -24,7 +24,8 @@ SCOPES = ("openid offline_access api:oemr api:fhir user/patient.crus user/encoun
           "user/medication.cruds user/allergy.cruds user/prescription.crds user/vital.crus user/Patient.read "
           "user/Patient.write "
           "user/Encounter.read user/Observation.read user/DiagnosticReport.read user/Specimen.rs "
-          "user/ServiceRequest.rs user/MedicationRequest.read user/Condition.read user/Practitioner.read "
+          "user/ServiceRequest.rs user/MedicationRequest.read user/Condition.read user/AllergyIntolerance.read "
+          "user/Practitioner.read "
           "user/Organization.read")
 TLS = ssl.create_default_context()
 TLS.check_hostname = False

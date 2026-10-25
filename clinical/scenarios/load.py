@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Load the Phase 9 lite scenario library into OpenEMR (plan M2), with one command and idempotently.
 
-    load.py [--reset] [case.json ...]     default: every case in cases/
+    load.py [--reset] [--no-background] [case.json ...]     default: every case in cases/
 
 --reset destroys the local instance and starts a fresh one first (clinical/spike/run.sh down, up, api), so the
 result is a known state built only from the repository. Without it, cases already present (by patient number
-LV-<case id>) are skipped, so running it twice changes nothing. Every case is checked first; an invalid case
+LV-<case id>) are skipped, so running it twice changes nothing. The Synthea background patients in
+clinical/synthea/background.json (patient numbers SYN-nnn) are loaded too, unless --no-background: demographics,
+problems and allergies only, so they can never produce a finding. Every case is checked first; an invalid case
 stops the load before anything is written.
 
 Load paths are those the M1 spike established (docs/evidence/clinical/20261025-openemr-m1-spike/): FHIR for the
@@ -76,6 +78,16 @@ def hl7(value):
 def ok(step, status, body):
     if status not in (200, 201):
         raise SystemExit(f"{step}: HTTP {status}: {json.dumps(body)[:600] if not isinstance(body, str) else body[:600]}")
+    return body
+
+
+def allergy_body(x):
+    """OpenEMR allergy fields; FHIR AllergyIntolerance.code comes only from the coded diagnosis field."""
+    body = {k: v for k, v in x.items() if k in ("title", "begdate", "reaction", "severity")}
+    if "rxnorm" in x:
+        body["diagnosis"] = f"RXCUI:{x['rxnorm']}"
+    elif "snomed" in x:
+        body["diagnosis"] = f"SNOMED-CT:{x['snomed']}"
     return body
 
 
@@ -188,7 +200,7 @@ def load(case):
     for x in case.get("problems", []):
         ok("problem", *fhir.call("POST", f"api/patient/{puuid}/medical_problem", x))
     for x in case.get("allergies", []):
-        ok("allergy", *fhir.call("POST", f"api/patient/{puuid}/allergy", x))
+        ok("allergy", *fhir.call("POST", f"api/patient/{puuid}/allergy", allergy_body(x)))
     for x in case.get("prescriptions", []):
         rx = {"drug": x["drug"], "rxnorm_drugcode": x["rxnorm"], "start_date": x["start"], "route": ROUTES[x["route"]],
               "drug_dosage_instructions": x["instructions"], "patient_id": pid, "encounter": encounter}
@@ -225,6 +237,29 @@ def load(case):
     print(f"{case['id']}: loaded (patient {number}, {len(orders)} orders)")
 
 
+def load_background():
+    people = json.loads((HERE.parent / "synthea" / "background.json").read_text())["patients"]
+    added = 0
+    for p in people:
+        if sql(f"SELECT pid FROM patient_data WHERE pubpid = {quote(p['number'])};"):
+            continue
+        status, body = fhir.call("POST", "fhir/Patient", {
+            "resourceType": "Patient",
+            "name": [{"use": "official", "family": p["family"], "given": [p["given"]]}],
+            "identifier": [{"type": {"coding": [{"system": "http://terminology.hl7.org/CodeSystem/v2-0203", "code": "PT"}]},
+                            "value": p["number"]}],
+            "gender": p["sex"], "birthDate": p["birth_date"]})
+        body = ok(f"{p['number']}: patient", status, body)
+        puuid = body.get("uuid") or body.get("id") or (body.get("data") or {}).get("uuid")
+        for x in p["problems"]:
+            ok(f"{p['number']}: problem", *fhir.call("POST", f"api/patient/{puuid}/medical_problem", {
+                "title": x["title"], "begdate": x["begdate"], "diagnosis": f"SNOMED-CT:{x['snomed']}"}))
+        for x in p["allergies"]:
+            ok(f"{p['number']}: allergy", *fhir.call("POST", f"api/patient/{puuid}/allergy", allergy_body(x)))
+        added += 1
+    print(f"background: {added} loaded, {len(people) - added} already present")
+
+
 def main(argv):
     reset = "--reset" in argv
     paths = [Path(a) for a in argv if not a.startswith("--")] or sorted((HERE / "cases").glob("*.json"))
@@ -238,6 +273,8 @@ def main(argv):
             print(run(step).strip().splitlines()[-1])
     # Result flags for S, I, R and SDD (list configuration, idempotent).
     run("sql", stdin=(SPIKE / "susceptibility-flags.sql").read_text())
+    if "--no-background" not in argv:
+        load_background()
     for path in paths:
         load(json.loads(path.read_text()))
 

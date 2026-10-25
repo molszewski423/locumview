@@ -123,8 +123,11 @@ def check(path, citations, require_approved=False):
         x = c.fields(f"problems[{i}]", x, ["title", "begdate"], ["diagnosis"])
         c.match(f"problems[{i}].begdate", x.get("begdate"), DATE, "a date")
     for i, x in enumerate(c.items("allergies", d.get("allergies", []))):
-        x = c.fields(f"allergies[{i}]", x, ["title", "begdate"], ["reaction", "severity"])
+        x = c.fields(f"allergies[{i}]", x, ["title", "begdate"], ["reaction", "severity", "rxnorm", "snomed"])
         c.match(f"allergies[{i}].begdate", x.get("begdate"), DATE, "a date")
+        for key in ("rxnorm", "snomed"):
+            if key in x:
+                c.match(f"allergies[{i}].{key}", x[key], DIGITS, f"a{'n RxNorm' if key == 'rxnorm' else ' SNOMED CT'} code")
     for i, x in enumerate(c.items("prescriptions", d.get("prescriptions", []))):
         x = c.fields(f"prescriptions[{i}]", x, ["drug", "rxnorm", "start", "route", "instructions"], ["end"])
         c.match(f"prescriptions[{i}].rxnorm", x.get("rxnorm"), DIGITS, "an RxNorm code")

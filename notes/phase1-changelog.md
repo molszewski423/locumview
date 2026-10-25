@@ -1251,3 +1251,28 @@ meningitis at 48 with alcohol use disorder (negative control).
   load skipped all and left counts unchanged; FHIR read-back of routes, stopped prescriptions (`completed`), pending
   orders and organisms checked. The local instance was destroyed afterwards.
 - **Open:** Synthea background patients, then M3. `check_cases.py --require-approved` now passes for the whole library.
+
+## 75. Phase 9 lite M2: Synthea background patients; M2 Done (2026-10-25)
+
+The last M2 item: background patients from Synthea, so the demo EHR has a realistic patient list.
+`clinical/synthea/README.md`.
+
+- **Generation:** `clinical/synthea/generate.sh` runs Synthea v4.0.0 (tagged release; its jar checked against the
+  SHA-256 GitHub publishes before running) in a digest-pinned Temurin 21 JRE container without network, with a fixed
+  seed, clinician seed and reference date: 20 living patients aged 25 to 90. Two generations give a byte-identical
+  `background.json`; loading never needs Java.
+- **Content:** demographics, active SNOMED CT disorders and active allergies (allergens only, coded). No encounters,
+  medications, labs or cultures, so background patients cannot produce findings. The loader loads them with the
+  cases (`SYN-nnn`, skipped when present; `--no-background` to leave them out).
+- **Found:** FHIR AllergyIntolerance.code comes only from an allergy's coded field; without it every allergen read
+  "Unknown". The loader now sends RxNorm or SNOMED CT codes (cases can carry them too), and allergies read back
+  coded. FHIR problem-list Conditions come back as text only for every patient: OpenEMR 8.4.1's problem-list query
+  reads the stored code without parsing it, a defect for the upstream list with the M1 fixes. The spike client had
+  also lost its AllergyIntolerance read scope when its scopes were rewritten; restored.
+- **Verified:** fresh instance, 20 background patients and 14 cases loaded in about 90 seconds; a second load
+  skipped everything with counts unchanged (no encounters or prescriptions from background patients); 34 patients
+  and coded allergies through FHIR; checker and tests pass. Instance destroyed afterwards.
+- **M2 Done** against the plan's criteria: 14 cases (at least 3 negative controls and 2 ambiguous), each versioned
+  with provenance, expected findings, rationale, citations and a reference answer, all approved in the owner's
+  clinical review; a schema checked in CI; a one-command idempotent loader that refuses cases without provenance;
+  Synthea for background patients only. Next: M3, the clinical app shell and SMART EHR launch.

@@ -8,7 +8,7 @@ to load into OpenEMR and the answer the rules must give.
 ```fish
 python3 clinical/scenarios/check_cases.py                  # check every case (pre-commit and CI run this)
 python3 clinical/scenarios/check_cases.py --require-approved   # what a frozen evaluation build must pass
-python3 clinical/scenarios/load.py --reset                 # fresh local OpenEMR, then load every case
+python3 clinical/scenarios/load.py --reset                 # fresh local OpenEMR, background patients, every case
 python3 clinical/scenarios/load.py                         # load into the running instance; loaded cases are skipped
 ```
 
@@ -55,4 +55,6 @@ organism arrives as text with its SNOMED code inside (`"414102007 (Enterobacter 
 qualifier as text (`"<= 1"`), and lab ServiceRequests stay `active` after results arrive: the rules read results, not
 order status. Prescriptions: the loader maps `IV`, `PO`, `IM` and `SC` to OpenEMR's `drug_route` list ids, so
 `MedicationRequest.dosageInstruction.route` carries the NCI code (C38276 IV, C38288 oral); stopped prescriptions read
-back as `completed`. Details: [docs/evidence/clinical/20261025-openemr-m1-spike/](../../docs/evidence/clinical/20261025-openemr-m1-spike/README.md).
+back as `completed`. Allergies with an `rxnorm` or `snomed` code read back coded; problems read back as text
+only (OpenEMR's FHIR problem-list query does not parse the stored code). Background patients:
+[../synthea/README.md](../synthea/README.md). Details: [docs/evidence/clinical/20261025-openemr-m1-spike/](../../docs/evidence/clinical/20261025-openemr-m1-spike/README.md).
