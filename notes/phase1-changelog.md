@@ -1447,4 +1447,5 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   `LEADER_TIMEOUT=10`), the same takeover-then-follower sequence as the cluster; with the marker removed, the restore
   runs and the upgrade and configuration checks pass. Marker removal on a `dr-x------` apache-owned `sites/` fails
   with all capabilities dropped and succeeds with `DAC_OVERRIDE` added. `kubectl kustomize` sets the pinned digest on
-  the init container; a server-side dry run accepts the Deployment, warning (restricted) only about `openemr`.
+  the init container; a server-side dry run accepts the Deployment under
+  baseline; the restricted warning now names `clear-leader-marker` as well as `openemr` (root, `DAC_OVERRIDE`).
