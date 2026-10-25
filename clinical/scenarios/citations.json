@@ -1,0 +1,80 @@
+{
+  "_note": "References the case files cite by id. Metadata (authors, title, journal, year, PMID, DOI) checked against PubMed on the date in metadata_checked. content_check says who has confirmed that a case's use of the source matches what it recommends: every case is clinically reviewed by the owner before it enters an evaluation build.",
+  "citations": {
+    "idsa-uti-2011": {
+      "authors": "Gupta K, Hooton TM, Naber KG, et al.",
+      "title": "International clinical practice guidelines for the treatment of acute uncomplicated cystitis and pyelonephritis in women: a 2010 update by the Infectious Diseases Society of America and the European Society for Microbiology and Infectious Diseases",
+      "source": "Clin Infect Dis. 2011;52(5):e103-e120",
+      "pmid": "21292654",
+      "doi": "10.1093/cid/ciq257",
+      "metadata_checked": "2026-10-25",
+      "content_check": "owner"
+    },
+    "idsa-cuti-2025": {
+      "authors": "Trautner BW, et al.",
+      "title": "Infectious Diseases Society of America 2025 Guideline on Management and Treatment of Complicated Urinary Tract Infections (series)",
+      "source": "Clin Infect Dis. Published 2026 Aug 24 (PubMed record date)",
+      "pmid": "41419213",
+      "doi": "10.1093/cid/ciaf460",
+      "metadata_checked": "2026-10-25",
+      "content_check": "owner",
+      "note": "Newer than the drafting agent's knowledge; its recommendations must be read and confirmed by the owner before a case relies on it."
+    },
+    "idsa-amr-gn-2024": {
+      "authors": "Tamma PD, Heil EL, Justo JA, et al.",
+      "title": "Infectious Diseases Society of America 2024 Guidance on the Treatment of Antimicrobial-Resistant Gram-Negative Infections",
+      "source": "Clin Infect Dis. 2024 Aug 7",
+      "pmid": "39108079",
+      "doi": "10.1093/cid/ciae403",
+      "metadata_checked": "2026-10-25",
+      "content_check": "owner",
+      "note": "Superseded by the 2026 guidance (idsa-amr-gn-2026); cases citing it need the owner to confirm the recommendation is unchanged."
+    },
+    "idsa-amr-gn-2026": {
+      "authors": "Tamma PD, et al.",
+      "title": "Infectious Diseases Society of America 2026 Guidance on the Treatment of Antimicrobial-Resistant Gram-Negative Infections",
+      "source": "Clin Infect Dis. 2026 Aug 8",
+      "pmid": "42570093",
+      "doi": "10.1093/cid/ciag481",
+      "metadata_checked": "2026-10-25",
+      "content_check": "owner",
+      "note": "Newer than the drafting agent's knowledge; read and confirmed by the owner before a case relies on it."
+    },
+    "idsa-shea-asp-2016": {
+      "authors": "Barlam TF, Cosgrove SE, Abbo LM, et al.",
+      "title": "Implementing an Antibiotic Stewardship Program: Guidelines by the Infectious Diseases Society of America and the Society for Healthcare Epidemiology of America",
+      "source": "Clin Infect Dis. 2016;62(10):e51-e77",
+      "pmid": "27080992",
+      "doi": "10.1093/cid/ciw118",
+      "metadata_checked": "2026-10-25",
+      "content_check": "owner"
+    },
+    "clsi-m100": {
+      "authors": "Clinical and Laboratory Standards Institute",
+      "title": "Performance Standards for Antimicrobial Susceptibility Testing (M100)",
+      "source": "CLSI, current edition (breakpoint tables for Enterobacterales)",
+      "metadata_checked": "2026-10-25",
+      "content_check": "owner",
+      "note": "A standard, not a journal article; the edition is recorded when the owner confirms the breakpoints a case uses."
+    },
+    "idsa-meningitis-2004": {
+      "authors": "Tunkel AR, Hartman BJ, Kaplan SL, et al.",
+      "title": "Practice guidelines for the management of bacterial meningitis",
+      "source": "Clin Infect Dis. 2004;39(9):1267-1284",
+      "pmid": "15494903",
+      "doi": "10.1086/425368",
+      "metadata_checked": "2026-10-25",
+      "content_check": "owner"
+    },
+    "escmid-meningitis-2016": {
+      "authors": "van de Beek D, Cabellos C, Dzupova O, et al.",
+      "title": "ESCMID guideline: diagnosis and treatment of acute bacterial meningitis",
+      "source": "Clin Microbiol Infect. 2016;22 Suppl 3:S37-S62",
+      "pmid": "27062097",
+      "doi": "10.1016/j.cmi.2016.01.007",
+      "metadata_checked": "2026-10-25",
+      "content_check": "owner",
+      "note": "A WHO bacterial meningitis guideline (2025) also exists; it is not indexed in PubMed and has not been added."
+    }
+  }
+}

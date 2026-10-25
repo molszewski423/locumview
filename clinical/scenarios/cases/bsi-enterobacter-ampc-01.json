@@ -1,0 +1,67 @@
+{
+  "schema": "locumview-case/1",
+  "id": "bsi-enterobacter-ampc-01",
+  "version": "0.1.0",
+  "title": "Enterobacter cloacae complex bacteremia on ceftriaxone reported susceptible",
+  "kind": "finding",
+  "modules": ["stewardship", "iv-to-po"],
+  "provenance": {
+    "source": "synthetic",
+    "author": "Claude Code (draft for owner review), scenario requested by the owner",
+    "created": "2026-10-25",
+    "clinical_review": {"status": "pending"}
+  },
+  "story": "A 66-year-old man with an indwelling urinary catheter is admitted with fever and rigors and started on IV ceftriaxone for presumed urosepsis. On hospital day 2 both blood culture sets grow Enterobacter cloacae complex, reported susceptible to ceftriaxone and cefepime. He is still febrile.",
+  "patient": {"family": "Casebook", "given": "Dov", "birth_date": "1960-05-09", "sex": "male"},
+  "encounter": {"class_code": "IMP", "start": "2026-10-21T22:30:00-04:00", "reason": "Fever, rigors, indwelling urinary catheter"},
+  "problems": [
+    {"title": "Sepsis, presumed urinary source", "diagnosis": "ICD10:A41.9", "begdate": "2026-10-21"},
+    {"title": "Neurogenic bladder with indwelling catheter", "diagnosis": "ICD10:N31.9", "begdate": "2019-04-01"}
+  ],
+  "prescriptions": [
+    {"drug": "ceftriaxone 1000 MG Injection", "rxnorm": "1665021", "start": "2026-10-21", "route": "IV",
+     "instructions": "1 g IV every 24 hours"}
+  ],
+  "vitals": [
+    {"taken": "2026-10-21T22:40:00-04:00", "temperature_f": 103.1, "pulse": 118, "bps": 96, "bpd": 58, "respiration": 22, "oxygen_saturation": 95},
+    {"taken": "2026-10-23T08:00:00-04:00", "temperature_f": 100.8, "pulse": 102, "bps": 116, "bpd": 70, "respiration": 18, "oxygen_saturation": 97}
+  ],
+  "labs": [
+    {"order_code": "LV-BMP", "order_text": "Basic labs", "collected": "2026-10-21T22:50:00-04:00",
+     "resulted": "2026-10-21T23:40:00-04:00", "results": [
+       {"loinc": "2160-0", "text": "Creatinine [Mass/volume] in Serum or Plasma", "value": "1.0", "units": "mg/dL", "range": "0.7-1.3", "flag": "N"},
+       {"loinc": "6690-2", "text": "Leukocytes [#/volume] in Blood by Automated count", "value": "18.4", "units": "10*3/uL", "range": "4.0-11.0", "flag": "H"}
+     ]}
+  ],
+  "cultures": [
+    {"order_code": "600-7", "order_text": "Bacteria identified in Blood by Culture",
+     "specimen": {"snomed": "119297000", "text": "Blood specimen"},
+     "collected": "2026-10-21T23:00:00-04:00", "resulted": "2026-10-23T07:30:00-04:00",
+     "organism": {"snomed": "414102007", "text": "Enterobacter cloacae complex"},
+     "susceptibilities": [
+       {"loinc": "28-1", "drug": "Ampicillin", "mic": ">=32", "units": "ug/mL", "interpretation": "R"},
+       {"loinc": "32-3", "drug": "Ampicillin+Sulbactam", "mic": ">=32", "units": "ug/mL", "interpretation": "R"},
+       {"loinc": "76-0", "drug": "Cefazolin", "mic": ">=64", "units": "ug/mL", "interpretation": "R"},
+       {"loinc": "141-2", "drug": "Ceftriaxone", "mic": "<=1", "units": "ug/mL", "interpretation": "S"},
+       {"loinc": "6644-9", "drug": "Cefepime", "mic": "<=1", "units": "ug/mL", "interpretation": "S"},
+       {"loinc": "412-7", "drug": "Piperacillin+Tazobactam", "mic": "<=4", "units": "ug/mL", "interpretation": "S"},
+       {"loinc": "35801-0", "drug": "Ertapenem", "mic": "<=0.25", "units": "ug/mL", "interpretation": "S"},
+       {"loinc": "6652-2", "drug": "Meropenem", "mic": "<=0.25", "units": "ug/mL", "interpretation": "S"},
+       {"loinc": "185-9", "drug": "Ciprofloxacin", "mic": "<=0.25", "units": "ug/mL", "interpretation": "S"},
+       {"loinc": "516-5", "drug": "Trimethoprim+Sulfamethoxazole", "mic": "<=20", "units": "ug/mL", "interpretation": "S"},
+       {"loinc": "267-5", "drug": "Gentamicin", "mic": "<=1", "units": "ug/mL", "interpretation": "S"}
+     ]}
+  ],
+  "expected_findings": [
+    {"module": "stewardship", "type": "suboptimal-agent", "drug": "Ceftriaxone",
+     "summary": "Enterobacter cloacae complex bacteremia on ceftriaxone: the organism carries an inducible AmpC, so ceftriaxone is not recommended for this invasive infection even though it tests susceptible; cefepime is susceptible (MIC <=1)."}
+  ],
+  "reference_answer": "Change ceftriaxone to cefepime, for example 2 g IV every 8 hours, adjusted for renal function. A carbapenem is not needed while the cefepime MIC is 2 or lower; reserve it for cefepime susceptible-dose dependent results or failure. Piperacillin-tazobactam is not a preferred alternative for serious AmpC infections. Remove or replace the urinary catheter as a source, and repeat blood cultures if he stays febrile. No IV to PO switch yet; once he improves, an oral agent the isolate is susceptible to (trimethoprim-sulfamethoxazole or a fluoroquinolone) can be considered for step-down.",
+  "rationale": "E. cloacae complex is one of the organisms with a moderate to high risk of clinically significant AmpC production. Third-generation cephalosporins such as ceftriaxone can select derepressed mutants during therapy, so IDSA guidance does not suggest ceftriaxone for invasive infections with these organisms (it may be reasonable for uncomplicated cystitis), and suggests cefepime when the cefepime MIC is 2 or lower. A susceptibility report alone does not show this: the finding needs the organism, the source and the current drug together. The IV to PO module should not fire on day 2 of bacteremia while febrile.",
+  "citations": [
+    {"ref": "idsa-amr-gn-2024", "supports": "AmpC-producing Enterobacterales: organisms at moderate to high risk, ceftriaxone not suggested for invasive infections, cefepime when the MIC is 2 or lower, carbapenems for SDD."},
+    {"ref": "idsa-amr-gn-2026", "supports": "Current version of the same guidance; owner to confirm the AmpC recommendations are unchanged."},
+    {"ref": "clsi-m100", "supports": "Enterobacterales breakpoints, including the cefepime SDD category."},
+    {"ref": "idsa-shea-asp-2016", "supports": "Prospective audit and feedback of antibiotic therapy against culture results as a stewardship intervention."}
+  ]
+}

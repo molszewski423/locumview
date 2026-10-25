@@ -1,0 +1,58 @@
+{
+  "schema": "locumview-case/1",
+  "id": "pyelo-matched-negative-01",
+  "version": "0.1.0",
+  "title": "Pyelonephritis on ceftriaxone; E. coli susceptible; still febrile and vomiting",
+  "kind": "negative-control",
+  "modules": ["stewardship", "iv-to-po"],
+  "provenance": {
+    "source": "synthetic",
+    "author": "Claude Code (draft for owner review)",
+    "created": "2026-10-25",
+    "clinical_review": {"status": "pending"}
+  },
+  "story": "A 45-year-old woman admitted with acute pyelonephritis on IV ceftriaxone. On hospital day 2 the urine culture grows E. coli susceptible to ceftriaxone. She is still febrile and vomiting, and is not taking anything by mouth.",
+  "patient": {"family": "Casebook", "given": "Bea", "birth_date": "1981-07-02", "sex": "female"},
+  "encounter": {"class_code": "IMP", "start": "2026-10-21T10:00:00-04:00", "reason": "Fever, flank pain, vomiting"},
+  "problems": [{"title": "Acute pyelonephritis", "diagnosis": "ICD10:N10", "begdate": "2026-10-21"}],
+  "prescriptions": [
+    {"drug": "ceftriaxone 1000 MG Injection", "rxnorm": "1665021", "start": "2026-10-21", "route": "IV",
+     "instructions": "1 g IV every 24 hours"}
+  ],
+  "vitals": [
+    {"taken": "2026-10-21T10:15:00-04:00", "temperature_f": 102.8, "pulse": 116, "bps": 108, "bpd": 64, "respiration": 20, "oxygen_saturation": 97},
+    {"taken": "2026-10-22T16:00:00-04:00", "temperature_f": 101.6, "pulse": 108, "bps": 114, "bpd": 70, "respiration": 18, "oxygen_saturation": 97}
+  ],
+  "labs": [
+    {"order_code": "LV-BMP", "order_text": "Basic labs", "collected": "2026-10-21T10:30:00-04:00",
+     "resulted": "2026-10-21T11:20:00-04:00", "results": [
+       {"loinc": "2160-0", "text": "Creatinine [Mass/volume] in Serum or Plasma", "value": "0.8", "units": "mg/dL", "range": "0.5-1.0", "flag": "N"},
+       {"loinc": "6690-2", "text": "Leukocytes [#/volume] in Blood by Automated count", "value": "16.8", "units": "10*3/uL", "range": "4.0-11.0", "flag": "H"}
+     ]}
+  ],
+  "cultures": [
+    {"order_code": "630-4", "order_text": "Bacteria identified in Urine by Culture",
+     "specimen": {"snomed": "122575003", "text": "Urine specimen"},
+     "collected": "2026-10-21T10:40:00-04:00", "resulted": "2026-10-22T15:30:00-04:00",
+     "organism": {"snomed": "112283007", "text": "Escherichia coli"},
+     "colony_count": {"loinc": "19090-0", "text": "Colony count [#/volume] in Urine", "value": ">100000", "units": "CFU/mL"},
+     "susceptibilities": [
+       {"loinc": "28-1", "drug": "Ampicillin", "mic": ">=32", "units": "ug/mL", "interpretation": "R"},
+       {"loinc": "32-3", "drug": "Ampicillin+Sulbactam", "mic": "<=2", "units": "ug/mL", "interpretation": "S"},
+       {"loinc": "141-2", "drug": "Ceftriaxone", "mic": "<=1", "units": "ug/mL", "interpretation": "S"},
+       {"loinc": "6644-9", "drug": "Cefepime", "mic": "<=1", "units": "ug/mL", "interpretation": "S"},
+       {"loinc": "35801-0", "drug": "Ertapenem", "mic": "<=0.25", "units": "ug/mL", "interpretation": "S"},
+       {"loinc": "185-9", "drug": "Ciprofloxacin", "mic": "<=0.25", "units": "ug/mL", "interpretation": "S"},
+       {"loinc": "516-5", "drug": "Trimethoprim+Sulfamethoxazole", "mic": "<=20", "units": "ug/mL", "interpretation": "S"},
+       {"loinc": "267-5", "drug": "Gentamicin", "mic": "<=1", "units": "ug/mL", "interpretation": "S"}
+     ]}
+  ],
+  "expected_findings": [],
+  "reference_answer": "No intervention: ceftriaxone matches the susceptibilities, and an IV to PO switch is premature while she is febrile, tachycardic and vomiting. Reassess oral step-down once she is clinically improving and tolerating oral intake.",
+  "rationale": "A negative control for both modules. The organism is susceptible to the current therapy, so there is no bug-drug mismatch; ceftriaxone is a reasonable agent for pyelonephritis, so de-escalation is not expected. IV to PO criteria (clinical improvement, afebrile, able to take oral medication) are not met.",
+  "citations": [
+    {"ref": "idsa-uti-2011", "supports": "Treatment of acute pyelonephritis, including parenteral therapy for hospitalized patients and oral step-down after improvement."},
+    {"ref": "idsa-cuti-2025", "supports": "Current guideline for complicated UTI; owner to confirm it agrees with the reference answer."},
+    {"ref": "idsa-shea-asp-2016", "supports": "Stewardship programs promoting timely IV to oral transition once criteria are met."}
+  ]
+}

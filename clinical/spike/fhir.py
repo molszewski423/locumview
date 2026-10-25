@@ -21,7 +21,8 @@ BASE = "https://127.0.0.1:18443"
 STATE = Path(os.environ["XDG_RUNTIME_DIR"]) / "locumview-openemr-spike"
 # Every scope below is one the instance lists in scopes_supported (/oauth2/default/.well-known/openid-configuration).
 SCOPES = ("openid offline_access api:oemr api:fhir user/patient.crus user/encounter.crus user/medical_problem.cruds "
-          "user/medication.cruds user/allergy.cruds user/prescription.crds user/Patient.read user/Patient.write "
+          "user/medication.cruds user/allergy.cruds user/prescription.crds user/vital.crus user/Patient.read "
+          "user/Patient.write "
           "user/Encounter.read user/Observation.read user/DiagnosticReport.read user/Specimen.rs "
           "user/ServiceRequest.rs user/MedicationRequest.read user/Condition.read user/Practitioner.read "
           "user/Organization.read")

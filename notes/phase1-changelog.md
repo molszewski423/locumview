@@ -1200,3 +1200,28 @@ Evidence, results and the owner's options: `docs/evidence/clinical/20261025-open
 - **Verified:** each load from an empty instance, HL7 import with no importer messages, FHIR read-back saved and
   compared; the website's roadmap generator, run locally on this ROADMAP, accepts it. The spike instance was
   destroyed afterwards. Nothing deployed, no cluster, desktop, image or public-site change.
+
+## 73. Phase 9 lite M2: scenario case format, checker, loader and first five cases (2026-10-25, In progress)
+
+Plan M2, on stock OpenEMR with one organism per culture (the owner's M1 decision). `clinical/scenarios/README.md`.
+
+- **Format `locumview-case/1`:** one JSON file per case with story, chart data, labs, cultures (one organism, no
+  growth, or pending), expected findings, reference answer, rationale and citations, a version and a provenance block.
+  Times carry offsets. `check_cases.py` (standard library, a pre-commit hook and therefore CI) refuses cases without
+  synthetic provenance, with two organisms, negative controls with findings, ambiguous cases with fewer than two
+  acceptable answers, unknown citations and unknown keys; `--require-approved` keeps cases without the owner's
+  clinical review out of an evaluation build. `test_check_cases.py`: 17 tests, each breaking a valid case.
+- **Loader:** `load.py --reset` builds a fresh local OpenEMR and loads every case in about 36 seconds, by the M1
+  paths, adding vital signs through the REST API and pending cultures as orders without results. Running it again
+  skips every case (patient number `LV-<id>`) and leaves all table counts unchanged. FHIR read-back checked per case.
+- **Cases (all `clinical_review: pending`):** ESBL-pattern E. coli pyelonephritis on ceftriaxone (bug-drug
+  mismatch); a matched-therapy pyelonephritis negative control; an ambiguous IV to PO case where only oral
+  beta-lactams remain; and two the owner asked for: Enterobacter cloacae complex bacteremia on ceftriaxone reported
+  susceptible (change to cefepime, AmpC), and suspected meningitis at 67 without ampicillin (Listeria coverage).
+- **Codes and references:** every LOINC, SNOMED CT and RxNorm code checked against loinc.org, tx.fhir.org or RxNav
+  (two guessed codes were wrong and replaced); every reference's metadata checked in PubMed. Two cited guidelines
+  (IDSA 2025 complicated UTI, IDSA 2026 resistant gram-negative guidance) postdate the drafting agent's knowledge and
+  are marked for the owner to read; a 2025 WHO meningitis guideline is noted but not added.
+- **Open:** 5 to 15 more cases (at least 3 negative controls and 2 ambiguous overall), the owner's clinical review of
+  every case, and Synthea background patients. Lab ServiceRequests stay `active` after results in OpenEMR; the rules
+  must read results. The local instance was destroyed after the checks.
