@@ -1393,3 +1393,15 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   ref-dev's ports 3390 and 3391; the "LocumView Demo" connection uses lv-demo01's secret since #61). Neither was
   applied to the cluster. The accounts still exist on the shut-off VM.
 - The VM itself stays defined and shut off. Deleting it (and its disk) is a separate owner decision.
+
+## 82. Clinical image verification as a script (2026-10-25)
+
+- README step 3 said to verify the clinical images' signatures before `kubectl apply -k k8s/clinical`, but left
+  the commands to the operator. `scripts/clinical/verify-images.sh` now reads every image pinned in
+  `k8s/clinical/kustomization.yaml` and runs the checks `clinical-images.yml` runs after a build: `cosign verify`
+  and `cosign verify-attestation --type spdxjson` against `image/desktop/signing/cosign.pub`. It exits non-zero if
+  any image fails or none is found. It uses only the public key.
+- operator-laptop needs cosign installed for this step (it had none on 2026-10-25); the owner chose to install it
+  there so the machine that applies the manifests also verifies them.
+- Verified on a workstation with cosign: both pinned images (OpenEMR, gateway) pass; with one digest altered by a
+  character, that image is reported FAILED and the script exits 1.
