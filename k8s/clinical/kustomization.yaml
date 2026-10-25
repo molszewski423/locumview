@@ -14,9 +14,11 @@ resources:
 # --insecure-ignore-tlog git.lan/mike/<image>@<digest>
 images:
   - name: git.lan/mike/locumview-openemr
-    digest: sha256:0000000000000000000000000000000000000000000000000000000000000000   # set after the first CI build
+    # commit de5a0ac, clinical-images run 162; signature and SBOM attestation (1,099 packages) verified 2026-10-25
+    digest: sha256:1e1ba9903481b6c3ec875f09d52e849266b74eb6bced419b89c1c4e53123a295
   - name: git.lan/mike/locumview-clinical-gateway
-    digest: sha256:0000000000000000000000000000000000000000000000000000000000000000   # set after the first CI build
+    # commit de5a0ac, clinical-images run 162; signature and SBOM attestation (130 packages) verified 2026-10-25
+    digest: sha256:f3c169a37d656465849749c4b6d80a29424c1f79a27a46a9ecaacbbac4d70071
 
 # Site values (not secret, but site-specific): read from site.env by the replacements below and never applied.
 configMapGenerator:
