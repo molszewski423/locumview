@@ -19,7 +19,8 @@ OpenEMR 8.4.1 with LocumView's fix (`clinical/images/openemr/`), MariaDB, and th
 1. `cp k8s/clinical/site.env.example k8s/clinical/site.env` and set `CLINICAL_NODE` (node2's node name).
 2. Create the database secret (database and administrator credentials) with `scripts/clinical/make-db-secret.sh`, commit the encrypted file, then
    `sops -d k8s/clinical/secrets/clinical-db.sops.yaml | kubectl apply -f -`.
-3. Verify the images' signatures (digests in `kustomization.yaml`), then `kubectl apply -k k8s/clinical`.
+3. `scripts/clinical/verify-images.sh` (needs cosign) verifies the signature and SBOM attestation of every image
+   pinned in `kustomization.yaml`; only when it reports all verified, `kubectl apply -k k8s/clinical`.
    The gateway waits for its Secret (step 5); OpenEMR installs itself on first start (a few minutes).
 4. When `kubectl -n clinical get pods` shows OpenEMR ready: `scripts/clinical/register-gateway.sh` configures OpenEMR's
    API and public address and registers the gateway; it writes `clinical-gateway.sops.yaml`. Commit it.

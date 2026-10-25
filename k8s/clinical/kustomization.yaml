@@ -10,8 +10,7 @@ resources:
   - gateway.yaml
 
 # The images CI built and signed (.gitea/workflows/clinical-images.yml), by digest. Updated by a commit after each
-# build that is to be deployed; verify first: cosign verify --key image/desktop/signing/cosign.pub
-# --insecure-ignore-tlog git.lan/mike/<image>@<digest>
+# build that is to be deployed; verify first: scripts/clinical/verify-images.sh
 images:
   - name: git.lan/mike/locumview-openemr
     # commit de5a0ac, clinical-images run 162; signature and SBOM attestation (1,099 packages) verified 2026-10-25
