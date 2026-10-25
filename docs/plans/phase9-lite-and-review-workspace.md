@@ -1,7 +1,7 @@
 # Plan: Phase 9 lite and the Clinical Review Workspace
 
 Status: **In progress**. Written 2026-10-22. Phase 4's core release milestone is Done (changelog #70); M1, the
-OpenEMR spike, is Done (changelog #72); the owner chose its option 4 (section 9). M2 is in progress (changelog #73). Decisions: ADR 0017 (and its update of 2026-10-22),
+OpenEMR spike, is Done (changelog #72); the owner chose its option 4 (section 9). M2 is Done (changelog #73 to #75); M3 is next. Decisions: ADR 0017 (and its update of 2026-10-22),
 ADR 0018. Data rules: `docs/policy/synthetic-data-and-independence.md`. Status of record: ROADMAP.md.
 
 ## 1. Sequence
@@ -50,8 +50,9 @@ the options in `docs/evidence/clinical/20261025-openemr-m1-spike/`.
 
 ### M2. Scenario library v0 and its loader
 
-**In progress** (changelog #73, #74): format, checker, loader and 14 cases (7 findings, 5 negative controls, 2 ambiguous) in
-`clinical/scenarios/`; all approved in the owner's clinical review. Synthea background patients not yet added.
+**Done 2026-10-25** (changelog #73 to #75): format, checker, loader and 14 cases (7 findings, 5 negative controls, 2
+ambiguous) in `clinical/scenarios/`, all approved in the owner's clinical review; 20 Synthea background patients in
+`clinical/synthea/`.
 
 - 10 to 20 hand-built synthetic cases, each a versioned file in this repository, with: patient story, data to load,
   **expected findings** (or none, for a negative control), **clinical rationale**, **guideline citations**, a
