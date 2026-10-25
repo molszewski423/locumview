@@ -75,6 +75,43 @@
       "metadata_checked": "2026-10-25",
       "content_check": "owner",
       "note": "A WHO bacterial meningitis guideline (2025) also exists; it is not indexed in PubMed and has not been added."
+    },
+    "idsa-crbsi-2009": {
+      "authors": "Mermel LA, Allon M, Bouza E, et al.",
+      "title": "Clinical practice guidelines for the diagnosis and management of intravascular catheter-related infection: 2009 update by the Infectious Diseases Society of America",
+      "source": "Clin Infect Dis. 2009;49(1):1-45",
+      "pmid": "19489710",
+      "doi": "10.1086/599376",
+      "metadata_checked": "2026-10-25",
+      "content_check": "owner"
+    },
+    "idsa-ciai-2010": {
+      "authors": "Solomkin JS, Mazuski JE, Bradley JS, et al.",
+      "title": "Diagnosis and management of complicated intra-abdominal infection in adults and children: guidelines by the Surgical Infection Society and the Infectious Diseases Society of America",
+      "source": "Clin Infect Dis. 2010;50(2):133-164",
+      "pmid": "20034345",
+      "doi": "10.1086/649554",
+      "note": "The 2024 IDSA update (Bonomo RA et al., PMID 38965057 and companions) covers risk assessment, imaging and microbiology, not antibiotic selection.",
+      "metadata_checked": "2026-10-25",
+      "content_check": "owner"
+    },
+    "ats-idsa-cap-2019": {
+      "authors": "Metlay JP, Waterer GW, Long AC, et al.",
+      "title": "Diagnosis and treatment of adults with community-acquired pneumonia. An official clinical practice guideline of the American Thoracic Society and Infectious Diseases Society of America",
+      "source": "Am J Respir Crit Care Med. 2019;200(7):e45-e67",
+      "pmid": "31573350",
+      "doi": "10.1164/rccm.201908-1581ST",
+      "metadata_checked": "2026-10-25",
+      "content_check": "owner"
+    },
+    "idsa-ssti-2014": {
+      "authors": "Stevens DL, Bisno AL, Chambers HF, et al.",
+      "title": "Practice guidelines for the diagnosis and management of skin and soft tissue infections: 2014 update by the Infectious Diseases Society of America",
+      "source": "Clin Infect Dis. 2014;59(2):e10-e52",
+      "pmid": "24973422",
+      "doi": "10.1093/cid/ciu444",
+      "metadata_checked": "2026-10-25",
+      "content_check": "owner"
     }
   }
 }

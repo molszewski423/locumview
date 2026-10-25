@@ -1,0 +1,244 @@
+{
+  "schema": "locumview-case/1",
+  "id": "pyelo-enterobacter-ambiguous-01",
+  "version": "0.1.0",
+  "title": "Enterobacter cloacae pyelonephritis improving on ceftriaxone, no bacteremia",
+  "kind": "ambiguous",
+  "modules": [
+    "stewardship",
+    "iv-to-po"
+  ],
+  "provenance": {
+    "source": "synthetic",
+    "author": "Claude Code (draft for owner review), case list approved by the owner",
+    "created": "2026-10-25",
+    "clinical_review": {
+      "status": "pending"
+    }
+  },
+  "story": "A 55-year-old woman with acute pyelonephritis is on IV ceftriaxone, hospital day 3, afebrile for 24 hours and eating. Urine grows Enterobacter cloacae complex susceptible to ceftriaxone, cefepime, trimethoprim-sulfamethoxazole and ciprofloxacin; blood cultures show no growth so far (final report pending).",
+  "patient": {
+    "family": "Casebook",
+    "given": "Mae",
+    "birth_date": "1971-10-14",
+    "sex": "female"
+  },
+  "encounter": {
+    "class_code": "IMP",
+    "start": "2026-10-22T18:00:00-04:00",
+    "reason": "Fever, flank pain"
+  },
+  "problems": [
+    {
+      "title": "Acute pyelonephritis",
+      "diagnosis": "ICD10:N10",
+      "begdate": "2026-10-22"
+    }
+  ],
+  "prescriptions": [
+    {
+      "drug": "ceftriaxone 1000 MG Injection",
+      "rxnorm": "1665021",
+      "route": "IV",
+      "instructions": "1 g IV every 24 hours",
+      "start": "2026-10-22"
+    }
+  ],
+  "vitals": [
+    {
+      "taken": "2026-10-22T18:10:00-04:00",
+      "temperature_f": 101.7,
+      "pulse": 104,
+      "bps": 116,
+      "bpd": 70,
+      "respiration": 18,
+      "oxygen_saturation": 98
+    },
+    {
+      "taken": "2026-10-25T08:00:00-04:00",
+      "temperature_f": 98.6,
+      "pulse": 78,
+      "bps": 124,
+      "bpd": 76,
+      "respiration": 14,
+      "oxygen_saturation": 99
+    }
+  ],
+  "labs": [
+    {
+      "order_code": "LV-BMP",
+      "order_text": "Basic labs",
+      "collected": "2026-10-22T18:20:00-04:00",
+      "resulted": "2026-10-22T19:10:00-04:00",
+      "results": [
+        {
+          "loinc": "2160-0",
+          "text": "Creatinine [Mass/volume] in Serum or Plasma",
+          "value": "0.9",
+          "units": "mg/dL",
+          "range": "0.5-1.0",
+          "flag": "N"
+        },
+        {
+          "loinc": "6690-2",
+          "text": "Leukocytes [#/volume] in Blood by Automated count",
+          "value": "14.0",
+          "units": "10*3/uL",
+          "range": "4.0-11.0",
+          "flag": "H"
+        }
+      ]
+    }
+  ],
+  "cultures": [
+    {
+      "order_code": "630-4",
+      "order_text": "Bacteria identified in Urine by Culture",
+      "specimen": {
+        "snomed": "122575003",
+        "text": "Urine specimen"
+      },
+      "collected": "2026-10-22T18:30:00-04:00",
+      "resulted": "2026-10-24T10:00:00-04:00",
+      "organism": {
+        "snomed": "414102007",
+        "text": "Enterobacter cloacae complex"
+      },
+      "colony_count": {
+        "loinc": "19090-0",
+        "text": "Colony count [#/volume] in Urine",
+        "value": ">100000",
+        "units": "CFU/mL"
+      },
+      "susceptibilities": [
+        {
+          "loinc": "28-1",
+          "drug": "Ampicillin",
+          "mic": ">=32",
+          "units": "ug/mL",
+          "interpretation": "R"
+        },
+        {
+          "loinc": "32-3",
+          "drug": "Ampicillin+Sulbactam",
+          "mic": ">=32",
+          "units": "ug/mL",
+          "interpretation": "R"
+        },
+        {
+          "loinc": "76-0",
+          "drug": "Cefazolin",
+          "mic": ">=64",
+          "units": "ug/mL",
+          "interpretation": "R"
+        },
+        {
+          "loinc": "141-2",
+          "drug": "Ceftriaxone",
+          "mic": "<=1",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "6644-9",
+          "drug": "Cefepime",
+          "mic": "<=1",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "412-7",
+          "drug": "Piperacillin+Tazobactam",
+          "mic": "<=4",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "35801-0",
+          "drug": "Ertapenem",
+          "mic": "<=0.25",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "6652-2",
+          "drug": "Meropenem",
+          "mic": "<=0.25",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "267-5",
+          "drug": "Gentamicin",
+          "mic": "<=1",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "185-9",
+          "drug": "Ciprofloxacin",
+          "mic": "<=0.25",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "516-5",
+          "drug": "Trimethoprim+Sulfamethoxazole",
+          "mic": "<=20",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "363-2",
+          "drug": "Nitrofurantoin",
+          "mic": "64",
+          "units": "ug/mL",
+          "interpretation": "I"
+        }
+      ]
+    },
+    {
+      "order_code": "600-7",
+      "order_text": "Bacteria identified in Blood by Culture",
+      "specimen": {
+        "snomed": "119297000",
+        "text": "Blood specimen"
+      },
+      "collected": "2026-10-22T18:20:00-04:00",
+      "status": "pending"
+    }
+  ],
+  "expected_findings": [
+    {
+      "module": "iv-to-po",
+      "type": "iv-to-po-switch",
+      "drug": "Ceftriaxone",
+      "summary": "Clinically improving with susceptible oral options (trimethoprim-sulfamethoxazole, ciprofloxacin), on ceftriaxone for an AmpC-risk organism."
+    }
+  ],
+  "acceptable_answers": [
+    "Step down to oral trimethoprim-sulfamethoxazole or ciprofloxacin, both susceptible, which also avoids the AmpC question.",
+    "Change ceftriaxone to cefepime because of the AmpC risk in an upper tract infection, then step down orally.",
+    "Continue ceftriaxone, given clinical response and no bacteremia, and step down orally when ready."
+  ],
+  "reference_answer": "Flag both the oral step-down and the AmpC concern. Oral TMP-SMX or a fluoroquinolone is the simplest answer that resolves both; changing to cefepime or continuing ceftriaxone in a responding patient is defensible.",
+  "rationale": "An ambiguous case: whether pyelonephritis counts as an invasive infection for the AmpC caution, and whether a clinical response on ceftriaxone changes it, is where reasonable pharmacists differ. Fully susceptible oral agents make step-down attractive.",
+  "citations": [
+    {
+      "ref": "idsa-amr-gn-2024",
+      "supports": "AmpC-producing Enterobacterales: ceftriaxone for uncomplicated cystitis versus invasive infections; cefepime when the MIC is 2 or lower."
+    },
+    {
+      "ref": "idsa-amr-gn-2026",
+      "supports": "Current version of the same guidance; owner to confirm the AmpC recommendations are unchanged."
+    },
+    {
+      "ref": "idsa-cuti-2025",
+      "supports": "Current guidance on oral step-down for complicated UTI and pyelonephritis; owner to confirm."
+    },
+    {
+      "ref": "idsa-shea-asp-2016",
+      "supports": "Stewardship programs promoting timely IV to oral transition once criteria are met."
+    }
+  ]
+}
