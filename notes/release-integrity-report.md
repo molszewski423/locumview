@@ -1,5 +1,11 @@
 # Release integrity report (Milestone 1, Phase 4)
 
+> Historical pre-milestone assessment from 2026-10-22. Later execution and verification are recorded in
+> [changelog entries #66 to #70](phase1-changelog.md), with current status in [ROADMAP.md](../ROADMAP.md).
+> The pending steps and risks below describe that assessment, not instructions to repeat completed operations.
+> Fleet rollback was skipped by owner decision; production rollout and remaining limits are stated in the
+> closeout records. The original findings are retained for traceability.
+
 Read-only investigation, 2026-10-22, by Claude Code. Nothing was merged, built, promoted, tagged, switched or
 rebooted. Role names: node1 (hypervisor and k3s node), node2 (k3s control plane and CI runner host), idm01;
 `<registry>` is the Gitea container registry; `<lv-demo01-address>` is the live demo desktop's address.

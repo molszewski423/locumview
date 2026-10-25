@@ -1,6 +1,6 @@
 # LocumView Plan
 
-Owner: Michael Olszewski. Status (2026-10-21): Phases 1, 2 and 3 complete: version one done 2026-10-20, and Phase 3's browser baseline the same day. The live demo moved to an image-built desktop on 2026-10-21. Next: Phase 4 and Phase 9 lite (ROADMAP.md has the current state).
+Owner: Michael Olszewski. Status (2026-10-24): Phases 1, 2 and 3 complete: version one done 2026-10-20, and Phase 3's browser baseline the same day. The live demo moved to an image-built desktop on 2026-10-21. Phase 4's core release milestone is Done; its packaging extensions and maintenance follow-ups remain Planned. Next: Phase 9 lite (ROADMAP.md has the current state).
 
 LocumView is an open-source virtual desktop platform built on RHEL 10. It provisions hardened GNOME desktops with Terraform and Ansible, delivers them through the browser via Apache Guacamole behind Keycloak SSO and MFA, and never exposes a desktop directly to the internet. Every environment must be rebuildable identically from the repository. Beyond the base desktop, it is a platform for research and local LLM usage in regulated environments: desktops can carry agentic tooling and generative and agentic applications (clinical and research tooling to start) built on local models, so no regulated data leaves the endpoint, with the tooling layer customizable for any regulated workflow. It is a portfolio project aimed at solutions architecture and platform engineering roles, with Red Hat as a target employer.
 
@@ -77,7 +77,7 @@ Name: nods to locum tenens clinicians and VMware View (now Horizon, owned by Omn
 | Exposure | Tailscale first, optionally Cloudflare Tunnel | Nothing listening publicly. |
 | Tool split | Terraform = infrastructure; Ansible = everything inside the guest; Terraform outputs feed Ansible dynamic inventory | Clean handoff. |
 | Hardening | scap-security-guide Ansible (DISA STIG / CIS), OpenSCAP reports committed to docs/evidence/, mapped to HIPAA safeguards | Compliance as code with evidence. |
-| Packaging | Signed RPMs built with mock, served from own dnf repo or COPR. Stretch: RHEL image mode (bootc). | "Signed RPM from my repo, installed by Ansible" is engineering. |
+| Packaging | Signed RPMs built in a pinned container and served from Gitea; mock/COPR extensions Planned. RHEL image mode (bootc) is the desktop artifact (ADR 0007). | Signed package provenance and the verified image release path are demonstrated in Phase 4. |
 | Platform ladder | libvirt (homelab) > KubeVirt on k3s > AWS EC2; desktop and Ansible layers stay constant | Shows portability; KubeVirt tells the OpenShift Virtualization story. |
 
 ### Broker alternatives considered
@@ -127,7 +127,35 @@ Superseded by [ADR 0009](adr/0009-v1-scope-integrate-dont-bundle.md) (2026-10-03
 
 Everything below is optional until version one ships.
 
-**Phase 4, Packaging and supply chain:** signed images (cosign) and SBOMs (syft) verified before promotion; LocumView's own pieces (extensions, branding, tour) as mock-built signed RPMs via COPR; Fedora/EPEL packages for missing dependencies (FHIR libraries); an OpenSCAP scan attached to every image release. (RHEL image mode, once a stretch goal here, became the version-one desktop: ADR 0007.)
+**Phase 4, Packaging and supply chain:** core release milestone **Done**, 2026-10-24 (changelog #62, #66 to #70).
+Signed images and SPDX SBOMs, signed per-image STIG scans and verified promotion; LocumView's four desktop
+components as signed RPMs from a pinned CentOS Stream 10 build container, published to Gitea and installed at
+versions selected from the image commit; background updates stage without requesting reboot. Deployed-desktop
+scan profiles and the live scan are verified. The implementation uses `rpmbuild` in the pinned container,
+not mock or COPR. Those earlier packaging ambitions remain Planned under the explicit scope below.
+
+### Phase 4 closeout scope
+
+| Item | Status and evidence |
+|---|---|
+| Signed image, SBOM and image-scan attestations checked before stable promotion | Done; #62 and #66 |
+| Four signed RPMs built, published, signature-checked and installed by image builds | Done; #62 and #66; Gitea registry |
+| Package versions pinned to the image source history | Done; #67; two signed SBOMs contain the same expected versions |
+| Background update service stages without requesting reboot; planned restart activates exact staged digest | Done; #68; disposable-desktop test, with timer held masked |
+| Scanner chooses image/reference profile and records it with results | Done; #69; live image-profile scan 405 pass / 0 fail |
+| Test desktop and temporary secret/plan cleanup | Done; owner exact ten-resource destroy, read-only infrastructure checks and local artifact checks |
+| Public COPR mirror; optional mock build integration | Planned; not required for the working Gitea/RPM release path |
+| Fedora/EPEL packaging of additional dependencies | Planned when a concrete dependency need is established; none claimed delivered by this milestone |
+| Reduce SBOM generation memory/swap usage | Planned optimization; both tested builds completed with valid SBOM attestations |
+| Maintain cosign compatibility flags as supported tools change | Planned; existing signature/attestation verification passed; not a claim that deprecation warnings are resolved |
+
+The signed release path is the exit gate for this milestone. The planned packaging extensions and maintenance
+items do not block the Phase 9 lite microbiology/FHIR spike. Production rollout of the newer stage-only images
+is separate: no new stable promotion or live-demo update is part of this documentation closeout. Local timer
+masks remain. This completion is scoped to verified functionality, not whole-image byte reproducibility,
+clinical validation, or all platform housekeeping. The older broad phase outline is superseded by this table.
+
+### Following phases
 
 **Phase 9 lite, Clinical AI demo** (planned, right after Phase 4; ADR 0017): the first slice of the clinical AI module (ADR 0008, US only). One web app (React, Vite, TypeScript, FHIR R4 types) served from k3s behind Keycloak and opened in the hardened Chrome (ADR 0016) in app mode, from a launcher with its own icon baked into the image and pinned in the locked layout; the managed Chrome policies allow the app's internal address. A home dashboard with a cross-module triage panel, module queues (Antimicrobial Stewardship, IV to PO, ADE Monitoring) and a patient view. A Python (FastAPI) agent service where deterministic rules decide what is flagged and a local model (Ollama) explains, with the reasoning and source data shown. OpenEMR as the mock EHR, loaded with Synthea patients and hand-built demo cases by an import script, launching the app as a SMART on FHIR app. First task, before any UI work: a spike showing that a scenario loads into the deployed OpenEMR version reproducibly and that cultures and susceptibility results come back out through its FHIR API faithfully enough for stewardship rules (FHIR write support is not assumed). A scenario library in the repository: 10 to 20 hand-built synthetic cases for internal work, growing to 20 to 30 for evaluation, including negative controls and ambiguous cases, each versioned with its expected findings, clinical rationale, guideline citations and a reference answer, loaded reproducibly, never by manual chart entry (ADR 0017, update of 2026-10-22; [plan](plans/phase9-lite-and-review-workspace.md); [policy](policy/synthetic-data-and-independence.md)). OpenEMR is a PHP application: it must run on a PHP release with the fixes for CVE-2026-109618 and CVE-2026-109619 (8.3.36, 8.4.27, 8.5.12 or later), and its image is covered by the same exposure check as the rest of the platform (docs/evidence/security/20261022-php2shell.md). Done when a pharmacist signs in at the LocumView desktop, opens the clinical app from its icon, launches it from an OpenEMR chart in patient context, and sees at least one stewardship and one IV to PO finding with the agent's explanation, all running on synthetic data and local models. Exit criterion, after internal refinement by the owner: a frozen, versioned evaluation build (rules, model, prompts, knowledge base and scenario set pinned). Portability tests against the Epic and Oracle Health (Cerner) sandboxes follow once OpenEMR works; MEDITECH's Greenfield Workspace later, pending approval.
 

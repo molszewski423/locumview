@@ -1,0 +1,25 @@
+{
+  "ended": "2026-10-23T10:56:21-05:00",
+  "oscap_exit_code": 0,
+  "private_artifact_sha256": {
+    "arf.xml": "sha256:dcc900acc0244a5d050af7e8b8dd40158b94a87100fd8d80b6c264abeaa8f030",
+    "oscap-exit-code.txt": "sha256:9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "profile.txt": "sha256:12c4529ffbd87d29e370593101ba1c6b4e14119c924194914963de7a2a9cc990",
+    "report.html": "sha256:0426b926f723bb04770318f9bcd0f183faac0a29133be3c50ee54957b8030441",
+    "stdout.txt": "sha256:9d1593f33064162e93e77992bb32c7a87ef17526a85c09208a8455213d9fdd7f",
+    "versions.txt": "sha256:f4b0f9b9f12e8e436fb044da754af1cd65b19a9aaa4dd9489c8cb7b8ccd74510"
+  },
+  "profile": "xccdf_org.locumview_profile_stig_gui_image",
+  "rule_results": {
+    "notapplicable": 40,
+    "notchecked": 7,
+    "notselected": 621,
+    "pass": 405
+  },
+  "scanner_source_commit": "sha1:e7079eb543488205593d3802cdadd6af919d713a",
+  "started": "2026-10-23T10:54:51-05:00",
+  "versions": [
+    "openscap-scanner-1.4.4-1.el10_2.x86_64",
+    "scap-security-guide-0.1.82-2.el10_2.noarch"
+  ]
+}

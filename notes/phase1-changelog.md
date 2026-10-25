@@ -1079,7 +1079,7 @@ The release sequence in `notes/release-integrity-report.md`.
   provisioning-guard failure were not independently tested. No full deployed STIG rescan of these candidates.
   Test cleanup and production rollout remain separate owner decisions; no stable promotion or demo update.
 
-## 69. Select and record the deployed-desktop STIG scan profile (2026-10-23, Built)
+## 69. Select and record the deployed-desktop STIG scan profile (2026-10-23, Done)
 
 - **Problem:** the scan wrapper hardcoded the reference profile. The earlier image-B scan therefore included
   the SSH-zone exception and omitted five partition checks, unlike the image release-gate profile (#66).
@@ -1096,3 +1096,35 @@ The release sequence in `notes/release-integrity-report.md`.
   propagation. Both shell scripts pass `bash -n`.
 - **Pending:** an owner-run live scan with the revised wrapper. No new live scan or desktop configuration
   change has occurred; earlier committed scan results are retained unchanged.
+
+### Live scan verified
+
+- Owner ran the merged wrapper without a profile override on the image-built demo. Auto-selected
+  `xccdf_org.locumview_profile_stig_gui_image`; scanner and wrapper exited 0. Structured ARF independently
+  parsed: 405 pass, zero fail, 40 not applicable, 7 not checked, 621 not selected.
+- Profile metadata and exit-code files agree with the ARF. Versions: openscap-scanner 1.4.4-1.el10_2 and
+  scap-security-guide 0.1.82-2.el10_2. This supersedes the pending-live-scan statement above. Historical reports
+  are unchanged; public selected metadata and private-artifact hashes: `docs/evidence/stig/20261023-live-profile/`.
+- Main checks run 137 and image run 138 succeeded for signed source merge `e7079eb` (verified through Gitea API).
+  No new promotion, desktop image switch, timer change or remediation is part of this scan.
+
+## 70. Phase 4 core release milestone closeout (2026-10-24, Done)
+
+- **Verified scope:** signed image/SBOM/scan attestations and promotion (#62, #66), signed RPM installation
+  (#66), package-version pinning verified through two signed SBOMs (#67), stage-only service and planned-reboot
+  acceptance (#68), and live scanner profile selection (#69). Test desktop destruction and encrypted secret/
+  saved-plan cleanup completed through reviewed owner runs and read-only checks.
+- **Plan reconciled:** packages use `rpmbuild` inside a pinned CentOS Stream 10 container and Gitea's RPM
+  registry. The older mock/COPR wording was a future ambition, not the delivered implementation. Public COPR,
+  optional mock integration and Fedora/EPEL packages for concrete future dependency needs remain Planned.
+  SBOM resource optimization and cosign compatibility-flag maintenance also remain Planned. These extensions
+  and maintenance items do not block the Phase 9 lite microbiology/FHIR spike. PLAN and ROADMAP record this
+  scoped milestone, rather than claiming every original phase idea is delivered.
+- **Website integration:** corrected roadmap status placement to the generator's supported format. The two
+  latest website preview runs (130 and 131) were failed at review time; a local run of the actual website
+  generator accepts the corrected roadmap and its privacy checks. Remote preview after this merge is still
+  to be confirmed. No production website deployment was performed.
+- **Limits:** no claim of whole-image byte reproducibility or clinical validation. Newer stage-only images
+  have not been promoted to the live demo; its existing timer mask and rollback tag remain. Production rollout,
+  the skipped fleet-rollback test, open platform housekeeping and packaging extensions remain distinct from
+  this verified milestone. Owner review of this closeout branch records the scope decision.

@@ -1,6 +1,6 @@
 # LocumView roadmap
 
-Status as of 2026-10-22. Labels: **Done** (built and verified), **Open** (version-one work not finished), **In progress** (work has started outside version one, not finished or shipped), **Planned** (after version one, or alongside it only if it doesn't delay it), **Parked** (deliberately not pursued for now). The build log ([notes/phase1-changelog.md](notes/phase1-changelog.md)) and [docs/PLAN.md](docs/PLAN.md) hold the detail.
+Status as of 2026-10-24. Labels: **Done** (built and verified), **Open** (version-one work not finished), **In progress** (work has started outside version one, not finished or shipped), **Planned** (after version one, or alongside it only if it doesn't delay it), **Parked** (deliberately not pursued for now). The build log ([notes/phase1-changelog.md](notes/phase1-changelog.md)) and [docs/PLAN.md](docs/PLAN.md) hold the detail.
 
 ## Version one (scope locked by ADR 0009)
 
@@ -20,13 +20,28 @@ Status as of 2026-10-22. Labels: **Done** (built and verified), **Open** (versio
 - CI that re-runs the pre-commit checks on every push. **Done**
 - Scoped kubeconfig for operators; admin GDM connection credentials into SOPS; Tomcat error page; cluster-wide egress policies. **Open**
 - Backup procedure for desktop VMs on node1. **Open**
-- `scan-stig.sh` accepts an explicit profile and auto-selects the image profile on bootc desktops, with the chosen profile recorded in the results (#69). **Built**, locally tested; owner-run live OpenSCAP verification pending.
+- `scan-stig.sh` accepts an explicit profile and auto-selects the image profile on bootc desktops, with the chosen profile recorded in the results (#69); live auto-profile scan 405 pass / 0 fail ([evidence](docs/evidence/stig/20261023-live-profile/README.md)). **Done**
 - Encryption at rest for desktop disks and cluster nodes. Desktops installed from the bootc image: LUKS bound to the vTPM (changelog #53). The hand-built reference desktop (until it is replaced) and the cluster nodes: **Open**
 - The rules the SSG HIPAA profile still fails: 39 on the reference desktop, 37 on desktops built from the bootc image (2026-10-20, which pass partition_for_var_log_audit and rpm_verify_permissions): applied through the tailoring or documented. **Open**
 
 ## Planned after version one
 
-Order after version one (revised 2026-10-22): move the live demo to an image-built desktop (done 2026-10-21); Phase 4 (packaging and supply chain, in progress); Phase 9 lite (clinical AI demo ending in a frozen evaluation build, ADR 0017); Phase 8 lite (demo video and first write-ups); Phase 7 (AWS, alongside SAA-C03); the Clinical Review Workspace, the first slice of the full Phase 9 (ADR 0018); then Phase 6 and the full Phase 9. The Review Workspace must not delay Phase 8 lite. Phase 5 (SUSE) keeps running in parallel. The phases are described in [docs/PLAN.md](docs/PLAN.md); Phase 9 lite and the Review Workspace in [docs/plans/phase9-lite-and-review-workspace.md](docs/plans/phase9-lite-and-review-workspace.md), under the rules in [docs/policy/synthetic-data-and-independence.md](docs/policy/synthetic-data-and-independence.md).
+Order after version one (revised 2026-10-22): move the live demo to an image-built desktop (done 2026-10-21); Phase 4 (core release milestone Done, 2026-10-24; packaging extensions Planned); Phase 9 lite (clinical AI demo ending in a frozen evaluation build, ADR 0017); Phase 8 lite (demo video and first write-ups); Phase 7 (AWS, alongside SAA-C03); the Clinical Review Workspace, the first slice of the full Phase 9 (ADR 0018); then Phase 6 and the full Phase 9. The Review Workspace must not delay Phase 8 lite. Phase 5 (SUSE) keeps running in parallel. The phases are described in [docs/PLAN.md](docs/PLAN.md); Phase 9 lite and the Review Workspace in [docs/plans/phase9-lite-and-review-workspace.md](docs/plans/phase9-lite-and-review-workspace.md), under the rules in [docs/policy/synthetic-data-and-independence.md](docs/policy/synthetic-data-and-independence.md).
+
+### Phase 4 closeout
+
+**Core release milestone Done (2026-10-24, changelog #70):** signed images and SPDX SBOMs, per-image STIG
+attestations, verified promotion, signed RPM installation, tested version pinning, stage-only update service,
+and the deployed-desktop scanner's profile selection. The disposable staging-test desktop was destroyed and
+its encrypted secret and saved plans removed. Main checks run 137 and image run 138 succeeded for `e7079eb`.
+
+Remaining work is explicit rather than counted as complete: **Planned** public COPR mirror and optional mock
+build integration; Fedora/EPEL dependency packages when a concrete need is established; SBOM resource
+optimization; cosign flag maintenance. These do not block Phase 9 lite's first spike. Production rollout of
+the tested stage-only images is a separate owner decision; the live demo remains on its existing stable image
+with its timer masked. See [closeout scope](docs/PLAN.md#phase-4-closeout-scope).
+
+### Follow-on work
 
 | Area | Item | Status | Reference |
 |---|---|---|---|
@@ -40,7 +55,7 @@ Order after version one (revised 2026-10-22): move the live demo to an image-bui
 | Desktop | Image signing (cosign), SBOMs (syft), registry and build pipeline | **Built** (changelog #57); desktops accept only signed images (changelog #58) | ADR 0007 |
 | Supply chain | Every image build scanned against the STIG image profile before it is pushed, the result attached as a signed attestation; verified promotion: builds go to `:testing`, desktops follow `:stable`, which moves only after the signature, SBOM and scan are verified | **Built** in Phase 4 (changelog #62, #66): first promotions 2026-10-22; the second tested on a test desktop first (upgrade, full STIG scan, rollback and forward). Live demo moved to `:stable`, verified in #66 | ADR 0007 |
 | Supply chain | LocumView's own pieces (shell extensions, branding, tour, EHR launcher) as signed RPMs, built and published by CI; the image installs them and checks every signature | **Built** in Phase 4 (changelog #62, #66). Version pinning **Done** (#67): two builds of one commit have the same four expected package versions in verified signed SBOMs ([evidence](docs/evidence/rpm-pinning/20261022/README.md)). Planned: a public COPR mirror | |
-| Desktop | Background image updates download and stage signed releases; the operator plans the reboot | Stage-only service **Done** (#68): newer signed candidate staged without reboot, then exact digest booted at an owner-planned restart ([evidence](docs/evidence/update-policy/20261023/README.md)). Existing desktop timer masks remain; production rollout is separate | |
+| Desktop | Background image updates download and stage signed releases; the operator plans the reboot | **Done** (#68): stage-only service; newer signed candidate staged without reboot, then exact digest booted at an owner-planned restart ([evidence](docs/evidence/update-policy/20261023/README.md)). Existing desktop timer masks remain; production rollout is separate | |
 | Desktop | Organization-set desktop layout (Mac, Windows or GNOME style), locked centrally | Built; Mac style and lock verified, Windows/GNOME not exercised | changelog #25, #28 |
 | Desktop | The live demo (login.locumview.com) on an image-built desktop, replacing the hand-built reference desktop | Done (2026-10-21) | Changelog #61; the reference desktop stays as a fallback for about a week, then retires |
 | Desktop | Separate, resettable demo desktop | Planned | First KubeVirt workload |

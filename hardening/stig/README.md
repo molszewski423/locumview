@@ -48,8 +48,10 @@ success merely because the later versions/ownership commands succeeded. Scripts 
 
 Profile selection changes the rule set: the image profile includes partition rules and excludes the documented
 SSH-zone exception. The reference profile does the opposite. Compare reports with their recorded profile IDs;
-do not infer equivalent coverage from pass/fail totals alone (changelog #66 and #69). Live OpenSCAP results for
-this revised wrapper are not yet recorded; local transport/scanner tests exercise selection and exit handling.
+do not infer equivalent coverage from pass/fail totals alone (changelog #66 and #69). The revised wrapper's
+live automatic image-profile selection passed on 2026-10-23: 405 pass / 0 fail
+([summary](../../docs/evidence/stig/20261023-live-profile/README.md)). Overrides and failed-rule/error handling
+are tested locally with mocked transports and scanners; they were not forced on the live desktop.
 
 The user needs sudo on the target (an IdM administrator works). For `apply-stig.sh`, take a snapshot first; remediation needs a reboot afterwards for kernel arguments, immutable audit rules and `/home` mount options. `scan-stig.sh` performs assessment only and does not request a reboot. Run logs and scan output are git-ignored because they contain addresses.
 
@@ -99,5 +101,6 @@ Several SSG 0.1.82 remediations create the authselect profile `custom/hardening`
 | bootc image, booted, 2026-10-19 | image profile | 402 | 4 | `docs/evidence/stig/20261019-image/` (the 4: the GRUB password and superuser, set per desktop at provisioning; the test account and its files) |
 | Desktop rebuilt from a clean clone by OpenTofu, 2026-10-20 (lv-test12) | image profile | 400 | 6 | not committed; the 6 were settings that IdM enrollment and first boot change after the build, fixed in provisioning (changelog #59) |
 | The same, installed from an ISO with those fixes, 2026-10-20 (lv-test13) | image profile | 405 | 0 | `docs/evidence/stig/20261020-image/`; `hipaa` on the same desktop: 119 pass, 37 fail, `docs/evidence/stig/20261020-hipaa/` |
+| Live image-built demo, revised wrapper auto-detection, 2026-10-23 | image profile | 405 | 0 | `docs/evidence/stig/20261023-live-profile/`; private raw reports retained, selected metadata published |
 
 The two remaining failures are the false positives above; with the current tailoring the result is 0 failures. Committed reports have the desktop's addresses replaced by placeholders. The full ARF result files (about 60 MB each) are not committed.
