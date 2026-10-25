@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Load the Phase 9 lite scenario library into OpenEMR (plan M2), with one command and idempotently.
 
-    load.py [--reset] [--no-background] [case.json ...]     default: every case in cases/
+    load.py [--target spike|cluster] [--reset] [--no-background] [case.json ...]     default: every case in cases/
 
---reset destroys the local instance and starts a fresh one first (clinical/spike/run.sh down, up, api), so the
+--target is the local spike (the default) or the clinical namespace (k8s/clinical, kubectl; owner run
+scripts/clinical/load-scenarios.sh, after register-gateway.sh). Both are reached the same way, from inside their
+containers, so no credential reaches this machine (targets.py). --reset (spike only) destroys the local instance and starts a fresh one first (clinical/spike/run.sh down, up, api), so the
 result is a known state built only from the repository. Without it, cases already present (by patient number
 LV-<case id>) are skipped, so running it twice changes nothing. The Synthea background patients in
 clinical/synthea/background.json (patient numbers SYN-nnn) are loaded too, unless --no-background: demographics,
@@ -34,6 +36,8 @@ def module(name, path):
 
 
 fhir = module("fhir", SPIKE / "fhir.py")
+targets = module("targets", HERE / "targets.py")
+target = None  # set by main()
 checker = module("check_cases", HERE / "check_cases.py")
 LAB = "LocumView Scenario Laboratory"
 # OpenEMR stores a prescription's route as an id in its drug_route list, which carries the NCI code FHIR emits;
@@ -58,12 +62,10 @@ def run(*args, stdin=None):
 
 
 def sql(statement):
-    rows = [line.split("\t") for line in run("sql", stdin=statement).splitlines()]
-    return rows[1:] if rows else []
+    return target.sql(statement)
 
 
-def quote(value):
-    return "'" + str(value).replace("\\", "\\\\").replace("'", "''") + "'"
+quote = targets.quote
 
 
 def utc(value):
@@ -184,7 +186,7 @@ def load(case):
         print(f"{case['id']}: already loaded, skipped")
         return
     p, e = case["patient"], case["encounter"]
-    status, body = fhir.call("POST", "fhir/Patient", {
+    status, body = target.api("POST", "fhir/Patient", {
         "resourceType": "Patient",
         # OpenEMR 8.4.1 reads only a name with use "official", and an identifier of type PT as its patient number.
         "name": [{"use": "official", "family": p["family"], "given": [p["given"]]}],
@@ -193,24 +195,24 @@ def load(case):
         "gender": p["sex"], "birthDate": p["birth_date"]})
     body = ok(f"{case['id']}: patient", status, body)
     puuid = body.get("uuid") or body.get("id") or (body.get("data") or {}).get("uuid")
-    pid = ok("patient lookup", *fhir.call("GET", f"api/patient/{puuid}"))["data"]["pid"]
-    data = ok("encounter", *fhir.call("POST", f"api/patient/{puuid}/encounter", {
+    pid = ok("patient lookup", *target.api("GET", f"api/patient/{puuid}"))["data"]["pid"]
+    data = ok("encounter", *target.api("POST", f"api/patient/{puuid}/encounter", {
         "date": utc(e["start"]), "reason": e["reason"], "class_code": e["class_code"], "pc_catid": "5"}))["data"]
     encounter = data["encounter"]
     for x in case.get("problems", []):
-        ok("problem", *fhir.call("POST", f"api/patient/{puuid}/medical_problem", x))
+        ok("problem", *target.api("POST", f"api/patient/{puuid}/medical_problem", x))
     for x in case.get("allergies", []):
-        ok("allergy", *fhir.call("POST", f"api/patient/{puuid}/allergy", allergy_body(x)))
+        ok("allergy", *target.api("POST", f"api/patient/{puuid}/allergy", allergy_body(x)))
     for x in case.get("prescriptions", []):
         rx = {"drug": x["drug"], "rxnorm_drugcode": x["rxnorm"], "start_date": x["start"], "route": ROUTES[x["route"]],
               "drug_dosage_instructions": x["instructions"], "patient_id": pid, "encounter": encounter}
         if "end" in x:
             rx["end_date"] = x["end"]
-        ok("prescription", *fhir.call("POST", "api/prescription", rx))
+        ok("prescription", *target.api("POST", "api/prescription", rx))
     for v in case.get("vitals", []):
         vital = {"date": utc(v["taken"]), **{("temperature" if k == "temperature_f" else k): str(val)
                                             for k, val in v.items() if k != "taken"}}
-        ok("vital signs", *fhir.call("POST", f"api/patient/{pid}/encounter/{encounter}/vital", vital))
+        ok("vital signs", *target.api("POST", f"api/patient/{pid}/encounter/{encounter}/vital", vital))
 
     lab_id, orders = lab_provider(), []
     for lab in case.get("labs", []):
@@ -223,11 +225,8 @@ def load(case):
                           {**cult["specimen"], "collected": utc(cult["collected"])})
         orders.append({"id": oid, "kind": "culture", "data": cult, "resulted": cult.get("resulted")})
     if any(o["resulted"] for o in orders):
-        subprocess.run(["podman", "exec", "-i", "openemr-spike-openemr", "sh", "-c", "cat > /tmp/lv-import.php"],
-                       input=IMPORT_PHP, text=True, check=True)
-        done = subprocess.run(["podman", "exec", "-i", "-u", "apache", "openemr-spike-openemr", "php",
-                               "/tmp/lv-import.php", str(lab_id)],
-                              input=message(case, pid, encounter, orders), text=True, capture_output=True)
+        done = target.php(target.install("import.php", IMPORT_PHP), str(lab_id),
+                          stdin=message(case, pid, encounter, orders))
         lines = done.stdout.strip().splitlines()
         report = json.loads(lines[-1]) if lines else {}
         if done.returncode or not lines or report["result"].get("mssgs") or report["result"].get("needmatch"):
@@ -243,7 +242,7 @@ def load_background():
     for p in people:
         if sql(f"SELECT pid FROM patient_data WHERE pubpid = {quote(p['number'])};"):
             continue
-        status, body = fhir.call("POST", "fhir/Patient", {
+        status, body = target.api("POST", "fhir/Patient", {
             "resourceType": "Patient",
             "name": [{"use": "official", "family": p["family"], "given": [p["given"]]}],
             "identifier": [{"type": {"coding": [{"system": "http://terminology.hl7.org/CodeSystem/v2-0203", "code": "PT"}]},
@@ -252,16 +251,23 @@ def load_background():
         body = ok(f"{p['number']}: patient", status, body)
         puuid = body.get("uuid") or body.get("id") or (body.get("data") or {}).get("uuid")
         for x in p["problems"]:
-            ok(f"{p['number']}: problem", *fhir.call("POST", f"api/patient/{puuid}/medical_problem", {
+            ok(f"{p['number']}: problem", *target.api("POST", f"api/patient/{puuid}/medical_problem", {
                 "title": x["title"], "begdate": x["begdate"], "diagnosis": f"SNOMED-CT:{x['snomed']}"}))
         for x in p["allergies"]:
-            ok(f"{p['number']}: allergy", *fhir.call("POST", f"api/patient/{puuid}/allergy", allergy_body(x)))
+            ok(f"{p['number']}: allergy", *target.api("POST", f"api/patient/{puuid}/allergy", allergy_body(x)))
         added += 1
     print(f"background: {added} loaded, {len(people) - added} already present")
 
 
 def main(argv):
+    global target
+    name = argv[argv.index("--target") + 1] if "--target" in argv else "spike"
+    if name not in targets.CONTAINERS:
+        raise SystemExit(f"--target is spike or cluster, not {name!r}")
+    argv = [a for i, a in enumerate(argv) if a != "--target" and (i == 0 or argv[i - 1] != "--target")]
     reset = "--reset" in argv
+    if reset and name != "spike":
+        raise SystemExit("--reset destroys the instance; it is for the local spike only")
     paths = [Path(a) for a in argv if not a.startswith("--")] or sorted((HERE / "cases").glob("*.json"))
     citations = json.loads((HERE / "citations.json").read_text())["citations"]
     problems = [e for p in paths for e in checker.check(p, citations)]
@@ -271,12 +277,14 @@ def main(argv):
     if reset:
         for step in ("down", "up", "api"):
             print(run(step).strip().splitlines()[-1])
+    target = targets.Target(name)
     # Result flags for S, I, R and SDD (list configuration, idempotent).
-    run("sql", stdin=(SPIKE / "susceptibility-flags.sql").read_text())
-    if "--no-background" not in argv:
-        load_background()
-    for path in paths:
-        load(json.loads(path.read_text()))
+    sql((SPIKE / "susceptibility-flags.sql").read_text())
+    with target.session(fhir.SCOPES):
+        if "--no-background" not in argv:
+            load_background()
+        for path in paths:
+            load(json.loads(path.read_text()))
 
 
 if __name__ == "__main__":

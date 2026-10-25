@@ -10,9 +10,16 @@ python3 clinical/scenarios/check_cases.py                  # check every case (p
 python3 clinical/scenarios/check_cases.py --require-approved   # what a frozen evaluation build must pass
 python3 clinical/scenarios/load.py --reset                 # fresh local OpenEMR, background patients, every case
 python3 clinical/scenarios/load.py                         # load into the running instance; loaded cases are skipped
+scripts/clinical/load-scenarios.sh                         # the clinical namespace (owner run, k8s/clinical/README.md)
 ```
 
-The loader runs the local instance from the M1 spike (`clinical/spike/run.sh`, rootless podman, localhost only).
+The loader writes to the local instance from the M1 spike (`clinical/spike/run.sh`, rootless podman, localhost only)
+or, with `--target cluster`, to OpenEMR in the clinical namespace. Both are reached the same way
+(`targets.py`): SQL inside the database container with its own root password, and API calls inside the OpenEMR
+container with the administrator credentials in its environment, so no credential reaches the machine running the
+loader. For the length of a load it registers and enables a loader API client and turns on the password grant;
+afterwards it deletes the client and restores the grant. Read a case back with
+`clinical/spike/readback.py LV-<case id> <dir>` (every case shares the family name Casebook).
 Loading is idempotent: each case's patient has the patient number `LV-<case id>`, and a case already present is
 skipped. No manual chart entry, ever.
 
