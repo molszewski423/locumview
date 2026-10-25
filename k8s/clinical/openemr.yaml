@@ -30,6 +30,24 @@ spec:
       automountServiceAccountToken: false
       securityContext:
         seccompProfile: {type: RuntimeDefault}
+      initContainers:
+        # Swarm mode's leader marker (sites/docker-leader) survives a crash. A start that finds it under five minutes
+        # old waits as a follower, and upstream's takeover after the wait leaves it a follower that never restores
+        # sites/ (changelog #85). One replica with Recreate never runs two at once, so a marker found at start is
+        # always stale: remove it. After the first install sites/ is dr-x------ (apache), so this runs as root with
+        # DAC_OVERRIDE only (baseline allows it).
+        - name: clear-leader-marker
+          image: git.lan/mike/locumview-openemr   # digest set in kustomization.yaml (images)
+          command: ["rm", "-f", "/sites/docker-leader", "/sites/docker-initiated"]
+          securityContext:
+            runAsUser: 0
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL], add: [DAC_OVERRIDE]}
+          resources:
+            requests: {memory: 16Mi, cpu: 10m}
+            limits: {memory: 64Mi}
+          volumeMounts: [{name: sites, mountPath: /sites}]
       containers:
         - name: openemr
           image: git.lan/mike/locumview-openemr   # digest set in kustomization.yaml (images)
