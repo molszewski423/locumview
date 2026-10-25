@@ -37,14 +37,18 @@ hardening/stig/scan-stig.sh --profile reference <user>@<image-desktop> ./referen
 
 The two full tailoring profile IDs are also accepted. Other profiles are rejected before any remote operation.
 This command is an owner run: it uploads the tailoring and helper, then asks for sudo to execute OpenSCAP on
-the target. Review `scan-stig-remote.sh` before running it. Results remain on the target and are fetched into the
-local output directory, which may contain spaces. No reports are automatically committed or published.
+the target. Review `scan-stig-remote.sh` before running it. Results are written on the target, fetched into the
+local output directory (which may contain spaces), then removed from the target. If the fetch fails they stay
+in the printed `/var/tmp/locumview-stig-scan.*` directory and the wrapper never returns 0. No reports are
+automatically committed or published.
 
 The selected full ID is printed and saved as `profile.txt`; `oscap-exit-code.txt` records the scanner exit,
 alongside `stdout.txt`, `versions.txt`, `arf.xml` and `report.html` when produced. The wrapper returns **0** for
 all checks passing, **2** for failed rules, and another nonzero code for scanner/transport errors. It fetches
 available diagnostics before returning a scan failure. Unlike the former wrapper, a failed scan does not return
-success merely because the later versions/ownership commands succeeded. Scripts calling it must handle exit 2.
+success merely because the later versions/ownership commands succeeded. Ownership is handed back on every exit,
+and a missing scanner package is recorded in `versions.txt` rather than replacing the scan result (#71).
+Scripts calling it must handle exit 2.
 
 Profile selection changes the rule set: the image profile includes partition rules and excludes the documented
 SSH-zone exception. The reference profile does the opposite. Compare reports with their recorded profile IDs;

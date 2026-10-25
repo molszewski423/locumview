@@ -8,6 +8,11 @@ import subprocess
 import tempfile
 import unittest
 
+# As a commit hook, Git exports GIT_DIR, GIT_INDEX_FILE and similar; inherited, they point the temporary
+# repositories' init, config and add at the real repository (changelog #71). Every git call here inherits this.
+for name in [name for name in os.environ if name.startswith("GIT_")]:
+    del os.environ[name]
+
 SCRIPT = Path(__file__).with_name("resolve-version.py")
 spec = importlib.util.spec_from_file_location("resolve_version", SCRIPT)
 resolver = importlib.util.module_from_spec(spec)

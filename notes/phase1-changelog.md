@@ -1128,3 +1128,45 @@ The release sequence in `notes/release-integrity-report.md`.
   have not been promoted to the live demo; its existing timer mask and rollback tag remain. Production rollout,
   the skipped fleet-rollback test, open platform housekeeping and packaging extensions remain distinct from
   this verified milestone. Owner review of this closeout branch records the scope decision.
+
+## 71. Phase 4 review fixes: scanner hand-back, rpmbuild status, scope notes (2026-10-24, Done)
+
+Claude Code reviewed Codex's Phase 4 work (#62, #66 to #70) with the owner. The scope decisions and evidence
+limits held up; these are the fixes from that review.
+
+- **Scanner hand-back:** `scan-stig-remote.sh` ran `rpm -q` under `set -e` before returning ownership of the
+  results. On a target missing `openscap-scanner` or `scap-security-guide`, the helper stopped there, the results
+  stayed root-owned and private, the fetch failed, and `scan-stig.sh` exited with the copy's error instead of
+  the scan's. Ownership now goes back in an `EXIT` trap, and a missing package is recorded in `versions.txt`.
+- **Scanner fetch and cleanup:** a failed fetch no longer replaces the scan status and never returns 0; the
+  results stay in the printed target directory. A successful fetch removes that directory from the target, so
+  private ARF and HTML reports do not accumulate in `/var/tmp`.
+- **rpmbuild status:** `build-rpms.sh` piped rpmbuild into `grep … || true`, discarding rpmbuild's exit status;
+  failures were caught only because the following copy found no packages. rpmbuild now writes a log, its own
+  status decides, and the full log is shown on failure.
+- **Scope notes:** the packaging README now says only the buildroot base image is pinned (build tools come from
+  current CentOS Stream repositories) and that a repeated publish keeps the first upload without comparing
+  contents. PLAN's closeout scope notes that first-boot Flatpaks are outside the image signature, SBOM and scan.
+- **Resolver test isolation:** committing these changes from a linked worktree ran the `rpm-version-selection`
+  hook as a real commit hook for the first time in that setup. Git exports `GIT_DIR` and `GIT_INDEX_FILE` to
+  hooks; `test-resolve-version.py` inherited them, so its temporary `git init`, `git config` and `git add` acted
+  on the operator's clone: `core.bare=true`, a test identity, `commit.gpgsign=false`, and test files in the
+  worktree index. The commit itself failed, so nothing was committed. The clone's settings were restored from
+  its sibling clone and the values read before the hook ran, and the index was rebuilt from HEAD. The test now
+  drops inherited `GIT_*` variables before any git call; under hook-style variables pointed at a throwaway
+  repository, the previous test rewrote that repository's config and the fixed one passes without touching it.
+- **Reviewed, not changed:** the RPM and image workflows can race on a push that changes package inputs; the
+  image fails closed and the packaging README already gives the rerun procedure.
+- **Background update signature enforcement (configuration verified):** the stage-only evidence (#68) shows a
+  signed candidate staged, not a refusal. A read-only owner check of the live demo desktop on 2026-10-24 found
+  both deployments' saved image references on the `ostree-image-signed:` transport, which `bootc upgrade`
+  reuses, and `/etc/containers/policy.json` rejecting by default with the desktop repository requiring a
+  `sigstoreSigned` signature from the image's baked cosign key (`matchRepository`). The background path therefore
+  enforces signatures by configuration. An unsigned candidate being refused was not observed; that negative test
+  on a disposable desktop is Planned, not required for this milestone. The rollback deployment still references
+  the retired `:latest` tag, which a rollback does not pull.
+- **Verified:** scanner tests 9 of 9 (two new, one extended); the new cases fail against the previous scripts.
+  shellcheck clean on the scanner scripts. A local `build-rpms.sh` run in the pinned container built all four
+  packages and the SRPM at `0.1.0-1.20261023000253gitd2fd2aa701.el10`, exit 0. A throwaway, never-pushed
+  commit with a failing `%check` exited 1, printed the full log ending in "rpmbuild failed" and produced no
+  packages. Nothing was signed or published; no desktop, image or workflow was touched.

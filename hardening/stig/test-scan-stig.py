@@ -30,6 +30,8 @@ if command.startswith('if test'):
     print(os.environ['DESKTOP_TYPE'])
 elif command.startswith('mktemp'):
     print(os.environ.get('REMOTE_DIR', '/var/tmp/locumview-stig-scan.test1234'))
+elif command.startswith('rm '):
+    (root/'removed').write_text(shlex.split(command)[-1])
 else:
     (root/'profile').write_text(shlex.split(command)[3])
     sys.exit(int(os.environ['SCAN_EXIT']))
@@ -37,6 +39,7 @@ else:
         self.mock("scp", """
 import os, pathlib, sys
 if ':' in sys.argv[-2]:
+    if os.environ.get('FETCH_EXIT'): sys.exit(int(os.environ['FETCH_EXIT']))
     root = pathlib.Path(os.environ['TEST_ROOT'])
     out = pathlib.Path(sys.argv[-1]); out.mkdir(parents=True, exist_ok=True)
     (out/'stdout.txt').write_text('Result fail\\n' if os.environ['SCAN_EXIT']=='2' else 'Result pass\\n')
@@ -77,6 +80,20 @@ if ':' in sys.argv[-2]:
             self.assertEqual(result.returncode, code)
             self.assertEqual((out / "oscap-exit-code.txt").read_text().strip(), str(code))
 
+    def test_fetched_results_are_removed_from_target(self):
+        result, _ = self.scan()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual((self.root / "removed").read_text(), "/var/tmp/locumview-stig-scan.test1234")
+
+    def test_failed_fetch_keeps_target_results_and_is_never_success(self):
+        self.env["FETCH_EXIT"] = "1"
+        for code, expected in ((0, 1), (2, 2), (255, 255)):
+            self.env["SCAN_EXIT"] = str(code)
+            result, _ = self.scan()
+            self.assertEqual(result.returncode, expected, result.stderr)
+            self.assertIn("remain on the target", result.stderr)
+            self.assertFalse((self.root / "removed").exists())
+
     def test_unknown_profile_rejected_before_network(self):
         result, _ = self.scan("--profile", "image;false")
         self.assertNotEqual(result.returncode, 0)
@@ -104,7 +121,7 @@ print('Result fail' if os.environ['SCAN_EXIT']=='2' else 'Result pass')
 sys.exit(int(os.environ['SCAN_EXIT']))
 """)
         self.mock("rpm", "print('fixture versions')")
-        self.mock("chown", "pass")
+        self.mock("chown", "import os, pathlib, sys; pathlib.Path(os.environ['TEST_ROOT'], 'chowned').write_text(sys.argv[-1])")
         out = self.root / "remote results"
         out.mkdir()
         (out / "locumview-stig-gui-tailoring.xml").write_text("fixture")
@@ -117,6 +134,17 @@ sys.exit(int(os.environ['SCAN_EXIT']))
             self.assertEqual((out / "profile.txt").read_text().strip(), IMAGE)
             self.assertEqual((out / "oscap-exit-code.txt").read_text().strip(), str(code))
             self.assertIn(IMAGE, (self.root / "oscap-args").read_text().splitlines())
+        # A missing scanner package must not stop the hand-back of results or replace the scan result.
+        self.mock("rpm", "print('package scap-security-guide is not installed'); raise SystemExit(1)")
+        for code in (0, 1):
+            (self.root / "chowned").unlink(missing_ok=True)
+            env = {**self.env, "SCAN_EXIT": str(code), "SUDO_UID": str(os.getuid()),
+                   "SUDO_GID": str(os.getgid())}
+            result = subprocess.run(["bash", str(HERE / "scan-stig-remote.sh"), IMAGE, str(out)],
+                                    env=env, text=True, capture_output=True)
+            self.assertEqual(result.returncode, code, result.stderr)
+            self.assertEqual((self.root / "chowned").read_text(), str(out))
+            self.assertIn("not installed", (out / "versions.txt").read_text())
 
 
 if __name__ == "__main__":

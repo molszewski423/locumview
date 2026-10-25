@@ -24,7 +24,9 @@ git show "$REV:packaging/rpm/locumview-desktop.spec" > "$WORK/SPECS/locumview-de
 podman run --rm --network=private -v "$WORK:/rpmbuild:Z" -v "$OUT:/out:Z" "$BUILDER" bash -euo pipefail -c '
   dnf -q -y install rpm-build dnf-plugins-core >/dev/null
   dnf -q -y builddep /rpmbuild/SPECS/locumview-desktop.spec >/dev/null
-  rpmbuild -ba --define "_topdir /rpmbuild" --define "lv_release '"$RELEASE"'" /rpmbuild/SPECS/locumview-desktop.spec 2>&1 \
-    | grep -E "^(Wrote|error|RPM build errors|[[:space:]]+/)" || true
+  # rpmbuild'"'"'s own exit status decides; the log is filtered for display only, and shown in full on failure.
+  rpmbuild -ba --define "_topdir /rpmbuild" --define "lv_release '"$RELEASE"'" /rpmbuild/SPECS/locumview-desktop.spec \
+    > /rpmbuild/rpmbuild.log 2>&1 || { cat /rpmbuild/rpmbuild.log >&2; echo "rpmbuild failed" >&2; exit 1; }
+  grep -E "^(Wrote|error|RPM build errors|[[:space:]]+/)" /rpmbuild/rpmbuild.log || true
   cp /rpmbuild/RPMS/noarch/*.rpm /rpmbuild/SRPMS/*.src.rpm /out/'
 ls -1 "$OUT" | grep -F "$SHORT"

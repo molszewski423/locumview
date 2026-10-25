@@ -47,6 +47,9 @@ The release is `1.<source committer time in UTC>git<first 10 source hash charact
 so adding objects to the repository cannot lengthen an abbreviation and change the version. The archive and
 spec are read from the resolved source commit. This pins package identities; it does not establish identical
 RPM bytes or image digests across rebuilds, and a published package must remain available in the registry.
+Only the buildroot's base image is pinned: `rpm-build` and the spec's build dependencies are installed from the
+current CentOS Stream repositories at build time. If a release is built again, the registry keeps the first
+upload; `publish-rpms.sh` reports the repeat as already published (HTTP 409) without comparing contents.
 
 `inputs.txt` deliberately covers the entire desktop files tree, plus package sources, build/sign/publish
 scripts, the builder pin, signing metadata, the license and the RPM workflow. The RPM workflow's `push.paths`
