@@ -78,6 +78,7 @@ variable "desktops" {
     memory_mib       = optional(number, 6144)
     vcpus            = optional(number, 4)
     guacamole_groups = optional(list(string), ["locumview-admins"])
+    guacamole_name   = optional(string) # label on the login page; default: the desktop's name
   }))
   default = {}
 }

@@ -27,7 +27,7 @@ cp site.auto.tfvars.example site.auto.tfvars      # fill in
 ./tofu.sh destroy                                 # removes the VMs, their volumes and IdM host entries
 ```
 
-`tofu.sh` decrypts the state passphrase and the IdM account's password from SOPS; neither is written to disk. Each desktop gets a Guacamole connection by host name (the desktop registers itself in IdM DNS at enrollment), granted to the user groups in `guacamole_groups` (default `locumview-admins`); destroy removes it and keeps the session history. `secrets.sh` pipes generated values straight into `sops --encrypt`, so it works with the public key alone.
+`tofu.sh` decrypts the state passphrase and the IdM account's password from SOPS; neither is written to disk. Each desktop gets a Guacamole connection by host name (the desktop registers itself in IdM DNS at enrollment), granted to the user groups in `guacamole_groups` (default `locumview-admins`) and labelled `guacamole_name` (default: the desktop's name); destroy removes it and keeps the session history. `secrets.sh` pipes generated values straight into `sops --encrypt`, so it works with the public key alone.
 
 ## Notes
 
