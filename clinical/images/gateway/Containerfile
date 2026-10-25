@@ -1,0 +1,27 @@
+# The clinical app and its gateway (clinical/app/), for the clinical namespace. Built by
+# .gitea/workflows/clinical-images.yml from the repository root:
+#   podman build -f clinical/images/gateway/Containerfile .
+# Every base image pinned by digest (the same Node 22 and Python 3.13 images as clinical/app/run.sh and CI); npm ci from
+# the lockfile; Python packages installed with --require-hashes. Runs as a non-root user on port 8080, behind Traefik.
+FROM docker.io/library/node@sha256:de170b39439eb0e5a3444ad7d60b015614a381e10fecae2e30ec9e735122f38d AS app
+WORKDIR /app
+COPY clinical/app/package.json clinical/app/package-lock.json clinical/app/.npmrc ./
+RUN npm ci --no-audit --no-fund
+COPY clinical/app/index.html clinical/app/tsconfig.json clinical/app/vite.config.ts ./
+COPY clinical/app/src ./src
+RUN npm run build
+
+FROM docker.io/library/python@sha256:073ffebb96ae4d0ed73ccad59f08c47bd84af8a79f5258130f8458ac50ad9ff4 AS deps
+COPY clinical/app/server/requirements.txt /requirements.txt
+RUN python -m venv /venv && /venv/bin/pip install --no-cache-dir --disable-pip-version-check --require-hashes -r /requirements.txt
+
+FROM docker.io/library/python@sha256:e32be0e55814a08977501ca863271d9bd02443710db8f2afaf8372e2c4508530
+COPY --from=deps /venv /venv
+COPY clinical/app/server/gateway.py clinical/app/server/scopes.py /srv/
+COPY --from=app /app/dist /srv/dist
+ENV STATIC_DIR=/srv/dist PYTHONDONTWRITEBYTECODE=1
+USER 10001:10001
+EXPOSE 8080
+CMD ["/venv/bin/uvicorn", "gateway:main", "--factory", "--app-dir", "/srv", "--host", "0.0.0.0", "--port", "8080", "--no-server-header"]
+LABEL org.opencontainers.image.title="LocumView clinical app gateway" \
+      org.opencontainers.image.description="The Phase 9 lite clinical app and its SMART gateway"

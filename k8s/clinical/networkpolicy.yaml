@@ -1,0 +1,61 @@
+# Default deny in both directions; each workload gets only the traffic it needs. No internet egress for any pod:
+# OpenEMR, MariaDB and the gateway talk only to each other, and Traefik reaches the two front ends.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: default-deny, namespace: clinical}
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: allow-dns, namespace: clinical}
+spec:
+  podSelector: {}
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: kube-system}}
+          podSelector: {matchLabels: {k8s-app: kube-dns}}
+      ports: [{protocol: UDP, port: 53}, {protocol: TCP, port: 53}]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: mariadb, namespace: clinical}
+spec:
+  podSelector: {matchLabels: {app: mariadb}}
+  policyTypes: [Ingress]
+  ingress:
+    - from: [{podSelector: {matchLabels: {app: openemr}}}]
+      ports: [{protocol: TCP, port: 3306}]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: openemr, namespace: clinical}
+spec:
+  podSelector: {matchLabels: {app: openemr}}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: kube-system}}
+          podSelector: {matchLabels: {app.kubernetes.io/name: traefik}}
+        - podSelector: {matchLabels: {app: gateway}}
+      ports: [{protocol: TCP, port: 80}]
+  egress:
+    - to: [{podSelector: {matchLabels: {app: mariadb}}}]
+      ports: [{protocol: TCP, port: 3306}]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: gateway, namespace: clinical}
+spec:
+  podSelector: {matchLabels: {app: gateway}}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: kube-system}}
+          podSelector: {matchLabels: {app.kubernetes.io/name: traefik}}
+      ports: [{protocol: TCP, port: 8080}]
+  egress:
+    - to: [{podSelector: {matchLabels: {app: openemr}}}]
+      ports: [{protocol: TCP, port: 80}]

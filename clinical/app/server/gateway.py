@@ -12,7 +12,9 @@ API does not answer CORS preflight requests, so the app cannot talk to it from t
 Settings (environment): EHR_FHIR_BASE (the EHR's FHIR base, the only accepted iss), CLIENT_ID,
 CLIENT_SECRET_FILE, PUBLIC_URL (this gateway's external https URL), STATIC_DIR, EHR_TLS_CA (a CA bundle for the
 EHR; default system roots), EHR_TLS_VERIFY=false (local test instance only), FRAME_ANCESTORS (origins allowed to
-frame the app: the EHR's). Sessions live in memory: one replica.
+frame the app: the EHR's), EHR_INTERNAL_URL (optional: an origin such as http://openemr.clinical.svc to which the
+gateway's own requests for the EHR's public origin are sent, so in-cluster traffic stays on the Service; launches
+are still checked against the public EHR_FHIR_BASE). Sessions live in memory: one replica.
 """
 from __future__ import annotations
 
@@ -48,6 +50,7 @@ class Settings:
     static_dir: str | None = None
     tls_verify: bool | str = True
     frame_ancestors: str = "'self'"
+    ehr_internal_url: str | None = None
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -59,7 +62,8 @@ class Settings:
         return cls(ehr_fhir_base=os.environ["EHR_FHIR_BASE"].rstrip("/"), client_id=os.environ["CLIENT_ID"],
                    client_secret=secret, public_url=os.environ["PUBLIC_URL"].rstrip("/"),
                    static_dir=os.environ.get("STATIC_DIR"), tls_verify=verify,
-                   frame_ancestors=os.environ.get("FRAME_ANCESTORS", "'self'"))
+                   frame_ancestors=os.environ.get("FRAME_ANCESTORS", "'self'"),
+                   ehr_internal_url=(os.environ.get("EHR_INTERNAL_URL") or "").rstrip("/") or None)
 
 
 @dataclass
@@ -93,6 +97,12 @@ def create_app(settings: Settings, transport: httpx.BaseTransport | None = None)
     client = httpx.Client(transport=transport, verify=settings.tls_verify, timeout=30, follow_redirects=False)
     ehr_origin = "{0.scheme}://{0.netloc}".format(urlsplit(settings.ehr_fhir_base))
 
+    def internal(url: str) -> str:
+        """The gateway's own requests to the EHR go to its internal address when one is set."""
+        if settings.ehr_internal_url and url.startswith(ehr_origin + "/"):
+            return settings.ehr_internal_url + url[len(ehr_origin):]
+        return url
+
     @app.middleware("http")
     async def headers(request: Request, call_next):
         response = await call_next(request)
@@ -119,7 +129,7 @@ def create_app(settings: Settings, transport: httpx.BaseTransport | None = None)
         # Only the configured EHR may start a launch: no open redirect, no requests to arbitrary servers.
         if iss.rstrip("/") != settings.ehr_fhir_base:
             raise HTTPException(400, "Launch from an EHR this app is not set up for")
-        smart = client.get(f"{settings.ehr_fhir_base}/.well-known/smart-configuration").raise_for_status().json()
+        smart = client.get(internal(f"{settings.ehr_fhir_base}/.well-known/smart-configuration")).raise_for_status().json()
         verifier, challenge = pkce()
         state = secrets.token_urlsafe(32)
         store.sweep()
@@ -138,7 +148,7 @@ def create_app(settings: Settings, transport: httpx.BaseTransport | None = None)
             raise HTTPException(400, "Unknown or expired launch: open the app from the chart again")
         if not pending["token_endpoint"].startswith(ehr_origin):
             raise HTTPException(502, "The EHR's token endpoint is not on the EHR's origin")
-        reply = client.post(pending["token_endpoint"], data={
+        reply = client.post(internal(pending["token_endpoint"]), data={
             "grant_type": "authorization_code", "code": code, "redirect_uri": f"{settings.public_url}/callback",
             "client_id": settings.client_id, "client_secret": settings.client_secret,
             "code_verifier": pending["verifier"]})
@@ -156,7 +166,7 @@ def create_app(settings: Settings, transport: httpx.BaseTransport | None = None)
         return response
 
     def ehr_get(session: Session, url: str, params: dict | None = None) -> dict:
-        reply = client.get(url, params=params, headers={"Authorization": f"Bearer {session.access_token}",
+        reply = client.get(internal(url), params=params, headers={"Authorization": f"Bearer {session.access_token}",
                                                        "Accept": "application/fhir+json"})
         if reply.status_code == 401:
             raise HTTPException(401, "The EHR session has ended: open the app from the chart again")

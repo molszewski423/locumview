@@ -122,6 +122,27 @@ class GatewayTests(unittest.TestCase):
         self.assertEqual(self.client.post("/api/fhir/Observation", json={}).status_code, 405)
         self.assertEqual(self.client.get("/api/fhir/Patient").json()["id"], "patient-1")
 
+    def test_internal_url_carries_the_gateways_requests_but_not_the_launch_check(self):
+        seen = []
+        inner = FakeEhr()
+
+        def transport(request):
+            seen.append(str(request.url))
+            public = str(request.url).replace("http://openemr.internal", "https://ehr.example.org")
+            return inner(httpx.Request(request.method, public, headers=request.headers, content=request.content))
+        settings = Settings(ehr_fhir_base=EHR, client_id="app", client_secret="s3cret", public_url=APP,
+                            ehr_internal_url="http://openemr.internal")
+        client = TestClient(create_app(settings, httpx.MockTransport(transport)), base_url=APP, follow_redirects=False)
+        r = client.get("/launch", params={"iss": EHR, "launch": "l"})
+        self.assertEqual(r.status_code, 302)
+        self.assertTrue(r.headers["location"].startswith("https://ehr.example.org/oauth2/"))  # the browser: public
+        q = parse_qs(urlsplit(r.headers["location"]).query)
+        client.get("/callback", params={"code": "c", "state": q["state"][0]})
+        client.get("/api/fhir/Observation")
+        self.assertTrue(seen and all(u.startswith("http://openemr.internal/") for u in seen), seen)
+        bad = client.get("/launch", params={"iss": "http://openemr.internal/apis/default/fhir", "launch": "l"})
+        self.assertEqual(bad.status_code, 400)  # launches are checked against the public base only
+
     def test_security_headers(self):
         r = self.client.get("/api/context")
         self.assertIn("frame-ancestors https://ehr.example.org", r.headers["content-security-policy"])

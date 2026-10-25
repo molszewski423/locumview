@@ -42,3 +42,4 @@ site.env
 # STIG run logs and scan results (contain host addresses)
 locumview-stig-*.log
 stig-scan-*/
+k8s/clinical/secrets/*.tmp

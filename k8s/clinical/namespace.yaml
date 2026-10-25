@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: clinical
+  labels:
+    app.kubernetes.io/part-of: locumview
+    # Pod Security Admission: baseline enforced, restricted warned and audited. OpenEMR's and MariaDB's upstream
+    # entrypoints start as root (Apache binds port 80 and drops to apache); the gateway meets restricted on its own.
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/audit: restricted

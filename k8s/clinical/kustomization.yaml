@@ -1,0 +1,36 @@
+# Non-secret resources: kubectl apply -k k8s/clinical (needs site.env, git-ignored; copy site.env.example).
+# Secrets are applied separately, decrypted in memory: sops -d k8s/clinical/secrets/<name>.sops.yaml | kubectl apply -f -
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - networkpolicy.yaml
+  - mariadb.yaml
+  - openemr.yaml
+  - gateway.yaml
+
+# The images CI built and signed (.gitea/workflows/clinical-images.yml), by digest. Updated by a commit after each
+# build that is to be deployed; verify first: cosign verify --key image/desktop/signing/cosign.pub
+# --insecure-ignore-tlog git.lan/mike/<image>@<digest>
+images:
+  - name: git.lan/mike/locumview-openemr
+    digest: sha256:0000000000000000000000000000000000000000000000000000000000000000   # set after the first CI build
+  - name: git.lan/mike/locumview-clinical-gateway
+    digest: sha256:0000000000000000000000000000000000000000000000000000000000000000   # set after the first CI build
+
+# Site values (not secret, but site-specific): read from site.env by the replacements below and never applied.
+configMapGenerator:
+  - name: site-values
+    envs: [site.env]
+    options:
+      disableNameSuffixHash: true
+      annotations: {config.kubernetes.io/local-config: "true"}
+replacements:
+  - source: {kind: ConfigMap, name: site-values, fieldPath: data.CLINICAL_NODE}
+    targets:
+      - select: {kind: StatefulSet, name: mariadb}
+        fieldPaths: ["spec.template.spec.nodeSelector.[kubernetes.io/hostname]"]
+      - select: {kind: Deployment, name: openemr}
+        fieldPaths: ["spec.template.spec.nodeSelector.[kubernetes.io/hostname]"]
+      - select: {kind: Deployment, name: gateway}
+        fieldPaths: ["spec.template.spec.nodeSelector.[kubernetes.io/hostname]"]
