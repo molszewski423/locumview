@@ -21,13 +21,9 @@ FROM guacamole_entity e,
 WHERE e.type = 'USER_GROUP' AND e.name = 'locumview-admins'
 ON CONFLICT DO NOTHING;
 
--- Users: the reference desktop. (locumview-demo gets only its own demo desktop, added with that VM.)
-INSERT INTO guacamole_connection_permission (entity_id, connection_id, permission)
-SELECT e.entity_id, c.connection_id, 'READ'
-FROM guacamole_entity e, guacamole_connection c
-WHERE e.type = 'USER_GROUP' AND e.name IN ('locumview-users', 'locumview-admins')
-  AND c.connection_name = 'locumview-ref-dev'
-ON CONFLICT DO NOTHING;
+-- Connections are granted where they are made: desktops through OpenTofu (guacamole_groups, upsert-desktop-connection.sh),
+-- the guest demo desktop to locumview-demo and locumview-admins only. The reference desktop's grant went with its
+-- connections (changelog #81).
 
 COMMIT;
 

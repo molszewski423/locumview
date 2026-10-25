@@ -1359,3 +1359,16 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   history stays) and writes the new one. Applied by the owner's `tofu.sh apply`; nothing applied yet.
 - Do not log in as the desktop's user on its console: GNOME allows one session per user, and the remote desktop
   stops working until that console session ends.
+
+## 81. Reference desktop connections removed from the login page (2026-10-25)
+
+- The owner chose to remove locumview-ref-dev's two Guacamole connections ("locumview-ref-dev" on 3390 and
+  "locumview-ref-dev (admin, GDM)" on 3389). The VM has been shut off since changelog #72 and lv-demo01 replaced it
+  (#61), so both only failed. Deleted live with `k8s/locumview/guacamole/delete-desktop-connection.sh`; session
+  history stays (its connection id is cleared).
+- `sso-groups.sql` no longer grants locumview-users and locumview-admins the reference desktop by name; desktops are
+  granted through OpenTofu (`guacamole_groups`).
+- Removed the SOPS secrets `desktop-locumview-ref-dev` and `desktop-locumview-ref-dev-demo` (RDP accounts for
+  ref-dev's ports 3390 and 3391; the "LocumView Demo" connection uses lv-demo01's secret since #61). Neither was
+  applied to the cluster. The accounts still exist on the shut-off VM.
+- The VM itself stays defined and shut off. Deleting it (and its disk) is a separate owner decision.
