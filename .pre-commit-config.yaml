@@ -35,6 +35,20 @@ repos:
         pass_filenames: false
         files: ^(packaging/rpm/|image/desktop/Containerfile$|\.gitea/workflows/(rpms|image)\.yml$)
 
+      - id: scenario-cases
+        name: Phase 9 lite scenario library (case format locumview-case/1)
+        entry: python3 clinical/scenarios/check_cases.py
+        language: system
+        pass_filenames: false
+        files: ^clinical/scenarios/
+
+      - id: scenario-checker-tests
+        name: Scenario checker refuses invalid cases
+        entry: python3 clinical/scenarios/test_check_cases.py
+        language: system
+        pass_filenames: false
+        files: ^clinical/scenarios/
+
       - id: sops-encrypted
         name: SOPS files are encrypted (ADR 0003)
         entry: python3 scripts/check-sops-encrypted.py
