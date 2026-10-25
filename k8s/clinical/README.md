@@ -18,6 +18,7 @@ OpenEMR 8.4.1 with LocumView's fix (`clinical/images/openemr/`), MariaDB, and th
 
 1. `cp k8s/clinical/site.env.example k8s/clinical/site.env` and set `CLINICAL_NODE` (node2's node name).
 2. Create the database secret (database and administrator credentials) with `scripts/clinical/make-db-secret.sh`, commit the encrypted file, then
+   create the namespace and apply the Secret into it: `kubectl apply -f k8s/clinical/namespace.yaml`, then
    `sops -d k8s/clinical/secrets/clinical-db.sops.yaml | kubectl apply -f -`.
 3. `scripts/clinical/verify-images.sh` (needs cosign) verifies the signature and SBOM attestation of every image
    pinned in `kustomization.yaml`; only when it reports all verified, `kubectl apply -k k8s/clinical`.
