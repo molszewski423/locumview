@@ -51,7 +51,7 @@ the options in `docs/evidence/clinical/20261025-openemr-m1-spike/`.
 ### M2. Scenario library v0 and its loader
 
 **In progress** (changelog #73, #74): format, checker, loader and 14 cases (7 findings, 5 negative controls, 2 ambiguous) in
-`clinical/scenarios/`; 13 approved in the owner's clinical review, one revised case awaiting it. Synthea background patients not yet added.
+`clinical/scenarios/`; all approved in the owner's clinical review. Synthea background patients not yet added.
 
 - 10 to 20 hand-built synthetic cases, each a versioned file in this repository, with: patient story, data to load,
   **expected findings** (or none, for a negative control), **clinical rationale**, **guideline citations**, a

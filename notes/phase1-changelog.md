@@ -1237,7 +1237,7 @@ meningitis at 48 with alcohol use disorder (negative control).
 - **Owner clinical review (2026-10-25):** the cases look good, with one correction: alcohol use disorder is not a
   risk factor that calls for Listeria coverage. The 48-year-old case was drafted as ambiguous on that premise; it is
   now a negative control (`meningitis-alcohol-negative-01`), and the age-35 case no longer implies that alcohol
-  matters. The other 13 cases are `approved`; the converted case is `pending` until the owner sees its new text.
+  matters. All 14 are `approved`; the owner approved the converted case's new text separately.
 
 - **Codes and references:** new RxNorm, LOINC (nine staphylococcal MIC tests) and SNOMED CT codes (MSSA 417943000)
   checked against RxNav, loinc.org and tx.fhir.org; four guidelines added to `citations.json` from PubMed (IDSA 2009
@@ -1250,4 +1250,4 @@ meningitis at 48 with alcohol use disorder (negative control).
 - **Verified:** checker 14 cases ok, 17 checker tests pass; fresh instance, all 14 loaded in about a minute; a second
   load skipped all and left counts unchanged; FHIR read-back of routes, stopped prescriptions (`completed`), pending
   orders and organisms checked. The local instance was destroyed afterwards.
-- **Open:** the owner's look at the converted meningitis case, Synthea background patients, then M3.
+- **Open:** Synthea background patients, then M3. `check_cases.py --require-approved` now passes for the whole library.

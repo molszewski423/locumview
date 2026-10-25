@@ -12,7 +12,10 @@
     "author": "Claude Code (draft for owner review), converted from an ambiguous case on the owner's correction",
     "created": "2026-10-25",
     "clinical_review": {
-      "status": "pending"
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-10-25",
+      "notes": "Owner clinical review: revised text approved after conversion to a negative control."
     }
   },
   "story": "A 48-year-old man with alcohol use disorder presents with fever, headache and neck stiffness; CSF shows a neutrophilic pleocytosis with low glucose. Empiric vancomycin, ceftriaxone and dexamethasone are started; cultures are pending. Ampicillin is not ordered; he is not immunocompromised.",
