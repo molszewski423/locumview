@@ -1415,3 +1415,16 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   than ansible-core 2.21.5 supports (`module 'dataclasses' has no attribute '_is_type'`). The hook now sets
   `always_run: false`, so it runs only when Ansible content changes. Linting `hardening/` on that laptop still needs
   an ansible-core release that supports 3.15; other machines are unaffected. No hook was skipped or bypassed.
+
+## 84. Clinical OpenEMR: restore the default site on an empty volume (2026-10-25)
+
+- Owner run step 3 (`kubectl apply -k k8s/clinical`): MariaDB came up; OpenEMR went into CrashLoopBackOff with
+  `Upgrade detected: 0 -> 15` and `Error: Cannot upgrade - OpenEMR is not configured yet`. Its `sites/` volume (PVC
+  `openemr-sites`, local-path) starts empty, so the image's default site files and `docker-version` were not there.
+  The M1 spike did not show this: `podman kube play` fills an empty volume from the image, Kubernetes does not.
+- `k8s/clinical/openemr.yaml` sets `SWARM_MODE=yes`. The single replica becomes the leader, and upstream's
+  `openemr.sh` restores `sites/` from the image's `/swarm-pieces` when `sites/default` is missing, then installs as
+  before. It takes over the stale leader marker the failed starts left on the volume.
+- Reproduced on a workstation with the same upstream image (pinned digest) and an empty bind-mounted `sites/`:
+  without the variable, the same error; with it, `Restoring empty .../sites directory...`, then the upgrade and
+  configuration checks pass. Images and digests are unchanged.
