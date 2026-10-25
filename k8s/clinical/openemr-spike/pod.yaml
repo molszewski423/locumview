@@ -1,0 +1,50 @@
+# Phase 9 lite M1 spike: a disposable OpenEMR on an operator workstation (podman kube play), not a cluster
+# workload. Storage is emptyDir, so every run starts from an empty database; ports are bound to 127.0.0.1 only.
+# The database passwords come from the Secret openemr-spike-db, which clinical/spike/run.sh generates at random
+# for each run and never writes to the repository. Run it with clinical/spike/run.sh, not directly.
+#
+# Images pinned by digest. OpenEMR 8.4.1 (newest release, 2026-09-20) ships PHP 8.5.12, the release with the
+# fixes for CVE-2026-109618 and CVE-2026-109619 (changelog #64). MariaDB is the digest OpenEMR 8.4.1's own
+# docker/production/docker-compose.yml pins.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: openemr-spike
+  labels:
+    app: openemr-spike
+spec:
+  restartPolicy: Never
+  containers:
+    - name: db
+      image: docker.io/library/mariadb@sha256:dd9b303aed4f4890ed09f766d8ca9ddfd176c0c6f6267feff53b3192ec65a979
+      args: ["mariadbd", "--character-set-server=utf8mb4"]
+      env:
+        - name: MARIADB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef: {name: openemr-spike-db, key: root}
+      resources:
+        limits: {memory: 768Mi}
+      volumeMounts:
+        - {name: db, mountPath: /var/lib/mysql}
+    - name: openemr
+      image: docker.io/openemr/openemr@sha256:786e7dd867ba82db408a56c9c0cf7336cfa7ac24644c9354bdd8a5a194e83c55
+      # MariaDB's first boot runs a temporary server without networking; OpenEMR's installer must wait for the
+      # real one (its compose file uses a health-check dependency, which a pod does not have).
+      command: ["sh", "-c", "until nc -w 1 127.0.0.1 3306 </dev/null >/dev/null 2>&1; do sleep 2; done; exec ./openemr.sh"]
+      env:
+        # Both containers share the pod's network namespace.
+        - {name: MYSQL_HOST, value: "127.0.0.1"}
+        - {name: MYSQL_ROOT_PASS, valueFrom: {secretKeyRef: {name: openemr-spike-db, key: root}}}
+        - {name: MYSQL_USER, value: openemr}
+        - {name: MYSQL_PASS, valueFrom: {secretKeyRef: {name: openemr-spike-db, key: openemr}}}
+        - {name: OE_USER, value: spike-admin}
+        - {name: OE_PASS, valueFrom: {secretKeyRef: {name: openemr-spike-db, key: admin}}}
+      ports:
+        - {containerPort: 443, hostPort: 18443, hostIP: 127.0.0.1}
+      resources:
+        limits: {memory: 1280Mi}
+      volumeMounts:
+        - {name: sites, mountPath: /var/www/localhost/htdocs/openemr/sites}
+  volumes:
+    - {name: db, emptyDir: {}}
+    - {name: sites, emptyDir: {}}

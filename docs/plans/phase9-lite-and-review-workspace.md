@@ -1,12 +1,12 @@
 # Plan: Phase 9 lite and the Clinical Review Workspace
 
-Status: **Planned**, nothing built. Written 2026-10-22. Phase 4 (packaging and supply chain) stays the current
-priority; nothing in this plan starts before it is done. Decisions: ADR 0017 (and its update of 2026-10-22),
+Status: **In progress**. Written 2026-10-22. Phase 4's core release milestone is Done (changelog #70); M1, the
+OpenEMR spike, is Done (changelog #72) and M2 waits on the owner's microbiology data-path decision (section 9). Decisions: ADR 0017 (and its update of 2026-10-22),
 ADR 0018. Data rules: `docs/policy/synthetic-data-and-independence.md`. Status of record: ROADMAP.md.
 
 ## 1. Sequence
 
-1. **Phase 4**, packaging and supply chain (In progress).
+1. **Phase 4**, packaging and supply chain (core release milestone Done, changelog #70).
 2. **Phase 9 lite**, the clinical AI demo, ending with a frozen evaluation build (Planned; this plan, milestones M1 to
    M6).
 3. **Phase 8 lite**, the demo video and first write-ups (Planned).
@@ -27,9 +27,10 @@ As defined by the release sequence in `notes/release-integrity-report.md` and RO
 
 ### M1. Spike: a scenario in and microbiology out of OpenEMR
 
-The first task after Phase 4. No UI work.
+The first task after Phase 4. No UI work. **Done 2026-10-25** (changelog #72): (a) met, (b) partly met; evidence and
+the options in `docs/evidence/clinical/20261025-openemr-m1-spike/`.
 
-- **Pinned:** an OpenEMR release (8.0.0 is current as of 2026-10-22; use the newest at the time), on a PHP release
+- **Pinned:** an OpenEMR release (8.0.0 was current on 2026-10-22; the spike used 8.4.1, the newest release, on PHP 8.5.12), on a PHP release
   with the fixes for CVE-2026-109618 and CVE-2026-109619 (changelog #64), deployed from manifests in this repository.
 - **(a) Reproducible load:** one scenario with a patient, an encounter, medications, basic labs, a blood or urine
   culture with an organism and an antibiotic susceptibility panel, loaded by a script from a file in this repository.
@@ -339,7 +340,7 @@ For the build log on locumview.com, in order, each shown as Planned until done:
 ## 9. Open decisions for the owner
 
 1. **Product naming:** is ADR 0017's app "AMS Intelligence", or is AMS Intelligence one module within it?
-2. **Microbiology data path** if the M1 spike shows that cultures and susceptibilities do not round-trip through
-   OpenEMR.
+2. **Microbiology data path**: the M1 spike found that cultures and susceptibilities round-trip only partly; the
+   four options and their trade-offs are in `docs/evidence/clinical/20261025-openemr-m1-spike/README.md`.
 3. **Reviewer delivery:** VDI (ADR 0018's design) or the browser-only fallback, per round.
 4. **Legal questions** 5 and 6 in `docs/legal/questions-for-a-lawyer.md`, before M8.

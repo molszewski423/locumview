@@ -1,0 +1,70 @@
+{
+  "id": "m1-spike-01",
+  "version": "0.1.0",
+  "provenance": {
+    "source": "synthetic",
+    "author": "LocumView (Claude Code, for owner review)",
+    "created": "2026-10-25",
+    "note": "Hand-built for the Phase 9 lite M1 spike only: tests loading and FHIR read-back, not clinical rules. No real patient, employer or institution data."
+  },
+  "story": "A 68-year-old woman admitted with acute pyelonephritis, started on IV ceftriaxone. On day 3 the urine culture grows E. coli with an ESBL-like pattern: ceftriaxone resistant, cefepime susceptible-dose dependent, carbapenems susceptible.",
+  "patient": {
+    "family": "Spikeone",
+    "given": "Synthia",
+    "birth_date": "1958-03-14",
+    "sex": "female"
+  },
+  "encounter": {
+    "class_code": "IMP",
+    "start": "2026-10-20 14:00:00",
+    "reason": "Fever, flank pain, dysuria"
+  },
+  "problems": [
+    {"title": "Acute pyelonephritis", "diagnosis": "ICD10:N10", "begdate": "2026-10-20"}
+  ],
+  "prescriptions": [
+    {
+      "drug": "ceftriaxone 1000 MG Injection",
+      "rxnorm_drugcode": "1665021",
+      "start_date": "2026-10-20",
+      "route": "IV",
+      "drug_dosage_instructions": "1 g IV every 24 hours"
+    }
+  ],
+  "lab": {
+    "name": "Spike Reference Laboratory",
+    "order_date": "2026-10-20 14:30:00",
+    "chemistry": {
+      "order_code": "SPIKE-BMP",
+      "order_text": "Basic labs",
+      "collected": "2026-10-20 15:00:00",
+      "resulted": "2026-10-20 16:05:00",
+      "results": [
+        {"loinc": "2160-0", "text": "Creatinine [Mass/volume] in Serum or Plasma", "value": "1.1", "units": "mg/dL", "range": "0.5-1.0", "flag": "H"},
+        {"loinc": "6690-2", "text": "Leukocytes [#/volume] in Blood by Automated count", "value": "14.2", "units": "10*3/uL", "range": "4.0-11.0", "flag": "H"}
+      ]
+    },
+    "culture": {
+      "order_code": "630-4",
+      "order_text": "Bacteria identified in Urine by Culture",
+      "specimen": {"snomed": "122575003", "text": "Urine specimen"},
+      "collected": "2026-10-20 15:10:00",
+      "resulted": "2026-10-22 09:40:00",
+      "organism": {"snomed": "112283007", "text": "Escherichia coli"},
+      "colony_count": {"loinc": "19090-0", "text": "Colony count [#/volume] in Urine", "value": ">100000", "units": "CFU/mL"},
+      "susceptibilities": [
+        {"loinc": "28-1", "drug": "Ampicillin", "mic": ">=32", "units": "ug/mL", "interpretation": "R"},
+        {"loinc": "32-3", "drug": "Ampicillin+Sulbactam", "mic": "16", "units": "ug/mL", "interpretation": "I"},
+        {"loinc": "412-7", "drug": "Piperacillin+Tazobactam", "mic": "<=4", "units": "ug/mL", "interpretation": "S"},
+        {"loinc": "141-2", "drug": "Ceftriaxone", "mic": ">=64", "units": "ug/mL", "interpretation": "R"},
+        {"loinc": "6644-9", "drug": "Cefepime", "mic": "4", "units": "ug/mL", "interpretation": "SDD"},
+        {"loinc": "35801-0", "drug": "Ertapenem", "mic": "<=0.25", "units": "ug/mL", "interpretation": "S"},
+        {"loinc": "6652-2", "drug": "Meropenem", "mic": "<=0.25", "units": "ug/mL", "interpretation": "S"},
+        {"loinc": "185-9", "drug": "Ciprofloxacin", "mic": ">=4", "units": "ug/mL", "interpretation": "R"},
+        {"loinc": "516-5", "drug": "Trimethoprim+Sulfamethoxazole", "mic": ">=320", "units": "ug/mL", "interpretation": "R"},
+        {"loinc": "363-2", "drug": "Nitrofurantoin", "mic": "<=16", "units": "ug/mL", "interpretation": "S"},
+        {"loinc": "267-5", "drug": "Gentamicin", "mic": "<=1", "units": "ug/mL", "interpretation": "S"}
+      ]
+    }
+  }
+}
