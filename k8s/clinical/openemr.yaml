@@ -36,6 +36,11 @@ spec:
           # MariaDB's first boot runs a temporary server without networking; OpenEMR's installer waits for the real one.
           command: ["sh", "-c", "until nc -w 1 mariadb 3306 </dev/null >/dev/null 2>&1; do sleep 2; done; exec ./openemr.sh"]
           env:
+            # A Kubernetes volume starts empty, unlike a podman or Docker volume, which is filled from the image (the
+            # M1 spike). Without the default site files, openemr.sh reads docker-version 0, tries an upgrade and
+            # exits ("Cannot upgrade - OpenEMR is not configured yet"). Swarm mode makes this one replica the leader,
+            # which restores sites/ from the image's /swarm-pieces when it is empty and leaves it alone afterwards.
+            - {name: SWARM_MODE, value: "yes"}
             - {name: MYSQL_HOST, value: mariadb}
             - {name: MYSQL_ROOT_PASS, valueFrom: {secretKeyRef: {name: clinical-db, key: root}}}
             - {name: MYSQL_USER, value: openemr}
