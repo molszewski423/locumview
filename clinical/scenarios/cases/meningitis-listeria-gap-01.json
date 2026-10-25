@@ -4,57 +4,171 @@
   "version": "0.1.0",
   "title": "Suspected bacterial meningitis at 67 on vancomycin and ceftriaxone, without ampicillin",
   "kind": "finding",
-  "modules": ["stewardship"],
+  "modules": [
+    "stewardship"
+  ],
   "provenance": {
     "source": "synthetic",
     "author": "Claude Code (draft for owner review), scenario requested by the owner",
     "created": "2026-10-25",
-    "clinical_review": {"status": "pending"}
+    "clinical_review": {
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-10-25",
+      "notes": "Owner clinical review: cases look good."
+    }
   },
   "story": "A 67-year-old woman presents with fever, severe headache, neck stiffness and new confusion. Lumbar puncture shows a neutrophilic pleocytosis with low glucose and high protein. Empiric vancomycin, ceftriaxone 2 g every 12 hours and dexamethasone are started; CSF and blood cultures are pending. Ampicillin is not ordered.",
-  "patient": {"family": "Casebook", "given": "Edith", "birth_date": "1959-02-17", "sex": "female"},
-  "encounter": {"class_code": "IMP", "start": "2026-10-24T21:15:00-04:00", "reason": "Fever, headache, neck stiffness, confusion"},
-  "problems": [{"title": "Suspected acute bacterial meningitis", "diagnosis": "ICD10:G00.9", "begdate": "2026-10-24"}],
+  "patient": {
+    "family": "Casebook",
+    "given": "Edith",
+    "birth_date": "1959-02-17",
+    "sex": "female"
+  },
+  "encounter": {
+    "class_code": "IMP",
+    "start": "2026-10-24T21:15:00-04:00",
+    "reason": "Fever, headache, neck stiffness, confusion"
+  },
+  "problems": [
+    {
+      "title": "Suspected acute bacterial meningitis",
+      "diagnosis": "ICD10:G00.9",
+      "begdate": "2026-10-24"
+    }
+  ],
   "prescriptions": [
-    {"drug": "vancomycin 1000 MG Injection", "rxnorm": "1807513", "start": "2026-10-24", "route": "IV",
-     "instructions": "Loading dose then 15 to 20 mg/kg IV every 8 to 12 hours, pharmacy to dose"},
-    {"drug": "ceftriaxone 2000 MG Injection", "rxnorm": "1665046", "start": "2026-10-24", "route": "IV",
-     "instructions": "2 g IV every 12 hours"},
-    {"drug": "dexamethasone phosphate 10 MG/ML Injectable Solution", "rxnorm": "309696", "start": "2026-10-24", "route": "IV",
-     "instructions": "10 mg IV every 6 hours, first dose with or before the first antibiotic dose"}
+    {
+      "drug": "vancomycin 1000 MG Injection",
+      "rxnorm": "1807513",
+      "start": "2026-10-24",
+      "route": "IV",
+      "instructions": "Loading dose then 15 to 20 mg/kg IV every 8 to 12 hours, pharmacy to dose"
+    },
+    {
+      "drug": "ceftriaxone 2000 MG Injection",
+      "rxnorm": "1665046",
+      "start": "2026-10-24",
+      "route": "IV",
+      "instructions": "2 g IV every 12 hours"
+    },
+    {
+      "drug": "dexamethasone phosphate 10 MG/ML Injectable Solution",
+      "rxnorm": "309696",
+      "start": "2026-10-24",
+      "route": "IV",
+      "instructions": "10 mg IV every 6 hours, first dose with or before the first antibiotic dose"
+    }
   ],
   "vitals": [
-    {"taken": "2026-10-24T21:25:00-04:00", "temperature_f": 102.9, "pulse": 112, "bps": 138, "bpd": 82, "respiration": 20, "oxygen_saturation": 96}
+    {
+      "taken": "2026-10-24T21:25:00-04:00",
+      "temperature_f": 102.9,
+      "pulse": 112,
+      "bps": 138,
+      "bpd": 82,
+      "respiration": 20,
+      "oxygen_saturation": 96
+    }
   ],
   "labs": [
-    {"order_code": "LV-BMP", "order_text": "Basic labs", "collected": "2026-10-24T21:40:00-04:00",
-     "resulted": "2026-10-24T22:30:00-04:00", "results": [
-       {"loinc": "2160-0", "text": "Creatinine [Mass/volume] in Serum or Plasma", "value": "0.9", "units": "mg/dL", "range": "0.5-1.0", "flag": "N"},
-       {"loinc": "6690-2", "text": "Leukocytes [#/volume] in Blood by Automated count", "value": "17.6", "units": "10*3/uL", "range": "4.0-11.0", "flag": "H"}
-     ]},
-    {"order_code": "LV-CSF", "order_text": "CSF cell count, glucose and protein", "collected": "2026-10-24T22:20:00-04:00",
-     "resulted": "2026-10-24T23:35:00-04:00", "results": [
-       {"loinc": "806-0", "text": "Leukocytes [#/volume] in Cerebrospinal Fluid by Manual count", "value": "1450", "units": "/uL", "range": "0-5", "flag": "H"},
-       {"loinc": "2342-4", "text": "Glucose [Mass/volume] in Cerebrospinal Fluid", "value": "28", "units": "mg/dL", "range": "40-70", "flag": "L"},
-       {"loinc": "2880-3", "text": "Protein [Mass/volume] in Cerebrospinal Fluid", "value": "210", "units": "mg/dL", "range": "15-45", "flag": "H"}
-     ]}
+    {
+      "order_code": "LV-BMP",
+      "order_text": "Basic labs",
+      "collected": "2026-10-24T21:40:00-04:00",
+      "resulted": "2026-10-24T22:30:00-04:00",
+      "results": [
+        {
+          "loinc": "2160-0",
+          "text": "Creatinine [Mass/volume] in Serum or Plasma",
+          "value": "0.9",
+          "units": "mg/dL",
+          "range": "0.5-1.0",
+          "flag": "N"
+        },
+        {
+          "loinc": "6690-2",
+          "text": "Leukocytes [#/volume] in Blood by Automated count",
+          "value": "17.6",
+          "units": "10*3/uL",
+          "range": "4.0-11.0",
+          "flag": "H"
+        }
+      ]
+    },
+    {
+      "order_code": "LV-CSF",
+      "order_text": "CSF cell count, glucose and protein",
+      "collected": "2026-10-24T22:20:00-04:00",
+      "resulted": "2026-10-24T23:35:00-04:00",
+      "results": [
+        {
+          "loinc": "806-0",
+          "text": "Leukocytes [#/volume] in Cerebrospinal Fluid by Manual count",
+          "value": "1450",
+          "units": "/uL",
+          "range": "0-5",
+          "flag": "H"
+        },
+        {
+          "loinc": "2342-4",
+          "text": "Glucose [Mass/volume] in Cerebrospinal Fluid",
+          "value": "28",
+          "units": "mg/dL",
+          "range": "40-70",
+          "flag": "L"
+        },
+        {
+          "loinc": "2880-3",
+          "text": "Protein [Mass/volume] in Cerebrospinal Fluid",
+          "value": "210",
+          "units": "mg/dL",
+          "range": "15-45",
+          "flag": "H"
+        }
+      ]
+    }
   ],
   "cultures": [
-    {"order_code": "606-4", "order_text": "Bacteria identified in Cerebrospinal Fluid by Culture",
-     "specimen": {"snomed": "258450006", "text": "Cerebrospinal fluid specimen"},
-     "collected": "2026-10-24T22:20:00-04:00", "status": "pending"},
-    {"order_code": "600-7", "order_text": "Bacteria identified in Blood by Culture",
-     "specimen": {"snomed": "119297000", "text": "Blood specimen"},
-     "collected": "2026-10-24T21:40:00-04:00", "status": "pending"}
+    {
+      "order_code": "606-4",
+      "order_text": "Bacteria identified in Cerebrospinal Fluid by Culture",
+      "specimen": {
+        "snomed": "258450006",
+        "text": "Cerebrospinal fluid specimen"
+      },
+      "collected": "2026-10-24T22:20:00-04:00",
+      "status": "pending"
+    },
+    {
+      "order_code": "600-7",
+      "order_text": "Bacteria identified in Blood by Culture",
+      "specimen": {
+        "snomed": "119297000",
+        "text": "Blood specimen"
+      },
+      "collected": "2026-10-24T21:40:00-04:00",
+      "status": "pending"
+    }
   ],
   "expected_findings": [
-    {"module": "stewardship", "type": "missing-empiric-coverage", "drug": "Ampicillin",
-     "summary": "Empiric therapy for suspected bacterial meningitis in a patient over 50 lacks ampicillin: cephalosporins and vancomycin do not cover Listeria monocytogenes."}
+    {
+      "module": "stewardship",
+      "type": "missing-empiric-coverage",
+      "drug": "Ampicillin",
+      "summary": "Empiric therapy for suspected bacterial meningitis in a patient over 50 lacks ampicillin: cephalosporins and vancomycin do not cover Listeria monocytogenes."
+    }
   ],
   "reference_answer": "Add ampicillin 2 g IV every 4 hours (adjusted for renal function) to vancomycin, ceftriaxone and dexamethasone until cultures exclude Listeria. With a serious penicillin allergy, trimethoprim-sulfamethoxazole is the usual alternative for Listeria coverage. Narrow therapy once CSF and blood cultures and Gram stain results return.",
   "rationale": "Adults older than 50 have a higher risk of Listeria monocytogenes meningitis, which is intrinsically resistant to cephalosporins. IDSA and ESCMID empiric regimens for this age group add ampicillin (or amoxicillin) to vancomycin and a third-generation cephalosporin. The finding rests on age, the working diagnosis and the absence of an ampicillin order; no culture result is needed, so it should fire while cultures are still pending.",
   "citations": [
-    {"ref": "idsa-meningitis-2004", "supports": "Empiric therapy for bacterial meningitis in adults over 50: vancomycin plus ampicillin plus a third-generation cephalosporin; dexamethasone."},
-    {"ref": "escmid-meningitis-2016", "supports": "Empiric amoxicillin or ampicillin for Listeria in adults over 50, added to a third-generation cephalosporin."}
+    {
+      "ref": "idsa-meningitis-2004",
+      "supports": "Empiric therapy for bacterial meningitis in adults over 50: vancomycin plus ampicillin plus a third-generation cephalosporin; dexamethasone."
+    },
+    {
+      "ref": "escmid-meningitis-2016",
+      "supports": "Empiric amoxicillin or ampicillin for Listeria in adults over 50, added to a third-generation cephalosporin."
+    }
   ]
 }

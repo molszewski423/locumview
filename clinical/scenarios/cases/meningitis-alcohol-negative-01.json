@@ -1,21 +1,21 @@
 {
   "schema": "locumview-case/1",
-  "id": "meningitis-alcohol-ambiguous-01",
+  "id": "meningitis-alcohol-negative-01",
   "version": "0.1.0",
-  "title": "Suspected bacterial meningitis at 48 with alcohol use disorder, without ampicillin",
-  "kind": "ambiguous",
+  "title": "Suspected bacterial meningitis at 48 with alcohol use disorder, on vancomycin and ceftriaxone without ampicillin",
+  "kind": "negative-control",
   "modules": [
     "stewardship"
   ],
   "provenance": {
     "source": "synthetic",
-    "author": "Claude Code (draft for owner review), case list approved by the owner",
+    "author": "Claude Code (draft for owner review), converted from an ambiguous case on the owner's correction",
     "created": "2026-10-25",
     "clinical_review": {
       "status": "pending"
     }
   },
-  "story": "A 48-year-old man with alcohol use disorder presents with fever, headache and neck stiffness; CSF shows a neutrophilic pleocytosis with low glucose. Empiric vancomycin, ceftriaxone and dexamethasone are started; cultures are pending. Ampicillin is not ordered.",
+  "story": "A 48-year-old man with alcohol use disorder presents with fever, headache and neck stiffness; CSF shows a neutrophilic pleocytosis with low glucose. Empiric vancomycin, ceftriaxone and dexamethasone are started; cultures are pending. Ampicillin is not ordered; he is not immunocompromised.",
   "patient": {
     "family": "Casebook",
     "given": "Ned",
@@ -153,28 +153,13 @@
       "status": "pending"
     }
   ],
-  "expected_findings": [
-    {
-      "module": "stewardship",
-      "type": "missing-empiric-coverage",
-      "drug": "Ampicillin",
-      "summary": "Under 50, but alcohol use disorder is listed by some guidelines as a Listeria risk factor; consider ampicillin."
-    }
-  ],
-  "acceptable_answers": [
-    "Add ampicillin 2 g IV every 4 hours until cultures exclude Listeria, treating alcohol use disorder as a risk factor.",
-    "Continue without ampicillin: under 50 and not immunocompromised in the IDSA sense; reassess when the Gram stain and cultures return."
-  ],
-  "reference_answer": "Raise Listeria coverage as a consideration rather than an error, citing the risk factor; either adding ampicillin or continuing with close review of early microbiology is defensible.",
-  "rationale": "An ambiguous case at the age boundary. IDSA bases empiric ampicillin on age over 50 and immunocompromise; ESCMID adds risk factors such as alcoholism. The rule should present the consideration, not assert a mistake.",
+  "expected_findings": [],
+  "reference_answer": "No intervention. Vancomycin plus a third-generation cephalosporin with dexamethasone is the empiric regimen for an adult under 50 who is not immunocompromised; alcohol use disorder is not an indication for empiric ampicillin. Narrow therapy when cultures return.",
+  "rationale": "A negative control at the age boundary: under 50, not immunocompromised, with alcohol use disorder. Alcohol use disorder is not a risk factor that calls for Listeria coverage (owner's clinical review, 2026-10-25). A rule that adds ampicillin for comorbidities other than age and immunocompromise fails this case.",
   "citations": [
     {
       "ref": "idsa-meningitis-2004",
       "supports": "Empiric therapy by age and risk: ampicillin added for adults over 50 and the immunocompromised."
-    },
-    {
-      "ref": "escmid-meningitis-2016",
-      "supports": "Empiric amoxicillin or ampicillin for Listeria by age and risk factors, added to a third-generation cephalosporin."
     }
   ]
 }

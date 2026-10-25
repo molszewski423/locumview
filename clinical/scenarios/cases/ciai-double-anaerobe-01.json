@@ -12,7 +12,10 @@
     "author": "Claude Code (draft for owner review), case list approved by the owner",
     "created": "2026-10-25",
     "clinical_review": {
-      "status": "pending"
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-10-25",
+      "notes": "Owner clinical review: cases look good."
     }
   },
   "story": "A 41-year-old man has a laparoscopic appendectomy for perforated appendicitis with localized peritonitis. He is started on piperacillin-tazobactam and metronidazole. Source control is adequate and he is improving on postoperative day 1.",

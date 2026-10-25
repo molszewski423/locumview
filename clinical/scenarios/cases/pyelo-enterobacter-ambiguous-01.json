@@ -13,7 +13,10 @@
     "author": "Claude Code (draft for owner review), case list approved by the owner",
     "created": "2026-10-25",
     "clinical_review": {
-      "status": "pending"
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-10-25",
+      "notes": "Owner clinical review: cases look good."
     }
   },
   "story": "A 55-year-old woman with acute pyelonephritis is on IV ceftriaxone, hospital day 3, afebrile for 24 hours and eating. Urine grows Enterobacter cloacae complex susceptible to ceftriaxone, cefepime, trimethoprim-sulfamethoxazole and ciprofloxacin; blood cultures show no growth so far (final report pending).",

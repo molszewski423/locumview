@@ -12,10 +12,13 @@
     "author": "Claude Code (draft for owner review), case list approved by the owner",
     "created": "2026-10-25",
     "clinical_review": {
-      "status": "pending"
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-10-25",
+      "notes": "Owner clinical review: cases look good."
     }
   },
-  "story": "A previously healthy 35-year-old man presents with fever, headache and neck stiffness; CSF shows a neutrophilic pleocytosis with low glucose. He is not immunocompromised, pregnant, or a heavy alcohol user. Empiric vancomycin, ceftriaxone 2 g every 12 hours and dexamethasone are started; cultures are pending.",
+  "story": "A previously healthy 35-year-old man presents with fever, headache and neck stiffness; CSF shows a neutrophilic pleocytosis with low glucose. He is not immunocompromised or pregnant. Empiric vancomycin, ceftriaxone 2 g every 12 hours and dexamethasone are started; cultures are pending.",
   "patient": {
     "family": "Casebook",
     "given": "Gil",

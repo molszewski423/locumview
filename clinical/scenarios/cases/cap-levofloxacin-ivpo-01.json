@@ -13,7 +13,10 @@
     "author": "Claude Code (draft for owner review), case list approved by the owner",
     "created": "2026-10-25",
     "clinical_review": {
-      "status": "pending"
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-10-25",
+      "notes": "Owner clinical review: cases look good."
     }
   },
   "story": "A 59-year-old man admitted with community-acquired pneumonia is on IV levofloxacin 750 mg daily, hospital day 3. He has been afebrile for 48 hours, eats normally, and his heart rate, respiratory rate and oxygen saturation on room air are normal.",

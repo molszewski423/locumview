@@ -39,7 +39,8 @@ class CheckerTests(unittest.TestCase):
         self.assertRefused(lambda c: c["provenance"].update(source="ehr-extract"), "must be 'synthetic'")
 
     def test_evaluation_build_refuses_unreviewed_case(self):
-        self.assertRefused(lambda c: None, "not approved", require_approved=True)
+        self.assertRefused(lambda c: c["provenance"].update(clinical_review={"status": "pending"}), "not approved",
+                           require_approved=True)
         approved = {"status": "approved", "by": "owner", "date": "2026-10-26"}
         self.assertEqual(self.errors(lambda c: c["provenance"].update(clinical_review=approved), True), [])
 

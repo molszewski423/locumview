@@ -1226,14 +1226,18 @@ Plan M2, on stock OpenEMR with one organism per culture (the owner's M1 decision
   every case, and Synthea background patients. Lab ServiceRequests stay `active` after results in OpenEMR; the rules
   must read results. The local instance was destroyed after the checks.
 
-## 74. Phase 9 lite M2: nine more cases, route coding fix (2026-10-25, In progress)
+## 74. Phase 9 lite M2: nine more cases, route coding fix, owner clinical review (2026-10-25, In progress)
 
-The nine cases the owner approved from the proposed list, bringing the library to 14 (7 findings, 4 negative
-controls, 3 ambiguous): Enterobacter cystitis on ceftriaxone and meningitis at 35 without ampicillin (negative pairs
+The nine cases the owner approved from the proposed list, bringing the library to 14 (7 findings, 5 negative
+controls, 2 ambiguous): Enterobacter cystitis on ceftriaxone and meningitis at 35 without ampicillin (negative pairs
 of the AmpC and Listeria cases), MSSA bacteremia on cefazolin (negative) and on vancomycin (de-escalation),
 piperacillin-tazobactam plus metronidazole (redundant anaerobic coverage), IV levofloxacin in stable pneumonia
-(IV to PO), cellulitis on day 12 (duration review), Enterobacter pyelonephritis on ceftriaxone and meningitis at 48
-with alcohol use disorder (ambiguous). All `clinical_review: pending`.
+(IV to PO), cellulitis on day 12 (duration review), Enterobacter pyelonephritis on ceftriaxone (ambiguous), and
+meningitis at 48 with alcohol use disorder (negative control).
+- **Owner clinical review (2026-10-25):** the cases look good, with one correction: alcohol use disorder is not a
+  risk factor that calls for Listeria coverage. The 48-year-old case was drafted as ambiguous on that premise; it is
+  now a negative control (`meningitis-alcohol-negative-01`), and the age-35 case no longer implies that alcohol
+  matters. The other 13 cases are `approved`; the converted case is `pending` until the owner sees its new text.
 
 - **Codes and references:** new RxNorm, LOINC (nine staphylococcal MIC tests) and SNOMED CT codes (MSSA 417943000)
   checked against RxNav, loinc.org and tx.fhir.org; four guidelines added to `citations.json` from PubMed (IDSA 2009
@@ -1246,5 +1250,4 @@ with alcohol use disorder (ambiguous). All `clinical_review: pending`.
 - **Verified:** checker 14 cases ok, 17 checker tests pass; fresh instance, all 14 loaded in about a minute; a second
   load skipped all and left counts unchanged; FHIR read-back of routes, stopped prescriptions (`completed`), pending
   orders and organisms checked. The local instance was destroyed afterwards.
-- **Open:** the owner's clinical review of all 14 cases (two cited guidelines postdate the drafting agent's
-  knowledge), Synthea background patients, then M3.
+- **Open:** the owner's look at the converted meningitis case, Synthea background patients, then M3.

@@ -13,7 +13,10 @@
     "author": "Claude Code (draft for owner review), case list approved by the owner",
     "created": "2026-10-25",
     "clinical_review": {
-      "status": "pending"
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-10-25",
+      "notes": "Owner clinical review: cases look good."
     }
   },
   "story": "A 47-year-old woman admitted with nonpurulent cellulitis of the lower leg received IV cefazolin for 2 days, then oral cephalexin. On day 12 of antibiotics the erythema and warmth have resolved and she is afebrile; cephalexin has no stop date.",
