@@ -1,0 +1,29 @@
+OpenEMR 8.4.1: SMART EHR launch with patient context always fails the user-to-patient access check.
+
+BearerTokenAuthorizationStrategy::populateTokenContextForRequest passes getRequestUserId() (an integer) to
+checkUserHasAccessToPatient(), which requires a UUID string, so the check rejects every launch; and
+findPatientByUuid() passes the UUID string to getPidByUuid(), which matches the binary uuid column. Either way the
+launched patient is never bound and FHIR reads are refused. Found in Phase 9 lite M3 (changelog #76); the same code is
+on OpenEMR's master branch as of 2026-10-25. To be offered upstream (owner decision). Applied to the local test
+instance by clinical/spike/run.sh up.
+
+--- a/src/RestControllers/Authorization/BearerTokenAuthorizationStrategy.php
++++ b/src/RestControllers/Authorization/BearerTokenAuthorizationStrategy.php
+@@ -443,7 +443,7 @@
+         $patientUuid = $context['patient'] ?? null;
+         if (!empty($patientUuid)) {
+             // we only set the bound patient access if the underlying user can still access the patient
+-            if ($this->checkUserHasAccessToPatient($restRequest->getRequestUserId(), $patientUuid)) {
++            if ($this->checkUserHasAccessToPatient($restRequest->getRequestUserUUIDString(), $patientUuid)) {
+                 $restRequest->setPatientUuidString($patientUuid);
+             } else {
+                 $this->getSystemLogger()->error("OpenEMR Error: api had patient launch scope but user did not have access to patient uuid."
+@@ -598,7 +598,7 @@
+     protected function findPatientByUuid(string $patientUuid): ?array
+     {
+         $patientService = $this->getPatientService();
+-        $pid = $patientService->getPidByUuid($patientUuid);
++        $pid = $patientService->getPidByUuid(UuidRegistry::uuidToBytes($patientUuid));
+         if (!is_numeric($pid) || (int) $pid <= 0) {
+             return null;
+         }

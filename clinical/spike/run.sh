@@ -24,6 +24,27 @@ for name, value in values.items():
 PY
 }
 
+# OpenEMR fixes in clinical/spike/patches/*.diff (unified diffs against the OpenEMR root), applied on the host because
+# the image has no patch tool; each patched file keeps its owner and mode.
+apply_patches() {
+  local diff file mode owner tmp root=/var/www/localhost/htdocs/openemr
+  for diff in clinical/spike/patches/*.diff; do
+    [[ -e "$diff" ]] || continue
+    file=$(sed -n 's|^+++ b/||p' "$diff" | head -1)
+    owner=$(podman exec openemr-spike-openemr stat -c %U:%G "$root/$file")
+    mode=$(podman exec openemr-spike-openemr stat -c %a "$root/$file")
+    tmp=$(mktemp -d)
+    mkdir -p "$tmp/$(dirname "$file")"
+    podman cp "openemr-spike-openemr:$root/$file" "$tmp/$file"
+    chmod u+w "$tmp/$file"
+    patch --quiet -p1 -d "$tmp" < "$diff"
+    podman cp "$tmp/$file" "openemr-spike-openemr:$root/$file"
+    podman exec -u 0 openemr-spike-openemr sh -c "chown $owner '$root/$file' && chmod $mode '$root/$file'"
+    rm -rf "$tmp"
+    echo "patched: $file ($(basename "$diff"))"
+  done
+}
+
 case "${1:-}" in
   up)
     if podman pod exists openemr-spike; then echo "An instance is running; run '$0 down' first." >&2; exit 1; fi
@@ -33,7 +54,7 @@ case "${1:-}" in
     podman kube play --quiet "$POD_YAML" >/dev/null
     echo "Waiting for OpenEMR's first-boot install (several minutes)..."
     for _ in $(seq 1 120); do
-      if curl -ksf -o /dev/null "$URL/interface/login/login.php"; then echo "ready: $URL"; exit 0; fi
+      if curl -ksf -o /dev/null "$URL/interface/login/login.php"; then apply_patches; echo "ready: $URL"; exit 0; fi
       podman pod exists openemr-spike || { echo "pod exited" >&2; exit 1; }
       sleep 10
     done
