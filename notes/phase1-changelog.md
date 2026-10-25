@@ -1449,3 +1449,16 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   with all capabilities dropped and succeeds with `DAC_OVERRIDE` added. `kubectl kustomize` sets the pinned digest on
   the init container; a server-side dry run accepts the Deployment under
   baseline; the restricted warning now names `clear-leader-marker` as well as `openemr` (root, `DAC_OVERRIDE`).
+
+## 86. Clinical gateway: readable client secret (2026-10-25)
+
+- Owner run step 5: after the `clinical-gateway` Secret was applied, the gateway exited at start with
+  `PermissionError: [Errno 13] Permission denied: '/run/gateway/client-secret'`. Kubernetes creates Secret volume
+  files owned by root; with `defaultMode: 0400` and no `fsGroup`, the gateway (uid and gid 10001) could not read its
+  own client secret. The local launch test (podman) did not show it: podman mounts Secrets differently.
+- `k8s/clinical/gateway.yaml` sets `fsGroup: 10001` on the pod and `defaultMode: 0440` on the Secret volume: the file
+  is owned by root, group 10001, readable by that group and nobody else. Both settings meet restricted.
+- Verified on node2's kubelet with a throwaway pod in a scratch namespace (deleted afterwards), a dummy Secret value
+  and the gateway's security context: with `0400` and no `fsGroup`, `-r-------- 0 0` and the read is denied; with
+  `fsGroup: 10001` and `0440`, `-r--r----- 0 10001` and the read succeeds. No other clinical manifest mounts a Secret
+  as a file.
