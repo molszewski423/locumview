@@ -1,0 +1,24 @@
+MSH|^~\&|SPIKELAB|SPIKELAB|OPENEMR|OPENEMR|20261022094000||ORU^R01^ORU_R01|SPK2-1|P|2.5.1
+PID|1||1^^^OPENEMR||Spikeone^Synthia||19580314|F|||||^PRN^PH^^1^555^5550100
+PV1|1|I|||||||||||||||||2
+ORC|RE|1|SPK1
+OBR|1|1|SPK1-CHEM|SPIKE-BMP^Basic labs^L|||20261020150000|||||||||||||||20261020160500|||F
+OBX|1|NM|2160-0^Creatinine [Mass/volume] in Serum or Plasma^LN||1.1|mg/dL|0.5-1.0|H|||F
+OBX|2|NM|6690-2^Leukocytes [#/volume] in Blood by Automated count^LN||14.2|10*3/uL|4.0-11.0|H|||F
+ORC|RE|2|SPK2
+OBR|2|2|SPK2-UC|630-4^Bacteria identified in Urine by Culture^LN|||20261020151000|||||||||||||||20261022094000|||F
+OBX|1|CWE|630-4^Bacteria identified in Urine by Culture^LN|1|112283007^Escherichia coli^SCT||||||F
+OBX|2|SN|19090-0^Colony count [#/volume] in Urine^LN|1|>^100000|CFU/mL|||||F
+SPM|1|||122575003^Urine specimen^SCT|||||||||||||20261020151000|||||||
+OBR|3|2|SPK2-SUS|29576-6^Bacterial susceptibility panel^LN|||20261020151000|||||||||||||||20261022094000|||F|630-4&Bacteria identified in Urine by Culture&LN^1^Escherichia coli|||2^SPK2-UC
+OBX|1|SN|28-1^Ampicillin [Susceptibility] by Minimum inhibitory concentration (MIC)^LN|1|>=^32|ug/mL||R|||F
+OBX|2|SN|32-3^Ampicillin+Sulbactam [Susceptibility] by Minimum inhibitory concentration (MIC)^LN|1|^16|ug/mL||I|||F
+OBX|3|SN|412-7^Piperacillin+Tazobactam [Susceptibility] by Minimum inhibitory concentration (MIC)^LN|1|<=^4|ug/mL||S|||F
+OBX|4|SN|141-2^Ceftriaxone [Susceptibility] by Minimum inhibitory concentration (MIC)^LN|1|>=^64|ug/mL||R|||F
+OBX|5|SN|6644-9^Cefepime [Susceptibility] by Minimum inhibitory concentration (MIC)^LN|1|^4|ug/mL||SDD|||F
+OBX|6|SN|35801-0^Ertapenem [Susceptibility] by Minimum inhibitory concentration (MIC)^LN|1|<=^0.25|ug/mL||S|||F
+OBX|7|SN|6652-2^Meropenem [Susceptibility] by Minimum inhibitory concentration (MIC)^LN|1|<=^0.25|ug/mL||S|||F
+OBX|8|SN|185-9^Ciprofloxacin [Susceptibility] by Minimum inhibitory concentration (MIC)^LN|1|>=^4|ug/mL||R|||F
+OBX|9|SN|516-5^Trimethoprim+Sulfamethoxazole [Susceptibility] by Minimum inhibitory concentration (MIC)^LN|1|>=^320|ug/mL||R|||F
+OBX|10|SN|363-2^Nitrofurantoin [Susceptibility] by Minimum inhibitory concentration (MIC)^LN|1|<=^16|ug/mL||S|||F
+OBX|11|SN|267-5^Gentamicin [Susceptibility] by Minimum inhibitory concentration (MIC)^LN|1|<=^1|ug/mL||S|||F

@@ -1,0 +1,1597 @@
+[
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "problem-list-item",
+      "display": "Problem List Item",
+      "system": "http://terminology.hl7.org/CodeSystem/condition-category"
+     }
+    ],
+    "text": "Problem List Item"
+   }
+  ],
+  "clinicalStatus": {
+   "coding": [
+    {
+     "code": "active",
+     "display": "Active",
+     "system": "http://terminology.hl7.org/CodeSystem/condition-clinical"
+    }
+   ]
+  },
+  "code": {
+   "text": "Acute pyelonephritis"
+  },
+  "id": "<Condition#1>",
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition|3.1.1",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns|3.1.1",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns|6.1.0",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns|7.0.0",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns|8.0.0"
+   ],
+   "versionId": "1"
+  },
+  "onsetDateTime": "2026-10-20T00:00:00+00:00",
+  "recordedDate": "2026-10-20T00:00:00+00:00",
+  "resourceType": "Condition",
+  "subject": {
+   "reference": "Patient/<Patient#1>"
+  },
+  "verificationStatus": {
+   "coding": [
+    {
+     "code": "unconfirmed",
+     "display": "Unconfirmed",
+     "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status"
+    }
+   ]
+  }
+ },
+ {
+  "basedOn": [
+   {
+    "reference": "ServiceRequest/<ServiceRequest#1>",
+    "type": "ServiceRequest"
+   }
+  ],
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "LAB",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/v2-0074"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "UNK",
+     "display": "unknown",
+     "system": "http://terminology.hl7.org/CodeSystem/v3-NullFlavor"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-20T16:05:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<DiagnosticReport#1>",
+  "issued": "2026-10-20T16:05:00+00:00",
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-lab",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-lab|3.1.1",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-lab|7.0.0",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-lab|8.0.0"
+   ],
+   "versionId": "1"
+  },
+  "performer": [
+   null
+  ],
+  "resourceType": "DiagnosticReport",
+  "result": [
+   {
+    "display": "Creatinine [Mass/volume] in Serum or Plasma",
+    "reference": "Observation/<Observation#4>",
+    "type": "Observation"
+   },
+   {
+    "display": "Leukocytes [#/volume] in Blood by Automated count",
+    "reference": "Observation/<Observation#15>",
+    "type": "Observation"
+   }
+  ],
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
+  "basedOn": [
+   {
+    "reference": "ServiceRequest/<ServiceRequest#2>",
+    "type": "ServiceRequest"
+   }
+  ],
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "LAB",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/v2-0074"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "UNK",
+     "display": "unknown",
+     "system": "http://terminology.hl7.org/CodeSystem/v3-NullFlavor"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T09:40:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<DiagnosticReport#2>",
+  "issued": "2026-10-22T09:40:00+00:00",
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-lab",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-lab|3.1.1",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-lab|7.0.0",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-lab|8.0.0"
+   ],
+   "versionId": "1"
+  },
+  "performer": [
+   null
+  ],
+  "resourceType": "DiagnosticReport",
+  "result": [
+   {
+    "display": "Ampicillin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#6>",
+    "type": "Observation"
+   },
+   {
+    "display": "Ampicillin+Sulbactam [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#7>",
+    "type": "Observation"
+   },
+   {
+    "display": "Piperacillin+Tazobactam [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#10>",
+    "type": "Observation"
+   },
+   {
+    "display": "Ceftriaxone [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#1>",
+    "type": "Observation"
+   },
+   {
+    "display": "Cefepime [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#13>",
+    "type": "Observation"
+   },
+   {
+    "display": "Ertapenem [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#8>",
+    "type": "Observation"
+   },
+   {
+    "display": "Meropenem [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#14>",
+    "type": "Observation"
+   },
+   {
+    "display": "Ciprofloxacin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#2>",
+    "type": "Observation"
+   },
+   {
+    "display": "Trimethoprim+Sulfamethoxazole [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#11>",
+    "type": "Observation"
+   },
+   {
+    "display": "Nitrofurantoin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#9>",
+    "type": "Observation"
+   },
+   {
+    "display": "Gentamicin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#5>",
+    "type": "Observation"
+   }
+  ],
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
+  "class": {
+   "code": "IMP",
+   "display": "inpatient encounter",
+   "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode"
+  },
+  "id": "<Encounter#1>",
+  "identifier": [
+   {
+    "system": "urn:uuid:<Encounter#1>",
+    "value": "<Encounter#1>"
+   }
+  ],
+  "meta": {
+   "versionId": "1"
+  },
+  "period": {
+   "start": "2026-10-20T14:00:00+00:00"
+  },
+  "reasonCode": [
+   {
+    "text": "Fever, flank pain, dysuria"
+   }
+  ],
+  "resourceType": "Encounter",
+  "status": "finished",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "type": [
+   {
+    "coding": [
+     {
+      "code": "185349003",
+      "display": "Encounter for check up (procedure)",
+      "system": "http://snomed.info/sct"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "community",
+      "display": "Home/Community",
+      "system": "http://terminology.hl7.org/CodeSystem/medicationrequest-category"
+     }
+    ]
+   }
+  ],
+  "dispenseRequest": {
+   "numberOfRepeatsAllowed": 0
+  },
+  "dosageInstruction": [
+   {
+    "text": "1 g IV every 24 hours"
+   }
+  ],
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<MedicationRequest#1>",
+  "intent": "order",
+  "medicationCodeableConcept": {
+   "coding": [
+    {
+     "code": "1665021",
+     "display": "ceftriaxone 1000 MG Injection",
+     "system": "http://www.nlm.nih.gov/research/umls/rxnorm"
+    }
+   ]
+  },
+  "meta": {
+   "versionId": "1"
+  },
+  "reportedBoolean": false,
+  "resourceType": "MedicationRequest",
+  "status": "active",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "141-2",
+     "display": "Ceftriaxone [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T09:40:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#1>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "R",
+      "display": "Resistant",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|3.1.1",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|7.0.0",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|8.0.0"
+   ],
+   "versionId": "1"
+  },
+  "note": [
+   {
+    "text": "\n"
+   }
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#1>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueString": ">= 64"
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "185-9",
+     "display": "Ciprofloxacin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T09:40:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#2>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "R",
+      "display": "Resistant",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|3.1.1",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|7.0.0",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|8.0.0"
+   ],
+   "versionId": "1"
+  },
+  "note": [
+   {
+    "text": "\n"
+   }
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#1>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueString": ">= 4"
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "19090-0",
+     "display": "Colony count [#/volume] in Urine",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T09:40:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#3>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "N",
+      "display": "No",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|3.1.1",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|7.0.0",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|8.0.0"
+   ],
+   "versionId": "1"
+  },
+  "note": [
+   {
+    "text": "\n"
+   }
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#2>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueString": "> 100000"
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "2160-0",
+     "display": "Creatinine [Mass/volume] in Serum or Plasma",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-20T16:05:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#4>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "H",
+      "display": "High",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|3.1.1",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|7.0.0",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|8.0.0"
+   ],
+   "versionId": "1"
+  },
+  "note": [
+   {
+    "text": "\n"
+   }
+  ],
+  "referenceRange": [
+   {
+    "high": {
+     "code": "mg/dL",
+     "system": "http://unitsofmeasure.org",
+     "unit": "mg/dL",
+     "value": 1
+    },
+    "low": {
+     "code": "mg/dL",
+     "system": "http://unitsofmeasure.org",
+     "unit": "mg/dL",
+     "value": 0.5
+    }
+   }
+  ],
+  "resourceType": "Observation",
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueQuantity": {
+   "code": "mg/dL",
+   "system": "http://unitsofmeasure.org",
+   "unit": "mg/dL",
+   "value": 1.1
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "267-5",
+     "display": "Gentamicin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T09:40:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#5>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "S",
+      "display": "Susceptible",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|3.1.1",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|7.0.0",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|8.0.0"
+   ],
+   "versionId": "1"
+  },
+  "note": [
+   {
+    "text": "\n"
+   }
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#1>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueString": "<= 1"
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "28-1",
+     "display": "Ampicillin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T09:40:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#6>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "R",
+      "display": "Resistant",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|3.1.1",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|7.0.0",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|8.0.0"
+   ],
+   "versionId": "1"
+  },
+  "note": [
+   {
+    "text": "\n"
+   }
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#1>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueString": ">= 32"
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "32-3",
+     "display": "Ampicillin+Sulbactam [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T09:40:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#7>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "I",
+      "display": "Intermediate",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|3.1.1",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|7.0.0",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|8.0.0"
+   ],
+   "versionId": "1"
+  },
+  "note": [
+   {
+    "text": "\n"
+   }
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#1>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueQuantity": {
+   "code": "ug/mL",
+   "system": "http://unitsofmeasure.org",
+   "unit": "ug/mL",
+   "value": 16
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "35801-0",
+     "display": "Ertapenem [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T09:40:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#8>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "S",
+      "display": "Susceptible",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|3.1.1",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|7.0.0",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|8.0.0"
+   ],
+   "versionId": "1"
+  },
+  "note": [
+   {
+    "text": "\n"
+   }
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#1>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueString": "<= 0.25"
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "363-2",
+     "display": "Nitrofurantoin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T09:40:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#9>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "S",
+      "display": "Susceptible",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|3.1.1",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|7.0.0",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|8.0.0"
+   ],
+   "versionId": "1"
+  },
+  "note": [
+   {
+    "text": "\n"
+   }
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#1>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueString": "<= 16"
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "412-7",
+     "display": "Piperacillin+Tazobactam [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T09:40:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#10>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "S",
+      "display": "Susceptible",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|3.1.1",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|7.0.0",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|8.0.0"
+   ],
+   "versionId": "1"
+  },
+  "note": [
+   {
+    "text": "\n"
+   }
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#1>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueString": "<= 4"
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "516-5",
+     "display": "Trimethoprim+Sulfamethoxazole [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T09:40:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#11>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "R",
+      "display": "Resistant",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|3.1.1",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|7.0.0",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|8.0.0"
+   ],
+   "versionId": "1"
+  },
+  "note": [
+   {
+    "text": "\n"
+   }
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#1>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueString": ">= 320"
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "630-4",
+     "display": "Bacteria identified in Urine by Culture",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T09:40:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#12>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "N",
+      "display": "No",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|3.1.1",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|7.0.0",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|8.0.0"
+   ],
+   "versionId": "1"
+  },
+  "note": [
+   {
+    "text": "\n"
+   }
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#2>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueString": "112283007 (Escherichia coli)"
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "6644-9",
+     "display": "Cefepime [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T09:40:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#13>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "SDD",
+      "display": "Susceptible-dose dependent",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|3.1.1",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|7.0.0",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|8.0.0"
+   ],
+   "versionId": "1"
+  },
+  "note": [
+   {
+    "text": "\n"
+   }
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#1>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueQuantity": {
+   "code": "ug/mL",
+   "system": "http://unitsofmeasure.org",
+   "unit": "ug/mL",
+   "value": 4
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "6652-2",
+     "display": "Meropenem [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T09:40:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#14>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "S",
+      "display": "Susceptible",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|3.1.1",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|7.0.0",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|8.0.0"
+   ],
+   "versionId": "1"
+  },
+  "note": [
+   {
+    "text": "\n"
+   }
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#1>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueString": "<= 0.25"
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "6690-2",
+     "display": "Leukocytes [#/volume] in Blood by Automated count",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-20T16:05:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#15>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "H",
+      "display": "High",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|3.1.1",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|7.0.0",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab|8.0.0"
+   ],
+   "versionId": "1"
+  },
+  "note": [
+   {
+    "text": "\n"
+   }
+  ],
+  "referenceRange": [
+   {
+    "high": {
+     "code": "10*3/uL",
+     "system": "http://unitsofmeasure.org",
+     "unit": "10*3/uL",
+     "value": 11
+    },
+    "low": {
+     "code": "10*3/uL",
+     "system": "http://unitsofmeasure.org",
+     "unit": "10*3/uL",
+     "value": 4
+    }
+   }
+  ],
+  "resourceType": "Observation",
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueQuantity": {
+   "code": "10*3/uL",
+   "system": "http://unitsofmeasure.org",
+   "unit": "10*3/uL",
+   "value": 14.2
+  }
+ },
+ {
+  "active": true,
+  "birthDate": "1958-03-14",
+  "communication": [
+   {
+    "language": {
+     "coding": [
+      {
+       "code": "unknown",
+       "display": "Unknown",
+       "system": "http://terminology.hl7.org/CodeSystem/data-absent-reason"
+      }
+     ]
+    }
+   }
+  ],
+  "deceasedBoolean": false,
+  "extension": [
+   {
+    "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex",
+    "valueCode": "F"
+   },
+   {
+    "extension": [
+     {
+      "url": "ombCategory",
+      "valueCoding": {
+       "code": "UNK",
+       "display": "Unknown",
+       "system": "http://terminology.hl7.org/CodeSystem/v3-NullFlavor"
+      }
+     },
+     {
+      "url": "text",
+      "valueString": "Unknown"
+     }
+    ],
+    "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race"
+   },
+   {
+    "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-sex",
+    "valueCoding": {
+     "code": "unknown",
+     "display": "Unknown",
+     "system": "DataAbsentReason"
+    }
+   },
+   {
+    "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-interpreter-needed",
+    "valueCoding": {
+     "code": "unknown",
+     "display": "Unknown",
+     "system": "http://terminology.hl7.org/CodeSystem/data-absent-reason"
+    }
+   }
+  ],
+  "gender": "female",
+  "id": "<Patient#1>",
+  "identifier": [
+   {
+    "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+    "type": {
+     "coding": [
+      {
+       "code": "PT",
+       "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+      }
+     ]
+    },
+    "use": "official",
+    "value": "1"
+   }
+  ],
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient|3.1.1",
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient|8.0.0"
+   ],
+   "versionId": "1"
+  },
+  "name": [
+   {
+    "family": "Spikeone",
+    "given": [
+     "Synthia"
+    ],
+    "use": "official"
+   }
+  ],
+  "resourceType": "Patient",
+  "text": {
+   "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"> <p>Synthia Spikeone</p></div>",
+   "status": "generated"
+  }
+ },
+ {
+  "authoredOn": "2026-10-20T14:30:00+00:00",
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "108252007",
+      "display": "Laboratory procedure",
+      "system": "http://snomed.info/sct"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "text": "Basic labs"
+  },
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<ServiceRequest#1>",
+  "intent": "order",
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-servicerequest"
+   ],
+   "versionId": "1"
+  },
+  "performerType": {
+   "coding": [
+    {
+     "code": "159001",
+     "display": "Laboratory technician",
+     "system": "http://snomed.info/sct"
+    }
+   ]
+  },
+  "priority": "routine",
+  "resourceType": "ServiceRequest",
+  "status": "active",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
+  "authoredOn": "2026-10-20T14:30:00+00:00",
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "108252007",
+      "display": "Laboratory procedure",
+      "system": "http://snomed.info/sct"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "text": "Bacteria identified in Urine by Culture"
+  },
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<ServiceRequest#2>",
+  "intent": "order",
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-servicerequest"
+   ],
+   "versionId": "1"
+  },
+  "performerType": {
+   "coding": [
+    {
+     "code": "159001",
+     "display": "Laboratory technician",
+     "system": "http://snomed.info/sct"
+    }
+   ]
+  },
+  "priority": "routine",
+  "resourceType": "ServiceRequest",
+  "status": "active",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
+  "accessionIdentifier": {
+   "type": {
+    "coding": [
+     {
+      "code": "ACSN",
+      "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+     }
+    ]
+   },
+   "value": "SPK2"
+  },
+  "collection": {
+   "collectedDateTime": "2026-10-20T15:10:00+00:00"
+  },
+  "id": "<Specimen#1>",
+  "identifier": [
+   {
+    "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+    "value": "SPK2-UC-1"
+   }
+  ],
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-specimen"
+   ],
+   "versionId": "1"
+  },
+  "resourceType": "Specimen",
+  "status": "available",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "type": {
+   "coding": [
+    {
+     "code": "122575003",
+     "display": "Urine specimen",
+     "system": "http://snomed.info/sct"
+    }
+   ]
+  }
+ },
+ {
+  "accessionIdentifier": {
+   "type": {
+    "coding": [
+     {
+      "code": "ACSN",
+      "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+     }
+    ]
+   },
+   "value": "SPK2"
+  },
+  "collection": {
+   "collectedDateTime": "2026-10-20T15:10:00+00:00"
+  },
+  "id": "<Specimen#2>",
+  "identifier": [
+   {
+    "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+    "value": "SPK2-UC-1"
+   }
+  ],
+  "meta": {
+   "profile": [
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-specimen"
+   ],
+   "versionId": "1"
+  },
+  "resourceType": "Specimen",
+  "status": "available",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "type": {
+   "coding": [
+    {
+     "code": "122575003",
+     "display": "Urine specimen",
+     "system": "http://snomed.info/sct"
+    }
+   ]
+  }
+ }
+]

@@ -1170,3 +1170,33 @@ limits held up; these are the fixes from that review.
   packages and the SRPM at `0.1.0-1.20261023000253gitd2fd2aa701.el10`, exit 0. A throwaway, never-pushed
   commit with a failing `%check` exited 1, printed the full log ending in "rpmbuild failed" and produced no
   packages. Nothing was signed or published; no desktop, image or workflow was touched.
+
+## 72. Phase 9 lite M1: OpenEMR microbiology spike (2026-10-25, Done)
+
+The first Phase 9 lite task (plan M1): a synthetic scenario loaded into OpenEMR and read back through its FHIR API.
+Evidence, results and the owner's options: `docs/evidence/clinical/20261025-openemr-m1-spike/`.
+
+- **Instance:** OpenEMR 8.4.1, the newest release, on PHP 8.5.12 (the CVE-2026-109618/109619 fix release), with
+  MariaDB 12.3.3, both pinned by digest in `k8s/clinical/openemr-spike/pod.yaml`. Run on node1 with rootless
+  `podman kube play` (owner decision: no cluster or desktop change for M1), localhost only, ephemeral storage, about
+  2 GiB capped; `clinical/spike/run.sh` creates and destroys it, with random per-run credentials in tmpfs.
+- **Found, not assumed:** FHIR writes only Patient, Organization and Practitioner (and DocumentReference create);
+  the standard REST API covers encounters, problems and prescriptions but no lab results; lab orders have no API.
+  The load path is therefore FHIR for the patient, the REST API for the encounter, problem and prescription, SQL for
+  the order-side rows the order form writes (lab provider, two orders, the specimen) and list configuration, and an
+  HL7 v2.5.1 ORU^R01 through OpenEMR's own importer for every result, the culture included.
+- **Result:** reproducible load met (two fresh instances, identical normalized FHIR output, 25 resources). Read-back
+  partly faithful: patient and encounter links, specimen type and collection time (on Specimen), result time, coded
+  S/I/R/SDD interpretations (after adding them to the result-flag list; stock OpenEMR gives text only) and every MIC
+  come back. The organism is text with the SNOMED code inside it, MICs with a qualifier are text, nothing links a
+  susceptibility to its organism, and each order's DiagnosticReport holds only one of its reports.
+- **Owner decision (2026-10-25):** of the four data-path options (OpenEMR only, a side FHIR server, fixes contributed
+  to OpenEMR, or OpenEMR now and fixes later), the last: M2 proceeds on stock OpenEMR with one organism per culture,
+  and the importer and FHIR mapping fixes are developed and offered upstream in parallel.
+- **Along the way:** all LOINC, SNOMED CT and RxNorm codes checked against their sources first (two draft LOINC codes
+  were wrong); OpenEMR quirks recorded (FHIR Patient name needs `use: official`; API clients start disabled;
+  MariaDB's first boot must finish before OpenEMR's installer). The retiring reference desktop was shut down and its
+  autostart disabled on the owner's instruction, to free memory on node1; it was not deleted.
+- **Verified:** each load from an empty instance, HL7 import with no importer messages, FHIR read-back saved and
+  compared; the website's roadmap generator, run locally on this ROADMAP, accepts it. The spike instance was
+  destroyed afterwards. Nothing deployed, no cluster, desktop, image or public-site change.
