@@ -33,6 +33,19 @@ jobs:
           python3 -m pip install -q --root-user-action=ignore 'pre-commit==4.2.0'
           pre-commit run --all-files --show-diff-on-failure
 
+      - name: Clinical app gateway tests (hash-pinned requirements)
+        run: |
+          cd "$GITHUB_WORKSPACE/clinical/app/server"
+          python3 -m venv /tmp/gateway
+          /tmp/gateway/bin/pip install -q --disable-pip-version-check --require-hashes -r requirements.txt
+          /tmp/gateway/bin/python -m unittest -v test_gateway
+
+      - name: Clinical app tests and build (pinned Node 22, the image clinical/app/run.sh uses)
+        uses: docker://docker.io/library/node@sha256:de170b39439eb0e5a3444ad7d60b015614a381e10fecae2e30ec9e735122f38d
+        with:
+          entrypoint: /bin/sh
+          args: -c "cd clinical/app && npm ci --no-audit --no-fund && npm test && npm run build"
+
       - name: gitleaks (whole history)
         uses: docker://docker.io/zricethezav/gitleaks:v8.30.1@sha256:b109bc5f8f76a38196a3e413704fc5b9e3c32360bce4e4b603bd6f45b3721dbb
         with:

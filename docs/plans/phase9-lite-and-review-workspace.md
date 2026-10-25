@@ -1,7 +1,7 @@
 # Plan: Phase 9 lite and the Clinical Review Workspace
 
 Status: **In progress**. Written 2026-10-22. Phase 4's core release milestone is Done (changelog #70); M1, the
-OpenEMR spike, is Done (changelog #72); the owner chose its option 4 (section 9). M2 is Done (changelog #73 to #75); M3 is next. Decisions: ADR 0017 (and its update of 2026-10-22),
+OpenEMR spike, is Done (changelog #72); the owner chose its option 4 (section 9). M2 is Done (changelog #73 to #75); M3 is in progress (changelog #76). Decisions: ADR 0017 (and its update of 2026-10-22),
 ADR 0018. Data rules: `docs/policy/synthetic-data-and-independence.md`. Status of record: ROADMAP.md.
 
 ## 1. Sequence
@@ -65,6 +65,12 @@ ambiguous) in `clinical/scenarios/`, all approved in the owner's clinical review
 - Synthea supplies background patients only; every case with an expected finding is hand-built.
 
 ### M3. Clinical app shell and EHR launch
+
+**In progress** (changelog #76): step 1, the app and its gateway with the SMART EHR launch, passes end to end locally
+(`docs/evidence/clinical/20261025-m3-local-launch/`). The app reads OpenEMR through a server-side gateway (owner
+decision, 2026-10-25), and OpenEMR 8.4.1 needs a two-line fix for any EHR launch with patient context
+(`docs/upstream/openemr-8.4.1.md`). Next: cluster deployment, IdM names and certificates, the Keycloak client, the
+desktop launcher.
 
 - The React and TypeScript app (ADR 0017) served from k3s behind Keycloak, opened from a launcher in the image (signed
   pipeline) in the managed Chrome app mode, with its address and OpenEMR's added to the Chrome allowlist and recorded

@@ -40,9 +40,12 @@ await launchButton.click();
 // APP_URL is where the app is served: OpenEMR's own origin (/clinical-app/), since OpenEMR 8.4.1's FHIR API does
 // not answer CORS preflight requests and a cross-origin browser app cannot read it.
 const appFrame = () => page.frames().find((f) => f !== page.mainFrame() && (f.url().startsWith(APP_URL) || /\/oauth2\//.test(f.url())));
-// The dialog is laid out off-screen when the chart page is opened on its own, so forms are submitted directly
-// through the button a user would press.
-const submit = (f, selector) => f.evaluate((sel) => { const b = document.querySelector(sel); b.form.requestSubmit(b); }, selector);
+// The test opens the chart page on its own rather than inside OpenEMR's tabbed main window, where dlgopen lays the
+// dialog out; here the dialog is not shown, so fields are set and forms submitted directly, through the button a user
+// would press. (Driving the tabbed main window instead is a known improvement.)
+// A real click event, not form.requestSubmit(): OpenEMR's consent screen builds the granted scopes from its permission
+// checkboxes in the Authorize button's click handler.
+const submit = (f, selector) => f.evaluate((sel) => document.querySelector(sel).click(), selector);
 const atApp = (f) => (f?.url() ?? "").startsWith(`${APP_URL}index.html`);
 
 // OpenEMR's authorization flow inside that frame: possibly a login, then a consent screen listing the scopes.
@@ -55,8 +58,10 @@ for (let i = 0; i < 20 && !atApp(appFrame()); i++) {
   await shot(page, `auth-${i}`);
   if (await f.locator("input[name=username]").count()) {
     // OpenEMR's OAuth sign-in offers a clinician login (user_role=api) and a patient login (portal-api).
-    await f.fill("input[name=username]", OE_USER);
-    await f.fill("input[name=password]", OE_PASS);
+    await f.evaluate(([user, pass]) => {
+      document.querySelector("input[name=username]").value = user;
+      document.querySelector("input[name=password]").value = pass;
+    }, [OE_USER, OE_PASS]);
     await submit(f, "button[name=user_role][value=api]");
   } else if (await f.locator("#authorize-btn").count()) {
     // The consent screen: the app's read-only resource permissions, then Authorize.
@@ -68,11 +73,19 @@ const app = appFrame();
 if (!app) throw new Error(`the app frame never appeared; frames: ${page.frames().map((f) => f.url()).join(", ")}`);
 await app.waitForSelector(".context, .status.error", { timeout: 30000 });
 await page.waitForTimeout(800);
-await shot(page, "app");
+// The dialog's frame cannot be photographed here, so the same session opens the app in its own tab for the record.
+const view = await context.newPage();
+await view.goto(`${APP_URL}index.html`);
+await view.waitForSelector(".context", { timeout: 20000 });
+await view.locator(".culture").first().scrollIntoViewIfNeeded().catch(() => {});
+await shot(view, "app");
 const context_ = await app.locator(".context").textContent().catch(() => null);
 const error = await app.locator(".status.error").textContent().catch(() => null);
 const organisms = await app.locator(".culture h3").allTextContents().catch(() => []);
-console.log(JSON.stringify({ url: app.url().split("?")[0], context: context_, error, organisms, failures }));
+const granted = await app.evaluate(() => fetch("api/context").then((r) => r.json()).catch(() => null));
+// Cookie names and attributes only (never values), to diagnose session problems.
+const cookies = (await context.cookies(APP_URL)).map((c) => `${c.name} sameSite=${c.sameSite} secure=${c.secure} path=${c.path}`);
+console.log(JSON.stringify({ url: app.url().split("?")[0], context: context_, error, organisms, failures, cookies, granted }));
 await browser.close();
 const ok = context_?.includes(EXPECT_NAME) && organisms.some((o) => o.includes(EXPECT_ORGANISM));
 process.exit(ok ? 0 : 1);

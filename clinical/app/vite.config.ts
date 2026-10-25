@@ -5,11 +5,9 @@ import { defineConfig } from "vite";
 
 const here = fileURLToPath(new URL(".", import.meta.url));
 
-// Two pages: launch.html (the SMART launch URI) and index.html (the redirect URI and the app).
+// One page, served by the gateway (server/gateway.py), which is also the SMART launch URI.
 export default defineConfig({
   base: "./",
   plugins: [react()],
-  build: {
-    rollupOptions: { input: { index: resolve(here, "index.html"), launch: resolve(here, "launch.html") } },
-  },
+  build: { rollupOptions: { input: { index: resolve(here, "index.html") } } },
 });

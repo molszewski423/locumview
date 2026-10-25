@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Chart } from "./smart";
+import type { Chart } from "./gateway";
 import { age, labs, latestVitals, patientName, patientNumber, route, text, value, when } from "./fhir/chart";
 import { cultures, formatMic, INTERPRETATIONS } from "./fhir/micro";
 

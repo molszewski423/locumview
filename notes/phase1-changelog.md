@@ -1276,3 +1276,35 @@ The last M2 item: background patients from Synthea, so the demo EHR has a realis
   with provenance, expected findings, rationale, citations and a reference answer, all approved in the owner's
   clinical review; a schema checked in CI; a one-command idempotent loader that refuses cases without provenance;
   Synthea for background patients only. Next: M3, the clinical app shell and SMART EHR launch.
+
+## 76. Phase 9 lite M3 step 1: clinical app, gateway, SMART EHR launch end to end (2026-10-25, In progress)
+
+Plan M3 step 1, local only. Evidence: `docs/evidence/clinical/20261025-m3-local-launch/`; app: `clinical/app/README.md`.
+
+- **App:** React, TypeScript and Vite: home dashboard, the three module queues (empty until M4) and the patient view
+  (problems, allergies, medications with route, vital signs, labs, microbiology with MICs and coded interpretations).
+  Its microbiology layer parses OpenEMR's organism text and MIC qualifiers and joins susceptibilities by specimen
+  accession; 8 tests against the M1 OpenEMR output. Node tooling in a digest-pinned Node 22 container; packages older
+  than two weeks; 0 npm audit findings.
+- **Found:** OpenEMR 8.4.1's FHIR API does not answer CORS preflight requests (404), so a browser app on another
+  origin cannot read it; browser (public) clients get the patient role only, and user scopes need a confidential
+  client; and the check for a launched patient always fails, twice over (an integer user id where a UUID is required,
+  then a UUID string compared with the binary column). The same code is on OpenEMR's master. All in
+  `docs/upstream/openemr-8.4.1.md` with the earlier M1 and M2 findings, for the owner to offer upstream.
+- **Owner decision (option A): a gateway.** `clinical/app/server/gateway.py` (FastAPI, hash-pinned requirements)
+  completes the SMART launch on the server with PKCE and the client secret, accepts launches only from the configured
+  EHR, keeps tokens server-side behind an HttpOnly, Secure, SameSite=Lax session cookie, forwards GET requests for
+  eight resource types pinned to the launched patient, serves the app from the same origin and allows only the EHR
+  to frame it. 10 tests against a fake EHR.
+- **OpenEMR fix:** `clinical/spike/patches/0001-smart-launch-patient-access.diff` (two lines), applied to each fresh
+  local instance by `run.sh up`; without it no EHR launch with patient context works.
+- **Verified:** `clinical/app/e2e.sh` (Playwright's Chromium, pinned) runs from a fresh instance to teardown: a
+  clinician launches the app from the chart's SMART card, approves OpenEMR's consent, and the app opens on the
+  patient with their culture; passed for two patients, granted scopes exactly the gateway's read-only set. CI now
+  runs the gateway tests and the app's tests and build.
+- **My mistake, contained:** a debug dump of the sign-in form printed the local instance's per-run administrator
+  password (random, localhost only, used nowhere else). The instance was destroyed at once and rebuilt with new
+  credentials; debug output now reports fields only as filled or empty.
+- **Open:** M3 steps 2 to 6 (cluster deployment, IdM names and certificates as an owner run, the Keycloak client,
+  the desktop launcher and Chrome allowlist through the signed image, the desktop check); an OpenEMR image carrying
+  the patch for the cluster; upstream submissions (owner decision).
