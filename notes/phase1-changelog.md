@@ -1171,7 +1171,7 @@ limits held up; these are the fixes from that review.
   commit with a failing `%check` exited 1, printed the full log ending in "rpmbuild failed" and produced no
   packages. Nothing was signed or published; no desktop, image or workflow was touched.
 
-## 72. Phase 9 lite M1: OpenEMR microbiology spike (2026-10-25, Done; microbiology decision open)
+## 72. Phase 9 lite M1: OpenEMR microbiology spike (2026-10-25, Done)
 
 The first Phase 9 lite task (plan M1): a synthetic scenario loaded into OpenEMR and read back through its FHIR API.
 Evidence, results and the owner's options: `docs/evidence/clinical/20261025-openemr-m1-spike/`.
@@ -1190,8 +1190,9 @@ Evidence, results and the owner's options: `docs/evidence/clinical/20261025-open
   S/I/R/SDD interpretations (after adding them to the result-flag list; stock OpenEMR gives text only) and every MIC
   come back. The organism is text with the SNOMED code inside it, MICs with a qualifier are text, nothing links a
   susceptibility to its organism, and each order's DiagnosticReport holds only one of its reports.
-- **Open decision for the owner:** the microbiology data path (OpenEMR only, a side FHIR server, fixes contributed to
-  OpenEMR, or OpenEMR now and fixes later). M2 waits for it.
+- **Owner decision (2026-10-25):** of the four data-path options (OpenEMR only, a side FHIR server, fixes contributed
+  to OpenEMR, or OpenEMR now and fixes later), the last: M2 proceeds on stock OpenEMR with one organism per culture,
+  and the importer and FHIR mapping fixes are developed and offered upstream in parallel.
 - **Along the way:** all LOINC, SNOMED CT and RxNorm codes checked against their sources first (two draft LOINC codes
   were wrong); OpenEMR quirks recorded (FHIR Patient name needs `use: official`; API clients start disabled;
   MariaDB's first boot must finish before OpenEMR's installer). The retiring reference desktop was shut down and its

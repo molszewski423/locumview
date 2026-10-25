@@ -7,8 +7,8 @@ Synthetic data only ([policy](../../../policy/synthetic-data-and-independence.md
 **Outcome:** (a) reproducible load: **met**. (b) faithful microbiology read-back: **partly met**. Patient,
 encounter, specimen type, collection and result times, each antibiotic's S, I, R or SDD interpretation (coded) and
 every MIC come back. The organism is not coded, MICs with a qualifier come back as text, and nothing in FHIR links a
-susceptibility result to the organism it was tested on. Per the plan, the options are listed below as an **open
-decision for the owner**; M2 waits for it.
+susceptibility result to the organism it was tested on. Per the plan, the options are listed below for the owner, who
+chose **option 4** on 2026-10-25.
 
 ## Versions and what was checked
 
@@ -85,9 +85,9 @@ back. After replacing server-assigned UUIDs with stable placeholders and droppin
 identical: 25 resources, 1,597 lines, no differences and no unresolved references
 (`fhir-readback.normalized.json`).
 
-## Open decision for the owner: the microbiology data path
+## The microbiology data path: options and the owner's decision
 
-The spike does not choose. The options, with their trade-offs:
+The spike did not choose. The options, with their trade-offs:
 
 1. **OpenEMR only, gaps accepted.** The rules service parses the two text formats above and links a susceptibility
    to the organism through its order. Simplest; nothing extra to run. Fragile, tied to OpenEMR's quirks, and limited
@@ -101,6 +101,11 @@ The spike does not choose. The options, with their trade-offs:
    the EHR and useful to others. Development time; a patched image differs from stock until upstream accepts it.
 4. **Option 1 now, option 3 later**: start M2 on OpenEMR as it is, with single-organism cultures, and contribute
    the fixes in parallel.
+
+**Owner decision, 2026-10-25: option 4.** M2 proceeds on stock OpenEMR 8.4.1 with **one organism per culture**;
+the rules read the organism and qualified MICs in the text formats recorded above, each format covered by tests.
+The importer and FHIR mapping fixes (coded organism, `valueQuantity.comparator`, `derivedFrom` from OBR-26) are
+developed in parallel and offered upstream; multi-organism cultures wait for them.
 
 ## Limits
 

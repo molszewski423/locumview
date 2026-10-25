@@ -1,7 +1,7 @@
 # Plan: Phase 9 lite and the Clinical Review Workspace
 
 Status: **In progress**. Written 2026-10-22. Phase 4's core release milestone is Done (changelog #70); M1, the
-OpenEMR spike, is Done (changelog #72) and M2 waits on the owner's microbiology data-path decision (section 9). Decisions: ADR 0017 (and its update of 2026-10-22),
+OpenEMR spike, is Done (changelog #72); the owner chose its option 4 (section 9), so M2 is next. Decisions: ADR 0017 (and its update of 2026-10-22),
 ADR 0018. Data rules: `docs/policy/synthetic-data-and-independence.md`. Status of record: ROADMAP.md.
 
 ## 1. Sequence
@@ -340,7 +340,8 @@ For the build log on locumview.com, in order, each shown as Planned until done:
 ## 9. Open decisions for the owner
 
 1. **Product naming:** is ADR 0017's app "AMS Intelligence", or is AMS Intelligence one module within it?
-2. **Microbiology data path**: the M1 spike found that cultures and susceptibilities round-trip only partly; the
-   four options and their trade-offs are in `docs/evidence/clinical/20261025-openemr-m1-spike/README.md`.
+2. **Microbiology data path**: decided 2026-10-25, option 4 of the M1 evidence
+   (`docs/evidence/clinical/20261025-openemr-m1-spike/README.md`): stock OpenEMR now with one organism per culture,
+   and fixes to OpenEMR's importer and FHIR mapping contributed upstream in parallel.
 3. **Reviewer delivery:** VDI (ADR 0018's design) or the browser-only fallback, per round.
 4. **Legal questions** 5 and 6 in `docs/legal/questions-for-a-lawyer.md`, before M8.
