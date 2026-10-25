@@ -1333,3 +1333,14 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   throwaway repository with a throwaway age key.
 - **Open:** first CI build, then a commit pinning both digests; the owner runs above; loading the scenario library
   into the cluster's OpenEMR (step 2b); IdM names and certificates (step 3).
+
+## 78. Phase 9 lite M3 step 2: clinical images built, verified and pinned (2026-10-25)
+
+- `clinical-images` run 162 (commit de5a0ac) built, pushed, signed and attested both images. Verified read-only with
+  `image/desktop/signing/cosign.pub`: `locumview-openemr@sha256:1e1ba990…` (signature bound to commit de5a0ac and
+  run 162; SPDX SBOM attestation, 1,099 packages) and `locumview-clinical-gateway@sha256:f3c169a3…` (same; 130
+  packages). Each tag's registry digest matched. Both pinned in `k8s/clinical/kustomization.yaml`.
+- A first check ran while the OpenEMR job was still attesting and found no SBOM; the run finished green and the
+  attestation verified on the second check. Measured locally: syft peaks near 1.9 GiB on the OpenEMR image (3 GB),
+  worth watching on the shared runner.
+- Nothing applied to the cluster yet: the owner runs in `k8s/clinical/README.md` come next.
