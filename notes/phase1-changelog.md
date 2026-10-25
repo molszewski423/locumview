@@ -1428,3 +1428,24 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
 - Reproduced on a workstation with the same upstream image (pinned digest) and an empty bind-mounted `sites/`:
   without the variable, the same error; with it, `Restoring empty .../sites directory...`, then the upgrade and
   configuration checks pass. Images and digests are unchanged.
+
+## 85. Clinical OpenEMR: clear swarm mode's leader marker at start (2026-10-25)
+
+- After #84 was applied, the new OpenEMR pod still crash-looped. The failed starts before #84 had left
+  `sites/docker-leader` on the volume. A start that finds that marker under five minutes old (`LEADER_TIMEOUT`, 300
+  s) waits as a follower; when the marker goes stale, upstream's `openemr.sh` takes over ("Successfully became
+  leader"), then calls `try_become_leader` once more, fails to recreate its own marker and sets itself back to
+  follower ("Promoted to leader after waiting period"). As a follower it never restores `sites/`, so it exits on the
+  missing `sqlconf.php` and writes a fresh marker for the next restart. Any crash before the install completes would
+  do the same. Candidate upstream fix (not submitted; owner's decision).
+- `k8s/clinical/openemr.yaml` adds an init container, `clear-leader-marker`, that removes `sites/docker-leader` and
+  `sites/docker-initiated` before OpenEMR starts. One replica with the `Recreate` strategy means no other OpenEMR runs
+  at the same time, so a marker found at start is always stale. It uses the same pinned image. After the first
+  install `sites/` is `dr-x------` owned by apache, so it runs as root with all capabilities dropped except
+  `DAC_OVERRIDE` (allowed under baseline, which is enforced), read-only root filesystem, no privilege escalation.
+- Verified on a workstation with the pinned upstream image: with a fresh marker on an empty `sites/` (and
+  `LEADER_TIMEOUT=10`), the same takeover-then-follower sequence as the cluster; with the marker removed, the restore
+  runs and the upgrade and configuration checks pass. Marker removal on a `dr-x------` apache-owned `sites/` fails
+  with all capabilities dropped and succeeds with `DAC_OVERRIDE` added. `kubectl kustomize` sets the pinned digest on
+  the init container; a server-side dry run accepts the Deployment under
+  baseline; the restricted warning now names `clear-leader-marker` as well as `openemr` (root, `DAC_OVERRIDE`).
