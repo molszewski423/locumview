@@ -48,6 +48,7 @@ module "desktop" {
   guacamole = var.guacamole_kubeconfig == "" ? null : {
     kubeconfig = var.guacamole_kubeconfig
     groups     = each.value.guacamole_groups
+    name       = each.value.guacamole_name
   }
 
   secrets = {

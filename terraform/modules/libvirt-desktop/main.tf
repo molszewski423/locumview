@@ -237,14 +237,14 @@ resource "terraform_data" "guacamole" {
 
   # Read by the destroy-time provisioner, which can only use self. Nothing secret here.
   input = {
-    name       = var.name
+    name       = coalesce(var.guacamole.name, var.name)
     kubeconfig = var.guacamole.kubeconfig
     scripts    = abspath("${path.module}/../../../k8s/locumview/guacamole")
   }
-  triggers_replace = [terraform_data.provisioned.id, var.guacamole.groups]
+  triggers_replace = [terraform_data.provisioned.id, var.guacamole.groups, coalesce(var.guacamole.name, var.name)]
 
   provisioner "local-exec" {
-    command     = "${self.input.scripts}/upsert-desktop-connection.sh ${var.name} - ${join(" ", var.guacamole.groups)}"
+    command     = "${self.input.scripts}/upsert-desktop-connection.sh ${self.input.name} - ${join(" ", var.guacamole.groups)}"
     interpreter = ["bash", "-c"]
     environment = {
       KUBECONFIG        = var.guacamole.kubeconfig

@@ -104,11 +104,13 @@ variable "guacamole" {
   description = <<-EOT
     The desktop's Guacamole connection (null: none). Written with k8s/locumview/guacamole/upsert-desktop-connection.sh
     through kubectl, using this kubeconfig (the scoped operator account is enough); READ for these Guacamole user
-    groups. Removed on destroy; session history stays.
+    groups. name is the connection's label on the login page (default: the desktop's name). Removed on destroy, or
+    on a rename; session history stays.
   EOT
   type = object({
     kubeconfig = string
     groups     = list(string)
+    name       = optional(string)
   })
   default = null
 }

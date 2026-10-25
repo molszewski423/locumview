@@ -1344,3 +1344,18 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   attestation verified on the second check. Measured locally: syft peaks near 1.9 GiB on the OpenEMR image (3 GB),
   worth watching on the shared runner.
 - Nothing applied to the cluster yet: the owner runs in `k8s/clinical/README.md` come next.
+
+## 80. Desktop connection label: lv-demo01's owner connection becomes lv-dev (2026-10-25)
+
+- The owner could log in only to the guest "LocumView Demo" desktop. Two causes, neither in the access layer:
+  the owner's IdM user had a console (GDM) session open on lv-demo01 since 2026-10-22, so its always-on headless
+  session could not start (48,650 restarts; port 3390 accepted RDP and dropped it after about two seconds), and
+  locumview-ref-dev is shut off (changelog #72), which guacd reports as "wrong security type". The console session
+  was closed with the owner's agreement; the headless session started and the owner's login was confirmed.
+- The owner's connection was named after the VM, lv-demo01, which reads as the demo desktop. The desktop module
+  takes an optional connection label (`guacamole_name`, default the desktop's name); node1 sets `lv-dev`. The VM,
+  its host name and IdM records keep lv-demo01: renaming them would rebuild the desktop.
+- A label change replaces only the Guacamole connection resource: OpenTofu deletes the old connection (session
+  history stays) and writes the new one. Applied by the owner's `tofu.sh apply`; nothing applied yet.
+- Do not log in as the desktop's user on its console: GNOME allows one session per user, and the remote desktop
+  stops working until that console session ends.
