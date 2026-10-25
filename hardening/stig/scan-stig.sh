@@ -42,7 +42,14 @@ if [[ "$status" != 0 && "$status" != 2 ]]; then
   echo "Remote scan failed (exit $status); attempting to fetch diagnostics." >&2
 fi
 mkdir -p "$OUT"
-scp -q "$TARGET:$R/*" "$OUT/"
+if scp -q "$TARGET:$R/*" "$OUT/"; then
+  # Results are fetched; the private ARF and report should not stay on the desktop. $R is validated above.
+  # shellcheck disable=SC2029
+  ssh "$TARGET" "rm -rf -- '$R'" || echo "Could not remove $R on the target; remove it by hand." >&2
+else
+  echo "Could not fetch results; they remain on the target in $R." >&2
+  [[ "$status" != 0 ]] || status=1
+fi
 echo "pass: $(grep -c '^Result.*pass$' "$OUT/stdout.txt" || true)  fail: $(grep -c '^Result.*fail$' "$OUT/stdout.txt" || true)"
 echo "profile: $profile; oscap/remote exit: $status (0 = all pass, 2 = failed rules, other = error)"
 echo "results: $OUT"

@@ -154,6 +154,9 @@ items do not block the Phase 9 lite microbiology/FHIR spike. Production rollout 
 is separate: no new stable promotion or live-demo update is part of this documentation closeout. Local timer
 masks remain. This completion is scoped to verified functionality, not whole-image byte reproducibility,
 clinical validation, or all platform housekeeping. The older broad phase outline is superseded by this table.
+The desktop's Flatpaks (Firefox, ONLYOFFICE, Extensions) are installed on first boot from Red Hat's or
+Flathub's current releases (`locumview-flatpaks.service`); they are outside the image signature, SBOM and
+image scan, and are not version-pinned.
 
 ### Following phases
 
