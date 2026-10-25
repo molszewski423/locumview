@@ -1156,8 +1156,15 @@ limits held up; these are the fixes from that review.
   drops inherited `GIT_*` variables before any git call; under hook-style variables pointed at a throwaway
   repository, the previous test rewrote that repository's config and the fixed one passes without touching it.
 - **Reviewed, not changed:** the RPM and image workflows can race on a push that changes package inputs; the
-  image fails closed and the packaging README already gives the rerun procedure. The stage-only evidence (#68)
-  shows a signed candidate staged; it does not show the background `bootc upgrade` refusing an unsigned one.
+  image fails closed and the packaging README already gives the rerun procedure.
+- **Background update signature enforcement (configuration verified):** the stage-only evidence (#68) shows a
+  signed candidate staged, not a refusal. A read-only owner check of the live demo desktop on 2026-10-24 found
+  both deployments' saved image references on the `ostree-image-signed:` transport, which `bootc upgrade`
+  reuses, and `/etc/containers/policy.json` rejecting by default with the desktop repository requiring a
+  `sigstoreSigned` signature from the image's baked cosign key (`matchRepository`). The background path therefore
+  enforces signatures by configuration. An unsigned candidate being refused was not observed; that negative test
+  on a disposable desktop is Planned, not required for this milestone. The rollback deployment still references
+  the retired `:latest` tag, which a rollback does not pull.
 - **Verified:** scanner tests 9 of 9 (two new, one extended); the new cases fail against the previous scripts.
   shellcheck clean on the scanner scripts. A local `build-rpms.sh` run in the pinned container built all four
   packages and the SRPM at `0.1.0-1.20261023000253gitd2fd2aa701.el10`, exit 0. A throwaway, never-pushed
