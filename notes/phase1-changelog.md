@@ -1519,7 +1519,9 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
 - `scripts/clinical/make-sso-secret.sh` (owner run): the client secret, read inside the Keycloak pod, and a new cookie
   secret go straight into `clinical-sso.sops.yaml`; neither ends in a newline (oauth2-proxy uses the files as they are,
   and a newline made Keycloak refuse the client in testing). README step 8.
-- kubeconform skips the `Middleware` kind (no bundled schema for Traefik's CRD); the server-side dry run checks it.
+- kubeconform skips the `Middleware` kind (no bundled schema for Traefik's CRD), in the pre-commit hook and in CI's
+  `checks.yml` step, which keeps its own copy of the arguments (the first push missed it and CI failed); the
+  server-side dry run checks the Middleware.
 - Verified on a workstation with Keycloak 26.8.0 (the cluster's digest) configured by the branch's
   `configure-realm.sh` and oauth2-proxy run with `sso.yaml`'s arguments, curl standing in for the browser and for
   Traefik: without a session both names redirect to Keycloak with `redirect_uri` on `/lv-sso/callback` and PKCE S256;
