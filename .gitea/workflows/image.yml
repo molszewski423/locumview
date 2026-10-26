@@ -129,7 +129,13 @@ jobs:
         run: |
           set -euo pipefail
           export DOCKER_CONFIG="$JOB/docker"
+          # syft unpacks the image into TMPDIR, which is RAM (tmpfs) for the runner service, and without a Go memory
+          # limit grew past 9.6 GiB on node2 next to the clinical workloads, until the API server stopped answering
+          # (changelog #92). Unpack on disk and cap the heap: 4.7 GiB peak and under 7 minutes in a test of this image.
+          export TMPDIR="$PWD/.syft-tmp" GOMEMLIMIT=3GiB
+          rm -rf "$TMPDIR"; install -d -m 0700 "$TMPDIR"
           syft scan "registry:$IMAGE@$DIGEST" -q -o "spdx-json=$JOB/sbom-full.spdx.json"
+          rm -rf "$TMPDIR"
           # Packages only: the per-file listing (about 140,000 files) makes the attestation about 160 MB, over the
           # 128 MiB that cosign will read back. Packages and their relationships are what vulnerability tracking uses.
           python3 -I - "$JOB/sbom-full.spdx.json" "$JOB/sbom.spdx.json" <<'PY'
@@ -172,7 +178,7 @@ jobs:
         if: always()
         run: |
           set -uo pipefail
-          [ -n "${JOB:-}" ] && find "$JOB" -type f -exec shred -u {} + 2>/dev/null; rm -rf "${JOB:-/nonexistent}" src
+          [ -n "${JOB:-}" ] && find "$JOB" -type f -exec shred -u {} + 2>/dev/null; rm -rf "${JOB:-/nonexistent}" src .syft-tmp
           # Keep the newest two desktop images locally (layer cache for the next build); drop the rest.
           podman images --format '{{.ID}} {{.Repository}}' | awk -v r="$IMAGE" '$2==r {print $1}' | tail -n +3 | xargs -r podman rmi -f >/dev/null 2>&1 || true
           podman image prune -f >/dev/null 2>&1 || true

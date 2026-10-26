@@ -1574,3 +1574,24 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
 - Not verified yet: Chrome on a desktop with these policies. Merging builds `:testing`; the plan is to try it on a
   desktop that follows `:testing` (M3 step 6: launcher, Keycloak, OpenEMR, SMART launch, Guacamole root blocked)
   before any promotion to `:stable`, which needs the owner's go.
+
+## 92. Image build: syft starved node2 of memory; SBOM step unpacks on disk with a capped heap (2026-10-26)
+
+- The image build for #91 (45aa2c0, digest `sha256:abfdbfe2…`) passed the scan, pushed `:testing` and signed, then
+  stalled in the SBOM step: after an hour `syft scan` held 9.6 GiB of node2's 15 GiB, and its unpacked image filled
+  6.4 GiB of the runner service's `/tmp`, which is RAM (tmpfs). Memory pressure ("full") stayed near 30%, swap filled,
+  and the k3s API server answered `apiserver not ready`. Earlier builds fit; node2 now also runs the clinical
+  workloads. No pod was OOM-killed.
+- The owner cancelled the run in Gitea; syft exited, memory and the API server recovered. That digest is signed but has
+  no SBOM or scan attestation, so the promote workflow refuses it; a rebuild is needed.
+- Tested on node1 with syft 1.54.1 (the runner's version) against that digest, capped at 8 GiB, with `GOMEMLIMIT=3GiB`
+  and the unpack directory on disk: finished in 6 min 39 s, about 4.7 GiB peak, 6.6 GiB on disk, an SBOM of 4,856
+  packages and 142,810 files (the full output; the workflow then drops the per-file part as before). Setting
+  `SYFT_FILE_METADATA_SELECTION=none` does not shrink the output (the files come from package ownership), so it is not
+  used.
+- `image.yml`'s SBOM step: `TMPDIR` under the job's work directory on disk, `GOMEMLIMIT=3GiB`, removed afterwards and
+  in the clean-up step.
+- Open: after the cancel and a runner restart, node2's `/tmp` still reports 6.4 GiB used while holding 4 KB of files
+  (space held by deleted files a process still has open; owner check in progress). Separately, the nightly
+  `backup-debianbox` job has failed three nights: snapshots reach both targets, but the Gitea dump fails, and its
+  Discord notification returns 404, so the failures alerted no one.
