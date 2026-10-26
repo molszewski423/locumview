@@ -87,6 +87,9 @@ spec:
     address: http://oauth2-proxy.clinical.svc.cluster.local:4180/
     trustForwardHeader: false
     authResponseHeaders: [X-Auth-Request-User, X-Auth-Request-Email]
+    # Traefik drops the auth server's cookies unless they are listed: without this, a session refreshed with Keycloak
+    # never reaches the browser and every request refreshes again. Sessions over 4 KB are split into _0, _1, ...
+    addAuthCookiesToResponse: [_lv_clinical_sso, _lv_clinical_sso_0, _lv_clinical_sso_1, _lv_clinical_sso_2]
 ---
 # oauth2-proxy's own paths (start, callback, sign-out) on both names, not behind the middleware.
 apiVersion: networking.k8s.io/v1
