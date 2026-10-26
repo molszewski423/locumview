@@ -1531,3 +1531,27 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   no newlines, no overwrite on rerun. Server-side dry runs of the clinical kustomization and the locumview network
   policy pass, with no restricted-profile warning for oauth2-proxy. Test users were mfa-exempt so that curl needed no
   TOTP; the realm's TOTP flow itself is unchanged.
+
+## 90. M3 step 4 applied: the clinical launch end to end through Keycloak; session refresh fixed (2026-10-25)
+
+- Owner run, README step 8 (from operator-laptop, and from node1 for `k8s/locumview`, whose git-ignored `site.env`
+  is only there): `configure-realm.sh` reapplied the realm unchanged and created group `locumview-clinical` and client
+  `clinical-sso`; the owner joined the group; `clinical-sso.sops.yaml` committed and applied; `kubectl diff -k
+  k8s/locumview` showed only the `keycloak` policy rule and a no-op on `cloudflared` (`ingress: []` spelled out);
+  applied (four other objects reported `configured` with no spec change: the database StatefulSets kept their
+  revisions and pods); images verified and `kubectl apply -k k8s/clinical`.
+- Checked without credentials: the client's public authorization endpoint accepts both callbacks with PKCE, refuses a
+  foreign `redirect_uri` (400) and a request without PKCE (`Missing parameter: code_challenge_method`). Anonymous
+  requests to both names redirect to Keycloak with their own callback and PKCE; a forged cookie is refused; the
+  gateway still reaches OpenEMR inside the cluster.
+- Owner's browser test (devsuse, IdM CA trusted): Keycloak sign-in with password and TOTP (`AuthSuccess` in
+  oauth2-proxy's log), OpenEMR login, launch from an `LV-` chart, OpenEMR's own SMART login and consent (stock OpenEMR,
+  as in the local test of #76), then the app: `/launch`, `/callback`, and Patient, Encounter, Condition,
+  AllergyIntolerance, MedicationRequest, Observation and Specimen reads, all 200; no 4xx or 5xx.
+- Found: oauth2-proxy logged `Refreshing session` on almost every request (355 in 40 minutes) with a growing session
+  age. Traefik's ForwardAuth drops the auth server's `Set-Cookie` unless the Middleware lists the cookie in
+  `addAuthCookiesToResponse`, so the refreshed session never reached the browser and every later request refreshed
+  again with Keycloak. `sso.yaml` now lists `_lv_clinical_sso` and its split names (`_0` to `_2`; sessions over
+  4 KB are split). Verify after applying: one refresh per user about every 4 minutes.
+- Also found: on its first admin login OpenEMR asks to register the install (product registration); declined. A later
+  setup step could record the decline ahead of time.
