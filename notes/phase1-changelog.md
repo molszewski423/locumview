@@ -1595,3 +1595,30 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   (space held by deleted files a process still has open; owner check in progress). Separately, the nightly
   `backup-debianbox` job has failed three nights: snapshots reach both targets, but the Gitea dump fails, and its
   Discord notification returns 404, so the failures alerted no one.
+
+## 93. M3 step 6: the EHR launcher tested on a desktop; ADR 0019 proposes one MFA sign-in (2026-10-26)
+
+- Image rebuilt after #92 (CI run 205, commit tag `679057885879`): `:testing` = `sha256:8c94dcf4…`, signature, SBOM
+  attestation and scan attestation verified (scan `pass`, nothing the image alone can judge failing). node2's lowest
+  available memory during the SBOM step was about 4.1 GiB. The earlier digest `sha256:abfdbfe2…` has no attestations
+  and must never be promoted.
+- Runner pitfall: restarting the CI runner service left rootless podman's pause process (`catatonit -P`, the CI user)
+  running against the old private `/tmp`, and the next build failed with `mkdir /var/tmp/buildah…: no such file or
+  directory`. Killing the pause process fixed it. Planned: an `ExecStopPost` in the runner unit that stops the CI
+  user's pause process.
+- Canary desktop `lv-test17` (OpenTofu, following `:stable`), switched by the owner to the digest above with
+  `bootc switch --enforce-container-sigpolicy` (`ostree-image-signed`), staged digest checked before the reboot.
+  Booted `8c94dcf4…`, rollback `:stable`; `/etc/locumview/ehr.conf` and the Chrome allowlist came from the new image.
+- M3 step 6, in the desktop over Guacamole: EHR launcher, then Keycloak with TOTP, then OpenEMR's login; dashboard;
+  SMART launch, consent and the clinical app with FHIR data, all in the one app window (no pop-ups); a plain Chrome
+  window blocks `login.locumview.com/`, `/realms/master` and outside sites; a second EHR window shares the Keycloak
+  session; after Chrome is closed, Keycloak asks again (session-only cookies, by design). Passed.
+- Findings (none blocks step 6): (1) pasting through Guacamole's clipboard does not reach image-built desktops (copy-out
+  is blocked by design, paste-in should work; Guacamole's text input works around it; not diagnosed yet); (2) MFA twice,
+  once for Guacamole and again in the desktop's Chrome, plus OpenEMR's own login; (3) the EHR launcher shows the stock
+  Chrome icon; (4) Ctrl+N and similar keys are caught by the local browser unless sent through Guacamole's text input.
+- Finding 2: the owner wants MFA once, at the front door, with the desktop as the trust boundary. ADR 0019 (Proposed)
+  makes the EHR names reachable only from LocumView desktops by mutual TLS (an IdM sub-CA for desktops, TPM-backed keys,
+  Chrome selecting the certificate by policy) and removes oauth2-proxy from the clinical namespace. Nothing is built;
+  a spike on the canary desktop comes first.
+- Promotion of `8c94dcf4…` to `:stable` waits for the owner's go.
