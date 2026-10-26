@@ -9,6 +9,7 @@ resources:
   - openemr.yaml
   - gateway.yaml
   - ingress.yaml
+  - sso.yaml
 
 # The images CI built and signed (.gitea/workflows/clinical-images.yml), by digest. Updated by a commit after each
 # build that is to be deployed; verify first: scripts/clinical/verify-images.sh
@@ -35,4 +36,6 @@ replacements:
       - select: {kind: Deployment, name: openemr}
         fieldPaths: ["spec.template.spec.nodeSelector.[kubernetes.io/hostname]"]
       - select: {kind: Deployment, name: gateway}
+        fieldPaths: ["spec.template.spec.nodeSelector.[kubernetes.io/hostname]"]
+      - select: {kind: Deployment, name: oauth2-proxy}
         fieldPaths: ["spec.template.spec.nodeSelector.[kubernetes.io/hostname]"]

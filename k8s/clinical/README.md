@@ -4,8 +4,9 @@ OpenEMR 8.4.1 with LocumView's fix (`clinical/images/openemr/`), MariaDB, and th
 (`clinical/images/gateway/`), on node2. Design and evidence: `clinical/app/README.md`,
 `docs/evidence/clinical/20261025-m3-local-launch/`.
 
-- **Network:** default deny. Traefik reaches OpenEMR (80) and the gateway (8080); the gateway reaches OpenEMR; OpenEMR
-  reaches MariaDB; DNS. No pod has internet egress.
+- **Network:** default deny. Traefik reaches OpenEMR (80), the gateway (8080) and oauth2-proxy (4180); the gateway
+  reaches OpenEMR; OpenEMR reaches MariaDB; oauth2-proxy reaches Keycloak (locumview namespace); DNS. No pod has
+  internet egress.
 - **Pod security:** baseline enforced, restricted warned. MariaDB (as mysql, no capabilities) and the gateway (non-root,
   read-only root filesystem, no capabilities, no service account token) meet restricted; OpenEMR's upstream
   entrypoint starts as root, drops NET_RAW only.
@@ -39,5 +40,17 @@ OpenEMR 8.4.1 with LocumView's fix (`clinical/images/openemr/`), MariaDB, and th
    `sops -d … | kubectl apply -f -`, then `kubectl apply -k k8s/clinical` (adds the Ingresses). Clients need IdM's CA
    (`k8s/locumview/keycloak/idm-ca.pem`); enrolled desktops already have it. The certificates last about two years;
    renewing is a rerun after moving the old files aside.
+
+8. Keycloak in front (M3 step 4; an access change): every request to either name first needs a Keycloak sign-in
+   (password and TOTP) by a member of `locumview-clinical`; OpenEMR's own login and the SMART launch follow as before.
+   - `kubectl -n locumview exec -i deploy/keycloak -- bash -s < k8s/locumview/keycloak/configure-realm.sh` (adds the
+     group and the `clinical-sso` client; the rest of the realm is reapplied unchanged).
+   - Add each clinical user to the group, keeping their password: `printf 'USERNAME=<user>\nUSER_GROUPS=locumview-clinical\nTMP_PASSWORD=\n' | cat - k8s/locumview/keycloak/create-user.sh | kubectl -n locumview exec -i deploy/keycloak -- bash -s`
+   - `scripts/clinical/make-sso-secret.sh`, commit `clinical-sso.sops.yaml`, then
+     `sops -d k8s/clinical/secrets/clinical-sso.sops.yaml | kubectl apply -f -`.
+   - `kubectl diff -k k8s/locumview` should show only Keycloak's network policy (oauth2-proxy may reach it); then
+     `kubectl apply -k k8s/locumview`.
+   - `scripts/clinical/verify-images.sh`, then `kubectl apply -k k8s/clinical` (oauth2-proxy, the `sso` middleware on
+     both Ingresses, the `/lv-sso` routes).
 
 Nothing in these steps displays a password, the client secret or a private key.

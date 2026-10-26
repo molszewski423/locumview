@@ -71,10 +71,11 @@ repos:
       - id: kubeconform
         name: kubeconform (podman, image pinned by digest)
         # *.sops.yaml carry a top-level `sops:` block (invalid for strict schema); sops-encrypted covers them.
+        # Traefik's Middleware is a CRD with no bundled schema; it is skipped here and checked by a server-side dry run.
         entry: >-
           --entrypoint /kubeconform
           ghcr.io/yannh/kubeconform:v0.8.0@sha256:faffaf43f95aa6425306e1ab8d6fcad72acb9049158f38e574c085ea1ec0f64e
-          -strict -summary
+          -strict -summary -skip Middleware
           -ignore-filename-pattern kustomization\.yaml$
           -ignore-filename-pattern \.sops\.ya?ml$
         language: docker_image

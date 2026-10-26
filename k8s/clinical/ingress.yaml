@@ -1,6 +1,7 @@
 # M3 step 3: the two front ends on Traefik's websecure entrypoint (TLS at the edge, plain HTTP to the pods, which the
 # network policy allows from Traefik only). Certificates come from IdM's CA (scripts/clinical/make-tls-secrets.sh) and
 # are applied from SOPS like the other Secrets. The names resolve through IdM DNS: AdGuard forwards corp.locumview.com.
+# Every request passes Keycloak first (sso.yaml); oauth2-proxy's own /lv-sso paths are routed there without it.
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -9,6 +10,7 @@ metadata:
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.middlewares: clinical-sso@kubernetescrd   # Keycloak first (sso.yaml)
 spec:
   ingressClassName: traefik
   tls: [{hosts: [emr.corp.locumview.com], secretName: clinical-tls-emr}]   # pragma: allowlist secret
@@ -25,6 +27,7 @@ metadata:
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.middlewares: clinical-sso@kubernetescrd   # Keycloak first (sso.yaml)
 spec:
   ingressClassName: traefik
   tls: [{hosts: [clinical.corp.locumview.com], secretName: clinical-tls-clinical}]   # pragma: allowlist secret
