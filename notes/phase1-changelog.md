@@ -1622,3 +1622,12 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   Chrome selecting the certificate by policy) and removes oauth2-proxy from the clinical namespace. Nothing is built;
   a spike on the canary desktop comes first.
 - Promotion of `8c94dcf4…` to `:stable` waits for the owner's go.
+
+## 94. Image-build runner: the pause-process pitfall of #93 is fixed (2026-10-26)
+
+- The runner unit on node2 (private infrastructure repository) now stops the CI user's rootless podman pause process
+  (`catatonit -P`) whenever the service stops, crash restarts included, and before it starts (`ExecStopPost` and
+  `ExecStartPre`, run as the CI user, no root). A new `update-unit.sh` installs only the unit and refuses while a build
+  runs.
+- Installed by the owner: the stale pause process from before was listed before the restart and gone after it; the
+  runner is active. The next image build is the end-to-end check.
