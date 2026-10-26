@@ -1496,3 +1496,38 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   because its file exists.
 - Checked read-only against IdM's DNS: `emr.` resolves to node2, `clinical.` does not resolve yet. Shellcheck clean;
   the stub test from #87 passes.
+
+## 89. Phase 9 lite M3 step 4: Keycloak in front of the clinical names (2026-10-25, prepared)
+
+- M3 step 3 is applied and verified (#87, #88, owner PR #30): `emr.` and `clinical.corp.locumview.com` resolve
+  through IdM DNS to node2, Traefik serves IdM-issued certificates (valid to 2028-10-26) that verify against IdM's CA,
+  OpenEMR's login page, the app and OpenEMR's OpenID configuration (issuer `https://emr.corp.locumview.com/oauth2/default`)
+  answer over HTTPS, and the login page links nothing over `http://`. Open: OpenEMR's cookies lack `Secure` (it sees
+  plain HTTP from Traefik); fix later by trusting `X-Forwarded-Proto` in the OpenEMR image.
+- Owner decision (2026-10-25, option 1 of 3): Keycloak in front of both names through Traefik forward-auth, not
+  OpenEMR's own OIDC login (would change stock OpenEMR) and not desktop-only reachability.
+- `k8s/clinical/sso.yaml`: oauth2-proxy v7.15.5 (pinned by digest), the Traefik `sso` Middleware (ForwardAuth) and an
+  Ingress for its `/lv-sso` paths on both names (clear of OpenEMR's `/oauth2`). Confidential client `clinical-sso`,
+  authorization code with PKCE S256, only group `locumview-clinical`; one session cookie for both names
+  (`.corp.locumview.com`, `Secure`, `HttpOnly`, `SameSite=Lax`, 10 hours, rechecked with Keycloak every 4 minutes).
+  Browsers use Keycloak's public address; the pod redeems codes and fetches keys from Keycloak inside the cluster.
+  Restricted profile; Secret files readable through `fsGroup` (#86).
+- `ingress.yaml`: both Ingresses use the middleware. Network policy: Traefik to oauth2-proxy (4180), oauth2-proxy to
+  Keycloak only; `k8s/locumview/networkpolicy.yaml` lets that pod reach Keycloak (8080).
+- `configure-realm.sh`: group `locumview-clinical` and the `clinical-sso` client with a groups claim in the ID token.
+  `create-user.sh`'s usage comment named `GROUPS`; the script reads `USER_GROUPS`.
+- `scripts/clinical/make-sso-secret.sh` (owner run): the client secret, read inside the Keycloak pod, and a new cookie
+  secret go straight into `clinical-sso.sops.yaml`; neither ends in a newline (oauth2-proxy uses the files as they are,
+  and a newline made Keycloak refuse the client in testing). README step 8.
+- kubeconform skips the `Middleware` kind (no bundled schema for Traefik's CRD), in the pre-commit hook and in CI's
+  `checks.yml` step, which keeps its own copy of the arguments (the first push missed it and CI failed); the
+  server-side dry run checks the Middleware.
+- Verified on a workstation with Keycloak 26.8.0 (the cluster's digest) configured by the branch's
+  `configure-realm.sh` and oauth2-proxy run with `sso.yaml`'s arguments, curl standing in for the browser and for
+  Traefik: without a session both names redirect to Keycloak with `redirect_uri` on `/lv-sso/callback` and PKCE S256;
+  a member of `locumview-clinical` signs in once and both names answer 202; a non-member signs in to Keycloak and gets
+  403 with no session; a forged cookie is redirected. `make-sso-secret.sh` against the same Keycloak (a throwaway age
+  key in a scratch copy): both values encrypted, the client secret equal to Keycloak's, cookie secret 32 characters,
+  no newlines, no overwrite on rerun. Server-side dry runs of the clinical kustomization and the locumview network
+  policy pass, with no restricted-profile warning for oauth2-proxy. Test users were mfa-exempt so that curl needed no
+  TOTP; the realm's TOTP flow itself is unchanged.

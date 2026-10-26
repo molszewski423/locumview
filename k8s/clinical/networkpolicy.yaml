@@ -1,5 +1,6 @@
 # Default deny in both directions; each workload gets only the traffic it needs. No internet egress for any pod:
-# OpenEMR, MariaDB and the gateway talk only to each other, and Traefik reaches the two front ends.
+# OpenEMR, MariaDB and the gateway talk only to each other, and Traefik reaches the two front ends. oauth2-proxy
+# answers Traefik and talks only to Keycloak.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata: {name: default-deny, namespace: clinical}
@@ -59,3 +60,22 @@ spec:
   egress:
     - to: [{podSelector: {matchLabels: {app: openemr}}}]
       ports: [{protocol: TCP, port: 80}]
+---
+# oauth2-proxy (sso.yaml): Traefik's ForwardAuth and the /lv-sso paths in; out only to Keycloak in the locumview
+# namespace, to redeem codes and fetch its keys (browsers reach Keycloak at its public address).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: oauth2-proxy, namespace: clinical}
+spec:
+  podSelector: {matchLabels: {app: oauth2-proxy}}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: kube-system}}
+          podSelector: {matchLabels: {app.kubernetes.io/name: traefik}}
+      ports: [{protocol: TCP, port: 4180}]
+  egress:
+    - to:
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: locumview}}
+          podSelector: {matchLabels: {app.kubernetes.io/name: keycloak}}
+      ports: [{protocol: TCP, port: 8080}]

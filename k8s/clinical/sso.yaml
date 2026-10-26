@@ -1,0 +1,111 @@
+# Keycloak in front of the clinical names (M3 step 4): oauth2-proxy answers Traefik's ForwardAuth for every request to
+# emr. and clinical.corp.locumview.com. Without a session it sends the browser to Keycloak (password and TOTP, ADR 0005);
+# only members of locumview-clinical get through. OpenEMR's own login and the SMART launch carry on behind it; the
+# gateway's calls to OpenEMR stay inside the cluster and never pass here. One session covers both names (cookie domain
+# .corp.locumview.com). Its paths live under /lv-sso, clear of OpenEMR's /oauth2. Meets the restricted profile.
+apiVersion: v1
+kind: Service
+metadata: {name: oauth2-proxy, namespace: clinical}
+spec:
+  selector: {app: oauth2-proxy}
+  ports: [{name: http, port: 4180, targetPort: 4180}]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: oauth2-proxy, namespace: clinical}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: oauth2-proxy}}
+  template:
+    metadata: {labels: {app: oauth2-proxy}}
+    spec:
+      nodeSelector: {kubernetes.io/hostname: CLINICAL_NODE}   # set from site.env
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532   # Secret files are owned by root; group 65532 may read them (changelog #86)
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: oauth2-proxy
+          # v7.15.5 (2026-10-01), pinned by digest.
+          image: quay.io/oauth2-proxy/oauth2-proxy@sha256:8498b0d0ef0a7b29686414000a08aee467f02d0299c9ed1e006a8f33fc017916
+          args:
+            - --http-address=0.0.0.0:4180
+            - --provider=oidc
+            - --client-id=clinical-sso
+            - --client-secret-file=/run/sso/client-secret
+            - --cookie-secret-file=/run/sso/cookie-secret
+            # Browsers reach Keycloak at its public address; this pod redeems codes and fetches keys inside the cluster.
+            - --oidc-issuer-url=https://login.locumview.com/realms/locumview
+            - --skip-oidc-discovery
+            - --login-url=https://login.locumview.com/realms/locumview/protocol/openid-connect/auth
+            - --redeem-url=http://keycloak.locumview.svc.cluster.local:8080/realms/locumview/protocol/openid-connect/token
+            - --oidc-jwks-url=http://keycloak.locumview.svc.cluster.local:8080/realms/locumview/protocol/openid-connect/certs
+            - --code-challenge-method=S256
+            - --scope=openid email profile
+            - --email-domain=*
+            - --allowed-group=locumview-clinical
+            - --proxy-prefix=/lv-sso
+            - --reverse-proxy
+            - --upstream=static://202
+            - --skip-provider-button
+            - --cookie-name=_lv_clinical_sso
+            - --cookie-domain=.corp.locumview.com
+            - --whitelist-domain=.corp.locumview.com
+            - --cookie-secure=true
+            - --cookie-samesite=lax
+            # Keycloak's session limits: 30 minutes idle, 10 hours at most. The refresh rechecks the session with Keycloak.
+            - --cookie-expire=10h
+            - --cookie-refresh=4m
+            - --silence-ping-logging
+          ports: [{containerPort: 4180, name: http}]
+          readinessProbe:
+            httpGet: {path: /ping, port: 4180}
+            periodSeconds: 10
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {memory: 32Mi, cpu: 10m}
+            limits: {memory: 128Mi}
+          volumeMounts: [{name: sso, mountPath: /run/sso, readOnly: true}]
+      volumes:
+        - name: sso
+          secret:
+            secretName: clinical-sso   # pragma: allowlist secret (the Secret's name, not a value)
+            defaultMode: 0440
+---
+# Traefik asks oauth2-proxy about every request on the clinical Ingresses (ingress.yaml, router.middlewares).
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata: {name: sso, namespace: clinical}
+spec:
+  forwardAuth:
+    address: http://oauth2-proxy.clinical.svc.cluster.local:4180/
+    trustForwardHeader: false
+    authResponseHeaders: [X-Auth-Request-User, X-Auth-Request-Email]
+---
+# oauth2-proxy's own paths (start, callback, sign-out) on both names, not behind the middleware.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sso
+  namespace: clinical
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  ingressClassName: traefik
+  tls:
+    - {hosts: [emr.corp.locumview.com], secretName: clinical-tls-emr}             # pragma: allowlist secret
+    - {hosts: [clinical.corp.locumview.com], secretName: clinical-tls-clinical}   # pragma: allowlist secret
+  rules:
+    - host: emr.corp.locumview.com
+      http:
+        paths: [{path: /lv-sso, pathType: Prefix, backend: {service: {name: oauth2-proxy, port: {number: 4180}}}}]
+    - host: clinical.corp.locumview.com
+      http:
+        paths: [{path: /lv-sso, pathType: Prefix, backend: {service: {name: oauth2-proxy, port: {number: 4180}}}}]

@@ -89,6 +89,11 @@ spec:
       ports: [{protocol: TCP, port: 8080}]
     - from: [{podSelector: {matchLabels: {app.kubernetes.io/name: cloudflared}}}]
       ports: [{protocol: TCP, port: 8080}]
+    # oauth2-proxy in front of the clinical names (k8s/clinical/sso.yaml): code redemption and keys, client clinical-sso.
+    - from:
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: clinical}}
+          podSelector: {matchLabels: {app: oauth2-proxy}}
+      ports: [{protocol: TCP, port: 8080}]
     # Infinispan/JGroups between Keycloak instances (rolling updates; HA later): 7800 data, 57800 failure detection.
     - from: [{podSelector: {matchLabels: {app.kubernetes.io/name: keycloak}}}]
       ports: [{protocol: TCP, port: 7800}, {protocol: TCP, port: 57800}]

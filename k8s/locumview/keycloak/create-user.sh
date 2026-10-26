@@ -3,7 +3,7 @@
 # The caller prepends USERNAME, FIRST, LAST, USER_GROUPS (space-separated) and TMP_PASSWORD (empty = keep) on stdin;
 # optional EMAIL, PERMANENT_PASSWORD=1 (shared demo password, not forced to change) and NO_SELF_SERVICE=1
 # (removes default-roles-locumview, so no account console: a guest can't change the password or add MFA). E.g.:
-#   { printf 'USERNAME=%q\nFIRST=%q\nLAST=%q\nGROUPS=%q\nTMP_PASSWORD=%q\n' ...; cat create-user.sh; } |
+#   { printf 'USERNAME=%q\nFIRST=%q\nLAST=%q\nUSER_GROUPS=%q\nTMP_PASSWORD=%q\n' ...; cat create-user.sh; } |
 #     kubectl -n locumview exec -i deploy/keycloak -- bash -s
 # The temporary password never appears in arguments or output. First login forces a new password
 # (realm policy) and TOTP enrolment (locumview-browser flow) unless the user is in locumview-demo.
