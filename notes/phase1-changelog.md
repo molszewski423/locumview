@@ -1462,3 +1462,24 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   and the gateway's security context: with `0400` and no `fsGroup`, `-r-------- 0 0` and the read is denied; with
   `fsGroup: 10001` and `0440`, `-r--r----- 0 10001` and the read succeeds. No other clinical manifest mounts a Secret
   as a file.
+
+## 87. Phase 9 lite M3 step 3: IdM names and certificates for the clinical front ends (2026-10-25, prepared)
+
+- Owner decision (2026-10-25): certificates from IdM's CA in an owner run, not cert-manager with IdM ACME and not
+  mkcert. IdM is the corp CA (ADR 0006) and enrolled desktops already trust it; renewal is a rerun about every two
+  years.
+- `scripts/clinical/make-tls-secrets.sh` (operator-laptop; needs an admin ticket on idm01 and `INGRESS_IP` in
+  `k8s/clinical/site.env`): for `emr.` and `clinical.corp.locumview.com`, adds the IdM host entry with its A record
+  (no PTR) and an `HTTP/` service when missing, makes an RSA 3072 key and CSR in a private tmpfs directory, sends only
+  the CSR to idm01 for `ipa cert-request`, checks the certificate against the repository's IdM CA, its host name and
+  the key, and writes `k8s/clinical/secrets/clinical-tls-<name>.sops.yaml` (`kubernetes.io/tls`). The key is never
+  displayed or written in plain text outside that directory. It refuses to overwrite.
+- `k8s/clinical/ingress.yaml`: one Ingress per name on Traefik's `websecure` entrypoint; TLS ends at Traefik, plain
+  HTTP to OpenEMR (80) and the gateway (8080), which the network policy already allows from Traefik only. The gateway
+  keeps calling OpenEMR inside the cluster (`EHR_INTERNAL_URL`); the names matter to browsers.
+- README step 7 and `site.env.example` (`INGRESS_IP`) describe the owner run.
+- Checked before review: the repository's `idm-ca.pem` has the same SHA-256 fingerprint as `/etc/ipa/ca.crt` on idm01;
+  neither name resolves yet. The script ran end to end on a workstation with idm01 replaced by a stub that signs the
+  CSR with a throwaway CA: both files written with every value encrypted; a certificate from a different CA, for a
+  different name or for a different key is refused. `ipa` itself was not run (it needs the admin ticket). Server-side
+  dry run of the Ingresses passes.

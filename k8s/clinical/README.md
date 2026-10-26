@@ -11,8 +11,8 @@ OpenEMR 8.4.1 with LocumView's fix (`clinical/images/openemr/`), MariaDB, and th
   entrypoint starts as root, drops NET_RAW only.
 - **Images:** built, signed and SBOM-attested by `.gitea/workflows/clinical-images.yml`; deployed by digest
   (`kustomization.yaml`, `images`).
-- **Names:** `emr.corp.locumview.com` (OpenEMR) and `clinical.corp.locumview.com` (the app), IdM DNS and certificates,
-  M3 step 3. Until then, checks use `kubectl port-forward`.
+- **Names:** `emr.corp.locumview.com` (OpenEMR) and `clinical.corp.locumview.com` (the app): IdM DNS records and
+  certificates from IdM's CA (step 7), served by Traefik (`ingress.yaml`). Before step 7, checks use `kubectl port-forward`.
 
 ## Deploying (owner runs on operator-laptop, in order)
 
@@ -32,4 +32,12 @@ OpenEMR 8.4.1 with LocumView's fix (`clinical/images/openemr/`), MariaDB, and th
    It decrypts nothing: SQL runs inside the MariaDB pod and API calls inside the OpenEMR pod, each with its own
    credentials (`clinical/scenarios/targets.py`). Running it again skips what is already loaded.
 
-Nothing in these steps displays a password or the client secret.
+7. Names and certificates (M3 step 3): set `INGRESS_IP` in `site.env` (node2's LAN address), get an admin ticket on
+   idm01 with `ssh -t <idm01> kinit admin`, then `scripts/clinical/make-tls-secrets.sh`. It adds the IdM host entries
+   (with their A records) and HTTP services, has IdM's CA issue one certificate per name and writes
+   `clinical-tls-emr.sops.yaml` and `clinical-tls-clinical.sops.yaml`. Commit them, apply each with
+   `sops -d … | kubectl apply -f -`, then `kubectl apply -k k8s/clinical` (adds the Ingresses). Clients need IdM's CA
+   (`k8s/locumview/keycloak/idm-ca.pem`); enrolled desktops already have it. The certificates last about two years;
+   renewing is a rerun after moving the old files aside.
+
+Nothing in these steps displays a password, the client secret or a private key.
