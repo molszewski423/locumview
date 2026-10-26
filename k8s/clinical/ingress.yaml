@@ -1,0 +1,34 @@
+# M3 step 3: the two front ends on Traefik's websecure entrypoint (TLS at the edge, plain HTTP to the pods, which the
+# network policy allows from Traefik only). Certificates come from IdM's CA (scripts/clinical/make-tls-secrets.sh) and
+# are applied from SOPS like the other Secrets. The names resolve through IdM DNS: AdGuard forwards corp.locumview.com.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: emr
+  namespace: clinical
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  ingressClassName: traefik
+  tls: [{hosts: [emr.corp.locumview.com], secretName: clinical-tls-emr}]   # pragma: allowlist secret
+  rules:
+    - host: emr.corp.locumview.com
+      http:
+        paths: [{path: /, pathType: Prefix, backend: {service: {name: openemr, port: {number: 80}}}}]
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: clinical
+  namespace: clinical
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  ingressClassName: traefik
+  tls: [{hosts: [clinical.corp.locumview.com], secretName: clinical-tls-clinical}]   # pragma: allowlist secret
+  rules:
+    - host: clinical.corp.locumview.com
+      http:
+        paths: [{path: /, pathType: Prefix, backend: {service: {name: gateway, port: {number: 8080}}}}]
