@@ -60,7 +60,7 @@ Each default app is a slot: the image fills it with LocumView's default, and a d
 | Slot | Default | Source | Swappable for |
 |---|---|---|---|
 | System browser | Firefox ESR, with enterprise policies following the DISA Firefox STIG (hardening/browser/) | Red Hat's Flatpak remote (registered desktops); Mozilla's Firefox from Flathub otherwise | |
-| EHR browser | Google Chrome in app mode (the "EHR" launcher, pinned first in the dock): DISA Chrome STIG policies, only the EHR's sites allowed (ADR 0016, hardening/browser/) | Google's RPM repository, in the image, checked against Google's pinned key | Microsoft Edge, EPEL Chromium, or the customer's standard browser |
+| EHR browser | Google Chrome in app mode (the "EHR" launcher, pinned first in the dock): DISA Chrome STIG policies, only the EHR's sites allowed (ADR 0016, hardening/browser/). This image, LocumView's reference deployment, points it at the clinical OpenEMR (`image/desktop/reference/`) | Google's RPM repository, in the image, checked against Google's pinned key | Microsoft Edge, EPEL Chromium, or the customer's standard browser |
 | Office | ONLYOFFICE | Flathub, first boot | The customer's office suite |
 | Files, calculator | GNOME Files, Calculator | RHEL (AppStream) | |
 | Extensions manager | GNOME Extensions | Flathub, first boot | |

@@ -1555,3 +1555,22 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   4 KB are split). Verify after applying: one refresh per user about every 4 minutes.
 - Also found: on its first admin login OpenEMR asks to register the install (product registration); declined. A later
   setup step could record the decline ahead of time.
+
+## 91. Phase 9 lite M3 step 5: the desktop's EHR launcher opens the clinical OpenEMR (2026-10-26, prepared)
+
+- Owner decisions (2026-10-26): the image points the EHR slot (ADR 0016) at the clinical OpenEMR on every desktop that
+  follows the image, including the public demo; the Keycloak gate stays `locumview-clinical` for now, and demo access
+  follows as its own change (a non-admin OpenEMR demo account with a shared password handled like the demo Keycloak
+  password, `locumview-demo` allowed in oauth2-proxy, and a scheduled reset of the synthetic charts). Until then demo
+  users who press EHR reach Keycloak and are refused after sign-in.
+- `image/desktop/reference/`: `ehr.conf` (`EHR_URL=https://emr.corp.locumview.com/`) and
+  `50-locumview-ehr-sites.json` (the placeholder page, `chrome://policy`, `emr.` and `clinical.corp.locumview.com`, and
+  only `/realms/locumview` and `/resources` on `login.locumview.com`, so Guacamole at that host's root stays blocked).
+  Containerfile step 3c installs them after step 3's `rpm -V`, because `ehr.conf` is the `locumview-ehr-launcher` RPM's
+  `%config` file; the RPM and `image/desktop/files/` keep the generic defaults for other deployments.
+- Desktops trust the IdM certificates through IdM enrollment (`ipa-client-install` adds IdM's CA to the system trust,
+  which Chrome uses on RHEL). The Chrome STIG policies stay as they are: pop-ups blocked (OpenEMR shows the SMART launch
+  in an in-page dialog), cookies for the session only (a Chrome restart means a new Keycloak sign-in).
+- Not verified yet: Chrome on a desktop with these policies. Merging builds `:testing`; the plan is to try it on a
+  desktop that follows `:testing` (M3 step 6: launcher, Keycloak, OpenEMR, SMART launch, Guacamole root blocked)
+  before any promotion to `:stable`, which needs the owner's go.
