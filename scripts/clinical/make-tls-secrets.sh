@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Owner run (operator-laptop), M3 step 3: IdM names and TLS certificates for emr. and clinical.corp.locumview.com.
 # Needs an admin ticket on idm01 (`ssh -t <idm01> kinit admin`) and INGRESS_IP in k8s/clinical/site.env (node2's LAN
-# address, where Traefik listens). For each name: an IdM host entry with its A record (no PTR) and an HTTP/ service,
-# each only if missing; a key and CSR made here; the certificate from IdM's CA (caIPAserviceCert), checked against the
+# address, where Traefik listens). For each name: an A record (no PTR), an IdM host entry and an HTTP/ service, each
+# only if missing; a key and CSR made here; the certificate from IdM's CA (caIPAserviceCert), checked against the
 # repository's IdM CA; and k8s/clinical/secrets/clinical-tls-<name>.sops.yaml (kubernetes.io/tls). The private key
 # exists only in a private tmpfs directory until SOPS encrypts it and is never displayed. Refuses to overwrite.
 #   scripts/clinical/make-tls-secrets.sh
@@ -23,8 +23,12 @@ for name in emr clinical; do
   out=k8s/clinical/secrets/clinical-tls-$name.sops.yaml
   [[ ! -e "$out" ]] || { echo "$out exists; skipping $fqdn"; continue; }
 
-  # shellcheck disable=SC2029  # $fqdn and $ip expand here on purpose
-  ssh "$IDM" "ipa host-show $fqdn >/dev/null 2>&1 || ipa host-add $fqdn --ip-address=$ip --no-reverse >/dev/null
+  # Both names share Traefik's address, which host-add --ip-address refuses for a second host: the A record is added
+  # on its own, then the host (whose DNS check it satisfies) and its HTTP service. Each step only if missing.
+  # shellcheck disable=SC2029  # $name, $fqdn and $ip expand here on purpose
+  ssh "$IDM" "set -e
+              ipa dnsrecord-show $DOMAIN $name >/dev/null 2>&1 || ipa dnsrecord-add $DOMAIN $name --a-rec=$ip >/dev/null
+              ipa host-show $fqdn >/dev/null 2>&1 || ipa host-add $fqdn >/dev/null
               ipa service-show HTTP/$fqdn >/dev/null 2>&1 || ipa service-add HTTP/$fqdn >/dev/null"
   echo "$fqdn: IdM host, A record and HTTP service present"
 

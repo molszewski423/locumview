@@ -1483,3 +1483,16 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   CSR with a throwaway CA: both files written with every value encrypted; a certificate from a different CA, for a
   different name or for a different key is refused. `ipa` itself was not run (it needs the admin ticket). Server-side
   dry run of the Ingresses passes.
+
+## 88. M3 step 3 owner run: both names on one address (2026-10-25)
+
+- First run of `make-tls-secrets.sh`: `emr.corp.locumview.com` completed (A record to node2, host, service,
+  certificate valid to 2028-10-26, `clinical-tls-emr.sops.yaml`). For `clinical.` IdM refused
+  `ipa host-add --ip-address`: `IP address … is already assigned in domain corp.locumview.com` (a host-add check;
+  two hosts may not claim one address that way). The script stopped before the service or any certificate; nothing
+  was written for `clinical.`.
+- The script now adds each A record with `ipa dnsrecord-add` (no such restriction), then the host without
+  `--ip-address` (its DNS check is met by the record), then the service, each only if missing. A rerun skips `emr.`
+  because its file exists.
+- Checked read-only against IdM's DNS: `emr.` resolves to node2, `clinical.` does not resolve yet. Shellcheck clean;
+  the stub test from #87 passes.
