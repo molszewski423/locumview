@@ -72,6 +72,8 @@ Every policy name in both files was checked against Chromium's policy list (`com
 1. `EHR_URL` in `/etc/locumview/ehr.conf`: the address the EHR launcher opens.
 2. The EHR's sites in `URLAllowlist`, including its sign-in pages (for example the identity provider's), in Chrome's URL filter format (`https://ehr.example.org`, `https://*.example.org`).
 
+The image built from this repository is LocumView's reference deployment and does both (`image/desktop/reference/`, Containerfile step 3c): the launcher opens the clinical OpenEMR (`https://emr.corp.locumview.com/`), and the allowlist adds it, the clinical app (`https://clinical.corp.locumview.com`) and only Keycloak's sign-in paths on `login.locumview.com` (`/realms/locumview`, `/resources`); that host's root, Guacamole, stays blocked. The `locumview-ehr-launcher` RPM and the files in `image/desktop/files/` keep the generic defaults above.
+
 
 ### Updates
 

@@ -121,6 +121,17 @@ RUN set -euo pipefail; \
     dracut -f --no-hostonly "/usr/lib/modules/$kver/initramfs.img" "$kver"; \
     lsinitrd "/usr/lib/modules/$kver/initramfs.img" > /tmp/initrd.txt; grep -q clevis /tmp/initrd.txt; rm -f /tmp/initrd.txt
 
+# 3c. LocumView's reference deployment (Phase 9 lite, M3 step 5): the EHR launcher opens the clinical OpenEMR, and
+#     Chrome allows only it, the clinical app and Keycloak's sign-in pages (the root of that host, Guacamole, stays
+#     blocked). After step 3's rpm -V, because ehr.conf is the locumview-ehr-launcher RPM's %config file; the RPM keeps
+#     its generic default for other deployments (ADR 0016). Desktops trust the certificates through IdM enrollment.
+RUN --mount=type=bind,target=/src \
+    set -euo pipefail; \
+    install -m 0644 /src/image/desktop/reference/ehr.conf /etc/locumview/ehr.conf; \
+    install -m 0644 /src/image/desktop/reference/50-locumview-ehr-sites.json \
+        /etc/opt/chrome/policies/managed/50-locumview-ehr-sites.json; \
+    grep -qx 'EHR_URL=https://emr.corp.locumview.com/' /etc/locumview/ehr.conf
+
 # 4. DISA STIG with GUI, LocumView image profile (hardening/stig/README.md), applied at build time by oscap-im.
 #    It installs the packages some rules need (AIDE, fapolicyd, USBGuard, ...), so it gets the entitlement too.
 RUN --mount=type=secret,id=rhsm --mount=type=bind,target=/src \

@@ -1,0 +1,11 @@
+{
+  "URLBlocklist": ["*", "javascript://*"],
+  "URLAllowlist": [
+    "file:///usr/share/locumview/ehr/*",
+    "chrome://policy",
+    "https://emr.corp.locumview.com",
+    "https://clinical.corp.locumview.com",
+    "https://login.locumview.com/realms/locumview",
+    "https://login.locumview.com/resources"
+  ]
+}
