@@ -1735,3 +1735,11 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
     `--hosts=<fqdn>` finds them. Revocation tooling should look up by host.
   - `certutil -L` ignores `-f` and asks for the token PIN interactively; scripts read certificates with `p11tool`.
 - **Next:** B3, whether the desktop user's Chrome can use the machine token's key, or the store must be per user.
+- **B3 test 1, 2026-10-27: certmonger and an empty token PIN.** `b3-empty-pin.sh` (owner, lv-test17) set the machine
+  token's PIN to empty and tried a PIN file holding only a newline, then a new request with `-P ""`. Both times the TPM
+  key signed the request and IdM issued the certificate (09:27:09, 09:27:20), but saving it back failed
+  (`NEED_TO_NOTIFY_ISSUED_SAVE_FAILED`; certmonger's log: the certificate went to the software `NSS Certificate DB`,
+  then `Error importing certificate`). Likely cause: writing an object to the token needs a login, which certmonger
+  skips with no PIN. The random PIN went back and the request returned to MONITORING; lockout counter 0 throughout.
+  Result: one tpm2-pkcs11 token cannot serve both a silent Chrome (empty PIN) and certmonger (needs a PIN). The four
+  extra certificates IdM issued for lv-test17 expire within 2 days.
