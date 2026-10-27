@@ -1697,7 +1697,8 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   operator-laptop: IdM name and certificate, Secrets in the cluster only, deleted with the namespace),
   `scripts/spike/mtls-chrome-policy.sh` (owner run on lv-test17) and `scripts/spike/mtls-checks.sh` (no root, from the
   machine holding the test CA: no certificate, another CA, the spike CA, both SNI/Host mismatches, `emr.` unchanged).
-  kubeconform now skips `TLSOption` and `IngressRoute` too (no bundled schema; the owner script does a server dry run).
+  kubeconform now skips `TLSOption` and `IngressRoute` too, in the pre-commit hook and in CI's own kubeconform step (no
+  bundled schema; the owner script does a server dry run). CI failed from 6ac91db to 6df97e4 until the CI step matched.
 - **Q3 run, 2026-10-27 (answered: yes).** The owner ran `mtls-endpoint.sh up` from operator-laptop (IdM name and
   certificate to 2028-10-27, manifests applied, whoami rolled out) and `mtls-chrome-policy.sh` on lv-test17.
   `mtls-checks.sh` from node1, 6 of 6 passed: no client certificate, refused at the handshake (TLS 1.3 alert
