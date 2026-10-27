@@ -1688,3 +1688,13 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   Keycloak (OIDC) or the gateway. Not researched yet.
 - **Next:** Q1's export proof (`pkcs11-tool --read-object --type privkey` refused; the token store useless on another
   vTPM), the reboot check from A7, then Q3 with Traefik (A5) and track B.
+- **Q1 export check, 2026-10-27, inconclusive:** `p11tool` with an empty `GNUTLS_PIN` treated it as unset and sent a
+  wrong authorization: the TPM's lockout counter went to 1 of 32 (it decays one per 300 s; no lockout). No further
+  login attempts with ad hoc tools on the live token; the blob-copy test needs a second vTPM.
+- **Q3 prepared (not applied):** `k8s/mtls-spike/` (namespace with restricted Pod Security, default-deny network
+  policy, `traefik/whoami` by digest, a `TLSOption` with `RequireAndVerifyClientCert` on the spike CA,
+  `passTLSClientCert`, an `IngressRoute` for the one name), `scripts/spike/mtls-endpoint.sh up|down` (owner run on
+  operator-laptop: IdM name and certificate, Secrets in the cluster only, deleted with the namespace),
+  `scripts/spike/mtls-chrome-policy.sh` (owner run on lv-test17) and `scripts/spike/mtls-checks.sh` (no root, from the
+  machine holding the test CA: no certificate, another CA, the spike CA, both SNI/Host mismatches, `emr.` unchanged).
+  kubeconform now skips `TLSOption` and `IngressRoute` too (no bundled schema; the owner script does a server dry run).
