@@ -1743,3 +1743,21 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   skips with no PIN. The random PIN went back and the request returned to MONITORING; lockout counter 0 throughout.
   Result: one tpm2-pkcs11 token cannot serve both a silent Chrome (empty PIN) and certmonger (needs a PIN). The four
   extra certificates IdM issued for lv-test17 expire within 2 days.
+- **B3, option B, 2026-10-27 (owner decision; result: works end to end).** Renewal without certmonger:
+  `b3-renew.sh` (owner, lv-test17, root) on the desktop user's own token (empty PIN): CSR signed by the TPM key in a
+  throwaway NSS database, `ipa cert-request` with the host keytab from the sub-CA, the certificate's key checked
+  against the CSR, `tpm2_ptool addcert` (takes no PIN), older certificates for the key deleted. Run twice: serials
+  `CCA1415B…` then `D1B594F4…`, the same TPM key (`bc924bf7…`) both times, one certificate left on the token, lockout
+  counter 0. Then `mtls-endpoint.sh ca` made Traefik trust only the sub-CA, and `mtls-chrome-policy.sh` with
+  `ISSUER_CN='LocumView spike clients'` made Chrome select by it. In lv-test17's Chrome: no PIN prompt, no picker,
+  and Traefik passed the certificate from the helper's second run (issuer `LocumView spike clients`, expiry
+  2026-10-29 13:35:34 UTC). `mtls-checks.sh` afterwards: no certificate, another CA, and now the old test CA too are
+  refused at the handshake (`unknown ca`); bypass attempt 421; `emr.` still Keycloak (its two "spike CA" checks
+  expect the test CA and now fail, as they should).
+- **What B3 settles for ADR 0019:** a per-user TPM token with an empty PIN (Chrome silent), renewed by a root helper
+  with the host's identity, not certmonger and not a machine token. Each user of a desktop gets their own key and
+  certificate; the subject stays the host. Still to decide in the ADR: the helper's timer, retries and expiry alert;
+  when a user's token is created (first login); `/dev/tpmrm0` access for desktop users without the spike's ACL; the
+  sub-CA's lifetime; revocation by host (`cert-find --hosts`).
+- **Still open in the spike:** Q1's blob-copy proof on a second vTPM; the reboot check (A7); then every undo in the
+  plan, including B2's machine token, `/etc/tpm2_pkcs11` link and certmonger drop-in, which option B does not use.
