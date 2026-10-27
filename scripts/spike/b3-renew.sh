@@ -13,7 +13,7 @@ U=${1:-molszewski}; H=$(getent passwd "$U" | cut -d: -f6)
 STORE=$H/.tpm2_pkcs11 TOKEN=locumview-desktop KEY=desktop
 SUBCA=locumview-spike-clients PROFILE=locumviewSpikeClient
 FQDN=$(hostname -f)
-f() { grep -v -i -e fapi -e 'tpm2-pkcs11/blob' ; }
+f() { grep -v -i -e fapi -e 'tpm2-pkcs11/blob' || true; }   # never fails when it removes every line
 lockout() { tpm2_getcap properties-variable | sed -n 's/^TPM2_PT_LOCKOUT_COUNTER: /TPM lockout counter: /p'; }
 der() { openssl pkey -pubin -outform DER 2>/dev/null | sha256sum | cut -c1-16; }
 # Objects in a tpm2_ptool listing: one line per object, "<db id> <class> <CKA_ID hex> <label>".
@@ -43,7 +43,7 @@ kid=$(objects | awk -v k="$KEY" '$2=="CKO_PRIVATE_KEY" && $4==k {print $3; exit}
 echo "key '$KEY', CKA_ID $kid"
 
 echo "== 2. CSR signed by the TPM key (empty PIN)"
-mkdir "$tmp/nss"; certutil -N -d "sql:$tmp/nss" --empty-password
+mkdir "$tmp/nss"; certutil -N -d "sql:$tmp/nss" --empty-password 2>&1 | f
 printf '' > "$tmp/pin"
 certutil -R -d "sql:$tmp/nss" -h "$TOKEN" -k "$kid" -s "CN=$FQDN" -f "$tmp/pin" -a -o "$tmp/req.csr" </dev/null 2>&1 | f
 grep -q 'BEGIN NEW CERTIFICATE REQUEST\|BEGIN CERTIFICATE REQUEST' "$tmp/req.csr" || { echo "STOP: no CSR"; lockout; exit 1; }
