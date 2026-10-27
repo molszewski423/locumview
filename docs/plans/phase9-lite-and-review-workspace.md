@@ -1,7 +1,7 @@
 # Plan: Phase 9 lite and the Clinical Review Workspace
 
 Status: **In progress**. Written 2026-10-22. Phase 4's core release milestone is Done (changelog #70); M1, the
-OpenEMR spike, is Done (changelog #72); the owner chose its option 4 (section 9). M2 is Done (changelog #73 to #75); M3 is in progress (changelog #76). Decisions: ADR 0017 (and its update of 2026-10-22),
+OpenEMR spike, is Done (changelog #72); the owner chose its option 4 (section 9). M2 is Done (changelog #73 to #75); M3 is in progress: its checks passed on a desktop (changelog #76 to #93), ADR 0019 (Proposed) is next. Decisions: ADR 0017 (and its update of 2026-10-22),
 ADR 0018. Data rules: `docs/policy/synthetic-data-and-independence.md`. Status of record: ROADMAP.md.
 
 ## 1. Sequence
@@ -66,11 +66,26 @@ ambiguous) in `clinical/scenarios/`, all approved in the owner's clinical review
 
 ### M3. Clinical app shell and EHR launch
 
-**In progress** (changelog #76): step 1, the app and its gateway with the SMART EHR launch, passes end to end locally
-(`docs/evidence/clinical/20261025-m3-local-launch/`). The app reads OpenEMR through a server-side gateway (owner
-decision, 2026-10-25), and OpenEMR 8.4.1 needs a two-line fix for any EHR launch with patient context
-(`docs/upstream/openemr-8.4.1.md`). Step 2 (cluster deployment) is prepared for review (changelog #77). Then IdM names and
-certificates, the Keycloak client, the desktop launcher.
+**In progress.** Steps 1 to 6 are done:
+
+1. The app and its gateway with the SMART EHR launch, end to end locally (changelog #76,
+   `docs/evidence/clinical/20261025-m3-local-launch/`). The app reads OpenEMR through a server-side gateway (owner
+   decision, 2026-10-25); OpenEMR 8.4.1 needs a two-line fix for any EHR launch with patient context
+   (`docs/upstream/openemr-8.4.1.md`).
+2. The clinical namespace on k3s: images built, verified and pinned, the scenario library loaded into the cluster's
+   OpenEMR (changelog #77 to #86).
+3. IdM names and certificates for `emr.` and `clinical.corp.locumview.com` (changelog #87, #88).
+4. Keycloak (TOTP, group `locumview-clinical`) in front of both names through oauth2-proxy; the launch passes end to
+   end in a browser (changelog #89, #90).
+5. The EHR launcher and the Chrome allowlist in the desktop image (changelog #91).
+6. On a desktop that follows the image (lv-test17, image `sha256:8c94dcf4…`): launcher, Keycloak, OpenEMR, SMART
+   launch with FHIR data in one app window, other sites blocked (changelog #93). That image is `:stable` since
+   2026-10-26 (changelog #95).
+
+Not marked Done yet: the desktop test showed two MFA prompts in a minute, and ADR 0019 (Proposed) would replace
+Keycloak in front of the EHR with mutual TLS from the desktops. Its spike is planned (`docs/plans/adr-0019-spike.md`);
+the owner decides whether M3 closes now or after that change. Demo access to the EHR is a separate change (changelog
+#91).
 
 - The React and TypeScript app (ADR 0017) served from k3s behind Keycloak, opened from a launcher in the image (signed
   pipeline) in the managed Chrome app mode, with its address and OpenEMR's added to the Chrome allowlist and recorded
