@@ -1642,3 +1642,39 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   it without a prompt; Traefik refusing clients without a desktop certificate at the handshake; certmonger issuing from
   an IdM sub-CA), a throwaway name and namespace (`mtls-spike`), owner runs for root and IdM steps, and an undo for
   every change. Nothing is built yet; the clinical namespace is untouched.
+
+## 96. ADR 0019 spike, track A partly run on 2026-10-26 (morning); recorded on 2026-10-27
+
+- **Drift:** an agent session on node1 ran part of track A on lv-test17 between about 10:30 and 10:52 on 2026-10-26,
+  before the spike plan (#95) was written that evening. That session ended without a handoff or changelog entry, so the
+  plan and #95 say no spike step has run. This entry reconstructs it from the session's scripts, the owner's pasted
+  output, and read-only checks on lv-test17 on 2026-10-27 (desktop user, no sudo).
+- **What ran (owner runs):** a root script put `tpm2-pkcs11` and `tpm2-pkcs11-tools` 1.9.0 into a `bootc usroverlay`,
+  gave the desktop user an ACL on `/dev/tpmrm0` (the user is not in `tss`), added a throwaway test CA to the system trust
+  anchors, a Chrome policy file `90-locumview-spike-mtls.json` (`AutoSelectCertificateForUrls` on the test CA's
+  issuer) and one extra URL in a copy of `50-locumview-ehr-sites.json`. User scripts made a token
+  (`locumview-desktop`, with a test PIN), an ECDSA P-256 key in the TPM, a CSR, and a 2-day client certificate signed
+  by the test CA on node1. The endpoint was a small Python TLS server on node1 requiring a client certificate, not
+  Traefik.
+- **Found:**
+  - Q1: the key was generated in the TPM (`tpm2_ptool addkey`); the user's NSS software database holds no key. The
+    export attempt (part 3) ran without its output being recorded, so "cannot be exported" is not shown yet.
+  - `certutil -R -k ec` cannot make the key on the token: it asks for `CKM_ECDH1_DERIVE`, which tpm2-pkcs11 does not
+    offer. The key has to come from `tpm2_ptool`; `certutil` then writes the CSR for it.
+  - The RPM registers itself with p11-kit (`/usr/share/p11-kit/modules/tpm2_pkcs11.module`), and the user's NSS
+    database already loads `p11-kit-proxy`, so **Chrome sees the token with no `modutil` step** (plan step A4 changes).
+  - fapolicyd (active) did not block the overlay's library; no SELinux denials today.
+  - Q2: Chrome selected the certificate and the endpoint accepted it, **but Chrome asked for the token PIN** first. The
+    decisive check, an empty user PIN (part 4, `tpm2_ptool changepin --new=""`), was prepared and has not run (the
+    token store is unchanged since 10:45).
+  - The plan's check through `chrome://settings/certificates` cannot work on the image: `URLBlocklist` is `*` and only
+    `chrome://policy` is allowed. Use `certutil -L -h <token>` instead, or allow that page in the spike's copy.
+  - Q3 (Traefik) and Q4 (certmonger, IdM sub-CA): not started. The Python server refused a client without a
+    certificate (`PEER_DID_NOT_RETURN_A_CERTIFICATE`), which says nothing about Traefik.
+- **Still in place on lv-test17** (up since 2026-10-26 09:37): the overlay packages, the TPM ACL, the test CA anchor,
+  both Chrome policy changes, the user token. The session's revert script covers all of them (root, then a reboot).
+  The client certificate expires 2026-10-28, the test CA 2026-11-02. The test CA's key is still on node1, in that
+  session's temporary directory.
+- **Next:** part 4 (empty PIN) decides Q2. If Chrome still prompts, the owner chooses between the ADR's fallback and
+  another way to prove "this is a desktop" (the session raised a per-desktop WireGuard peer); ADR 0019 is revised
+  before Q3 and Q4.
