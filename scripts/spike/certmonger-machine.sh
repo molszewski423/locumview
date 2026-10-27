@@ -4,8 +4,9 @@
 # machine-level token, using only the host's own IdM identity (keytab); then renews it and checks the key is the same.
 #   sudo bash certmonger-machine.sh        up (each step only if not done)
 #   sudo bash certmonger-machine.sh down   stop tracking, remove the store, the NSS database and the drop-in
-# The token's user PIN is empty on purpose (Q2): the key's protection is the TPM. Prints the TPM lockout counter
-# before and after; stops on the first failure instead of retrying a login.
+# The token's user PIN is random and root-only: certmonger treats an empty PIN file as "no PIN" (first run,
+# NEED_KEYINFO_READ_PIN, no login attempted), so the empty PIN that keeps Chrome silent (Q2) does not work for it.
+# Prints the TPM lockout counter before and after; stops on the first failure instead of retrying a login.
 set -euo pipefail
 [ "$(id -u)" = 0 ] || { echo "STOP: run with sudo"; exit 1; }
 [ "$(hostname -s)" = lv-test17 ] || { echo "STOP: not lv-test17"; exit 1; }
@@ -42,6 +43,12 @@ if [ ! -f "$STORE/tpm2_pkcs11.sqlite3" ]; then
 fi
 q tpm2_ptool listobjects --path="$STORE" --label="$TOKEN" | grep -q "CKA_LABEL: $KEY" \
   || q tpm2_ptool addkey --path="$STORE" --label="$TOKEN" --userpin="" --algorithm=ecc256 --key-label="$KEY" >/dev/null
+if [ ! -s "$PIN" ]; then   # empty PIN (first run): one login with it, known to work, to set a random one
+  up=$(openssl rand -hex 16)
+  q tpm2_ptool changepin --path="$STORE" --label="$TOKEN" --user=user --old="" --new="$up" >/dev/null
+  umask 077; printf '%s' "$up" > "$PIN"; unset up
+  echo "user PIN set to a random value in $PIN (root only)"
+fi
 echo "key '$KEY' is in the TPM token '$TOKEN'"
 
 echo "== 2. NSS database for certmonger ($DB)"
@@ -66,6 +73,9 @@ fi
 systemctl restart certmonger
 
 echo "== 4. request from $SUBCA with the host's own identity"
+if getcert list -i "$ID" 2>/dev/null | grep -q 'NEED_KEYINFO_READ_PIN'; then
+  getcert stop-tracking -i "$ID" >/dev/null; echo "stuck request from the first run removed"
+fi
 if ! getcert list -i "$ID" 2>/dev/null | grep -q "Request ID '$ID'"; then
   ipa-getcert request -d "$DB" -n "$KEY" -t "$TOKEN" -p "$PIN" -X "$SUBCA" -T "$PROFILE" \
     -K "host/$FQDN" -N "CN=$FQDN" -I "$ID" -w -v || true
