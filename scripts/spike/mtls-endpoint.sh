@@ -3,6 +3,7 @@
 # mtls-spike.corp.locumview.com behind Traefik, and its undo. Needs an admin ticket on idm01 (`ssh -t <idm01> kinit
 # admin`), cluster-admin kubectl, INGRESS_IP in k8s/clinical/site.env, and the spike test CA's certificate (public).
 #   scripts/spike/mtls-endpoint.sh up <spike-ca.pem>
+#   scripts/spike/mtls-endpoint.sh ca <client-ca.pem>   replace the trusted client CA (test CA or the IdM sub-CA, B3)
 #   scripts/spike/mtls-endpoint.sh down
 # up: IdM A record, host and HTTP service (each only if missing); a server key and CSR in a private tmpfs directory;
 # the certificate from IdM's CA, checked against the repository's IdM CA; k8s/mtls-spike applied; Secrets
@@ -72,5 +73,14 @@ down)
               true"
   echo "$FQDN: namespace, Secrets, IdM certificate, service, host and A record removed"
   ;;
-*) echo "usage: $0 up <spike-ca.pem> | down" >&2; exit 2 ;;
+ca)
+  ca=${2:?usage: $0 ca <client-ca.pem>}
+  openssl x509 -in "$ca" -noout -subject | grep -q -e 'CN *= *LocumView spike test CA' -e 'CN *= *LocumView spike clients' \
+    || { echo "$ca is neither the spike test CA nor the spike sub-CA" >&2; exit 1; }
+  ! openssl pkey -in "$ca" -noout 2>/dev/null || { echo "$ca contains a private key; pass the certificate only" >&2; exit 1; }
+  kubectl -n "$NAME" create secret generic spike-ca --from-file=ca.crt="$ca" \
+    --dry-run=client -o yaml | kubectl apply -f -
+  echo "Traefik now trusts only: $(openssl x509 -in "$ca" -noout -subject)"
+  ;;
+*) echo "usage: $0 up <spike-ca.pem> | ca <client-ca.pem> | down" >&2; exit 2 ;;
 esac
