@@ -1762,3 +1762,13 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   sub-CA's lifetime; revocation by host (`cert-find --hosts`).
 - **Still open in the spike:** Q1's blob-copy proof on a second vTPM; the reboot check (A7); then every undo in the
   plan, including B2's machine token, `/etc/tpm2_pkcs11` link and certmonger drop-in, which option B does not use.
+
+## 97. ADR 0019 revised for the renewal helper; M3 closes after ADR 0019 is built (2026-10-27)
+
+- Owner decision: M3 stays In progress until ADR 0019 is built, so the EHR opens with one MFA sign-in. OpenEMR's own
+  login stays (stock OpenEMR); single sign-on into OpenEMR itself is a separate question for after.
+- ADR 0019 (still Proposed) revised from the spike (#96): a root renewal helper with the host keytab instead of
+  certmonger; one TPM token per desktop user with an empty PIN, created by the helper at a user's first sign-in,
+  with TPM access for that user; the certificate's subject is the host; revocation looked up by host; the sub-CA's
+  lifetime to be chosen (IdM's default is 20 years); a "Spike results" section. Build plan step 1 marked done.
+- Next: the owner accepts or amends the ADR; then the spike undos, IdM's real sub-CA (step 2), the image (step 3).

@@ -1,7 +1,7 @@
 # ADR 0019: The EHR is reachable only from LocumView desktops, with one MFA sign-in
 
-Status: Proposed (design; nothing below is built)
-Date: 2026-10-26
+Status: Proposed (revised 2026-10-27 after the spike: the design works on the platform; nothing is built)
+Date: 2026-10-26; revised 2026-10-27 (changelog #96, owner decision on renewal)
 
 ## Context
 
@@ -43,8 +43,12 @@ is refused before any HTTP request reaches OpenEMR or the gateway.
 - **A dedicated IdM sub-CA** (`ipa ca-add`, for example `locumview-desktop-clients`) with a CA ACL that lets only
   hosts in the `locumview-desktops` hostgroup (already set by OpenTofu) request from it, under a certificate profile
   for TLS client authentication with a **short validity** (days, not years).
-- **Certmonger on each desktop** requests and renews the certificate with the host's own IdM identity
-  (`ipa-getcert request -X <sub-CA>`), so no new credential is handed out. Provisioning sets this up at first boot.
+- **A root renewal helper on each desktop** (a LocumView RPM with a systemd timer) requests and renews the
+  certificate with the host's own IdM identity (the host keytab, `ipa cert-request` from the sub-CA), so no new
+  credential is handed out. It makes a CSR with the TPM key, checks the issued certificate carries that key, stores
+  it on the user's token and removes older ones. Certmonger was tried first and does not fit: it treats an empty
+  token PIN as "no PIN" and then cannot save the certificate to the token (spike B3), while Chrome only stays silent
+  with an empty PIN (spike Q2). Owner decision, 2026-10-27.
 - **Traefik** gets a `TLSOption` with `clientAuth: RequireAndVerifyClientCert` and the sub-CA's certificate only,
   applied to the two clinical routers. These two hostnames are served by no other router, so the TLS option is not
   shared or overridden (Traefik answers 421 if SNI and Host map to different TLS options). Traefik 3.7.13 runs on
@@ -56,17 +60,26 @@ is refused before any HTTP request reaches OpenEMR or the gateway.
   removed**, and `login.locumview.com` leaves the EHR's Chrome allowlist (the desktop's Chrome then reaches only the
   two clinical names).
 
-### 3. The device key cannot leave the desktop
+### 3. The device key cannot leave the desktop, and Chrome does not ask for a PIN
 
 A certificate is only as good as its private key. If a user could copy the key to a laptop, the laptop would pass
 for a desktop. The key is therefore created in the **desktop's TPM 2.0** (every desktop has one: OpenTofu's
 `tpm-crb` vTPM, also used for disk unlock) through `tpm2-pkcs11` (RHEL 10 AppStream), and Chrome uses it through NSS
-as a PKCS#11 token. The key never exists outside the TPM, so it cannot be exported, only used on that machine.
+as a PKCS#11 token. The key never exists outside the TPM, so it cannot be exported, only used on that machine
+(the token reports it `CKA_SENSITIVE`, `CKA_NEVER_EXTRACTABLE`; spike B2).
 
-If the build spike (below) shows that this cannot be made to work with Chrome and certmonger on RHEL 10, the
-fallback is a software key in the desktop user's NSS database, recorded as a known weakness: exfiltration paths are
-already narrow (clipboard copy-out blocked, USBGuard, the Chrome allowlist), but a user with a shell could export
-the key. That fallback is not chosen silently; it comes back to the owner.
+- **One token per desktop user**, in the user's home (`~/.tpm2_pkcs11`), with an **empty user PIN**: the key's
+  protection is the TPM, and a PIN would make Chrome prompt at every start. Chrome finds the token with no
+  registration step: the RPM registers tpm2-pkcs11 with p11-kit, and the user's NSS database loads p11-kit's proxy.
+- **The certificate's subject is the host**, whichever user's token holds it: the certificate proves "this is a
+  LocumView desktop", not who is signed in (section 4).
+- **The root helper creates the token** (an ECDSA P-256 key generated in the TPM) the first time a user signs in to
+  the desktop, and gives that user read and write access to the TPM resource manager (`/dev/tpmrm0`) for the session.
+  Desktop users are not in `tss`. Every wrong authorization to the TPM raises its dictionary-attack counter, so the
+  build checks that a user cannot lock out the objects the disk unlock depends on.
+
+The software-key fallback considered earlier (a user with a shell could export the key) is not needed: the spike
+showed the TPM path works with Chrome, IdM and Traefik.
 
 ### 4. Who may use the EHR
 
@@ -83,8 +96,12 @@ signs in with the demo OpenEMR account; no oauth2-proxy group change is needed.
 
 Traefik does not check revocation lists for client certificates. A desktop is cut off by:
 
-- **the short validity:** when OpenTofu destroys a desktop, its IdM host entry is removed, so certmonger can no
-  longer renew, and the last certificate expires within days;
+- **the short validity:** when OpenTofu destroys a desktop, its IdM host entry is removed, so the helper can no
+  longer renew, and the last certificate expires within days. To be decided at build: the validity (the spike used 2
+  days) and when the helper renews and alerts;
+- **revoking a desktop's certificates in IdM** (`ipa cert-revoke`) does not stop Traefik, which reads no revocation
+  list, but stops renewal. They are found by host: `ipa cert-find --hosts=<fqdn>` (filtering by sub-CA or issuer
+  returned nothing in the spike);
 - **immediately, if needed:** removing the sub-CA from the TLS option (all desktops) or re-issuing the sub-CA. A
   per-desktop immediate cut-off is not offered; if one is ever needed, the answer is a revocation-aware check in
   front of the gateway, decided then.
@@ -94,8 +111,11 @@ Traefik does not check revocation lists for client certificates. A desktop is cu
 - One MFA per session instead of two; closing Chrome costs only the OpenEMR login.
 - Fewer moving parts in the clinical namespace: no oauth2-proxy, no cross-namespace traffic to Keycloak, no cookie
   secret, no Keycloak client to keep in step.
-- New moving parts: an IdM sub-CA and profile, certmonger on each desktop, TPM-backed keys, and a Traefik TLS option.
-  Certmonger renews on its own; OpenTofu's existing IdM host lifecycle covers issue and cut-off.
+- New moving parts: an IdM sub-CA and profile, a renewal helper on each desktop (our own code, with its timer,
+  retries and an expiry alert), per-user TPM tokens, and a Traefik TLS option. OpenTofu's existing IdM host lifecycle
+  covers issue and cut-off.
+- The sub-CA's own lifetime must be set: IdM gives a sub-CA 20 years by default. The owner chooses a lifetime and a
+  rotation runbook at build time.
 - A browser on the owner's laptops (operator-laptop, suse-laptop) can no longer open the EHR directly. Testing and administration go
   through a desktop, or `kubectl port-forward` for maintenance.
 - The `Secure` cookie gap in OpenEMR (open item from M3 step 4) stays open and is unaffected.
@@ -103,11 +123,11 @@ Traefik does not check revocation lists for client certificates. A desktop is cu
 
 ## Build plan (each step reviewed; access changes need the owner's approval)
 
-1. **Spike on lv-test17:** a TPM-backed key through tpm2-pkcs11, a certificate from a test sub-CA, Chrome selecting it
-   through `AutoSelectCertificateForUrls` against a throwaway mTLS endpoint. Recorded in the changelog either way.
+1. ~~**Spike on lv-test17**~~ Done 2026-10-27 (changelog #96, `docs/plans/adr-0019-spike.md`); its throwaway pieces
+   are undone before step 3's test.
 2. IdM: the sub-CA, the profile and the CA ACL (owner run; a script in `scripts/clinical/`).
-3. Image and provisioning: tpm2-pkcs11, the certmonger request, the NSS module registration for desktop users, the
-   Chrome policy. Built, scanned, tried on a `:testing` desktop.
+3. Image and provisioning: tpm2-pkcs11, the renewal helper and its timer, token creation and TPM access at a user's
+   first sign-in, the Chrome policy (as a LocumView RPM). Built, scanned, tried on a `:testing` desktop.
 4. Cluster: the Traefik TLS option on both routers, then oauth2-proxy and its pieces removed (an access change: the
    owner approves the cut-over).
 5. Test from a desktop (the M3 step 6 checks again) and from a laptop on the LAN (refused at the handshake).
@@ -136,3 +156,21 @@ Traefik does not check revocation lists for client certificates. A desktop is cu
 - **Not confirmed yet** (the spike's job): Chrome on RHEL 10 using a tpm2-pkcs11 token through the user's NSS
   database, certmonger issuing into that token, and the policy working on Linux exactly as documented for Windows
   and macOS.
+
+## Spike results (2026-10-27, changelog #96)
+
+- **Key in the TPM:** an ECDSA P-256 key generated through tpm2-pkcs11, flagged `CKA_SENSITIVE`,
+  `CKA_NEVER_EXTRACTABLE`; the software NSS database holds no key. Not yet shown: the token's files are useless on
+  another vTPM.
+- **Chrome:** with an empty token PIN, Chrome on RHEL 10 presents the certificate with no PIN prompt and no picker,
+  through `AutoSelectCertificateForUrls` filtered on the issuer.
+- **Traefik 3.7.13:** a `TLSOption` with `RequireAndVerifyClientCert` refuses a client with no certificate or with
+  one from another CA at the handshake; SNI and Host pointing at different options gives 421 both ways.
+- **IdM:** a sub-CA, a TLS-client profile derived from `caIPAserviceCert` (its key constraint must allow EC), a CA
+  ACL for `locumview-desktops`; the host keytab is enough to request and renew.
+- **Certmonger:** works with a PIN in a root-only file (issues, renews into the same TPM key, once the request names
+  `-G EC -g 256` and the store is found at `/etc/tpm2_pkcs11`), but not with the empty PIN Chrome needs; hence the
+  renewal helper.
+- **End to end:** the helper issued and renewed into the user's token twice (new serial, same key), Traefik trusted
+  only the sub-CA, and the desktop's Chrome reached the endpoint silently.
+

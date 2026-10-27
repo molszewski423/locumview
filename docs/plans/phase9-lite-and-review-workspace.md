@@ -83,8 +83,9 @@ ambiguous) in `clinical/scenarios/`, all approved in the owner's clinical review
    2026-10-26 (changelog #95).
 
 Not marked Done yet: the desktop test showed two MFA prompts in a minute, and ADR 0019 (Proposed) would replace
-Keycloak in front of the EHR with mutual TLS from the desktops. Its spike is planned (`docs/plans/adr-0019-spike.md`);
-the owner decides whether M3 closes now or after that change. Demo access to the EHR is a separate change (changelog
+Keycloak in front of the EHR with mutual TLS from the desktops. Its spike passed (changelog #96).
+Owner decision, 2026-10-27: M3 closes after ADR 0019 is built (its build plan steps 2 to 5), so the EHR opens with
+one MFA sign-in. Demo access to the EHR is a separate change (changelog
 #91).
 
 - The React and TypeScript app (ADR 0017) served from k3s behind Keycloak, opened from a launcher in the image (signed
