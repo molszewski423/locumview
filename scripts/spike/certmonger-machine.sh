@@ -86,7 +86,7 @@ if getcert list -i "$ID" 2>/dev/null | grep -q 'stuck: yes'; then
   getcert stop-tracking -i "$ID" >/dev/null; echo "stuck request from an earlier run removed"
 fi
 if ! getcert list -i "$ID" 2>/dev/null | grep -q "Request ID '$ID'"; then
-  ipa-getcert request -d "$DB" -n "$KEY" -t "$TOKEN" -p "$PIN" -X "$SUBCA" -T "$PROFILE" \
+  ipa-getcert request -d "$DB" -n "$KEY" -t "$TOKEN" -p "$PIN" -X "$SUBCA" -T "$PROFILE" -G EC -g 256 \
     -K "host/$FQDN" -N "CN=$FQDN" -I "$ID" -w -v || true
 fi
 for _ in $(seq 24); do   # up to 2 minutes for MONITORING or a stuck state
