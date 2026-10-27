@@ -1703,7 +1703,7 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   `mtls-checks.sh` from node1, 6 of 6 passed: no client certificate, refused at the handshake (TLS 1.3 alert
   `certificate required`); a certificate from another CA, refused (`unknown ca`); the spike CA's, 200 with the
   subject passed through; SNI `mtls-spike` with Host `emr.`, 421; SNI `emr.` with Host `mtls-spike` and no
-  certificate (the bypass attempt), 421; `emr.` itself still 302 to Keycloak. In lv-test17's Chrome, the page loaded
+  certificate (the bypass attempt), 421; `emr.` itself still 302 to Keycloak. In lv-test17's Chrome, with no PIN prompt, the page loaded
   as a secure connection (IdM server certificate) and Traefik passed on `CN=lv-test17.corp.locumview.com` from the
   spike CA with the TPM certificate's expiry: the TPM-held key, through Chrome, through Traefik.
 - **Finding:** oauth2-proxy's cookies use `--cookie-domain=.corp.locumview.com` (`k8s/clinical/sso.yaml`), so the
