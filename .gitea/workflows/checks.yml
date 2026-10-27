@@ -55,7 +55,9 @@ jobs:
         uses: docker://ghcr.io/yannh/kubeconform:v0.8.0@sha256:faffaf43f95aa6425306e1ab8d6fcad72acb9049158f38e574c085ea1ec0f64e
         with:
           entrypoint: /kubeconform
-          args: -strict -summary -skip Middleware,TLSOption,IngressRoute -ignore-filename-pattern kustomization\.yaml$ -ignore-filename-pattern \.sops\.ya?ml$ k8s
+          args: >-
+            -strict -summary -skip Middleware,TLSOption,IngressRoute
+            -ignore-filename-pattern kustomization\.yaml$ -ignore-filename-pattern \.sops\.ya?ml$ k8s
 
       - name: tflint
         uses: docker://ghcr.io/terraform-linters/tflint:v0.64.0@sha256:85c63179e53e69f48fb5d1e22fb6c2b4941049c7f906f30625defa6ffcc3f834
