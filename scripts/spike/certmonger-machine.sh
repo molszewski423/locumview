@@ -55,8 +55,12 @@ q certutil -K -d "$DB" -h "$TOKEN" -f "$PIN" | grep -E "\b$KEY\$"   # one login,
 echo "== 3. certmonger sees the same store"
 if [ ! -f "$DROPIN" ]; then
   install -d -m 0755 "${DROPIN%/*}"
-  printf '%s\n' '[Service]' "Environment=TPM2_PKCS11_STORE=$STORE" 'Environment=TPM2_PKCS11_BACKEND=esysdb' \   # pragma: allowlist secret
-    'Environment=TPM2_PKCS11_TCTI=device:/dev/tpmrm0' > "$DROPIN"
+  {
+    echo '[Service]'
+    echo "Environment=TPM2_PKCS11_STORE=$STORE"
+    echo 'Environment=TPM2_PKCS11_BACKEND=esysdb'   # pragma: allowlist secret
+    echo 'Environment=TPM2_PKCS11_TCTI=device:/dev/tpmrm0'
+  } > "$DROPIN"
   systemctl daemon-reload
 fi
 systemctl restart certmonger
