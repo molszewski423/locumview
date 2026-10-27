@@ -1,0 +1,35 @@
+# The boundary under test (Q3): Traefik refuses any client without a certificate from the spike CA at the handshake,
+# before HTTP. The server certificate (from IdM's CA) and the throwaway client CA (public certificate only) are put in
+# the cluster by scripts/spike/mtls-endpoint.sh.
+apiVersion: traefik.io/v1alpha1
+kind: TLSOption
+metadata: {name: mtls-spike, namespace: mtls-spike}
+spec:
+  minVersion: VersionTLS12
+  clientAuth:
+    secretNames: [spike-ca]   # pragma: allowlist secret
+    clientAuthType: RequireAndVerifyClientCert
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata: {name: client-cert-info, namespace: mtls-spike}
+spec:
+  passTLSClientCert:
+    info:
+      notAfter: true
+      subject: {commonName: true, organization: true}
+      issuer: {commonName: true}
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata: {name: whoami, namespace: mtls-spike}
+spec:
+  entryPoints: [websecure]
+  routes:
+    - match: Host(`mtls-spike.corp.locumview.com`)
+      kind: Rule
+      middlewares: [{name: client-cert-info}]
+      services: [{name: whoami, port: 80}]
+  tls:
+    secretName: mtls-spike-tls   # pragma: allowlist secret
+    options: {name: mtls-spike}

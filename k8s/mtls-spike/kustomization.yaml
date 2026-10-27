@@ -1,0 +1,10 @@
+# ADR 0019 spike, Q3 (docs/plans/adr-0019-spike.md, step A5): a throwaway endpoint behind Traefik that requires a
+# client certificate at the TLS handshake. Applied and removed by scripts/spike/mtls-endpoint.sh, which also creates
+# the two Secrets (server certificate from IdM, the spike test CA). The clinical namespace is not touched.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - networkpolicy.yaml
+  - whoami.yaml
+  - routes.yaml

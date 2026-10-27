@@ -1642,3 +1642,123 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   it without a prompt; Traefik refusing clients without a desktop certificate at the handshake; certmonger issuing from
   an IdM sub-CA), a throwaway name and namespace (`mtls-spike`), owner runs for root and IdM steps, and an undo for
   every change. Nothing is built yet; the clinical namespace is untouched.
+
+## 96. ADR 0019 spike, track A partly run on 2026-10-26 (morning); recorded on 2026-10-27
+
+- **Drift:** an agent session on node1 ran part of track A on lv-test17 between about 10:30 and 10:52 on 2026-10-26,
+  before the spike plan (#95) was written that evening. That session ended without a handoff or changelog entry, so the
+  plan and #95 say no spike step has run. This entry reconstructs it from the session's scripts, the owner's pasted
+  output, and read-only checks on lv-test17 on 2026-10-27 (desktop user, no sudo).
+- **What ran (owner runs):** a root script put `tpm2-pkcs11` and `tpm2-pkcs11-tools` 1.9.0 into a `bootc usroverlay`,
+  gave the desktop user an ACL on `/dev/tpmrm0` (the user is not in `tss`), added a throwaway test CA to the system trust
+  anchors, a Chrome policy file `90-locumview-spike-mtls.json` (`AutoSelectCertificateForUrls` on the test CA's
+  issuer) and one extra URL in a copy of `50-locumview-ehr-sites.json`. User scripts made a token
+  (`locumview-desktop`, with a test PIN), an ECDSA P-256 key in the TPM, a CSR, and a 2-day client certificate signed
+  by the test CA on node1. The endpoint was a small Python TLS server on node1 requiring a client certificate, not
+  Traefik.
+- **Found:**
+  - Q1: the key was generated in the TPM (`tpm2_ptool addkey`); the user's NSS software database holds no key. The
+    export attempt (part 3) ran without its output being recorded, so "cannot be exported" is not shown yet.
+  - `certutil -R -k ec` cannot make the key on the token: it asks for `CKM_ECDH1_DERIVE`, which tpm2-pkcs11 does not
+    offer. The key has to come from `tpm2_ptool`; `certutil` then writes the CSR for it.
+  - The RPM registers itself with p11-kit (`/usr/share/p11-kit/modules/tpm2_pkcs11.module`), and the user's NSS
+    database already loads `p11-kit-proxy`, so **Chrome sees the token with no `modutil` step** (plan step A4 changes).
+  - fapolicyd (active) did not block the overlay's library; no SELinux denials today.
+  - Q2: Chrome selected the certificate and the endpoint accepted it, **but Chrome asked for the token PIN** first. The
+    decisive check, an empty user PIN (part 4, `tpm2_ptool changepin --new=""`), was prepared and has not run (the
+    token store is unchanged since 10:45).
+  - The plan's check through `chrome://settings/certificates` cannot work on the image: `URLBlocklist` is `*` and only
+    `chrome://policy` is allowed. Use `certutil -L -h <token>` instead, or allow that page in the spike's copy.
+  - Q3 (Traefik) and Q4 (certmonger, IdM sub-CA): not started. The Python server refused a client without a
+    certificate (`PEER_DID_NOT_RETURN_A_CERTIFICATE`), which says nothing about Traefik.
+- **Still in place on lv-test17** (up since 2026-10-26 09:37): the overlay packages, the TPM ACL, the test CA anchor,
+  both Chrome policy changes, the user token. The session's revert script covers all of them (root, then a reboot).
+  The client certificate expires 2026-10-28, the test CA 2026-11-02. The test CA's key is still on node1, in that
+  session's temporary directory.
+- **2026-10-27, part 4 run (Q2 answered: yes).** The owner set the token's user PIN to empty (`certutil -K` with an
+  empty password file then listed the `desktop` key). After every Chrome window was closed and Chrome restarted, a
+  plain window opened the test endpoint with **no PIN prompt and no certificate picker**; the page showed the TPM
+  certificate's subject (`CN=lv-test17.corp.locumview.com`, issuer the test CA), confirmed in the endpoint's log.
+  The key's protection is that it stays in the TPM, not a PIN. Side notes: Chrome showed "Not secure" because it did
+  not trust the throwaway server certificate (one refused handshake, `certificate unknown`, before each accepted
+  request); with IdM-issued server certificates, which desktops already trust, this does not arise. A typed URL is
+  lost if Guacamole's input method is still on text input: switch it to None and click the address bar first.
+- **Open owner wish, outside ADR 0019:** one sign-in for the whole path, the EHR opening on a signed-in OpenEMR
+  dashboard. ADR 0019 removes the second Keycloak sign-in only; OpenEMR's own login stays until OpenEMR trusts
+  Keycloak (OIDC) or the gateway. Not researched yet.
+- **Next:** Q1's export proof (`pkcs11-tool --read-object --type privkey` refused; the token store useless on another
+  vTPM), the reboot check from A7, then Q3 with Traefik (A5) and track B.
+- **Q1 export check, 2026-10-27, inconclusive:** `p11tool` with an empty `GNUTLS_PIN` treated it as unset and sent a
+  wrong authorization: the TPM's lockout counter went to 1 of 32 (it decays one per 300 s; no lockout). No further
+  login attempts with ad hoc tools on the live token; the blob-copy test needs a second vTPM.
+- **Q3 prepared (not applied):** `k8s/mtls-spike/` (namespace with restricted Pod Security, default-deny network
+  policy, `traefik/whoami` by digest, a `TLSOption` with `RequireAndVerifyClientCert` on the spike CA,
+  `passTLSClientCert`, an `IngressRoute` for the one name), `scripts/spike/mtls-endpoint.sh up|down` (owner run on
+  operator-laptop: IdM name and certificate, Secrets in the cluster only, deleted with the namespace),
+  `scripts/spike/mtls-chrome-policy.sh` (owner run on lv-test17) and `scripts/spike/mtls-checks.sh` (no root, from the
+  machine holding the test CA: no certificate, another CA, the spike CA, both SNI/Host mismatches, `emr.` unchanged).
+  kubeconform now skips `TLSOption` and `IngressRoute` too, in the pre-commit hook and in CI's own kubeconform step (no
+  bundled schema; the owner script does a server dry run). CI failed from 6ac91db to 6df97e4 until the CI step matched.
+- **Q3 run, 2026-10-27 (answered: yes).** The owner ran `mtls-endpoint.sh up` from operator-laptop (IdM name and
+  certificate to 2028-10-27, manifests applied, whoami rolled out) and `mtls-chrome-policy.sh` on lv-test17.
+  `mtls-checks.sh` from node1, 6 of 6 passed: no client certificate, refused at the handshake (TLS 1.3 alert
+  `certificate required`); a certificate from another CA, refused (`unknown ca`); the spike CA's, 200 with the
+  subject passed through; SNI `mtls-spike` with Host `emr.`, 421; SNI `emr.` with Host `mtls-spike` and no
+  certificate (the bypass attempt), 421; `emr.` itself still 302 to Keycloak. In lv-test17's Chrome, with no PIN prompt, the page loaded
+  as a secure connection (IdM server certificate) and Traefik passed on `CN=lv-test17.corp.locumview.com` from the
+  spike CA with the TPM certificate's expiry: the TPM-held key, through Chrome, through Traefik.
+- **Finding:** oauth2-proxy's cookies use `--cookie-domain=.corp.locumview.com` (`k8s/clinical/sso.yaml`), so the
+  browser sends them to every name under that domain: the spike endpoint received `_lv_clinical_sso_csrf`. Any
+  service under `corp.` would receive the clinical session cookie the same way. ADR 0019 removes oauth2-proxy; if it
+  stays, narrow the cookie to the two clinical names.
+- **Track B, B1 and B2 run, 2026-10-27 (Q4 answered for the machine: yes).** `idm-subca.sh up` (owner, operator-laptop):
+  sub-CA `locumview-spike-clients` under IdM's CA (IdM gives a sub-CA 20 years; the real build must set its lifetime
+  and rotation), profile `locumviewSpikeClient` from caIPAserviceCert (2 days, client auth only, EC P-256/P-384), CA
+  ACL for the `locumview-desktops` hostgroup only. `certmonger-machine.sh` then `certmonger-retry-ec.sh` (owner,
+  lv-test17): a machine token in the TPM with an EC P-256 key; certmonger requested with the host's keytab only and
+  reached MONITORING; `getcert resubmit` issued a second certificate. IdM lists both for lv-test17 (expiring 13:00:16
+  and 13:06:36 UTC on 2026-10-29); the second's public key equals the TPM key (`e4340c59…`); the token holds one
+  private key, flagged `CKA_SENSITIVE; CKA_NEVER_EXTRACTABLE`; the software database holds none; TPM lockout counter
+  0 throughout; no SELinux denials (also checked with dontaudit rules off).
+- **Found on the way (each changes the real build):**
+  - certmonger treats an empty PIN file as "no PIN" (`NEED_KEYINFO_READ_PIN`, no login attempted). The machine token
+    needs a PIN in a root-only file, so the empty PIN that keeps Chrome silent (Q2) does not carry over. B3 decides
+    how the user's Chrome reaches the key.
+  - certmonger's key helper does not receive `TPM2_PKCS11_STORE` from the unit's environment: it saw only an empty
+    slot. Linking the store at tpm2-pkcs11's first default path, `/etc/tpm2_pkcs11` (used only by processes that can
+    write there), fixed it with no SELinux change.
+  - The new NSS database loads `p11-kit-proxy`, which already exposes the token; registering the library again with
+    `modutil` fails.
+  - Requests must name the key type (`-G EC -g 256`). Without it certmonger kept its RSA default and at renewal made
+    an RSA candidate key in the TPM; IdM refused it (`Key Type EC Not Matched`). With it, renewal keeps the key.
+  - The stock profile accepts RSA only (`Key Type RSA Not Matched` for the EC key) until its key constraint changes.
+  - `ipa cert-find --ca=<sub-CA>` and `--issuer=<sub-CA DN>` return nothing for the sub-CA's certificates;
+    `--hosts=<fqdn>` finds them. Revocation tooling should look up by host.
+  - `certutil -L` ignores `-f` and asks for the token PIN interactively; scripts read certificates with `p11tool`.
+- **Next:** B3, whether the desktop user's Chrome can use the machine token's key, or the store must be per user.
+- **B3 test 1, 2026-10-27: certmonger and an empty token PIN.** `b3-empty-pin.sh` (owner, lv-test17) set the machine
+  token's PIN to empty and tried a PIN file holding only a newline, then a new request with `-P ""`. Both times the TPM
+  key signed the request and IdM issued the certificate (09:27:09, 09:27:20), but saving it back failed
+  (`NEED_TO_NOTIFY_ISSUED_SAVE_FAILED`; certmonger's log: the certificate went to the software `NSS Certificate DB`,
+  then `Error importing certificate`). Likely cause: writing an object to the token needs a login, which certmonger
+  skips with no PIN. The random PIN went back and the request returned to MONITORING; lockout counter 0 throughout.
+  Result: one tpm2-pkcs11 token cannot serve both a silent Chrome (empty PIN) and certmonger (needs a PIN). The four
+  extra certificates IdM issued for lv-test17 expire within 2 days.
+- **B3, option B, 2026-10-27 (owner decision; result: works end to end).** Renewal without certmonger:
+  `b3-renew.sh` (owner, lv-test17, root) on the desktop user's own token (empty PIN): CSR signed by the TPM key in a
+  throwaway NSS database, `ipa cert-request` with the host keytab from the sub-CA, the certificate's key checked
+  against the CSR, `tpm2_ptool addcert` (takes no PIN), older certificates for the key deleted. Run twice: serials
+  `CCA1415B…` then `D1B594F4…`, the same TPM key (`bc924bf7…`) both times, one certificate left on the token, lockout
+  counter 0. Then `mtls-endpoint.sh ca` made Traefik trust only the sub-CA, and `mtls-chrome-policy.sh` with
+  `ISSUER_CN='LocumView spike clients'` made Chrome select by it. In lv-test17's Chrome: no PIN prompt, no picker,
+  and Traefik passed the certificate from the helper's second run (issuer `LocumView spike clients`, expiry
+  2026-10-29 13:35:34 UTC). `mtls-checks.sh` afterwards: no certificate, another CA, and now the old test CA too are
+  refused at the handshake (`unknown ca`); bypass attempt 421; `emr.` still Keycloak (its two "spike CA" checks
+  expect the test CA and now fail, as they should).
+- **What B3 settles for ADR 0019:** a per-user TPM token with an empty PIN (Chrome silent), renewed by a root helper
+  with the host's identity, not certmonger and not a machine token. Each user of a desktop gets their own key and
+  certificate; the subject stays the host. Still to decide in the ADR: the helper's timer, retries and expiry alert;
+  when a user's token is created (first login); `/dev/tpmrm0` access for desktop users without the spike's ACL; the
+  sub-CA's lifetime; revocation by host (`cert-find --hosts`).
+- **Still open in the spike:** Q1's blob-copy proof on a second vTPM; the reboot check (A7); then every undo in the
+  plan, including B2's machine token, `/etc/tpm2_pkcs11` link and certmonger drop-in, which option B does not use.

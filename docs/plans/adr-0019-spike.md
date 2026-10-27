@@ -1,6 +1,10 @@
 # Plan: the ADR 0019 spike (mutual TLS from a desktop, TPM-backed key)
 
-Status: **Planned**. Written 2026-10-26. Decision under test: ADR 0019 (Proposed). Canary desktop: lv-test17, running
+Status: **In progress**: part of track A ran on 2026-10-26 before this plan was written (changelog #96): Q1 partly
+shown; Q2 yes on 2026-10-27 with an empty token PIN (no prompt, no picker); Q3 yes on 2026-10-27 (6 of 6 checks and the
+TPM certificate through Chrome and Traefik); Q4 yes on 2026-10-27, with a
+root renewal helper instead of certmonger (owner decision, B3 option B): end to end, Chrome silent, Traefik accepting
+only the IdM sub-CA. Open: Q1's blob-copy proof, the reboot check, the undos (changelog #96). Written 2026-10-26. Decision under test: ADR 0019 (Proposed). Canary desktop: lv-test17, running
 the `:stable` image (`sha256:8c94dcf4…`, promoted 2026-10-26).
 
 ## 1. What the spike must answer
@@ -36,7 +40,8 @@ On lv-test17, as the desktop user and with `sudo -l`-free commands where possibl
 1. The vTPM is present and usable: `/dev/tpmrm0` exists, its group and mode, `tpm2_getcap properties-fixed` (tpm2-tools
    is in the image).
 2. Packages: `tpm2-pkcs11` is **not** in the image (checked in `image/desktop/Containerfile`); `nss-tools` (`modutil`,
-   `certutil`) and `certmonger` come with `ipa-client`, to be confirmed with `rpm -q`.
+   `certutil`) and `certmonger` come with `ipa-client`, to be confirmed with `rpm -q`. (2026-10-27: confirmed; also
+   `pkcs11-provider`, `opensc`, `gnutls-utils`. The desktop user is not in `tss`, so `/dev/tpmrm0` needs a grant.)
 3. **fapolicyd** mode and rules (the STIG content installs it): a library added outside the image may be denied when
    Chrome loads it. This decides how step A1 adds the package.
 4. Chrome's version, `chrome://policy` showing the managed `URLAllowlist` (the spike name has to be allowed too), and
@@ -65,9 +70,9 @@ Proof it cannot leave:
 it on operator-laptop (client auth only, 2 days); the certificate goes back into the token. Only the CSR and the
 certificate cross; both are public.
 
-**A4. Chrome sees the token (Q2, part 1).** Register the module in the user's NSS database
-(`modutil -dbdir sql:$HOME/.pki/nssdb -add tpm2 -libfile /usr/lib64/pkcs11/libtpm2_pkcs11.so`), then check
-`chrome://settings/certificates` lists the certificate. **Watch for a PIN prompt:** the token is created with an empty
+**A4. Chrome sees the token (Q2, part 1).** No registration needed: the RPM registers the module with p11-kit and the
+user's NSS database loads `p11-kit-proxy` (#96). Check with `certutil -L -d sql:$HOME/.pki/nssdb -h <token>`;
+`chrome://settings/certificates` is blocked by the image's `URLBlocklist`. **Watch for a PIN prompt:** the token is created with an empty
 user PIN on purpose, because the key's protection is the TPM, not a PIN. If Chrome still asks, that is the main
 finding of the spike.
 
