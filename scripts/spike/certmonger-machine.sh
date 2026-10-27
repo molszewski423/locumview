@@ -94,8 +94,11 @@ for _ in $(seq 24); do   # up to 2 minutes for MONITORING or a stuck state
 done
 getcert list -i "$ID" 2>/dev/null | grep -E 'status:|stuck:|ca-error|issuer:|subject:|expires:'
 getcert list -i "$ID" | grep -q 'status: MONITORING' || { lockout; echo "STOP: not MONITORING"; exit 1; }
-pub() { certutil -L -d "$DB" -n "$TOKEN:$KEY" -a -f "$PIN" 2>/dev/null | openssl x509 -noout -pubkey | sha256sum | cut -c1-16; }
-ser() { certutil -L -d "$DB" -n "$TOKEN:$KEY" -a -f "$PIN" 2>/dev/null | openssl x509 -noout -serial; }
+# The certificate as stored on the token, read with p11tool (certutil -L ignores -f and prompts; never answer that).
+crt() { GNUTLS_PIN=$(cat "$PIN") p11tool --provider /usr/lib64/pkcs11/libtpm2_pkcs11.so --login \
+          --export "pkcs11:token=$TOKEN;object=$KEY;type=cert" </dev/null 2>/dev/null; }
+pub() { crt | openssl x509 -noout -pubkey | sha256sum | cut -c1-16; }
+ser() { crt | openssl x509 -noout -serial; }
 k1=$(pub); s1=$(ser)
 
 echo "== 5. renewal keeps the key"
@@ -106,7 +109,7 @@ echo "before: $s1 key $k1"; echo "after:  $s2 key $k2"
 [ "$s1" != "$s2" ] && [ "$k1" = "$k2" ] && echo "PASS: new certificate, same TPM key" || echo "FAIL: see above"
 
 echo "== 6. the private key stays in the TPM"
-echo "-- software database (expect: no keys found):"; certutil -K -d "$DB" -f "$PIN" 2>&1 | grep -v -i fapi || true
+echo "-- software database (expect: no keys found):"; certutil -K -d "$DB" -h internal -f "$PIN" </dev/null 2>&1 | grep -v -i fapi || true
 lockout
 avc=$(ausearch -m avc -ts "$start" 2>/dev/null | grep denied | head -5 || true)
 echo "${avc:-no SELinux denials since $start}"
