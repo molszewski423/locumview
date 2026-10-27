@@ -15,7 +15,6 @@ TOKEN=locumview-machine KEY=machine ID=lv-spike-client
 SUBCA=locumview-spike-clients PROFILE=locumviewSpikeClient
 FQDN=$(hostname -f)
 DROPIN=/etc/systemd/system/certmonger.service.d/90-locumview-spike.conf
-MOD=/usr/lib64/pkcs11/libtpm2_pkcs11.so
 export TPM2_PKCS11_STORE=$STORE TPM2_PKCS11_BACKEND=esysdb TPM2_PKCS11_TCTI=device:/dev/tpmrm0
 lockout() { tpm2_getcap properties-variable | sed -n 's/^TPM2_PT_LOCKOUT_COUNTER: /TPM lockout counter: /p'; }
 q() { "$@" 2> >(grep -v -i -e fapi >&2); }
@@ -47,8 +46,9 @@ echo "key '$KEY' is in the TPM token '$TOKEN'"
 
 echo "== 2. NSS database for certmonger ($DB)"
 [ -f "$BASE/nssdb/cert9.db" ] || { install -d -m 0700 "$BASE/nssdb"; certutil -N -d "$DB" --empty-password; }
-modutil -dbdir "$DB" -list 2>/dev/null | grep -q 'library name: .*libtpm2_pkcs11' \
-  || q modutil -dbdir "$DB" -add tpm2-machine -libfile "$MOD" -force >/dev/null
+# No module registration: the new database loads p11-kit-proxy, which exposes the tpm2-pkcs11 token found through
+# TPM2_PKCS11_STORE (registering the library a second time fails).
+q certutil -U -d "$DB" | grep -q "token: $TOKEN\$" || { echo "STOP: NSS does not see the token $TOKEN"; exit 1; }
 restorecon -R "$BASE"
 q certutil -K -d "$DB" -h "$TOKEN" -f "$PIN" | grep -E "\b$KEY\$"   # one login, empty PIN (proven in part 4)
 
