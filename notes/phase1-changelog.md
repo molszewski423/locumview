@@ -1698,3 +1698,15 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   `scripts/spike/mtls-chrome-policy.sh` (owner run on lv-test17) and `scripts/spike/mtls-checks.sh` (no root, from the
   machine holding the test CA: no certificate, another CA, the spike CA, both SNI/Host mismatches, `emr.` unchanged).
   kubeconform now skips `TLSOption` and `IngressRoute` too (no bundled schema; the owner script does a server dry run).
+- **Q3 run, 2026-10-27 (answered: yes).** The owner ran `mtls-endpoint.sh up` from operator-laptop (IdM name and
+  certificate to 2028-10-27, manifests applied, whoami rolled out) and `mtls-chrome-policy.sh` on lv-test17.
+  `mtls-checks.sh` from node1, 6 of 6 passed: no client certificate, refused at the handshake (TLS 1.3 alert
+  `certificate required`); a certificate from another CA, refused (`unknown ca`); the spike CA's, 200 with the
+  subject passed through; SNI `mtls-spike` with Host `emr.`, 421; SNI `emr.` with Host `mtls-spike` and no
+  certificate (the bypass attempt), 421; `emr.` itself still 302 to Keycloak. In lv-test17's Chrome, the page loaded
+  as a secure connection (IdM server certificate) and Traefik passed on `CN=lv-test17.corp.locumview.com` from the
+  spike CA with the TPM certificate's expiry: the TPM-held key, through Chrome, through Traefik.
+- **Finding:** oauth2-proxy's cookies use `--cookie-domain=.corp.locumview.com` (`k8s/clinical/sso.yaml`), so the
+  browser sends them to every name under that domain: the spike endpoint received `_lv_clinical_sso_csrf`. Any
+  service under `corp.` would receive the clinical session cookie the same way. ADR 0019 removes oauth2-proxy; if it
+  stays, narrow the cookie to the two clinical names.
