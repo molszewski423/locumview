@@ -22,7 +22,10 @@ lockout
 
 echo "== 1. stop the old request, delete the RSA candidate"
 getcert stop-tracking -i "$ID" </dev/null >/dev/null 2>&1 || true
-tpm2_ptool listobjects --path="$STORE" --label="$TOKEN" 2>/dev/null | python3 -I -c '
+# tpm2_ptool can exit non-zero over its FAPI warnings; its listing is still complete.
+objs=$(tpm2_ptool listobjects --path="$STORE" --label="$TOKEN" 2>/dev/null || true)
+[ -n "$objs" ] || { echo "STOP: no object listing from tpm2_ptool"; exit 1; }
+cands=$(printf '%s\n' "$objs" | python3 -I -c '
 import sys, re
 objs, cur = [], {}
 for l in sys.stdin:
@@ -31,21 +34,23 @@ for l in sys.stdin:
     if m: cur[m.group(1)] = m.group(2).strip()
 for o in objs:
     if o.get("CKA_LABEL", "").startswith("machine (candidate"): print(o["id"])
-' | while read -r oid; do tpm2_ptool objdel --path="$STORE" "$oid" 2>&1 | f; echo "deleted candidate object $oid"; done
-certutil -K -d "$DB" -h "$TOKEN" -f "$PIN" </dev/null 2>&1 | f
+') || { echo "STOP: could not parse the object listing"; exit 1; }
+echo "candidate objects: ${cands:-none}"
+for oid in $cands; do tpm2_ptool objdel --path="$STORE" "$oid" 2>&1 | f || true; echo "deleted candidate object $oid"; done
+certutil -K -d "$DB" -h "$TOKEN" -f "$PIN" </dev/null 2>&1 | f || true
 
 echo "== 2. request again, key type EC P-256 (the existing TPM key)"
 ipa-getcert request -d "$DB" -n "$KEY" -t "$TOKEN" -p "$PIN" -X locumview-spike-clients -T locumviewSpikeClient \
-  -G EC -g 256 -K "host/$FQDN" -N "CN=$FQDN" -I "$ID" </dev/null 2>&1 | f
+  -G EC -g 256 -K "host/$FQDN" -N "CN=$FQDN" -I "$ID" </dev/null 2>&1 | f || true
 settle; status
 k1=$(pub); s1=$(ser); echo "issued: $s1 key $k1"
 
 echo "== 3. renew"
-getcert resubmit -i "$ID" </dev/null 2>&1 | f
+getcert resubmit -i "$ID" </dev/null 2>&1 | f || true
 sleep 5; settle; status
 k2=$(pub); s2=$(ser); echo "renewed: $s2 key $k2"
 if [ "$s1" != "$s2" ] && [ "$k1" = "$k2" ]; then echo "PASS: new certificate, same TPM key"
 elif [ "$s1" != "$s2" ]; then echo "RENEWED WITH A NEW KEY (rotation): see the token's keys below"
 else echo "NOT RENEWED: see ca-error above"; fi
-certutil -K -d "$DB" -h "$TOKEN" -f "$PIN" </dev/null 2>&1 | f
+certutil -K -d "$DB" -h "$TOKEN" -f "$PIN" </dev/null 2>&1 | f || true
 lockout
