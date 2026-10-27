@@ -23,7 +23,10 @@ q() { "$@" 2> >(grep -v -i -e fapi >&2); }
 if [ "${1:-}" = down ]; then
   getcert stop-tracking -i "$ID" 2>/dev/null || true
   rm -f "$DROPIN"; systemctl daemon-reload; systemctl try-restart certmonger
+  [ "$(readlink /etc/tpm2_pkcs11 2>/dev/null)" = "$STORE" ] && rm -f /etc/tpm2_pkcs11
   rm -rf "$BASE"
+  # Root tools run without the store variable made an empty ~/.tpm2_pkcs11 for root during the spike.
+  [ -d /root/.tpm2_pkcs11 ] && echo "note: /root/.tpm2_pkcs11 left for the owner to check and remove"
   echo "== B2 undone: tracking stopped, $BASE and the drop-in removed (the certificate expires within 2 days)"
   exit 0
 fi
@@ -50,6 +53,11 @@ if [ ! -s "$PIN" ]; then   # empty PIN (first run): one login with it, known to 
   echo "user PIN set to a random value in $PIN (root only)"
 fi
 echo "key '$KEY' is in the TPM token '$TOKEN'"
+# certmonger's key helper does not get TPM2_PKCS11_STORE (it saw only an empty slot, no denial, no sandbox), so the
+# store is also linked at tpm2-pkcs11's first default path. The library uses that path only when the process can write
+# there: root and certmonger (cert_t target) can, desktop users cannot and keep using ~/.tpm2_pkcs11.
+if [ ! -e /etc/tpm2_pkcs11 ] && [ ! -L /etc/tpm2_pkcs11 ]; then ln -s "$STORE" /etc/tpm2_pkcs11; fi
+[ "$(readlink /etc/tpm2_pkcs11)" = "$STORE" ] || { echo "STOP: /etc/tpm2_pkcs11 exists and is not our link"; exit 1; }
 
 echo "== 2. NSS database for certmonger ($DB)"
 [ -f "$BASE/nssdb/cert9.db" ] || { install -d -m 0700 "$BASE/nssdb"; certutil -N -d "$DB" --empty-password; }
@@ -68,13 +76,14 @@ if [ ! -f "$DROPIN" ]; then
     echo 'Environment=TPM2_PKCS11_BACKEND=esysdb'   # pragma: allowlist secret
     echo 'Environment=TPM2_PKCS11_TCTI=device:/dev/tpmrm0'
   } > "$DROPIN"
+  chmod 0644 "$DROPIN"
   systemctl daemon-reload
 fi
 systemctl restart certmonger
 
 echo "== 4. request from $SUBCA with the host's own identity"
-if getcert list -i "$ID" 2>/dev/null | grep -q 'NEED_KEYINFO_READ_PIN'; then
-  getcert stop-tracking -i "$ID" >/dev/null; echo "stuck request from the first run removed"
+if getcert list -i "$ID" 2>/dev/null | grep -q 'stuck: yes'; then
+  getcert stop-tracking -i "$ID" >/dev/null; echo "stuck request from an earlier run removed"
 fi
 if ! getcert list -i "$ID" 2>/dev/null | grep -q "Request ID '$ID'"; then
   ipa-getcert request -d "$DB" -n "$KEY" -t "$TOKEN" -p "$PIN" -X "$SUBCA" -T "$PROFILE" \
