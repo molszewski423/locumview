@@ -1631,3 +1631,14 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   runs.
 - Installed by the owner: the stale pause process from before was listed before the restart and gone after it; the
   runner is active. The next image build is the end-to-end check.
+
+## 95. `:stable` promoted to the M3 step 6 image; ADR 0019 spike planned (2026-10-26)
+
+- The owner ran `promote` (Actions, manual) with the explicit digest `sha256:8c94dcf4…` (the image of #93, tried on
+  lv-test17); the run passed its checks (signature, SBOM and scan attestations) and moved `:stable` to it. Desktops
+  following `:stable` pick it up on their next update; lv-test17 already runs it.
+- lv-test17 is kept for the ADR 0019 spike instead of being destroyed now.
+- Spike plan: `docs/plans/adr-0019-spike.md`. Four questions (TPM-backed key that cannot be exported; Chrome presenting
+  it without a prompt; Traefik refusing clients without a desktop certificate at the handshake; certmonger issuing from
+  an IdM sub-CA), a throwaway name and namespace (`mtls-spike`), owner runs for root and IdM steps, and an undo for
+  every change. Nothing is built yet; the clinical namespace is untouched.
