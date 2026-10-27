@@ -89,7 +89,10 @@ if ! getcert list -i "$ID" 2>/dev/null | grep -q "Request ID '$ID'"; then
   ipa-getcert request -d "$DB" -n "$KEY" -t "$TOKEN" -p "$PIN" -X "$SUBCA" -T "$PROFILE" \
     -K "host/$FQDN" -N "CN=$FQDN" -I "$ID" -w -v || true
 fi
-getcert list -i "$ID" | grep -E 'status:|stuck:|ca-error|issuer:|subject:|expires:|key pair storage|certificate:'
+for _ in $(seq 24); do   # up to 2 minutes for MONITORING or a stuck state
+  getcert list -i "$ID" 2>/dev/null | grep -q -e 'status: MONITORING' -e 'stuck: yes' && break; sleep 5
+done
+getcert list -i "$ID" 2>/dev/null | grep -E 'status:|stuck:|ca-error|issuer:|subject:|expires:'
 getcert list -i "$ID" | grep -q 'status: MONITORING' || { lockout; echo "STOP: not MONITORING"; exit 1; }
 pub() { certutil -L -d "$DB" -n "$TOKEN:$KEY" -a -f "$PIN" 2>/dev/null | openssl x509 -noout -pubkey | sha256sum | cut -c1-16; }
 ser() { certutil -L -d "$DB" -n "$TOKEN:$KEY" -a -f "$PIN" 2>/dev/null | openssl x509 -noout -serial; }
