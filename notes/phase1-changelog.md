@@ -1675,6 +1675,16 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   both Chrome policy changes, the user token. The session's revert script covers all of them (root, then a reboot).
   The client certificate expires 2026-10-28, the test CA 2026-11-02. The test CA's key is still on node1, in that
   session's temporary directory.
-- **Next:** part 4 (empty PIN) decides Q2. If Chrome still prompts, the owner chooses between the ADR's fallback and
-  another way to prove "this is a desktop" (the session raised a per-desktop WireGuard peer); ADR 0019 is revised
-  before Q3 and Q4.
+- **2026-10-27, part 4 run (Q2 answered: yes).** The owner set the token's user PIN to empty (`certutil -K` with an
+  empty password file then listed the `desktop` key). After every Chrome window was closed and Chrome restarted, a
+  plain window opened the test endpoint with **no PIN prompt and no certificate picker**; the page showed the TPM
+  certificate's subject (`CN=lv-test17.corp.locumview.com`, issuer the test CA), confirmed in the endpoint's log.
+  The key's protection is that it stays in the TPM, not a PIN. Side notes: Chrome showed "Not secure" because it did
+  not trust the throwaway server certificate (one refused handshake, `certificate unknown`, before each accepted
+  request); with IdM-issued server certificates, which desktops already trust, this does not arise. A typed URL is
+  lost if Guacamole's input method is still on text input: switch it to None and click the address bar first.
+- **Open owner wish, outside ADR 0019:** one sign-in for the whole path, the EHR opening on a signed-in OpenEMR
+  dashboard. ADR 0019 removes the second Keycloak sign-in only; OpenEMR's own login stays until OpenEMR trusts
+  Keycloak (OIDC) or the gateway. Not researched yet.
+- **Next:** Q1's export proof (`pkcs11-tool --read-object --type privkey` refused; the token store useless on another
+  vTPM), the reboot check from A7, then Q3 with Traefik (A5) and track B.
