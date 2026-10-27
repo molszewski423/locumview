@@ -1710,3 +1710,28 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   browser sends them to every name under that domain: the spike endpoint received `_lv_clinical_sso_csrf`. Any
   service under `corp.` would receive the clinical session cookie the same way. ADR 0019 removes oauth2-proxy; if it
   stays, narrow the cookie to the two clinical names.
+- **Track B, B1 and B2 run, 2026-10-27 (Q4 answered for the machine: yes).** `idm-subca.sh up` (owner, operator-laptop):
+  sub-CA `locumview-spike-clients` under IdM's CA (IdM gives a sub-CA 20 years; the real build must set its lifetime
+  and rotation), profile `locumviewSpikeClient` from caIPAserviceCert (2 days, client auth only, EC P-256/P-384), CA
+  ACL for the `locumview-desktops` hostgroup only. `certmonger-machine.sh` then `certmonger-retry-ec.sh` (owner,
+  lv-test17): a machine token in the TPM with an EC P-256 key; certmonger requested with the host's keytab only and
+  reached MONITORING; `getcert resubmit` issued a second certificate. IdM lists both for lv-test17 (expiring 13:00:16
+  and 13:06:36 UTC on 2026-10-29); the second's public key equals the TPM key (`e4340c59…`); the token holds one
+  private key, flagged `CKA_SENSITIVE; CKA_NEVER_EXTRACTABLE`; the software database holds none; TPM lockout counter
+  0 throughout; no SELinux denials (also checked with dontaudit rules off).
+- **Found on the way (each changes the real build):**
+  - certmonger treats an empty PIN file as "no PIN" (`NEED_KEYINFO_READ_PIN`, no login attempted). The machine token
+    needs a PIN in a root-only file, so the empty PIN that keeps Chrome silent (Q2) does not carry over. B3 decides
+    how the user's Chrome reaches the key.
+  - certmonger's key helper does not receive `TPM2_PKCS11_STORE` from the unit's environment: it saw only an empty
+    slot. Linking the store at tpm2-pkcs11's first default path, `/etc/tpm2_pkcs11` (used only by processes that can
+    write there), fixed it with no SELinux change.
+  - The new NSS database loads `p11-kit-proxy`, which already exposes the token; registering the library again with
+    `modutil` fails.
+  - Requests must name the key type (`-G EC -g 256`). Without it certmonger kept its RSA default and at renewal made
+    an RSA candidate key in the TPM; IdM refused it (`Key Type EC Not Matched`). With it, renewal keeps the key.
+  - The stock profile accepts RSA only (`Key Type RSA Not Matched` for the EC key) until its key constraint changes.
+  - `ipa cert-find --ca=<sub-CA>` and `--issuer=<sub-CA DN>` return nothing for the sub-CA's certificates;
+    `--hosts=<fqdn>` finds them. Revocation tooling should look up by host.
+  - `certutil -L` ignores `-f` and asks for the token PIN interactively; scripts read certificates with `p11tool`.
+- **Next:** B3, whether the desktop user's Chrome can use the machine token's key, or the store must be per user.

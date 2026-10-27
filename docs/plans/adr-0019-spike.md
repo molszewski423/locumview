@@ -2,7 +2,8 @@
 
 Status: **In progress**: part of track A ran on 2026-10-26 before this plan was written (changelog #96): Q1 partly
 shown; Q2 yes on 2026-10-27 with an empty token PIN (no prompt, no picker); Q3 yes on 2026-10-27 (6 of 6 checks and the
-TPM certificate through Chrome and Traefik); Q1's export proof and Q4 open. Written 2026-10-26. Decision under test: ADR 0019 (Proposed). Canary desktop: lv-test17, running
+TPM certificate through Chrome and Traefik); Q4 yes for the machine on 2026-10-27
+(certmonger issues and renews into the TPM key with the host identity); B3 and Q1's blob-copy proof open. Written 2026-10-26. Decision under test: ADR 0019 (Proposed). Canary desktop: lv-test17, running
 the `:stable` image (`sha256:8c94dcf4…`, promoted 2026-10-26).
 
 ## 1. What the spike must answer
