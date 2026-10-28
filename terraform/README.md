@@ -3,6 +3,7 @@
 ADR 0013: OpenTofu creates and removes the infrastructure around each desktop; the desktop itself is the bootc image in `image/desktop/` (ADR 0007).
 
 - `modules/libvirt-desktop/`: one desktop on libvirt. IdM host entry with a one-time enrollment password and host group membership; desktop disk and seed volumes; the seed (built by `scripts/seed.sh`, never through cloud-init's user-data); the VM (q35, UEFI with Secure Boot, SMM, vTPM, LAN bridge, installer ISO); and a wait until first-boot provisioning ejects the seed, after which the seed volume is wiped (`scripts/wait-provisioned.sh`).
+- `node3/`: the same for node3, operator-laptop kept running as a second hypervisor (changelog #99). Same module and the same IdM, RHSM and registry secrets (symlinks to `node1/`), its own state and desktop list; OpenTofu runs on node3 itself (`libvirt_uri = "qemu:///system"`). Host prep: `hypervisor/node3-host.sh`.
 - `node1/`: the root configuration for the reference hypervisor. Desktops are listed in `desktops.auto.tfvars`; their secrets are in `desktops/<name>.sops.yaml`; site values are in `site.auto.tfvars` (git-ignored, see the example file). State and plan files are encrypted (OpenTofu state encryption, enforced).
 
 ## Requirements

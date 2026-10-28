@@ -244,9 +244,12 @@ resource "terraform_data" "guacamole" {
   triggers_replace = [terraform_data.provisioned.id, var.guacamole.groups, coalesce(var.guacamole.name, var.name)]
 
   provisioner "local-exec" {
-    command     = "${self.input.scripts}/upsert-desktop-connection.sh ${self.input.name} - ${join(" ", var.guacamole.groups)}"
+    # The connection name goes through the environment, never into the command line: a label such as
+    # "lv-test18 (node3)" broke bash -c when it was interpolated (changelog #99).
+    command     = "\"${self.input.scripts}/upsert-desktop-connection.sh\" \"$GUAC_NAME\" - ${join(" ", var.guacamole.groups)}"
     interpreter = ["bash", "-c"]
     environment = {
+      GUAC_NAME         = self.input.name
       KUBECONFIG        = var.guacamole.kubeconfig
       GUAC_HOSTNAME     = local.fqdn
       GUAC_PORT         = "3390"
@@ -257,9 +260,10 @@ resource "terraform_data" "guacamole" {
 
   provisioner "local-exec" {
     when        = destroy
-    command     = "${self.input.scripts}/delete-desktop-connection.sh ${self.input.name}"
+    command     = "\"${self.input.scripts}/delete-desktop-connection.sh\" \"$GUAC_NAME\""
     interpreter = ["bash", "-c"]
     environment = {
+      GUAC_NAME  = self.input.name
       KUBECONFIG = self.input.kubeconfig
     }
   }

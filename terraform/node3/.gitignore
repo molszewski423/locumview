@@ -1,0 +1,10 @@
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+site.auto.tfvars
+# Committed on purpose, despite the repository-wide patterns: the lock file pins the verified provider hashes
+# (ADR 0013), and the desktop list holds no secrets. site.auto.tfvars (real addresses) stays ignored.
+!.terraform.lock.hcl
+!desktops.auto.tfvars

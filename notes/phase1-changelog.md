@@ -436,9 +436,9 @@ Owner decision: LocumView is licensed under Apache-2.0. Until now the repo had n
 - **Gap found and fixed:** the session was locked, and every extension, the guard included, reported state 2 (inactive). GNOME disables extensions while the session is locked unless they list `unlock-dialog` in `session-modes`. For the guard this meant the 5-minute timer was cancelled on lock, and if the extension was turned off before the lock signal reached it, content copied just before locking stayed on the clipboard for the whole lock. Fix: `metadata.json` adds `"session-modes": ["user", "unlock-dialog"]`, so the guard stays on at the lock screen (it touches no UI), and `disable()` now clears the clipboard as a backstop (logout, reload). Syntax-checked; takes effect when `install-desktop.sh` is re-run and the sessions are restarted (pending, owner).
 - **Still to verify live:** copy out of the desktop blocked; clipboard empty 5 minutes after a copy; clipboard empty after lock and unlock; the guard state 1 (active) while the session is locked.
 
-## 29. node3 leaves the cluster; desktop allowlist down to two nodes (2026-10-04)
+## 29. The CentOS worker leaves the cluster; desktop allowlist down to two nodes (2026-10-04)
 
-- **Cluster change (about 18:20 to 20:43 EDT; openSUSE was installed at 18:30):** node3 (<suse-laptop-ip>) was reinstalled as `suse-laptop`, an openSUSE Leap 16.0 dev box for the SUSE variant of LocumView, and deleted from k3s. The cluster is node1 and node2. The `locumview` pods that were on node3 (guacd, cloudflared, Keycloak) were rescheduled: guacd and Keycloak run on node1, cloudflared on node1 and node2. Checked with `kubectl get pods -n locumview -o wide`.
+- **Cluster change (about 18:20 to 20:43 EDT; openSUSE was installed at 18:30):** The CentOS worker `centosbook` (<suse-laptop-ip>) was reinstalled as `suse-laptop`, an openSUSE Leap 16.0 dev box for the SUSE variant of LocumView, and deleted from k3s. The cluster is node1 and node2. The `locumview` pods that were on node3 (guacd, cloudflared, Keycloak) were rescheduled: guacd and Keycloak run on node1, cloudflared on node1 and node2. Checked with `kubectl get pods -n locumview -o wide`.
 - `packaging/remote-access/user-mode-root.sh`: `K3S_NODES` drops <suse-laptop-ip>. That address now belongs to a developer laptop, not a node where guacd can run, so it must not reach RDP (3389, 3390) or SSH on the desktops.
 - ADR 0002: dated update note; the decision is unchanged.
 - **Owner decision:** suse-laptop gets no direct RDP to the desktops, even though it is the SUSE development machine. Reference desktops are reached through Guacamole (Keycloak password + TOTP), the same path users take; desktops built locally on suse-laptop are unaffected.
@@ -614,7 +614,7 @@ Owner direction. No files changed besides this entry; live state only.
 
 Owner direction. Docs and evidence only; nothing running changed. Pass 2 (live config) follows.
 
-- **Host names** in docs, notes and evidence logs are now roles: `node1` (GPU agent and hypervisor), `node2` (k3s server), `node3` (the retired CentOS worker), `suse-laptop` (openSUSE), `operator-laptop` (Fedora; the owner's daily laptop and the operator machine) (both renamed on 2026-10-22 from `dev-laptop-1` and `dev-laptop-2`, which only numbered them), `git.internal` (the private Gitea). Addresses are named placeholders (`<idm-ip>`, `<ref-dev-ip>`, `<node1-ip>`, `<node2-ip>`, `<gateway-ip>`, ...); home paths are `~`. `idm01` and `corp.locumview.com` stay: they are part of the reference design. Earlier entries keep their meaning; only the names changed.
+- **Host names** in docs, notes and evidence logs are now roles: `node1` (GPU agent and hypervisor), `node2` (k3s server), `centosbook` (the retired CentOS worker; it was called node3 until 2026-10-28, when the name went to operator-laptop as a hypervisor, #99), `suse-laptop` (openSUSE), `operator-laptop` (Fedora; the owner's daily laptop and the operator machine) (both renamed on 2026-10-22 from `dev-laptop-1` and `dev-laptop-2`, which only numbered them), `git.internal` (the private Gitea). Addresses are named placeholders (`<idm-ip>`, `<ref-dev-ip>`, `<node1-ip>`, `<node2-ip>`, `<gateway-ip>`, ...); home paths are `~`. `idm01` and `corp.locumview.com` stay: they are part of the reference design. Earlier entries keep their meaning; only the names changed.
 - **Files renamed:** `hypervisor/import-node1.sh`, `node1-br0.sh`, `node1-memory.sh`, `locumview-ref-dev.node1.xml`, `docs/evidence/phase2/import-node1.log` (previously named after the host).
 - **`docs/break-glass.md`** says what kind of credential each account uses, not where it is kept; the locations are in the owner's private runbook. The idm01 admin account's sudo now asks for a password (it had none before).
 - **GNOME extension metadata** links to the public repository instead of the private Gitea address.
@@ -1800,3 +1800,36 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   a certificate whose own subject is the spike name, printing what it skips. Rule for every LocumView script and agent:
   never revoke, delete or disable from a search result without checking each item, and run any destructive IdM
   command against a listing first.
+
+## 99. node3: operator-laptop as a second hypervisor and k3s worker, stages 1 and 2 (2026-10-28)
+
+- **Why:** a read-only audit of the three machines (owner's private notes) found that node1 is not short of RAM
+  or CPU at rest, but its idle desktop VMs are pushed to swap when the local AI model is busy (15.5 GiB of qemu
+  memory swapped out at the time), and that node2 (the k3s server, a 2-core i3) is the tightest machine while it
+  also builds the desktop images. operator-laptop (4 cores / 8 threads, 32 GB, NVMe, Fedora 45) was idle. Owner
+  decision: it becomes node3, hosting test desktops first (Scenario C). The name was free: the CentOS worker that
+  carried it left the cluster in #29 and is now `suse-laptop`; older references were reworded.
+- **Stage 1, host (`hypervisor/node3-host.sh`, owner run):** battery held at 75 to 80% on AC, sleep targets
+  masked (lid switch already ignored), KSM per ADR 0010, VM directory `/var/lib/libvirt/images/locumview` without
+  btrfs copy-on-write and with the `virt_image_t` label, libvirt pool `locumview`, intra-zone forwarding in
+  firewalld (no port opened), LAN bridge `br0` with the NIC's MAC (switchover with automatic rollback). The wired
+  link first negotiated 100 Mb/s (a 10/100 device on the path also slowed node2); after re-cabling, 1 Gb/s on all
+  three nodes (720 to 820 Mb/s measured). Verified from node1: `br0` holds the reserved address, LAN and default
+  routes via `br0`, DNS from the LAN resolver only, SELinux enforcing.
+- **Stage 2, k3s (private homelab script, owner run):** agent v1.36.5+k3s1 with SELinux (`k3s-selinux` 1.6, the
+  EL8 build the upstream installer picks for Fedora; it loaded on Fedora 45), WireGuard (`flannel-wg` up), tainted
+  `NoSchedule` so nothing runs there unless placed. Verified: node Ready, only node-exporter scheduled, pod-to-pod
+  across all three nodes (about 4 to 5 ms), cluster DNS and the in-cluster Ollama Service reachable from a test
+  pod, no SELinux denials. The k3s upgrade plan for agents now tolerates the taint; its first run on node3 was a
+  no-op (same version, binary label intact).
+- **Stage 3, prepared:** `terraform/node3` (README) with one disposable Standard desktop, `lv-test18`. The installer
+  ISO was copied into node3's pool through libvirt (no root), SHA-256 checked against node1's copy. Next: owner
+  creates the state and desktop secrets and runs `tofu apply` on node3, then the checks in the plan (UEFI Secure
+  Boot, vTPM, LUKS, signed `:stable` image, IdM enrollment, Guacamole RDP), then `tofu destroy` and a second apply.
+- **Stage 3, first apply on node3 (lv-test18):** installation and first-boot provisioning completed (IdM enrollment,
+  DNS, seed wiped); the long quiet stretch (one vCPU at 100%, no disk I/O) was the AIDE database build (#66, about
+  13 minutes on node1). The last step failed: the module put the Guacamole connection name into the `bash -c`
+  command line unquoted, and the label `lv-test18 (node3)` broke it (the destroy-time step had the same bug).
+  Fixed: both provisioners pass the name in `GUAC_NAME` and quote it; tested in bash with names containing spaces,
+  parentheses, quotes and `;`. No effect on node1's resources (a provisioner command is not a trigger).
+
