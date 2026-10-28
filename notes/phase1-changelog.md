@@ -1772,3 +1772,31 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   with TPM access for that user; the certificate's subject is the host; revocation looked up by host; the sub-CA's
   lifetime to be chosen (IdM's default is 20 years); a "Spike results" section. Build plan step 1 marked done.
 - Next: the owner accepts or amends the ADR; then the spike undos, IdM's real sub-CA (step 2), the image (step 3).
+
+## 98. Incident: the spike's undo revoked six IdM system certificates; idm01 restored from the nightly backup (2026-10-27)
+
+- **What happened (about 10:05):** `scripts/spike/mtls-endpoint.sh down` looked up the spike server certificate with
+  `ipa cert-find --services=HTTP/mtls-spike… --status=VALID` and revoked every serial it printed. IdM ignored the
+  filter and returned all valid certificates, and the loop revoked six before the CA stopped answering: idm01's IPA
+  RA agent, CA Subsystem, CA server (Dogtag TLS), OCSP Subsystem, CA Audit and `ipa-ca-agent` certificates (reason
+  "cessation of operation", which cannot be undone). With the RA certificate revoked, IdM could no longer log in to
+  its CA (`PKI API login failed: invalid authentication`): no certificate could be issued, renewed, shown or revoked.
+  Sign-in, Kerberos, LDAP and DNS kept working; no desktop, EHR or other host certificate was revoked.
+- **Cause:** the script trusted a search result for a destructive action without checking each certificate. The
+  agent wrote and ran it without a dry run against IdM. The same day's spike had already shown that `cert-find`
+  filters by CA and issuer return nothing for the sub-CA, a warning that its filters are not reliable.
+- **Recovery:** read-only diagnosis on idm01 mapped five serials to its system certificates (the sixth turned out to be
+  `ipa-ca-agent`). A backup of the broken state was taken first (`idm01-backup.service`, 14:10 UTC, kept off-host for
+  a few days). The nightly full backup of 07:34 UTC (before any spike change in IdM) was checked: idm01's local copy
+  and the off-host encrypted copy had the same SHA-256; type FULL, host idm01, IPA 4.13.4 as installed. `ipa-restore`
+  (owner run, Directory Manager password from the encrypted secrets file, copied to the clipboard without display)
+  restored the directory and the CA database. Verified: all six certificates `Revoked: False`, certificate lookups
+  work, all services running. A power outage at 11:38 rebooted node1 and node2 between diagnosis and restore; every
+  VM came back on its own.
+- **Side effect, wanted:** the restore also removed the remaining spike pieces in IdM (sub-CA, profile, CA ACL, the
+  `mtls-spike` DNS record, host and service, the spike certificates for lv-test17). The spike undo is complete:
+  cluster namespace deleted, lv-test17 reverted and rebooted, the test CA files on node1 deleted.
+- **Fix:** `mtls-endpoint.sh down` now finds candidates by subject, re-reads each with `cert-show`, and revokes only
+  a certificate whose own subject is the spike name, printing what it skips. Rule for every LocumView script and agent:
+  never revoke, delete or disable from a search result without checking each item, and run any destructive IdM
+  command against a listing first.
