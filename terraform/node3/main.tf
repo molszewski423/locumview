@@ -27,6 +27,8 @@ module "desktop" {
   bridge        = var.bridge
   installer_iso = var.installer_iso
   libvirt_uri   = var.libvirt_uri
+  ovmf_code     = var.ovmf_code
+  ovmf_vars     = var.ovmf_vars
 
   idm            = var.idm
   k3s_node_cidrs = var.k3s_node_cidrs

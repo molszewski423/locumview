@@ -112,3 +112,18 @@ variable "registry_sops_file" {
   type        = string
   default     = "registry.sops.yaml"
 }
+
+# node3 runs Fedora: its edk2 package names the Secure Boot firmware differently from Debian (node1). This pair is
+# Fedora's "2m-raw-x64-sb-enrolled" descriptor (/usr/share/qemu/firmware/31-...json): raw, Microsoft keys enrolled,
+# Secure Boot and SMM required, the same properties as node1's OVMF_*_4M.ms.fd.
+variable "ovmf_code" {
+  description = "Secure Boot capable OVMF code file on node3 (Fedora path)."
+  type        = string
+  default     = "/usr/share/edk2/ovmf/OVMF_CODE.secboot.fd"
+}
+
+variable "ovmf_vars" {
+  description = "OVMF variables template with the Microsoft keys enrolled, on node3 (Fedora path)."
+  type        = string
+  default     = "/usr/share/edk2/ovmf/OVMF_VARS.secboot.fd"
+}
