@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# LocumView hypervisor prep for node2: a Fedora laptop (operator-laptop) kept running as a second hypervisor and
-# k3s worker. Stage 1 of the node2 plan (changelog #99): host only, no k3s (node2-k3s is separate), no VMs.
-# Run as root on node2:  sudo bash hypervisor/node2-host.sh          (idempotent)
-# Undo everything here:  sudo bash hypervisor/node2-host.sh --undo
+# LocumView hypervisor prep for node4: a Fedora laptop (operator-laptop) kept running as another hypervisor and
+# k3s worker (node1 = the AI workstation, node2 = the k3s server, node3 = the former CentOS worker). Stage 1 of the
+# node4 plan (changelog #99): host only, no k3s (the k3s join is a separate, private homelab script), no VMs.
+# Run as root on node4:  sudo bash hypervisor/node4-host.sh          (idempotent)
+# Undo everything here:  sudo bash hypervisor/node4-host.sh --undo
 #
 #   1. Power: battery charges to 80% (starts again at 75%) because the laptop stays on AC; sleep, suspend and
 #      hibernate are masked so the machine never sleeps (the lid switch must already be set to ignore).
@@ -16,10 +17,10 @@
 #      transient systemd unit and rolls back to the original wired profile if br0 does not get the same address
 #      and reach the gateway within 60 s. Node values are read from the running system, not from site.env.
 set -euo pipefail
-LOG=/var/log/locumview-node2-br0.log
+LOG=/var/log/locumview-node4-br0.log
 IMAGES=/var/lib/libvirt/images/locumview
 [ "$(id -u)" = 0 ] || { echo "run as root"; exit 1; }
-grep -q '^ID=fedora' /etc/os-release || { echo "node2 is the Fedora host"; exit 1; }
+grep -q '^ID=fedora' /etc/os-release || { echo "node4 is the Fedora host"; exit 1; }
 
 NIC=${NIC:-$(ip -o route show default | awk '$0 !~ / dev br0 /{print $5; exit}')}
 NIC=${NIC:-$(nmcli -t -f DEVICE,TYPE con show --active | awk -F: '$2=="802-3-ethernet"{print $1; exit}')}
@@ -34,7 +35,7 @@ bridge_switch() { # runs inside the transient unit
   mac=$(cat "/sys/class/net/$NIC/address")
   zone=$(firewall-cmd --get-zone-of-interface="$NIC")
   [ -n "$old" ] && [ -n "$ip" ] && [ -n "$gw" ] || { echo "RESULT: NOT STARTED (no active wired profile/address on $NIC)"; exit 1; }
-  echo "old=$old ip=$ip gw=$gw zone=$zone" > /var/lib/locumview-node2-br0.prev
+  echo "old=$old ip=$ip gw=$gw zone=$zone" > /var/lib/locumview-node4-br0.prev
   nmcli con show br0 >/dev/null 2>&1 || nmcli con add type bridge ifname br0 con-name br0 \
     bridge.stp no bridge.forward-delay 0 bridge.mac-address "$mac" ipv4.method auto ipv6.method auto \
     ipv6.ignore-auto-dns yes connection.zone "$zone" connection.autoconnect yes
@@ -64,9 +65,11 @@ undo() {
     echo 0 > "$b/charge_control_start_threshold" 2>/dev/null || true; done
   systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target
   rm -f /etc/tmpfiles.d/locumview-ksm.conf; echo 0 > /sys/kernel/mm/ksm/run
-  if [ -f /var/lib/locumview-node2-br0.prev ]; then
-    # shellcheck disable=SC1091
-    . /var/lib/locumview-node2-br0.prev
+  prev=/var/lib/locumview-node4-br0.prev
+  [ -f "$prev" ] || prev=/var/lib/locumview-node2-br0.prev # first run used the name node2 (renamed 2026-10-28)
+  if [ -f "$prev" ]; then
+    # shellcheck disable=SC1090
+    . "$prev"
     nmcli con mod "$old" connection.autoconnect yes; nmcli con up "$old" || true
     nmcli con delete "br0-port-$NIC" br0 || true
     firewall-cmd --permanent --zone="$zone" --remove-forward >/dev/null; firewall-cmd --reload >/dev/null
@@ -89,7 +92,7 @@ grep -q 'HandleLidSwitch=ignore' /etc/systemd/logind.conf /etc/systemd/logind.co
 
 echo "== 1. power"
 cat > /etc/udev/rules.d/90-locumview-battery.rules <<'RULE'
-# LocumView node2: on AC all the time, keep the battery between 75 and 80%.
+# LocumView node4: on AC all the time, keep the battery between 75 and 80%.
 ACTION=="add|change", SUBSYSTEM=="power_supply", KERNEL=="BAT[0-9]", ATTR{charge_control_end_threshold}="80", ATTR{charge_control_start_threshold}="75"
 RULE
 for b in /sys/class/power_supply/BAT*; do
@@ -127,8 +130,8 @@ if ip -4 -br addr show br0 2>/dev/null | grep -q UP; then
   echo "   br0 already up: $(ip -4 -br addr show br0)"
 else
   : > "$LOG"
-  systemd-run --unit=locumview-node2-br0 --collect env NIC="$NIC" bash "$(readlink -f "$0")" --bridge
-  echo "   switchover running in unit locumview-node2-br0 (SSH may drop for a few seconds); log $LOG"
+  systemd-run --unit=locumview-node4-br0 --collect env NIC="$NIC" bash "$(readlink -f "$0")" --bridge
+  echo "   switchover running in unit locumview-node4-br0 (SSH may drop for a few seconds); log $LOG"
   for _ in $(seq 120); do grep -q '^RESULT' "$LOG" && break; sleep 1; done
   grep '^RESULT' "$LOG" || { echo "   no result yet; see $LOG"; exit 1; }
 fi

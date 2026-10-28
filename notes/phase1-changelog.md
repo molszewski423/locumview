@@ -1800,3 +1800,30 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   a certificate whose own subject is the spike name, printing what it skips. Rule for every LocumView script and agent:
   never revoke, delete or disable from a search result without checking each item, and run any destructive IdM
   command against a listing first.
+
+## 99. node4: operator-laptop as a second hypervisor and k3s worker, stages 1 and 2 (2026-10-28)
+
+- **Why:** a read-only audit of the three machines (owner's private notes) found that node1 is not short of RAM
+  or CPU at rest, but its idle desktop VMs are pushed to swap when the local AI model is busy (15.5 GiB of qemu
+  memory swapped out at the time), and that node2 (the k3s server, a 2-core i3) is the tightest machine while it
+  also builds the desktop images. operator-laptop (4 cores / 8 threads, 32 GB, NVMe, Fedora 45) was idle. Owner
+  decision: it becomes node4, hosting test desktops first (Scenario C). node3 stays the name of the former CentOS
+  worker.
+- **Stage 1, host (`hypervisor/node4-host.sh`, owner run):** battery held at 75 to 80% on AC, sleep targets
+  masked (lid switch already ignored), KSM per ADR 0010, VM directory `/var/lib/libvirt/images/locumview` without
+  btrfs copy-on-write and with the `virt_image_t` label, libvirt pool `locumview`, intra-zone forwarding in
+  firewalld (no port opened), LAN bridge `br0` with the NIC's MAC (switchover with automatic rollback). The wired
+  link first negotiated 100 Mb/s (a 10/100 device on the path also slowed node2); after re-cabling, 1 Gb/s on all
+  three nodes (720 to 820 Mb/s measured). Verified from node1: `br0` holds the reserved address, LAN and default
+  routes via `br0`, DNS from the LAN resolver only, SELinux enforcing.
+- **Stage 2, k3s (private homelab script, owner run):** agent v1.36.5+k3s1 with SELinux (`k3s-selinux` 1.6, the
+  EL8 build the upstream installer picks for Fedora; it loaded on Fedora 45), WireGuard (`flannel-wg` up), tainted
+  `NoSchedule` so nothing runs there unless placed. Verified: node Ready, only node-exporter scheduled, pod-to-pod
+  across all three nodes (about 4 to 5 ms), cluster DNS and the in-cluster Ollama Service reachable from a test
+  pod, no SELinux denials. The k3s upgrade plan for agents now tolerates the taint; its first run on node4 was a
+  no-op (same version, binary label intact).
+- **Stage 3, prepared:** `terraform/node4` (README) with one disposable Standard desktop, `lv-test18`. The installer
+  ISO was copied into node4's pool through libvirt (no root), SHA-256 checked against node1's copy. Next: owner
+  creates the state and desktop secrets and runs `tofu apply` on node4, then the checks in the plan (UEFI Secure
+  Boot, vTPM, LUKS, signed `:stable` image, IdM enrollment, Guacamole RDP), then `tofu destroy` and a second apply.
+
