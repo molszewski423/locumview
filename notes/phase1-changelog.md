@@ -1833,3 +1833,19 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   Fixed: both provisioners pass the name in `GUAC_NAME` and quote it; tested in bash with names containing spaces,
   parentheses, quotes and `;`. No effect on node1's resources (a provisioner command is not a trigger).
 
+## 100. ADR 0011 and 0017 updates: agentic engineering assistant as built, hybrid inference policy (2026-10-28)
+
+- ADR 0011 records the Built headless OpenCode assistant in the homelab infrastructure repository,
+  replacing the unbuilt persona, tool server and bot-fork design. It describes sandboxing, permissions,
+  the review ledger, kill switches, the local model evaluation and the larger benchmark In progress.
+- Owner decision recorded: public-repository engineering may use approved zero-retention cloud models,
+  with separate runners, enforced local egress and cloud pre-flight exclusions and secret scanning.
+  Private data and patient-context agents stay local-only; the routing policy file is Planned.
+- ADR 0017 adds a Planned consideration, with no decision or build, for a separate clinician research
+  assistant without PHI, FHIR or EHR credentials, shared credentials or shared patient-context vector stores.
+- **Verified 2026-10-28 (Claude Code, on node1):** a local-tier task's external HTTPS request failed (even DNS to
+  the LAN resolver is blocked) while its request to the local model on 127.0.0.1 succeeded; a cloud-tier task on a
+  real clone of this repository passed the gate with the three clinical paths absent from the checkout and no
+  secret findings, and finished in 20 s; gitleaks refused a planted fake token. Drafted by Codex, reviewed by
+  Claude Code; pre-commit run on the changed files. Next: owner review; record the benchmark result and the routing
+  policy when available. (#99 is the node3 entry on a branch not yet merged.)

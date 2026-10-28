@@ -112,3 +112,19 @@ EHR launch. This update adds scope and an exit criterion to Phase 9 lite. Plan, 
 
 Open, for the owner: whether this app is "AMS Intelligence" or AMS Intelligence is one module within it (listed with
 a recommendation in the plan document). Nothing in this update is built. Status lives in ROADMAP.md.
+
+## Consideration 2026-10-28: a clinician research assistant, separate from patient-context agents
+
+**Planned consideration only: no decision and no build.** A clinician research assistant could answer
+general medical questions without PHI, retrieve literature such as PubMed and curated guidelines, and
+provide citations with dates. It would separate retrieved evidence from the model's interpretation.
+
+This would be an application separate from the patient-context agents, with its own namespace and
+identity, no FHIR or EHR credentials, and network policy blocking traffic in both directions between its
+namespace and the clinical namespace. It could use approved cloud models through the same kind of
+routing policy considered in ADR 0011's 2026-10-28 update.
+
+Sign-in, audit logging and retrieval tooling could be reused, but credentials and vector stores would
+not be shared with patient-context agents. Patient-context agents stay local-only, with deterministic
+rules deciding findings and the local model explaining them. This consideration changes no decision
+about those agents.
