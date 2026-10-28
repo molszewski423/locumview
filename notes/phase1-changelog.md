@@ -1826,4 +1826,10 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   ISO was copied into node3's pool through libvirt (no root), SHA-256 checked against node1's copy. Next: owner
   creates the state and desktop secrets and runs `tofu apply` on node3, then the checks in the plan (UEFI Secure
   Boot, vTPM, LUKS, signed `:stable` image, IdM enrollment, Guacamole RDP), then `tofu destroy` and a second apply.
+- **Stage 3, first apply on node3 (lv-test18):** installation and first-boot provisioning completed (IdM enrollment,
+  DNS, seed wiped); the long quiet stretch (one vCPU at 100%, no disk I/O) was the AIDE database build (#66, about
+  13 minutes on node1). The last step failed: the module put the Guacamole connection name into the `bash -c`
+  command line unquoted, and the label `lv-test18 (node3)` broke it (the destroy-time step had the same bug).
+  Fixed: both provisioners pass the name in `GUAC_NAME` and quote it; tested in bash with names containing spaces,
+  parentheses, quotes and `;`. No effect on node1's resources (a provisioner command is not a trigger).
 
