@@ -1,8 +1,8 @@
-# Copy to site.auto.tfvars (git-ignored) and fill in. node4 = operator-laptop running as a second hypervisor.
+# Copy to site.auto.tfvars (git-ignored) and fill in. node3 = operator-laptop running as a second hypervisor.
 libvirt_uri        = "qemu:///system"
 installer_iso      = "/var/lib/libvirt/images/locumview/<installer ISO>"
 idm_ca_certificate = "<path to the IdM CA certificate on this machine>"
-k3s_node_cidrs     = ["<node1-ip>/32", "<k3s server node ip>/32"]   # the nodes guacd may run on (not node4: tainted)
+k3s_node_cidrs     = ["<node1-ip>/32", "<k3s server node ip>/32"]   # the nodes guacd may run on (not node3: tainted)
 dns_ip             = "<LAN DNS server>"
 guacamole_kubeconfig = "<path to the operator kubeconfig>"
 update_image         = "<registry>/<owner>/locumview-desktop:stable"

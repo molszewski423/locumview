@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Create SOPS-encrypted secrets for node4 (ADR 0003): values are generated here and piped straight into
+# Create SOPS-encrypted secrets for node3 (ADR 0003): values are generated here and piped straight into
 # sops --encrypt, so no plain-text copy is written. Encrypting needs only the public key in .sops.yaml.
 #   ./secrets.sh state            state.sops.yaml: the state encryption passphrase (once)
 #   ./secrets.sh desktop <name>   desktops/<name>.sops.yaml: break-glass, GRUB, LUKS recovery, RDP credentials
@@ -10,7 +10,7 @@ cd "$(dirname "$0")"
 rnd() { local s=''; while [ "${#s}" -lt "$1" ]; do s+=$(head -c 64 /dev/urandom | LC_ALL=C tr -dc 'A-Za-z0-9'); done; printf '%s' "${s:0:$1}"; }
 enc() { # $1 target file; YAML on stdin
   [ ! -e "$1" ] || { echo "$1 exists; delete it first to replace it"; exit 1; }
-  sops --encrypt --filename-override "terraform/node4/$1" --input-type yaml --output-type yaml /dev/stdin > "$1.tmp"
+  sops --encrypt --filename-override "terraform/node3/$1" --input-type yaml --output-type yaml /dev/stdin > "$1.tmp"
   mv "$1.tmp" "$1"; echo "wrote $1"
 }
 case "${1:-}" in

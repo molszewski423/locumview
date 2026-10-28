@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run OpenTofu for node4 (ADR 0013; same module and secrets as node1, own state). From an operator machine that holds the age key (ADR 0003):
+# Run OpenTofu for node3 (ADR 0013; same module and secrets as node1, own state). From an operator machine that holds the age key (ADR 0003):
 #   ./tofu.sh init | plan | apply | destroy ...
 # The state passphrase and the IdM account's password come from SOPS; neither is written to disk.
 set -euo pipefail

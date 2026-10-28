@@ -6,7 +6,7 @@ variable "state_passphrase" {
 
 # Site values: site.auto.tfvars (git-ignored; see site.auto.tfvars.example).
 variable "libvirt_uri" {
-  description = "libvirt on node4: qemu:///system when OpenTofu runs on node4 itself (operator-laptop), else qemu+ssh://<user>@<node4>/system."
+  description = "libvirt on node3: qemu:///system when OpenTofu runs on node3 itself (operator-laptop), else qemu+ssh://<user>@<node3>/system."
   type        = string
 }
 
@@ -21,7 +21,7 @@ variable "bridge" {
 }
 
 variable "installer_iso" {
-  description = "Installer ISO path on node4 (volume in the locumview pool)."
+  description = "Installer ISO path on node3 (volume in the locumview pool)."
   type        = string
 }
 
