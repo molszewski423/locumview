@@ -261,3 +261,65 @@ anything except DNS and Gitea (tested against the cluster API, the internet and 
 is gone within `ttlSecondsAfterFinished`; a patch touching `agent/` or another excluded path is refused by the tool
 server; a fourth PR is refused while 3 are open; the audit volume appears in the next nightly restic snapshot; an
 injected instruction planted in a test file does not produce any action outside a PR to the fork.
+
+## Update 2026-10-28: the agent that was built; local and cloud inference with enforced controls
+
+The design in sections 1 to 7 and the Argus update was not built: no Open WebUI engineering persona, tool
+server, or bot account with a fork and pull requests. This section records the engineering assistant Built
+instead, using facts verified on 2026-10-28, and the owner's hybrid inference decision of that date.
+
+### Engineering assistant as built
+
+The implementation lives in the homelab infrastructure repository under `linus/agent/`. It is a headless
+coding agent (OpenCode) on node1, running as a dedicated unprivileged Unix user with no sudo, no access to
+the owner's credentials and no secrets tooling. Senior engineers (Claude Code and Codex) or the owner
+submit tasks through a file-based queue.
+
+Each task runs in a fresh clone **without a git remote**, inside a bubblewrap sandbox with only the clone
+writable, under a hardened systemd unit. The agent cannot push, merge, deploy or write to the cluster.
+When a task needs cluster access, it uses a read-only ServiceAccount bound to `view`.
+
+Reports, diffs and logs wait for review. A reviewer lands accepted work as their own signed commit with
+`Agent:` and `Reviewed-by:` trailers. Every review verdict is appended to a ledger recording tier, model,
+run time, tokens, edit level and reviewer. One kill-switch command stops both runners; a separate switch
+turns cloud inference off.
+
+The local `linus-agent` model is Qwen3.6 35B-A3B, a mixture of experts with 3B active parameters and a 64K
+context, on node1's GPU. It was chosen by a six-task evaluation on 2026-10-28: 6/6 versus 3/6 for gpt-oss
+20B. A larger benchmark comparing it with free cloud models is In progress: eleven tasks including
+Kubernetes, OpenTofu and security fixes, with three runs per model. This ADR will record the result.
+
+### Hybrid inference policy and enforced controls
+
+Owner decision, 2026-10-28: section 6's local-only principle changes for engineering work on public
+repositories only. Two tiers use two runners:
+
+- **Local tier, Built:** no network except localhost, enforced by the kernel through systemd
+  `IPAddressDeny=any` and `IPAddressAllow=localhost`. Verification: an external request failed while the
+  local model answered.
+- **Cloud tier, Built:** only repositories already public and only zero-retention free models, two
+  OpenCode Zen models at the time of writing. A cloud task never receives a kubeconfig or the private
+  agent context. Before it is queued, a pre-flight gate excludes clinical code, synthetic FHIR cases and
+  clinical evidence from the checkout using sparse checkout exclusions for `clinical/`,
+  `docs/evidence/clinical/` and `scripts/clinical/`. It then scans what remains with gitleaks in a pinned
+  image with no network. Any finding refuses the task. Verification used a real clone and a planted token.
+
+Providers whose terms allow training on inputs are not used for repository work. By owner decision, one
+such model is used only on synthetic benchmark tasks. Hosted trial APIs whose terms forbid production use
+of generated content are excluded.
+
+Patient data, patient-context clinical agents (ADR 0017) and anything private stay local-only. This update
+does not change that boundary.
+
+**Planned:** a routing policy file listing approved providers and models per data class. The default is
+local; uncertainty means local. This is also the shape a LocumView deployment would use to declare its
+approved inference providers.
+
+### Consequences
+
+- Section 6's boundary claim now reads: "regulated and private data never leave the boundary;
+  public-repository engineering may use approved zero-retention cloud models behind enforced controls".
+- Free tiers can change or disappear. Local inference is the floor.
+- Requests to a cloud provider pass through its proxy.
+- Review load remains a cost. Permissions, egress controls and human review bound the effect of prompt
+  injection and the work requiring review; these controls do not depend on the model resisting an instruction.
