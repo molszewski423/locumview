@@ -1848,4 +1848,4 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   real clone of this repository passed the gate with the three clinical paths absent from the checkout and no
   secret findings, and finished in 20 s; gitleaks refused a planted fake token. Drafted by Codex, reviewed by
   Claude Code; pre-commit run on the changed files. Next: owner review; record the benchmark result and the routing
-  policy when available. (#99 is the node3 entry on a branch not yet merged.)
+  policy when available.
