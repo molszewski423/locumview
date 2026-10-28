@@ -64,8 +64,15 @@ down)
   kubectl delete namespace "$NAME" --ignore-not-found --wait=true
   # shellcheck disable=SC2029
   ssh "$IDM" "set -e
-              for s in \$(ipa cert-find --services=HTTP/$FQDN --status=VALID 2>/dev/null | sed -n 's/^ *Serial number: //p'); do
-                ipa cert-revoke \$s --revocation-reason=5 >/dev/null && echo revoked \$s
+              # Revoke only certificates whose own subject is this name: on 2026-10-27 cert-find --services returned
+              # unrelated certificates and the old loop revoked six of them (changelog #98). Each candidate is
+              # re-read with cert-show and checked before anything is revoked.
+              for s in \$(ipa cert-find --subject=$FQDN --status=VALID 2>/dev/null | sed -n 's/^ *Serial number: //p'); do
+                subj=\$(ipa cert-show \$s 2>/dev/null | sed -n 's/^ *Subject: //p')
+                case \"\$subj\" in
+                  CN=$FQDN,*) ipa cert-revoke \$s --revocation-reason=5 >/dev/null && echo \"revoked \$s (\$subj)\" ;;
+                  *) echo \"skipped \$s: subject \$subj is not $FQDN\" ;;
+                esac
               done
               ipa service-show HTTP/$FQDN >/dev/null 2>&1 && ipa service-del HTTP/$FQDN >/dev/null
               ipa host-show $FQDN >/dev/null 2>&1 && ipa host-del $FQDN >/dev/null
