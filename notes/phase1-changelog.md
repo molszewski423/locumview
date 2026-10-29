@@ -1866,5 +1866,6 @@ Agent: Codex
 - **Updated:** the product plan now states the small explicit musl/BusyBox, apk and OpenRC rationale, language/runtime compatibility gates and the intended clinical development workspace. The hosted workstream is renamed accordingly in ROADMAP.md and remains Planned, with transport, identity, persistence, isolation and AI data permissions still to verify.
 - **Scope:** general-purpose and standalone use remain available. Five shared toolchains are a starting stack. A small base is not security validation; RHEL/SUSE evidence does not transfer. No deployment, runtime migration or package change.
 - **Verification:** official Alpine rationale and public text/links reviewed; all required pre-commit checks passed. Companion website update supplies the page explanation and a labeled future-desktop concept with synthetic projects.
+- **Editorial follow-up:** owner requested American spelling, so the public contribution workstream uses "program"; the website inherits the label from this roadmap.
 
 Agent: Codex
