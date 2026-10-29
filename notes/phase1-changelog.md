@@ -1879,3 +1879,13 @@ Agent: Codex
 - **Next:** review the platform branch first, then the website branch with the default main roadmap. Owner integration and production publication remain separate steps.
 
 Agent: Codex
+
+## 104. Organization-led LocumView workspace and distribution targets (2026-10-29 11:10 EDT)
+
+- **Owner correction:** the clinical reference implementation is built on RHEL, while LocumView is designed to be Linux distribution agnostic and driven by organizational requirements. Data sovereignty is the offering goal. SUSE is one target, and Debian is also Planned.
+- **Updated:** the portfolio now presents the LocumView workspace and Catalyst as core products. A separate workspace deployment-target table records RHEL Built, SUSE / openSUSE In progress and Debian Planned. README and plans distinguish the organization-led design from distribution-specific evidence.
+- **Website scope:** preserve the existing clinical and sovereignty positioning and deployment sections; correct the new product cards and retain the approved Catalyst page and screenshots. Product and target status remain generated from ROADMAP.md.
+- **Verification:** public text, links and status boundaries reviewed; full pre-commit checks passed. No infrastructure, distribution implementation or clinical scope change.
+- **Next:** owner reviews and integrates this correction before the updated website. Production publication remains approved for the reviewed site, with signed owner integration and output review before default-branch pushes.
+
+Agent: Codex

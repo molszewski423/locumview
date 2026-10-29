@@ -10,8 +10,11 @@ Name: nods to locum tenens clinicians and VMware View (now Horizon, owned by Omn
 
 ## Core product family and Catalyst (owner direction, 2026-10-29)
 
-LocumView's product family includes the RHEL clinical desktop, the SUSE / openSUSE desktop and **Catalyst**, its
-AI-focused development platform and open-source contribution project. Catalyst is a core offering, with the
+LocumView's organization-led workspace is designed to be Linux distribution agnostic, with data sovereignty
+as the offering goal. The clinical reference implementation is built on RHEL; SUSE / openSUSE is In progress
+and Debian is Planned. Organizations drive distribution, infrastructure and jurisdiction choices, and each
+target needs independent validation. **Catalyst** is its AI-focused development platform and open-source
+contribution project. Catalyst is a core offering, with the
 mission of helping clinicians and other domain experts deepen IT engineering and building skills. It extends
 the same purpose: give people control of their tools, make engineering understandable, and retain reproducible,
 reviewable evidence. It is not a desktop profile or a requirement for the clinical desktop.

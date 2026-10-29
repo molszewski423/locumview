@@ -4,15 +4,26 @@ Status as of 2026-10-29. Labels: **Done** (built and verified), **Open** (versio
 
 ## Core product portfolio
 
-LocumView's core offerings share open engineering, reproducible configuration, human control and evidence of
-what works. Catalyst is a first-class product alongside the RHEL and SUSE desktop offerings, with its own
-development and learning mission. Product membership does not imply the same release maturity or controls.
+LocumView is an organization-led workspace designed to be Linux distribution agnostic. The clinical reference
+implementation is built on RHEL. Organizations should be able to choose the distribution, infrastructure and
+jurisdiction that fit their needs, with data sovereignty as the offering goal. Other distribution targets need
+their own builds and validation. Catalyst is a core development and learning product alongside that workspace.
 
 | ID | Product | Purpose | Status | Release scope |
 |---|---|---|---|---|
-| rhel | LocumView RHEL desktop | A hardened, reproducible clinical workspace delivered through the browser | **Built**: version one and the Phase 4 core release milestone verified | The RHEL desktop has its own hardening, identity and signed-image evidence; production operation remains an organizational responsibility |
-| suse | LocumView SUSE / openSUSE desktop | An enterprise Linux desktop option for organizations choosing the SUSE ecosystem | **In progress**: infrastructure work has begun; not supported or shipped | Equivalent desktop delivery and hardening need distribution-specific evidence |
+| workspace | LocumView workspace | An organization-led Linux workspace designed for data sovereignty and control over distribution, infrastructure and jurisdiction | **Built**: the clinical reference implementation runs on RHEL; version one and the Phase 4 core release milestone verified | Linux distribution agnostic by design; RHEL evidence applies to the RHEL build, and other targets require independent validation |
 | catalyst | Catalyst | An AI-focused development platform helping clinicians and other domain experts deepen IT engineering and building skills | **In progress**: Alpine VM desktop, native Rust/C workflow and managed LazyVim Rust language-server checks verified | Core LocumView product and open-source contribution project; public source release, unified Vera, persistent Learning Mode and hosted delivery remain Planned |
+
+## Workspace deployment targets
+
+Distribution choice is driven by the organization's requirements. These targets describe implementation status,
+not a limit on the distribution-agnostic design or a promise that all Linux distributions are supported today.
+
+| ID | Distribution | Status | Validation scope |
+|---|---|---|---|
+| rhel | Red Hat Enterprise Linux | **Built**: clinical reference desktop and browser delivery verified | RHEL image, hardening, identity and signed-release evidence |
+| suse | SUSE Linux Enterprise / openSUSE | **In progress**: infrastructure work has begun; not supported or shipped | Distribution-specific builds, delivery and equivalent-hardening evidence remain open |
+| debian | Debian | **Planned**: community-governed, vendor-neutral deployment target | Build from the shared definitions and validate according to organizational need |
 
 ## Catalyst build and contribution plan
 

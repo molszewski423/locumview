@@ -6,8 +6,11 @@ Website: [locumview.com](https://locumview.com) · Sign in: [login.locumview.com
 
 ## Core products
 
-LocumView includes the RHEL clinical desktop, the SUSE / openSUSE desktop offering and **Catalyst**, an
-AI-focused development platform and open-source contribution project in development. Catalyst's goal is to
+LocumView's workspace is built on RHEL for the clinical reference implementation and designed to be Linux
+distribution agnostic and organization-led. Data sovereignty is the goal: organizations choose their
+distribution, infrastructure and jurisdiction. SUSE / openSUSE is In progress and Debian is Planned, with
+independent validation for each target. **Catalyst** is a core AI-focused development platform and open-source
+contribution project in development. Catalyst's goal is to
 help clinicians and other domain experts deepen their IT engineering and building skills through practical,
 reviewable work. It shares LocumView's open, reproducible and human-controlled design philosophy while
 remaining independently installable. Each product has its own release and validation gates.

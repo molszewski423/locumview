@@ -1,7 +1,8 @@
 # Catalyst: LocumView development and learning platform
 
 Owner direction: 2026-10-29. Catalyst is a **core LocumView product offering and open-source contribution
-project**, alongside the RHEL and SUSE / openSUSE desktop offerings. Current workstream status comes from
+project**, alongside the organization-led LocumView workspace. The clinical reference build is RHEL;
+SUSE / openSUSE is In progress and Debian is Planned within its distribution-agnostic direction. Current workstream status comes from
 [ROADMAP.md](../../ROADMAP.md#catalyst-build-and-contribution-plan).
 
 ## Purpose and audience
@@ -48,8 +49,7 @@ acceptance gates below are still Planned; the current local VM is not evidence t
 
 | Offering | Primary role | Independent acceptance |
 |---|---|---|
-| LocumView RHEL desktop | Hardened clinical and organizational workspace | RHEL image, hardening, identity, release and browser-delivery evidence |
-| LocumView SUSE / openSUSE desktop | Enterprise desktop option for the SUSE ecosystem | Distribution-specific delivery and equivalent-hardening evidence |
+| LocumView workspace | Organization-led Linux workspace with data sovereignty as its goal; clinical reference built on RHEL | RHEL evidence is specific to that build; SUSE / openSUSE In progress, Debian Planned, and every target needs distribution-specific delivery and hardening evidence |
 | Catalyst | AI-focused engineering workstation, practical learning and open-source contribution | Alpine workstation, toolchains/editors, AI permissions, learning and public-release evidence |
 
 Catalyst shares LocumView's design philosophy and product family. Its standalone installation requires no
