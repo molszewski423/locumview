@@ -17,7 +17,9 @@ the same purpose: give people control of their tools, make engineering understan
 reviewable evidence. It is not a desktop profile or a requirement for the clinical desktop.
 
 Alpine is the small, explicit starting foundation. Development in any language uses the appropriate toolchain
-or runtime; the five shared languages are a starting stack. Within LocumView, the primary use case is a secure
+or runtime; the five shared languages are a starting stack. Alpine also builds fluency in lightweight and
+containerized Linux and resource optimization for constrained medical and embedded technology. C and Rust are
+core to that embedded development direction. Within LocumView, the primary use case is a secure
 VDI development workspace for clinical technology, with hosted delivery still subject to its own acceptance.
 
 The [Catalyst build plan](plans/catalyst-product.md) covers the common Alpine workstation, AI-assisted engineering,

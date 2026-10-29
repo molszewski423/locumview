@@ -1869,3 +1869,13 @@ Agent: Codex
 - **Editorial follow-up:** owner requested American spelling, so the public contribution workstream uses "program"; the website inherits the label from this roadmap.
 
 Agent: Codex
+
+## 103. Catalyst lightweight Linux fluency and embedded health technology (2026-10-29 10:55 EDT)
+
+- **Owner direction:** Alpine also supports gaining fluency in lightweight and containerized Linux platforms, with resource optimization relevant to medical devices and embedded health technology. C and Rust are core to this embedded development direction.
+- **Updated:** the product/build plans and roadmap learning acceptance now include dependency selection, resource limits, device simulation and C/Rust embedded projects. Planned exercises must identify a reproducible workload, resource budgets and measured results. Alpine is the development/Linux learning environment; firmware targets and simulator/hardware evidence are identified separately.
+- **Status:** embedded learning projects remain Planned. Any-language development, standalone use and the primary clinical-development VDI use case are preserved. No device deployment, toolchain installation or runtime change.
+- **Verification:** official Alpine and Embedded Rust references reviewed, public text/links checked, and all required pre-commit checks passed. Companion website copy adds container fluency and a dedicated C/Rust embedded explanation.
+- **Next:** review the platform branch first, then the website branch with the default main roadmap. Owner integration and production publication remain separate steps.
+
+Agent: Codex

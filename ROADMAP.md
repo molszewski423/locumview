@@ -21,11 +21,15 @@ help implement and support review while learners develop their own command of Li
 testing, APIs, infrastructure and maintainable systems. Engineering Mode remains the default; optional Learning
 Mode supports guided practice and increasing independence. See [the product build plan](docs/plans/catalyst-product.md).
 
+Alpine also supports learning lightweight and containerized Linux and resource optimization for constrained
+medical and embedded technology. C and Rust are core to the planned systems/embedded learning path, including
+device simulation, target-specific tooling and measured resource use.
+
 | ID | Workstream | Status | Acceptance |
 |---|---|---|---|
 | workstation | Reproducible engineering workstation | **In progress**: Alpine/OpenRC/Sway VM and native Rust fmt, Clippy, tests, C FFI, GDB and managed LazyVim LSP checks pass | Prove clean rebuild and recovery, both editors, rootless project workflows and the selected hardware; a working VM is not a released distribution |
 | ai-workflow | Vera and AI-assisted engineering | **Planned**: persona and backend contracts exist; clients are provisioned, but unified Vera and authenticated end-to-end tool use are unverified | Show actual provider, scoped project context, reviewable diffs, tests and safe failure without silent cloud escalation |
-| learning | Optional persistent Learning Mode | **Planned**: mode contract and private progress design only | Original practical exercises, feedback, private progress across restarts and demonstrated independent explanation, debugging and testing |
+| learning | Optional persistent Learning Mode | **Planned**: mode contract and private progress design only | Original practical exercises, including lightweight Linux/containers and C/Rust embedded projects with measured resource use; feedback, private progress across restarts and demonstrated independent explanation, debugging and testing |
 | contribution | Public source and contribution program | **Planned**: open-source direction and Apache-2.0 selected; public implementation repository and formal license adoption pending | Reviewed license and notices, public source, reproducible quick start, contribution guide, code of conduct, issue templates and a small tested starter project |
 | integration | LocumView secure VDI development workspace | **Planned**: primary LocumView use case is developing clinical technology; standalone use stays available, but hosted delivery is unverified | Independently test transport, identity, storage, reconnect, isolation and AI data permissions; existing RHEL/SUSE security evidence does not transfer automatically |
 

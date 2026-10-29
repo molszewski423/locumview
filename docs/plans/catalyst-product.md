@@ -23,6 +23,18 @@ in VDI guests. Packages are added deliberately and configuration stays reviewabl
 measured for the actual workload; a small OS alone is not evidence of secure clinical delivery. See
 [Alpine's rationale](https://alpinelinux.org/about/).
 
+Alpine is also an intentional learning choice: gain fluency in lightweight and containerized Linux platforms
+and the resource optimization important to medical devices and embedded health technology. Learners should
+understand dependencies, packaging, service boundaries and resource limits, then measure memory, CPU, storage
+and response time against a project's requirements. Device gateways and simulated telemetry provide practical
+contexts for those skills.
+
+C and Rust are core to the systems and embedded development direction. Planned exercises cover device
+interfaces, C interoperability, cross-compilation, debugging and resource-aware programming. Alpine is the
+development and Linux learning environment; firmware may target bare-metal hardware, an RTOS or another Linux
+system. Each target needs its own toolchain, simulator or hardware evidence and resource measurements. See the
+[Embedded Rust Book](https://docs.rust-embedded.org/book/intro/index.html) for embedded and C/Rust foundations.
+
 Catalyst is designed for development in any language through the appropriate native toolchain, project container
 or supported runtime. Rust, C, Python, Go and TypeScript are the shared starting stack, not a restriction. Additional
 languages and prebuilt tools need compatibility and editor/debugger checks, including musl/glibc boundaries.
@@ -58,7 +70,9 @@ interfaces or apply RHEL/SUSE controls to Catalyst by assertion.
 3. **Learning by building.** Keep Engineering Mode the default. Add optional Guided, Collaborative and Independent
    practice, original exercises, explanations, code review and increasing independence. Cover Linux/Git,
    programming, APIs, testing/debugging, containers, networking and cloud-native infrastructure. Persist private
-   progress across restarts and assess demonstrated skills rather than assumed knowledge.
+   progress across restarts and assess demonstrated skills rather than assumed knowledge. Planned lightweight
+   Linux/container and C/Rust embedded exercises must record a reproducible workload, resource budgets and
+   measured results, with simulator and hardware evidence identified separately.
 4. **Contribution and public release.** Review the selected Apache-2.0 license, third-party notices and assets;
    publish reviewed implementation source through the owner's release process. Provide a tested quick start,
    contribution guide, code of conduct, issue/PR templates and approachable documented tasks. Start with one
