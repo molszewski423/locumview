@@ -1849,3 +1849,13 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
   secret findings, and finished in 20 s; gitleaks refused a planted fake token. Drafted by Codex, reviewed by
   Claude Code; pre-commit run on the changed files. Next: owner review; record the benchmark result and the routing
   policy when available.
+
+## 101. Catalyst as a core LocumView product and contribution project (2026-10-29 10:05 EDT)
+
+- **Owner direction:** Catalyst is an AI-focused development platform and open-source contribution project, alongside the RHEL and SUSE desktop offerings. Its goal is to help clinicians and other domain experts deepen IT engineering and building skills. Standalone use requires no shared LocumView services.
+- **Built:** core-product and Catalyst workstream tables in ROADMAP.md, the detailed product/contribution plan, and links from README and PLAN. Workstation, AI, learning, public source/contributions and optional hosted delivery each retain independent acceptance gates. Existing RHEL version-one scope and the clinical AI regional policy are preserved.
+- **Evidence:** current Alpine VM, native Rust/C fmt/Clippy/tests/diagnostics/GDB and managed LazyVim Rust LSP checks are recorded as bounded prototype evidence. Unified Vera, persistent Learning Mode, public implementation release and Catalyst VDI remain Planned. No installation, source publication, deployment or access change is implied.
+- **Verification:** public-text and link review and all required `pre-commit run --all-files` checks passed. Companion website review adds a dedicated Catalyst page/tab, sourced statuses and actual prototype screenshots.
+- **Next:** owner reviews this branch before the website branch, integrates with a signed merge and passing CI, then reviews website publication separately.
+
+Agent: Codex

@@ -1,6 +1,33 @@
 # LocumView roadmap
 
-Status as of 2026-10-27. Labels: **Done** (built and verified), **Open** (version-one work not finished), **In progress** (work has started outside version one, not finished or shipped), **Planned** (after version one, or alongside it only if it doesn't delay it), **Parked** (deliberately not pursued for now). The build log ([notes/phase1-changelog.md](notes/phase1-changelog.md)) and [docs/PLAN.md](docs/PLAN.md) hold the detail.
+Status as of 2026-10-29. Labels: **Done** (built and verified), **Open** (version-one work not finished), **In progress** (work has started outside version one, not finished or shipped), **Planned** (after version one, or alongside it only if it doesn't delay it), **Parked** (deliberately not pursued for now). The build log ([notes/phase1-changelog.md](notes/phase1-changelog.md)) and [docs/PLAN.md](docs/PLAN.md) hold the detail.
+
+## Core product portfolio
+
+LocumView's core offerings share open engineering, reproducible configuration, human control and evidence of
+what works. Catalyst is a first-class product alongside the RHEL and SUSE desktop offerings, with its own
+development and learning mission. Product membership does not imply the same release maturity or controls.
+
+| ID | Product | Purpose | Status | Release scope |
+|---|---|---|---|---|
+| rhel | LocumView RHEL desktop | A hardened, reproducible clinical workspace delivered through the browser | **Built**: version one and the Phase 4 core release milestone verified | The RHEL desktop has its own hardening, identity and signed-image evidence; production operation remains an organizational responsibility |
+| suse | LocumView SUSE / openSUSE desktop | An enterprise Linux desktop option for organizations choosing the SUSE ecosystem | **In progress**: infrastructure work has begun; not supported or shipped | Equivalent desktop delivery and hardening need distribution-specific evidence |
+| catalyst | Catalyst | An AI-focused development platform helping clinicians and other domain experts deepen IT engineering and building skills | **In progress**: Alpine VM desktop, native Rust/C workflow and managed LazyVim Rust language-server checks verified | Core LocumView product and open-source contribution project; public source release, unified Vera, persistent Learning Mode and hosted delivery remain Planned |
+
+## Catalyst build and contribution plan
+
+Mission: help people who understand a domain become more capable builders of its tools. AI should explain,
+help implement and support review while learners develop their own command of Linux, programming, debugging,
+testing, APIs, infrastructure and maintainable systems. Engineering Mode remains the default; optional Learning
+Mode supports guided practice and increasing independence. See [the product build plan](docs/plans/catalyst-product.md).
+
+| ID | Workstream | Status | Acceptance |
+|---|---|---|---|
+| workstation | Reproducible engineering workstation | **In progress**: Alpine/OpenRC/Sway VM and native Rust fmt, Clippy, tests, C FFI, GDB and managed LazyVim LSP checks pass | Prove clean rebuild and recovery, both editors, rootless project workflows and the selected hardware; a working VM is not a released distribution |
+| ai-workflow | Vera and AI-assisted engineering | **Planned**: persona and backend contracts exist; clients are provisioned, but unified Vera and authenticated end-to-end tool use are unverified | Show actual provider, scoped project context, reviewable diffs, tests and safe failure without silent cloud escalation |
+| learning | Optional persistent Learning Mode | **Planned**: mode contract and private progress design only | Original practical exercises, feedback, private progress across restarts and demonstrated independent explanation, debugging and testing |
+| contribution | Public source and contribution programme | **Planned**: open-source direction and Apache-2.0 selected; public implementation repository and formal license adoption pending | Reviewed license and notices, public source, reproducible quick start, contribution guide, code of conduct, issue templates and a small tested starter project |
+| integration | Optional LocumView hosted delivery | **Planned**: standalone-first architecture; no Catalyst browser VDI or shared-service integration verified | Independently test transport, identity, storage, reconnect and isolation; existing RHEL/SUSE security evidence does not transfer automatically |
 
 ## Version one (scope locked by ADR 0009)
 

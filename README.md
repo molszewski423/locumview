@@ -4,6 +4,18 @@ An open-source virtual desktop platform for regulated environments, built in the
 
 Website: [locumview.com](https://locumview.com) · Sign in: [login.locumview.com](https://login.locumview.com)
 
+## Core products
+
+LocumView includes the RHEL clinical desktop, the SUSE / openSUSE desktop offering and **Catalyst**, an
+AI-focused development platform and open-source contribution project in development. Catalyst's goal is to
+help clinicians and other domain experts deepen their IT engineering and building skills through practical,
+reviewable work. It shares LocumView's open, reproducible and human-controlled design philosophy while
+remaining independently installable. Each product has its own release and validation gates.
+
+See the [product portfolio and status](ROADMAP.md#core-product-portfolio) and
+[Catalyst build and contribution plan](docs/plans/catalyst-product.md). Catalyst's public implementation release
+and contribution entry points are Planned; this repository does not yet contain its workstation implementation.
+
 ## The problem
 
 Clinical desktops sit in front of patient data all day, yet they are often hand-built VDI images: assembled by one person, customized over time, and reproducible only by the person who made them. When an auditor asks "show me that this desktop was built the way you say it was", the answer is too often a screenshot and someone's memory. There is no signed image, no machine-readable evidence that the hardening was applied, and no way to rebuild the same desktop from scratch. LocumView closes that gap. Every desktop is a signed RHEL 10 image, built by CI and provisioned by OpenTofu from a clean clone with no manual steps, hardened to the DISA STIG with the OpenSCAP results committed beside the code, and reachable only through the browser behind single sign-on and MFA. The desktop is not just hardened, it is provably hardened, and it can be destroyed and rebuilt from the repository in about 20 minutes.

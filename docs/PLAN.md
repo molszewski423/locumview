@@ -8,6 +8,21 @@ Core test for every phase: can a reviewer clone the repo and rebuild it with no 
 
 Name: nods to locum tenens clinicians and VMware View (now Horizon, owned by Omnissa).
 
+## Core product family and Catalyst (owner direction, 2026-10-29)
+
+LocumView's product family includes the RHEL clinical desktop, the SUSE / openSUSE desktop and **Catalyst**, its
+AI-focused development platform and open-source contribution project. Catalyst is a core offering, with the
+mission of helping clinicians and other domain experts deepen IT engineering and building skills. It extends
+the same purpose: give people control of their tools, make engineering understandable, and retain reproducible,
+reviewable evidence. It is not a desktop profile or a requirement for the clinical desktop.
+
+The [Catalyst build plan](plans/catalyst-product.md) covers the common Alpine workstation, AI-assisted engineering,
+optional persistent learning, contributions and release gates. The [roadmap](../ROADMAP.md#core-product-portfolio)
+is the status of record. Native VM/Rust/LSP evidence exists; public source release, a unified Vera runtime,
+persistent Learning Mode and hosted integration remain Planned. RHEL hardening or browser-delivery results do
+not establish those properties for Catalyst. The locked RHEL version-one acceptance and prior phase evidence
+are preserved; this product decision adds no infrastructure deployment or runtime migration.
+
 ## 1. Progress log
 
 | Date | Step | Notes |
