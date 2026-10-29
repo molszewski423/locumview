@@ -15,6 +15,23 @@ AI accelerates explanation, implementation and review while the person develops 
 Progress means being able to explain a design, debug a failure, write a meaningful test and maintain a system.
 Generated code or course completion alone is not evidence of those skills.
 
+## Why Alpine, and which languages
+
+Alpine provides a small foundation built around musl and BusyBox, with apk for packages and OpenRC for services.
+Those choices fit a lightweight, explicit and inspectable engineering workspace, useful on modest hardware and
+in VDI guests. Packages are added deliberately and configuration stays reviewable. Resource efficiency must be
+measured for the actual workload; a small OS alone is not evidence of secure clinical delivery. See
+[Alpine's rationale](https://alpinelinux.org/about/).
+
+Catalyst is designed for development in any language through the appropriate native toolchain, project container
+or supported runtime. Rust, C, Python, Go and TypeScript are the shared starting stack, not a restriction. Additional
+languages and prebuilt tools need compatibility and editor/debugger checks, including musl/glibc boundaries.
+
+Within LocumView, the main use case is a secure VDI development workspace for clinical technology: interoperability
+services, synthetic workflows, device simulators, AI evaluation and supporting infrastructure. General-purpose
+standalone use remains available. The hosted security, identity, transport, persistence, reconnect and isolation
+acceptance gates below are still Planned; the current local VM is not evidence that hosted VDI is ready.
+
 ## Product boundaries
 
 | Offering | Primary role | Independent acceptance |

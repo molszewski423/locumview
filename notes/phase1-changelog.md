@@ -1859,3 +1859,12 @@ Prepared for owner review; nothing applied to the cluster. Runbook: `k8s/clinica
 - **Next:** owner reviews this branch before the website branch, integrates with a signed merge and passing CI, then reviews website publication separately.
 
 Agent: Codex
+
+## 102. Catalyst Alpine rationale, language scope and clinical development VDI (2026-10-29 10:35 EDT)
+
+- **Owner direction:** explain why Alpine was selected, support development in any language with the appropriate toolchain/runtime, and identify secure VDI development of clinical technology as the primary LocumView use case.
+- **Updated:** the product plan now states the small explicit musl/BusyBox, apk and OpenRC rationale, language/runtime compatibility gates and the intended clinical development workspace. The hosted workstream is renamed accordingly in ROADMAP.md and remains Planned, with transport, identity, persistence, isolation and AI data permissions still to verify.
+- **Scope:** general-purpose and standalone use remain available. Five shared toolchains are a starting stack. A small base is not security validation; RHEL/SUSE evidence does not transfer. No deployment, runtime migration or package change.
+- **Verification:** official Alpine rationale and public text/links reviewed; all required pre-commit checks passed. Companion website update supplies the page explanation and a labeled future-desktop concept with synthetic projects.
+
+Agent: Codex

@@ -27,7 +27,7 @@ Mode supports guided practice and increasing independence. See [the product buil
 | ai-workflow | Vera and AI-assisted engineering | **Planned**: persona and backend contracts exist; clients are provisioned, but unified Vera and authenticated end-to-end tool use are unverified | Show actual provider, scoped project context, reviewable diffs, tests and safe failure without silent cloud escalation |
 | learning | Optional persistent Learning Mode | **Planned**: mode contract and private progress design only | Original practical exercises, feedback, private progress across restarts and demonstrated independent explanation, debugging and testing |
 | contribution | Public source and contribution programme | **Planned**: open-source direction and Apache-2.0 selected; public implementation repository and formal license adoption pending | Reviewed license and notices, public source, reproducible quick start, contribution guide, code of conduct, issue templates and a small tested starter project |
-| integration | Optional LocumView hosted delivery | **Planned**: standalone-first architecture; no Catalyst browser VDI or shared-service integration verified | Independently test transport, identity, storage, reconnect and isolation; existing RHEL/SUSE security evidence does not transfer automatically |
+| integration | LocumView secure VDI development workspace | **Planned**: primary LocumView use case is developing clinical technology; standalone use stays available, but hosted delivery is unverified | Independently test transport, identity, storage, reconnect, isolation and AI data permissions; existing RHEL/SUSE security evidence does not transfer automatically |
 
 ## Version one (scope locked by ADR 0009)
 

@@ -16,6 +16,10 @@ mission of helping clinicians and other domain experts deepen IT engineering and
 the same purpose: give people control of their tools, make engineering understandable, and retain reproducible,
 reviewable evidence. It is not a desktop profile or a requirement for the clinical desktop.
 
+Alpine is the small, explicit starting foundation. Development in any language uses the appropriate toolchain
+or runtime; the five shared languages are a starting stack. Within LocumView, the primary use case is a secure
+VDI development workspace for clinical technology, with hosted delivery still subject to its own acceptance.
+
 The [Catalyst build plan](plans/catalyst-product.md) covers the common Alpine workstation, AI-assisted engineering,
 optional persistent learning, contributions and release gates. The [roadmap](../ROADMAP.md#core-product-portfolio)
 is the status of record. Native VM/Rust/LSP evidence exists; public source release, a unified Vera runtime,
