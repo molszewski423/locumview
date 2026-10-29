@@ -100,6 +100,18 @@ with fmt, strict Clippy, four boundary tests, deliberate compiler/lint diagnosti
 Rust hover, definition, completion, formatting and diagnostic appearance/clearing. These are bounded engineering
 checks, not a complete editor, agent, hardware or hosted-product acceptance.
 
+Codex-verified VSCodium evidence on the existing Alpine VM: VSCodium 1.140.06880 (editor API 1.140.0) from
+Flatpak 1.16.6 with SDK 25.08, with the rust-lang.rust-analyzer 0.4.3100 extension reviewed in a temporary
+profile using native Alpine rust-analyzer 2026.06.08 and Rust/Cargo 1.96.1. Eight actual checks pass on the
+graphical test host: extension activation, hover, definition, completion, formatting, an E0308 diagnostic
+appearing and then clearing, and a native Cargo test task that exits 0 in the graphical terminal. A
+checksum-pinned extension runs through a reusable isolated test runner. The prototype source suite at this
+checkpoint passes 56 tests and automation JavaScript checks. The review made no permanent extension or settings change and used no root access;
+afterwards the original workspace was restored, scratch state was cleaned and the normal extension directory
+was still empty. This evidence is one bounded editor toolchain check. It does not establish persistent editor
+defaults, debugger adapters, manual menus, physical hardware results, or full workstation, public release or
+clinical readiness.
+
 Vera's unified runtime, persistent Learning Mode, selectable domain profiles, starter-project library and
 Catalyst browser VDI are Planned. Use synthetic clinical data and simulated devices. Domain correctness,
 privacy, clinical validation and human review are separate from language-level memory safety. Public learning

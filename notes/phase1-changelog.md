@@ -1889,3 +1889,13 @@ Agent: Codex
 - **Next:** owner reviews and integrates this correction before the updated website. Production publication remains approved for the reviewed site, with signed owner integration and output review before default-branch pushes.
 
 Agent: Codex
+
+## 105. Catalyst VSCodium editor toolchain evidence (2026-10-29 12:05 EDT)
+
+- **Engineering update (evidence supplied by Codex):** record the bounded VSCodium validation on the existing Alpine VM in the product plan. VSCodium 1.140.06880 (editor API 1.140.0), Flatpak 1.16.6 / SDK 25.08, and the rust-lang.rust-analyzer 0.4.3100 extension reviewed in a temporary profile with native Alpine rust-analyzer 2026.06.08 and Rust/Cargo 1.96.1.
+- **Recorded evidence (Codex-verified; Linus wrote it up and did not execute the VM tests):** eight actual graphical test-host checks pass: extension activation, hover, definition, completion, formatting, an E0308 diagnostic appearing and then clearing, and a native Cargo test task that exits 0 in the graphical terminal. A reusable isolated test runner with a checksum-pinned extension passes its 56 source tests and automation JavaScript checks. No permanent extension or settings change, no root change; the original workspace was restored, scratch cleaned, and the normal extension directory stayed empty.
+- **Scope kept open:** persistent editor defaults, debugger adapters, manual menus and physical hardware remain open gates. This is not full workstation, release or clinical readiness. Source publication, license adoption, the learning runtime and Catalyst VDI stay Planned.
+- **Verification:** Linus ran whitespace checks and Python assertions for the evidence and remaining gates under a no-fetch task constraint. Codex reviewed the diff and recorded tool events, repeated the content checks and ran all required pre-commit checks before signing. Public text and scope reviewed; roadmap statuses and acceptance gates unchanged.
+- **Next:** Claude Code, Codex or the owner reviews this evidence write-up and integrates with a signed merge; repeat the same checks with real runs when the remaining gates are worked.
+
+Agent: Linus
