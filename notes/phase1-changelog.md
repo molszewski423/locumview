@@ -1889,3 +1889,11 @@ Agent: Codex
 - **Next:** owner reviews and integrates this correction before the updated website. Production publication remains approved for the reviewed site, with signed owner integration and output review before default-branch pushes.
 
 Agent: Codex
+
+## 105. Catalyst desktop connection through the access layer (2026-11-04)
+
+- **Added:** a VNC path for Catalyst desktops: one guacd egress rule to an exact address (site value `CATALYST_VDI_CIDR`), the Keycloak and Guacamole group `catalyst-users`, and `upsert-vnc-connection.sh`.
+- **Boundary:** each desktop's WayVNC requires a generated password, which `upsert-vnc-connection.sh` takes on stdin and stores in the connection. guacd 1.6.0 cannot use WayVNC's TLS or RSA-AES modes (tested against the published image), so Apple Diffie-Hellman protects the login only and the session is not encrypted between guacd and the guest. The rule is therefore narrower than the RDP rule, and each guest accepts VNC only from the k3s nodes. Clipboard stays off, as on the RDP desktops. No patient data on these desktops, and they stay on the trusted network until an authenticated encrypted tunnel from guacd replaces this path.
+- **Verification:** the owner opened a desktop through the access layer with MFA, with no VNC prompt, and a probe from a k3s node showed no login-free method. `kubectl kustomize` renders the new rule. Shellcheck passes on the script, and a test against a temporary Postgres confirmed it stores the login, keeps `cursor`, and hides the password. The live connection was set by an equivalent private script, not this one.
+
+Agent: Claude Code

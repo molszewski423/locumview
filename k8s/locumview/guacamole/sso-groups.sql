@@ -4,12 +4,12 @@
 BEGIN;
 
 INSERT INTO guacamole_entity (name, type)
-SELECT g, 'USER_GROUP' FROM (VALUES ('locumview-admins'), ('locumview-users'), ('locumview-demo')) v(g)
+SELECT g, 'USER_GROUP' FROM (VALUES ('locumview-admins'), ('locumview-users'), ('locumview-demo'), ('catalyst-users')) v(g)
 ON CONFLICT (type, name) DO NOTHING;
 
 INSERT INTO guacamole_user_group (entity_id)
 SELECT entity_id FROM guacamole_entity
-WHERE type = 'USER_GROUP' AND name IN ('locumview-admins', 'locumview-users', 'locumview-demo')
+WHERE type = 'USER_GROUP' AND name IN ('locumview-admins', 'locumview-users', 'locumview-demo', 'catalyst-users')
 ON CONFLICT (entity_id) DO NOTHING;
 
 -- Admins: full Guacamole administration.

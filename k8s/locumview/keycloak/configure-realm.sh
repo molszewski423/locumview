@@ -38,7 +38,8 @@ echo "realm master: brute-force protection applied"
 k get "roles/mfa-exempt" -r "$R" >/dev/null 2>&1 || k create roles -r "$R" -s name=mfa-exempt \
   -s 'description=Skips TOTP in the locumview-browser flow. Granted only through group locumview-demo (ADR 0005).'
 # locumview-clinical: may open the clinical names (OpenEMR and the clinical app) through clinical-sso below.
-for g in locumview-admins locumview-users locumview-demo locumview-clinical; do
+# catalyst-users: may open the Catalyst desktops (k8s/locumview/guacamole/upsert-vnc-connection.sh).
+for g in locumview-admins locumview-users locumview-demo locumview-clinical catalyst-users; do
   k get groups -r "$R" --fields name --format csv --noquotes | grep -qx "$g" || k create groups -r "$R" -s name="$g"
 done
 k add-roles -r "$R" --gname locumview-demo --rolename mfa-exempt
