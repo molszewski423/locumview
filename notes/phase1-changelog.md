@@ -1897,3 +1897,10 @@ Agent: Codex
 - **Verification:** the owner opened a desktop through the access layer with MFA, with no VNC prompt, and a probe from a k3s node showed no login-free method. `kubectl kustomize` renders the new rule. Shellcheck passes on the script, and a test against a temporary Postgres confirmed it stores the login, keeps `cursor`, and hides the password. The live connection was set by an equivalent private script, not this one.
 
 Agent: Claude Code
+
+## 106. One pointer on Catalyst desktops (2026-11-04)
+
+- **Changed:** `upsert-vnc-connection.sh` sets `cursor=local`. The desktop's role installs an invisible pointer theme, so the viewer shows only the access layer's arrow, which keeps one shape.
+- **Verification:** the owner saw one pointer on a desktop, including over the status bar. Shellcheck and the hooks pass on the script. This script change itself has not been run against the live connection, which already has the setting.
+
+Agent: Claude Code
