@@ -2,8 +2,8 @@
 # Create or update a Guacamole VNC connection for a Catalyst desktop. Operator machine.
 #   printf '%s' "$password" | k8s/locumview/guacamole/upsert-vnc-connection.sh <connection-name> <host> <user-group>...
 # The desktop's WayVNC password comes on stdin and never appears in arguments or output. The username is the fixed one
-# the desktop's role writes. Permissions: READ for each listed Guacamole user group (others are revoked). A `cursor`
-# setting made by hand is kept. See changelog #105 for what this login does and does not protect.
+# the desktop's role writes. Permissions: READ for each listed Guacamole user group (others are revoked).
+# See changelog #105 for what this login does and does not protect, and #106 for `cursor`.
 set -euo pipefail
 NAME=${1:?connection name}; HOST=${2:?desktop address or name}; shift 2
 [ $# -ge 1 ] || { echo "give at least one user group"; exit 1; }
@@ -19,10 +19,10 @@ BEGIN;
 INSERT INTO guacamole_connection (connection_name, protocol)
 SELECT :'name', 'vnc' WHERE NOT EXISTS (SELECT 1 FROM guacamole_connection WHERE connection_name = :'name' AND parent_id IS NULL);
 UPDATE guacamole_connection SET protocol = 'vnc' WHERE connection_name = :'name' AND parent_id IS NULL;
-DELETE FROM guacamole_connection_parameter WHERE parameter_name <> 'cursor' AND connection_id = (SELECT connection_id FROM guacamole_connection WHERE connection_name = :'name' AND parent_id IS NULL);
+DELETE FROM guacamole_connection_parameter WHERE connection_id = (SELECT connection_id FROM guacamole_connection WHERE connection_name = :'name' AND parent_id IS NULL);
 INSERT INTO guacamole_connection_parameter (connection_id, parameter_name, parameter_value)
 SELECT c.connection_id, p.n, p.v FROM guacamole_connection c,
-  (VALUES ('hostname', :'host'), ('port', '5900'), ('color-depth', '24'), ('disable-copy', 'true'),
+  (VALUES ('hostname', :'host'), ('port', '5900'), ('color-depth', '24'), ('disable-copy', 'true'), ('cursor', 'local'),
           ('username', 'vdi'), ('password', :'password')) p(n, v)
 WHERE c.connection_name = :'name' AND c.parent_id IS NULL;
 DELETE FROM guacamole_connection_permission cp USING guacamole_connection c, guacamole_entity e
