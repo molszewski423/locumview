@@ -76,6 +76,10 @@ spec:
     # Planned: a dedicated desktop subnet with Proxmox (Phase 6), so this no longer spans the whole LAN.
     - to: [{ipBlock: {cidr: DESKTOP_CIDR}}]   # egress[0]: kustomization.yaml replacements
       ports: [{protocol: TCP, port: 3389}, {protocol: TCP, port: 3390}, {protocol: TCP, port: 3391}]
+    # Catalyst desktops, VNC only, by exact address (site value CATALYST_VDI_CIDR): guacd cannot encrypt this path yet,
+    # so this is narrower than the RDP rule. Each guest also accepts VNC only from the k3s nodes.
+    - to: [{ipBlock: {cidr: CATALYST_VDI_CIDR}}]   # egress[1]: kustomization.yaml replacements
+      ports: [{protocol: TCP, port: 5900}]
 ---
 # Keycloak: serves Guacamole's server-side JWKS fetch (browsers reach it via port-forward now, the tunnel later).
 apiVersion: networking.k8s.io/v1
