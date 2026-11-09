@@ -5,6 +5,7 @@ ADR 0013: OpenTofu creates and removes the infrastructure around each desktop; t
 - `modules/libvirt-desktop/`: one desktop on libvirt. IdM host entry with a one-time enrollment password and host group membership; desktop disk and seed volumes; the seed (built by `scripts/seed.sh`, never through cloud-init's user-data); the VM (q35, UEFI with Secure Boot, SMM, vTPM, LAN bridge, installer ISO); and a wait until first-boot provisioning ejects the seed, after which the seed volume is wiped (`scripts/wait-provisioned.sh`).
 - `node3/`: the same for node3, operator-laptop kept running as a second hypervisor (changelog #99). Same module and the same IdM, RHSM and registry secrets (symlinks to `node1/`), its own state and desktop list; OpenTofu runs on node3 itself (`libvirt_uri = "qemu:///system"`). Host prep: `hypervisor/node3-host.sh`.
 - `node1/`: the root configuration for the reference hypervisor. Desktops are listed in `desktops.auto.tfvars`; their secrets are in `desktops/<name>.sops.yaml`; site values are in `site.auto.tfvars` (git-ignored, see the example file). State and plan files are encrypted (OpenTofu state encryption, enforced).
+- `modules/libvirt-catalyst-vm/` and `catalyst/`: persistent headless development VMs for Catalyst contributors, one per person, on node1 (see below).
 
 ## Requirements
 
@@ -36,3 +37,22 @@ cp site.auto.tfvars.example site.auto.tfvars      # fill in
 - The libvirt provider does not remove a domain whose first start failed; it stays defined in libvirt but not in the state. Undefine it (`virsh undefine <name> --nvram --tpm`) before applying again.
 - The libvirt and FreeIPA providers are not signed in the OpenTofu registry. Their hashes in `node1/.terraform.lock.hcl` were checked against the checksums published with each GitHub release.
 - Verified on node1 (changelog #54) and from the operator machine with SOPS (changelog #55): install and provisioning in 5.5 minutes, a second plan with no changes, and a destroy that removed every resource.
+
+## Catalyst contributor VMs
+
+`catalyst/` is a separate root with its own encrypted state, so these VMs never share a plan with the desktops. Each VM runs Catalyst's headless profile on Debian stable: the Debian cloud image Catalyst pins (fetched and checked against its SHA-512 on the operator machine, then uploaded), a 40 GiB system disk backed by that image, and a 60 GiB home disk that a rebuild of the system disk keeps (`prevent_destroy`; cloud-init formats it only when blank). The seed carries the VM's secrets, a git bundle of Catalyst's main and the inventory; `scripts/provision.sh` enrolls the VM in IdM with a one-time password, installs the bundle and runs Catalyst's apply. The seed is then ejected and wiped.
+
+Access comes from IdM, not from the VM: the contributor's account and their own host group exist first, with HBAC and sudo rules that name that group. OpenTofu adds the VM's host to that group and to `catalyst-dev-vms` and changes no rule, so its IdM account keeps only host and host group privileges. The VM's SSH allows only directory users listed for it (`devalpine_ssh_directory_users`) from `ssh_sources`. A local `lvadmin` account with the operator's keys is the break-glass path; its password is in SOPS. Free page reporting is on (ADR 0010).
+
+```
+cd terraform/catalyst
+cp site.auto.tfvars.example site.auto.tfvars                  # fill in
+cp catalyst-vms.auto.tfvars.example catalyst-vms.auto.tfvars  # git-ignored: names people
+./secrets.sh state                                            # once
+./secrets.sh vm <name>                                        # per VM: the break-glass password
+./tofu.sh bundle <Catalyst checkout>                          # before a VM is first created
+./tofu.sh init
+./tofu.sh apply
+```
+
+The IdM account is node1's (`../node1/idm.sops.yaml`). Give each VM a fixed MAC address: the node's guest filter matches on it. Destroying a VM leaves its home volume; remove it by hand if the person's work is no longer needed.

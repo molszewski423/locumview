@@ -1,0 +1,6 @@
+# Copy to site.auto.tfvars (git-ignored) and fill in.
+libvirt_uri        = "qemu+ssh://<user>@<node1>/system"
+idm_ca_certificate = "<path to the IdM CA certificate on this machine>"
+admin_ssh_keys     = ["<operator public key>"]
+ssh_sources        = ["<node1-ip>/32", "<node2-ip>/32", "<operator machine>/32"]
+extra_ca_file      = "<path to the Git server's CA certificate, if not publicly trusted>"

@@ -1,0 +1,11 @@
+# Copy to catalyst-vms.auto.tfvars (git-ignored: it names people) and add one entry per contributor.
+# The IdM account and its own host group exist first, with HBAC and sudo rules that name that group; OpenTofu adds
+# the VM's host to that group and to the shared one, and changes no rule.
+catalyst_vms = {
+  "<name>" = {
+    mac             = "52:54:00:<xx>:<xx>:<xx>" # fixed, so the node's guest filter can match it
+    directory_users = ["<idm user>"]
+    hostgroup       = "<the user's own host group>"
+    # memory_mib = 6144, vcpus = 4, root_gib = 40, home_gib = 60 by default
+  }
+}
