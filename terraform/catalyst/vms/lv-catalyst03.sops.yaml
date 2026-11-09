@@ -1,0 +1,16 @@
+lvadmin_password: ENC[AES256_GCM,data:FMq4HKrNX5ipGl5OEViP5zICAXCfTMvm,iv:A/VkVxToN2Nsjdh7f2iATInJ4G9tWqTixw7VQ375EG8=,tag:0dlSWMuUQeX+VXQTugLeaA==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAzd2RtdzVZUUxMckdMWkJ3
+            VDZweXFXM0ZjRkN3UklHMEJyejRHRks2NzI0CktiWDFiMk5uVVVpSGtYSmZqVU14
+            UDU3VUl5cENKaTNZR1NMdVFWdTlVT28KLS0tIGZLbUo0S1ByZHc2MTZGMFY1QVRj
+            MUh6WEZrK2tTVEtvZFh3SkRhMTRNL1kK6cR/SoVLvgXvqfxYCfCinqZntQy0b4Ax
+            Fy1nMWOQynUMJS5zIFtgIhxe1F17Uiv5bcFDuh8LEL9VXI5Y/aEufw==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1rtd08pu892une8jknwex6ey2rxdp76j3w67gstrd5vpvep24ussscpr59n
+    lastmodified: "2026-11-09T01:42:32Z"
+    mac: ENC[AES256_GCM,data:XVVeZHufDMiL/90HaxI8StdHXMaeKEAXm3Bnrhj6bM44EJYcZDJe2b0HXhdXAArYGvDGMnu/YOsdL+gKHpdx8R4ffQIjpXKiAlnZQslNnHCP3CwkpUt5emgS/Vqel080tmWAdO+48hRU1OiqpZCQGoKh1x5oGzogWRD0P8LTRRk=,iv:Ox3TgHdPYaPFjLpDv52x3TrTqD26lE2Ju1LvQOZMpfo=,tag:YqIXmeX8X7+Q4kxfb96IJQ==,type:str]
+    unencrypted_suffix: _unencrypted
+    version: 3.13.3

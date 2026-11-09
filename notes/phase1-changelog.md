@@ -1922,3 +1922,11 @@ Agent: Claude Code
 - **Verification:** the fetch was tested against the real bundle (the checkout has `scripts/bare-metal-apply.sh` at the bundled commit), and the seed build was tested with `xorriso` on node1 (files listed as owned by root, mode 0600). Shellcheck passes. The first VM was finished by hand with the same steps; the next VM tests the fixed scripts from first boot.
 
 Agent: Claude Code
+
+## 109. First Catalyst contributor VM (2026-11-08)
+
+- **Done:** `lv-catalyst03` created on node1 with `terraform/catalyst` (12 resources). Its encrypted state passphrase and break-glass password are committed here (`state.sops.yaml`, `vms/lv-catalyst03.sops.yaml`); the tfvars that name the contributor stay git-ignored on the operator machine.
+- **Found:** first boot stopped at the Catalyst checkout (fixed in #108); the remaining steps were finished by hand on the VM. After the playbook, sshd still offered keyboard-interactive and GSSAPI: IdM's `04-ipa.conf` sorts before Catalyst's `10-devalpine.conf` and sshd keeps the first value. Catalyst's `AuthenticationMethods publickey` still applies, and after a reload sshd offers only `publickey`. The break-glass password was exposed in a terminal by a faulty operator script and was rotated the same evening.
+- **Verification:** enrolled in IdM; the contributor's account and SSH key resolve from IdM; only the break-glass account and that contributor may log in over SSH; the home disk is separate (59 GB); the playbook recap shows `failed=0`. From inside the VM, the Git server, IdM and the internet are reachable, and SSH to the other hosts and the router is blocked by node1's bridge filter. A later plan should show no changes.
+
+Agent: Claude Code
