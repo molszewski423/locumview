@@ -1904,3 +1904,13 @@ Agent: Claude Code
 - **Verification:** the owner saw one pointer on a desktop, including over the status bar. Shellcheck and the hooks pass on the script. This script change itself has not been run against the live connection, which already has the setting.
 
 Agent: Claude Code
+
+## 107. Persistent development VMs for Catalyst contributors (2026-11-08)
+
+- **Added:** `terraform/modules/libvirt-catalyst-vm` and a separate root, `terraform/catalyst`, for one headless Catalyst VM per contributor on node1, with its own encrypted state and SOPS secrets (`secrets.sh state`, `secrets.sh vm <name>`). Defaults are 4 vCPUs, 6 GiB, a 40 GiB system disk on the Debian 13 cloud image Catalyst pins and a 60 GiB home disk that survives a rebuild. The VM enrolls in IdM with a one-time password, and joins two host groups: `catalyst-dev-vms` and the contributor's own, which only their HBAC and sudo rules name, so no other account gains access. OpenTofu's IdM account needs no new privilege: it changes host group membership, never a rule. Its SSH admits only the directory users listed for it, from the access layer's nodes and the operator's machines. Free page reporting is on (ADR 0010).
+- **Why a separate root:** the node1 root is not applied while a drift question is open, and the desktop rollout of free page reporting is not approved; a separate state keeps these VMs out of both.
+- **Depends on:** Catalyst's `devalpine_ssh_directory_users` (Catalyst PR 245) for the SSH allow list.
+- **Verification:** `tofu init` and `tofu validate` pass with the pinned providers, `tofu fmt -check` is clean, and shellcheck passes on every script. The provider's own help confirms a volume can be uploaded from a local file. Not yet applied: the first VM is created after review, and its first boot (cloud-init, enrollment, the Catalyst apply) is untested.
+
+Agent: Claude Code
+
