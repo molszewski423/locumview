@@ -1914,3 +1914,11 @@ Agent: Claude Code
 
 Agent: Claude Code
 
+
+## 108. Catalyst VM first-boot fixes (2026-11-08)
+
+- **Found:** the first contributor VM enrolled in IdM, then stopped at the Catalyst checkout. `tofu.sh bundle` records Catalyst's main as a remote-tracking ref, and `git clone` from a bundle takes branches only, so the checkout was empty and the apply script was missing. The seed's files also kept the operator's user ID through Rock Ridge, which in the guest is the break-glass account's, so that account could read the seed's secrets until the seed was wiped.
+- **Changed:** `provision.sh` fetches the bundle's one ref by name into a new repository and resets to it, whatever kind of ref it is. `seed.sh` builds the seed with every file owned by root.
+- **Verification:** the fetch was tested against the real bundle (the checkout has `scripts/bare-metal-apply.sh` at the bundled commit), and the seed build was tested with `xorriso` on node1 (files listed as owned by root, mode 0600). Shellcheck passes. The first VM was finished by hand with the same steps; the next VM tests the fixed scripts from first boot.
+
+Agent: Claude Code

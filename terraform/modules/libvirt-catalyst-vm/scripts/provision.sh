@@ -28,12 +28,19 @@ getent passwd admin >/dev/null && echo "IdM accounts resolve through SSSD"
 
 log Catalyst checkout and inventory
 install -d -o lvadmin -g lvadmin -m 0755 /home/lvadmin
-# The seed's files are root-only (built under umask 077), so root clones and then hands the checkout over.
-[ -d /home/lvadmin/catalyst/.git ] || git clone -q "$SEED/catalyst.bundle" /home/lvadmin/catalyst
-chown -R lvadmin:lvadmin /home/lvadmin/catalyst
+# The seed's files are root-only, so root fetches and then hands the checkout over. The bundle holds one ref, which
+# need not be a branch (tofu.sh bundles origin/main), so it is fetched by name rather than cloned.
+C=/home/lvadmin/catalyst
+if ! git -C "$C" rev-parse -q --verify HEAD >/dev/null 2>&1; then
+  rm -rf "$C"
+  git init -q -b main "$C"
+  git -C "$C" fetch -q "$SEED/catalyst.bundle" "$(git bundle list-heads "$SEED/catalyst.bundle" | awk 'NR == 1 {print $2}')"
+  git -C "$C" reset -q --hard FETCH_HEAD
+fi
+chown -R lvadmin:lvadmin "$C"
 install -o lvadmin -g lvadmin -m 0600 "$SEED/inventory.yml" /home/lvadmin/catalyst-inventory.yml
 
 log apply the headless profile
-SUDO_USER=lvadmin bash /home/lvadmin/catalyst/scripts/bare-metal-apply.sh --activate
+SUDO_USER=lvadmin bash "$C/scripts/bare-metal-apply.sh" --activate
 log "provisioning complete"
 eject /dev/sr0 || eject "$(blkid -L cidata)"

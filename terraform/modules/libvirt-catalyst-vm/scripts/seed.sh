@@ -28,6 +28,7 @@ printf 'instance-id: %s-%s\nlocal-hostname: %s\n' "$LV_NAME" "$(date +%Y%m%d%H%M
   printf 'mounts:\n  - [LABEL=catalyst-home, /home, ext4, "defaults,nofail", "0", "2"]\n'
   printf 'runcmd:\n  - [bash, -c, "mkdir -p /run/catalyst-seed && mount -o ro LABEL=cidata /run/catalyst-seed && bash /run/catalyst-seed/catalyst/provision.sh"]\n'
 } > "$T/seed/user-data"
-xorriso -as mkisofs -quiet -o "$T/seed.iso" -V cidata -J -R "$T/seed" 2>/dev/null
+# Owned by root in the guest: Rock Ridge would otherwise keep the operator's uid, which is the first local account's.
+xorriso -as mkisofs -quiet -o "$T/seed.iso" -V cidata -J -R -uid 0 -gid 0 "$T/seed" 2>/dev/null
 virsh -q -c "$LV_URI" vol-upload --pool "$LV_POOL" "$LV_SEED_VOLUME" "$T/seed.iso"
 echo "seed uploaded to $LV_POOL/$LV_SEED_VOLUME"
