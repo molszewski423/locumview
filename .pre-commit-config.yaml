@@ -53,6 +53,13 @@ repos:
         pass_filenames: false
         files: ^clinical/scenarios/
 
+      - id: clinical-rules
+        name: Phase 9 lite rules give every case's expected findings
+        entry: python3 clinical/agent/test_rules.py
+        language: system
+        pass_filenames: false
+        files: ^clinical/(agent|scenarios)/
+
       - id: sops-encrypted
         name: SOPS files are encrypted (ADR 0003)
         entry: python3 scripts/check-sops-encrypted.py

@@ -1,7 +1,7 @@
 # Plan: Phase 9 lite and the Clinical Review Workspace
 
 Status: **In progress**. Written 2026-10-22. Phase 4's core release milestone is Done (changelog #70); M1, the
-OpenEMR spike, is Done (changelog #72); the owner chose its option 4 (section 9). M2 is Done (changelog #73 to #75); M3 is in progress: its checks passed on a desktop (changelog #76 to #93), ADR 0019 (Proposed) is next. Decisions: ADR 0017 (and its update of 2026-10-22),
+OpenEMR spike, is Done (changelog #72); the owner chose its option 4 (section 9). M2 is Done (changelog #73 to #75); M3 is in progress: its checks passed on a desktop (changelog #76 to #93); it closes once ADR 0019 (Proposed) is built. M4 is in progress alongside it: the rules give every case's expected findings (changelog #110). Decisions: ADR 0017 (and its update of 2026-10-22),
 ADR 0018. Data rules: `docs/policy/synthetic-data-and-independence.md`. Status of record: ROADMAP.md.
 
 ## 1. Sequence
@@ -95,6 +95,10 @@ one MFA sign-in. Demo access to the EHR is a separate change (changelog
 - Home dashboard, alert queue, patient view, with no findings yet. No order entry and no write to the EHR.
 
 ### M4. Rules and explanation pipeline
+
+**In progress**, started 2026-11-09 alongside ADR 0019's build. Step 1 done: the stewardship and IV to PO rules in
+`clinical/agent/` give exactly each case's expected findings, checked in CI (changelog #110). Next: the FHIR adapter,
+the service and the app's alert queue, then the explanations.
 
 - The agent service (Python, FastAPI): stewardship rule set first, then IV to PO.
 - Every rule cites its guideline source in the repository. Every case in the library has a test: the rules must

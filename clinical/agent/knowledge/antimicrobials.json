@@ -1,0 +1,92 @@
+{
+  "_note": "Knowledge base for the Phase 9 lite rules (plan M4). Versioned with the rules: raise version on every change. Every rule names the references in clinical/scenarios/citations.json it rests on. Codes: RxNorm (prescribed products), LOINC (susceptibility results), SNOMED CT (organisms, specimens), ICD-10-CM (problems).",
+  "version": "0.1.0",
+  "agents": {
+    "amoxicillin": {"display": "Amoxicillin"},
+    "ampicillin": {"display": "Ampicillin", "covers_listeria": true},
+    "ampicillin-sulbactam": {"display": "Ampicillin-sulbactam", "anaerobic": true},
+    "cefazolin": {"display": "Cefazolin", "antistaphylococcal_beta_lactam": true},
+    "cefepime": {"display": "Cefepime"},
+    "cefpodoxime": {"display": "Cefpodoxime"},
+    "ceftriaxone": {"display": "Ceftriaxone", "third_generation_cephalosporin": true},
+    "cefotaxime": {"display": "Cefotaxime", "third_generation_cephalosporin": true},
+    "ceftazidime": {"display": "Ceftazidime", "third_generation_cephalosporin": true},
+    "cephalexin": {"display": "Cephalexin"},
+    "ciprofloxacin": {"display": "Ciprofloxacin", "oral_bioequivalent": true},
+    "ertapenem": {"display": "Ertapenem", "anaerobic": true},
+    "levofloxacin": {"display": "Levofloxacin", "oral_bioequivalent": true},
+    "meropenem": {"display": "Meropenem", "anaerobic": true, "covers_listeria": true},
+    "metronidazole": {"display": "Metronidazole", "anaerobic": true, "anaerobic_only": true, "oral_bioequivalent": true},
+    "nafcillin": {"display": "Nafcillin", "antistaphylococcal_beta_lactam": true},
+    "oxacillin": {"display": "Oxacillin", "antistaphylococcal_beta_lactam": true},
+    "penicillin-g": {"display": "Penicillin G", "covers_listeria": true},
+    "piperacillin-tazobactam": {"display": "Piperacillin-tazobactam", "anaerobic": true},
+    "trimethoprim-sulfamethoxazole": {"display": "Trimethoprim-sulfamethoxazole", "oral_bioequivalent": true},
+    "vancomycin": {"display": "Vancomycin"}
+  },
+  "products": {
+    "1659149": "piperacillin-tazobactam",
+    "1665021": "ceftriaxone",
+    "1665046": "ceftriaxone",
+    "1665050": "cefazolin",
+    "1665060": "cefazolin",
+    "1665515": "levofloxacin",
+    "1807513": "vancomycin",
+    "309114": "cephalexin",
+    "311683": "metronidazole"
+  },
+  "susceptibility_tests": {
+    "28-1": {"agent": "ampicillin", "oral_step_down": "amoxicillin"},
+    "32-3": {"agent": "ampicillin-sulbactam"},
+    "76-0": {"agent": "cefazolin"},
+    "85422-4": {"agent": "cefazolin", "urinary_surrogate": true, "oral_step_down": "an oral cephalosporin the cefazolin urinary surrogate supports, such as cefpodoxime"},
+    "141-2": {"agent": "ceftriaxone"},
+    "185-9": {"agent": "ciprofloxacin", "oral_step_down": "ciprofloxacin"},
+    "20396-8": {"agent": "levofloxacin", "oral_step_down": "levofloxacin"},
+    "267-5": {"agent": "gentamicin"},
+    "363-2": {"agent": "nitrofurantoin"},
+    "383-0": {"agent": "oxacillin"},
+    "412-7": {"agent": "piperacillin-tazobactam"},
+    "516-5": {"agent": "trimethoprim-sulfamethoxazole", "oral_step_down": "trimethoprim-sulfamethoxazole"},
+    "524-9": {"agent": "vancomycin"},
+    "6644-9": {"agent": "cefepime"},
+    "6652-2": {"agent": "meropenem"},
+    "6932-8": {"agent": "penicillin-g"},
+    "35801-0": {"agent": "ertapenem"},
+    "193-3": {"agent": "clindamycin"},
+    "233-7": {"agent": "erythromycin"},
+    "29254-0": {"agent": "linezolid"},
+    "35788-9": {"agent": "daptomycin"},
+    "496-0": {"agent": "tetracycline"}
+  },
+  "organisms": {
+    "112283007": {"display": "Escherichia coli", "groups": []},
+    "414102007": {"display": "Enterobacter cloacae complex", "groups": ["inducible-ampc"]},
+    "417943000": {"display": "Methicillin susceptible Staphylococcus aureus", "groups": ["staphylococcus-aureus"]}
+  },
+  "specimens": {
+    "119297000": "blood",
+    "122575003": "urine",
+    "258450006": "csf"
+  },
+  "conditions": {
+    "bacterial-meningitis": {"icd10_prefixes": ["G00"]},
+    "cellulitis": {"icd10_prefixes": ["L03"], "recommended_days": 5, "review_after_days": 7, "refs": ["idsa-ssti-2014"]},
+    "community-acquired-pneumonia": {"icd10_prefixes": ["J18"], "recommended_days": 5, "review_after_days": 7, "refs": ["ats-idsa-cap-2019"]}
+  },
+  "thresholds": {
+    "fever_f": 100.4,
+    "stability": {"max_temperature_f": 100.3, "max_pulse": 100, "max_respiration": 24, "min_oxygen_saturation": 90, "min_systolic": 90},
+    "afebrile_hours": 24,
+    "listeria_age": 50
+  },
+  "rules": {
+    "bug-drug-mismatch": {"module": "stewardship", "refs": ["clsi-m100", "idsa-shea-asp-2016"]},
+    "ampc-third-generation-cephalosporin": {"module": "stewardship", "refs": ["idsa-amr-gn-2024"]},
+    "mssa-vancomycin": {"module": "stewardship", "refs": ["idsa-crbsi-2009"]},
+    "meningitis-listeria": {"module": "stewardship", "refs": ["idsa-meningitis-2004", "escmid-meningitis-2016"]},
+    "double-anaerobic-coverage": {"module": "stewardship", "refs": ["idsa-ciai-2010"]},
+    "duration-review": {"module": "stewardship", "refs": ["idsa-shea-asp-2016"]},
+    "iv-to-po-switch": {"module": "iv-to-po", "refs": ["idsa-shea-asp-2016", "ats-idsa-cap-2019"]}
+  }
+}
