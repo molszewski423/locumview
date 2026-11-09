@@ -209,6 +209,10 @@ def load(case):
         if "end" in x:
             rx["end_date"] = x["end"]
         ok("prescription", *target.api("POST", "api/prescription", rx))
+    # OpenEMR 8.4.1's FHIR MedicationRequest has no start date: it does not select start_date and fills authoredOn
+    # from date_added, which the API leaves empty (docs/upstream/openemr-8.4.1.md, item 11). Record each order as
+    # written on its start date, as an order entered at the start of therapy would be.
+    sql(f"UPDATE prescriptions SET date_added = start_date WHERE patient_id = {int(pid)} AND date_added IS NULL;")
     for v in case.get("vitals", []):
         vital = {"date": utc(v["taken"]), **{("temperature" if k == "temperature_f" else k): str(val)
                                             for k, val in v.items() if k != "taken"}}

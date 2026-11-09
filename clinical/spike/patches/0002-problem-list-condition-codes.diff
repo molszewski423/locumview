@@ -1,0 +1,52 @@
+--- a/src/Services/FHIR/Condition/FhirConditionProblemListItemService.php
++++ b/src/Services/FHIR/Condition/FhirConditionProblemListItemService.php
+@@ -196,6 +196,9 @@
+             $row['clinical_status'] = $this->computeClinicalStatus($row);
+             $row['verification_status'] = $this->computeVerificationStatus($row);
+             $row['category'] = self::CATEGORY_PROBLEM_LIST; // Default category for problem list items
++            // LocumView fix: this query bypasses ConditionService, so the stored codes (for example "ICD10:N10") were
++            // never parsed and populateCode() always fell back to the title. Parse them as ConditionService does.
++            $row['diagnosis'] = $this->parseDiagnosisCodes($row['diagnosis'] ?? '');
+ 
+             $records[] = $row;
+         }
+@@ -206,6 +209,29 @@
+     }
+ 
+     /**
++     * Parse a stored diagnosis string ("ICD10:N10;SNOMED-CT:...") into the array populateCode() expects, as
++     * BaseService::addCoding() does for ConditionService.
++     */
++    private function parseDiagnosisCodes(string $diagnosis): array
++    {
++        if (trim($diagnosis) === '') {
++            return [];
++        }
++        $codesService = new \OpenEMR\Services\CodeTypesService();
++        $codes = [];
++        foreach (explode(';', $diagnosis) as $item) {
++            $parsed = $codesService->parseCode($item);
++            $codes[$parsed['code']] = [
++                'code' => $parsed['code'],
++                'description' => $codesService->lookup_code_description($item),
++                'code_type' => $parsed['code_type'],
++                'system' => $codesService->getSystemForCodeType($parsed['code_type']),
++            ];
++        }
++        return $codes;
++    }
++
++    /**
+      * Compute verification status
+      */
+     private function computeVerificationStatus($dataRecord): string
+@@ -232,6 +258,9 @@
+ 
+         $this->populateCategory($dataRecord, $conditionResource, FhirConditionCategory::PROBLEM_LIST_ITEM);
+         $this->populateCode($dataRecord, $conditionResource, 'Problem');
++        if (!empty($dataRecord['title'])) {
++            $conditionResource->getCode()->setText($dataRecord['title']); // LocumView fix: keep the title beside the codes
++        }
+         $this->populateSubject($dataRecord, $conditionResource);
+         $this->populateClinicalStatus($dataRecord, $conditionResource);
+ 

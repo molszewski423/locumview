@@ -14,8 +14,9 @@ contribute fixes in parallel). Nothing here has been submitted.
 | 6 | FHIR Observation | Qualified MICs (SN, `>=^32`) are returned as text, not `valueQuantity` with `comparator` | Rules parse the text form | Handled in the app's data layer |
 | 7 | FHIR Observation | A susceptibility result has no `derivedFrom`/`hasMember` link to its organism (OBR-26 is stored only as a report note) | No organism-to-susceptibility link beyond specimen accession | One organism per culture (owner decision) |
 | 8 | FHIR DiagnosticReport | One DiagnosticReport per order, holding only one of the order's reports; `code` is "unknown" | Rules read Observations, not reports | Documented |
-| 9 | FHIR Condition | The problem-list query reads `lists.diagnosis` without parsing it, so every problem returns text only | Problem codes unavailable to rules | Documented |
+| 9 | FHIR Condition | The problem-list query reads `lists.diagnosis` without parsing it, so every problem returns text only | Problem codes unavailable to rules | Patched locally: `clinical/spike/patches/0002-problem-list-condition-codes.diff` parses the codes as `ConditionService` does and keeps the title as `code.text` |
 | 10 | Registration | `token_endpoint_auth_method: none` is refused; public clients are registered by `application_type` other than `private` | Documentation gap | Documented |
+| 11 | FHIR MedicationRequest | The prescription query does not select `start_date`, `authoredOn` comes only from `date_added` (empty for orders created through the REST API), and `status` is `completed` whenever `end_date` is set, even in the future | No start date for duration rules; a future stop date reads as stopped | Loader sets `date_added` to the start date; the adapter reads `authoredOn` and `status` |
 
 Evidence: M1 `docs/evidence/clinical/20261025-openemr-m1-spike/`, M2 changelog #75, M3
 `docs/evidence/clinical/20261025-m3-local-launch/`.

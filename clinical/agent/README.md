@@ -12,8 +12,13 @@ python3 clinical/agent/test_rules.py      # every case's expected findings, and 
 ## How it fits together
 
 - `lvrules/snapshot.py`: the patient snapshot the rules read, and `from_case`, which builds it from a case file
-  (chart data only: never the story, the expected findings or the reference answer). A FHIR adapter that builds the
-  same snapshot from OpenEMR's FHIR API is the next step, so the case tests and the runtime run the same rules.
+  (chart data only: never the story, the expected findings or the reference answer).
+- `lvrules/fhir.py`: `from_fhir`, which builds the same snapshot from the FHIR resources the app gateway returns
+  from OpenEMR, converting times to the site's time zone. The tests check that every case gives the same snapshot
+  and the same findings both ways, so the case tests stand for the runtime.
+- `fixtures/fhir/`: each case's FHIR read-back from a local OpenEMR (the M1 spike with patches 0001 and 0002, loaded
+  by `clinical/scenarios/load.py`), with server ids and timestamps removed by `clinical/spike/readback.py` and
+  trimmed by `fixtures/slim.py`. Re-record them after a change to a case, the loader or the OpenEMR patches.
 - `lvrules/rules.py`: one function per rule. Each finding carries its evidence (the data points it used) and the
   references it rests on, by key in [`../scenarios/citations.json`](../scenarios/citations.json).
 - `knowledge/antimicrobials.json`: the versioned knowledge base: agents and their properties, RxNorm products,
@@ -45,7 +50,11 @@ not offered for meningitis or *S. aureus* bacteremia.
   IV to PO rule does not read it, and the finding asks the pharmacist to confirm intake before switching.
 - **Immunocompromise is not checked** by the Listeria rule: age is its only risk criterion until an owner-reviewed
   list of conditions exists.
-- **Problems are matched by ICD-10 code.** OpenEMR's FHIR problem list returns text only (M1), so the FHIR adapter
-  has to recover the code before these rules can run against it.
+- **Problems are matched by ICD-10 code.** Stock OpenEMR 8.4.1 returns problem-list conditions as text only;
+  `clinical/spike/patches/0002-problem-list-condition-codes.diff` fixes that, and the OpenEMR image carries it.
+  Without it the meningitis and duration rules stay silent (tested).
+- **Prescription dates.** OpenEMR returns no start date unless the order's `date_added` is set (the loader sets it
+  to the start date) and marks any order with an end date `completed`, so a future stop date reads as stopped.
+  A dosage timing `boundsPeriod`, when an EHR sends one, is used instead.
 - The knowledge base holds what the 14 cases need and the closest related agents. An agent, organism or test it does
   not know is ignored, never guessed.
