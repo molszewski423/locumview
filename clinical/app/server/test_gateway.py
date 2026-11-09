@@ -150,5 +150,71 @@ class GatewayTests(unittest.TestCase):
         self.assertEqual(r.headers["x-content-type-options"], "nosniff")
 
 
+class FakeAgent:
+    def __init__(self, status=200):
+        self.requests, self.status = [], status
+
+    def __call__(self, request: httpx.Request) -> httpx.Response:
+        self.requests.append(request)
+        if self.status != 200:
+            return httpx.Response(self.status, json={"detail": "chart content the browser must not see"})
+        return httpx.Response(200, json={"knowledge_version": "0.1.0", "findings": [{"rule": "r", "drug": "D"}]})
+
+
+class FindingsTests(unittest.TestCase):
+    """/api/findings: the gateway reads the launched patient's chart and posts it to the agent service, which never
+    sees an EHR token."""
+
+    def app(self, agent=None, agent_url="http://agent.internal:8080"):
+        self.ehr = FakeEhr()
+        settings = Settings(ehr_fhir_base=EHR, client_id="app", client_secret="s3cret", public_url=APP,
+                            agent_url=agent_url)
+        client = TestClient(create_app(settings, httpx.MockTransport(self.ehr),
+                                       httpx.MockTransport(agent) if agent else None),
+                            base_url=APP, follow_redirects=False)
+        q = parse_qs(urlsplit(client.get("/launch", params={"iss": EHR, "launch": "l"}).headers["location"]).query)
+        client.get("/callback", params={"code": "c", "state": q["state"][0]})
+        return client
+
+    def test_the_agent_gets_the_launched_patients_chart_and_no_token(self):
+        agent = FakeAgent()
+        r = self.app(agent).get("/api/findings")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()["findings"], [{"rule": "r", "drug": "D"}])
+        (request,) = agent.requests
+        self.assertEqual(str(request.url), "http://agent.internal:8080/v1/findings")
+        self.assertNotIn("authorization", {k.lower() for k in request.headers})
+        self.assertNotIn(TOKEN, request.content.decode())
+        sent = json.loads(request.content)["resources"]
+        self.assertEqual(sent[0], {"resourceType": "Patient", "id": "patient-1"})
+        self.assertEqual([r["id"] for r in sent[1:]], ["obs-1", "obs-2"])   # every page of every search
+        searched = {u.path.rsplit("/", 1)[-1] for u in self.ehr.searches if "page=2" not in str(u)}
+        self.assertEqual(searched, {"patient-1", "Encounter", "Condition", "MedicationRequest", "Observation",
+                                    "Specimen", "ServiceRequest"})
+        self.assertTrue(all(u.params.get("patient") == "patient-1" for u in self.ehr.searches
+                            if not u.path.endswith("/patient-1") and "page=2" not in str(u)))
+
+    def test_no_session_no_findings(self):
+        agent = FakeAgent()
+        client = TestClient(create_app(Settings(ehr_fhir_base=EHR, client_id="app", client_secret="s",
+                                                public_url=APP, agent_url="http://agent.internal:8080"),
+                                       httpx.MockTransport(FakeEhr()), httpx.MockTransport(agent)), base_url=APP)
+        self.assertEqual(client.get("/api/findings").status_code, 401)
+        self.assertEqual(agent.requests, [])
+
+    def test_without_an_agent_url_the_route_says_so(self):
+        self.assertEqual(self.app(agent_url=None).get("/api/findings").status_code, 503)
+
+    def test_an_agent_refusal_is_reported_without_its_detail(self):
+        r = self.app(FakeAgent(status=422)).get("/api/findings")
+        self.assertEqual(r.status_code, 502)
+        self.assertNotIn("chart content", r.text)
+
+    def test_an_unreachable_agent_is_a_502(self):
+        def down(request):
+            raise httpx.ConnectError("refused", request=request)
+        self.assertEqual(self.app(down).get("/api/findings").status_code, 502)
+
+
 if __name__ == "__main__":
     unittest.main()

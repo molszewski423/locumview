@@ -21,6 +21,7 @@ RUN = HERE.parent.parent / "spike" / "run.sh"
 STATE = Path(os.environ["XDG_RUNTIME_DIR"]) / "locumview-openemr-spike"
 EMR = "https://127.0.0.1:18443"
 GATEWAY = "https://127.0.0.1:8443"
+AGENT = "http://127.0.0.1:8090"        # clinical/agent/run.sh serve
 NAME = "LocumView Clinical (gateway)"
 sys.path.insert(0, str(HERE.parent / "server"))
 from scopes import SCOPES  # noqa: E402  (the scopes the gateway requests are the ones it registers)
@@ -51,15 +52,18 @@ def main() -> None:
     private("gateway.env", "".join(f"{k}={v}\n" for k, v in {
         "EHR_FHIR_BASE": f"{EMR}/apis/default/fhir", "CLIENT_ID": client["client_id"],
         "CLIENT_SECRET_FILE": "/run/gateway/client-secret", "PUBLIC_URL": GATEWAY, "STATIC_DIR": "/dist",
-        "EHR_TLS_VERIFY": "false", "FRAME_ANCESTORS": EMR}.items()))
+        "EHR_TLS_VERIFY": "false", "FRAME_ANCESTORS": EMR, "AGENT_URL": AGENT}.items()))
     password = next(base64.b64decode(line.split(":", 1)[1].strip()).decode()
                     for line in (STATE / "secret.yaml").read_text().splitlines() if line.strip().startswith("admin:"))
     pid = sql(f"SELECT pid FROM patient_data WHERE pubpid = '{number}';").splitlines()[-1]
     case = json.loads((HERE.parent.parent / "scenarios" / "cases" / f"{number.removeprefix('LV-')}.json").read_text())
     organism = next((c["organism"]["text"] for c in case.get("cultures", []) if "organism" in c), "")
+    # The case's expected findings in the modules it lists, as module|type|drug: the app must show exactly these there.
+    findings = ";".join(sorted(f"{f['module']}|{f['type']}|{f['drug']}" for f in case["expected_findings"]))
     private("e2e.env", "".join(f"{k}={v}\n" for k, v in {
         "OE_USER": "spike-admin", "OE_PASS": password, "PID": pid, "APP_NAME": NAME, "APP_URL": f"{GATEWAY}/",
-        "EXPECT_NAME": f"{case['patient']['given']} {case['patient']['family']}", "EXPECT_ORGANISM": organism}.items()))
+        "EXPECT_NAME": f"{case['patient']['given']} {case['patient']['family']}", "EXPECT_ORGANISM": organism,
+        "EXPECT_MODULES": ",".join(case["modules"]), "EXPECT_FINDINGS": findings}.items()))
     print(f"registered '{NAME}' and wrote the test settings for {number}")
 
 

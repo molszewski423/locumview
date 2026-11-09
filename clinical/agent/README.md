@@ -6,8 +6,22 @@ rules decide what is flagged; the local model will only explain a finding, never
 only, so the tests run unchanged in pre-commit and CI.
 
 ```fish
-python3 clinical/agent/test_rules.py      # every case's expected findings, and each rule's boundaries
+python3 clinical/agent/test_rules.py      # every case's expected findings, and each rule's boundaries (no packages)
+clinical/agent/run.sh test                # the service's tests too, in the pinned Python image (CI runs the same)
+SITE_TZ=America/New_York clinical/agent/run.sh serve     # the service on http://127.0.0.1:8090, for local tests
 ```
+
+## The service
+
+`service.py` is the agent service of ADR 0017 (FastAPI). The clinical app's gateway reads the launched patient's chart
+from the EHR and posts it to `POST /v1/findings` as `{"resources": [...]}`; the service returns each finding with its
+evidence and its references (title, source, PubMed id or DOI), the knowledge-base version and the snapshot's "now".
+It holds no EHR credential and makes no outbound request (owner decision, 2026-11-09): the model that will explain
+findings later sits here, away from EHR tokens. It refuses a request without exactly one Patient and an Encounter,
+with unknown modules, or with more than 5,000 resources, and does not echo chart content in errors. `GET /healthz`
+reports the knowledge-base version. Settings: `SITE_TZ` (required), `KNOWLEDGE_FILE`, `CITATIONS_FILE`. Packages:
+`requirements.txt` (FastAPI and Uvicorn, hash-pinned, taken from the gateway's), `requirements-test.txt` (httpx for
+the test client). Its image, Kubernetes manifests and network policy are the next step.
 
 ## How it fits together
 

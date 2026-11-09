@@ -157,8 +157,10 @@ def _stable(s: Snapshot, kb: Knowledge) -> tuple[bool, list[str]]:
     window = s.as_of - timedelta(hours=kb.thresholds["afebrile_hours"])
     recent_fever = any(v.temperature_f is not None and v.temperature_f >= kb.thresholds["fever_f"]
                        for v in s.vitals if v.taken >= window)
-    evidence = [f"Vitals {latest.taken:%Y-%m-%d %H:%M}: T {latest.temperature_f} F, HR {latest.pulse}, "
-                f"RR {latest.respiration}, SpO2 {latest.oxygen_saturation}%, SBP {latest.systolic}",
+    def n(x):
+        return "?" if x is None else f"{x:g}"
+    evidence = [f"Vitals {latest.taken:%Y-%m-%d %H:%M}: T {n(latest.temperature_f)} F, HR {n(latest.pulse)}, "
+                f"RR {n(latest.respiration)}, SpO2 {n(latest.oxygen_saturation)}%, SBP {n(latest.systolic)}",
                 f"No temperature of {kb.thresholds['fever_f']} F or more in the last "
                 f"{kb.thresholds['afebrile_hours']} hours"]
     return all(checks) and not recent_fever, evidence
