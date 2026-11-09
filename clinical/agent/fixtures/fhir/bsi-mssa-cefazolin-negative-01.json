@@ -1,0 +1,2506 @@
+[
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "problem-list-item",
+      "display": "Problem List Item",
+      "system": "http://terminology.hl7.org/CodeSystem/condition-category"
+     }
+    ]
+   }
+  ],
+  "clinicalStatus": {
+   "coding": [
+    {
+     "code": "active",
+     "display": "Active",
+     "system": "http://terminology.hl7.org/CodeSystem/condition-clinical"
+    }
+   ]
+  },
+  "code": {
+   "coding": [
+    {
+     "code": "K91.2",
+     "display": "",
+     "system": "http://hl7.org/fhir/sid/icd-10"
+    }
+   ]
+  },
+  "id": "<Condition#1>",
+  "onsetDateTime": "2021-03-15T00:00:00+00:00",
+  "recordedDate": "2021-03-15T00:00:00+00:00",
+  "resourceType": "Condition",
+  "subject": {
+   "reference": "Patient/<Patient#1>"
+  },
+  "verificationStatus": {
+   "coding": [
+    {
+     "code": "unconfirmed",
+     "display": "Unconfirmed",
+     "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status"
+    }
+   ]
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "problem-list-item",
+      "display": "Problem List Item",
+      "system": "http://terminology.hl7.org/CodeSystem/condition-category"
+     }
+    ]
+   }
+  ],
+  "clinicalStatus": {
+   "coding": [
+    {
+     "code": "active",
+     "display": "Active",
+     "system": "http://terminology.hl7.org/CodeSystem/condition-clinical"
+    }
+   ]
+  },
+  "code": {
+   "coding": [
+    {
+     "code": "T80.211A",
+     "display": "",
+     "system": "http://hl7.org/fhir/sid/icd-10"
+    }
+   ]
+  },
+  "id": "<Condition#2>",
+  "onsetDateTime": "2026-10-21T00:00:00+00:00",
+  "recordedDate": "2026-10-21T00:00:00+00:00",
+  "resourceType": "Condition",
+  "subject": {
+   "reference": "Patient/<Patient#1>"
+  },
+  "verificationStatus": {
+   "coding": [
+    {
+     "code": "unconfirmed",
+     "display": "Unconfirmed",
+     "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status"
+    }
+   ]
+  }
+ },
+ {
+  "basedOn": [
+   {
+    "reference": "ServiceRequest/<ServiceRequest#1>",
+    "type": "ServiceRequest"
+   }
+  ],
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "LAB",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/v2-0074"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "UNK",
+     "display": "unknown",
+     "system": "http://terminology.hl7.org/CodeSystem/v3-NullFlavor"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-21T21:10:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<DiagnosticReport#1>",
+  "issued": "2026-10-21T21:10:00+00:00",
+  "resourceType": "DiagnosticReport",
+  "result": [
+   {
+    "display": "Creatinine [Mass/volume] in Serum or Plasma",
+    "reference": "Observation/<Observation#3>",
+    "type": "Observation"
+   },
+   {
+    "display": "Leukocytes [#/volume] in Blood by Automated count",
+    "reference": "Observation/<Observation#23>",
+    "type": "Observation"
+   }
+  ],
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
+  "basedOn": [
+   {
+    "reference": "ServiceRequest/<ServiceRequest#2>",
+    "type": "ServiceRequest"
+   }
+  ],
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "LAB",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/v2-0074"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "UNK",
+     "display": "unknown",
+     "system": "http://terminology.hl7.org/CodeSystem/v3-NullFlavor"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T18:00:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<DiagnosticReport#2>",
+  "issued": "2026-10-22T18:00:00+00:00",
+  "resourceType": "DiagnosticReport",
+  "result": [
+   {
+    "display": "Penicillin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#24>",
+    "type": "Observation"
+   },
+   {
+    "display": "Oxacillin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#14>",
+    "type": "Observation"
+   },
+   {
+    "display": "Vancomycin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#19>",
+    "type": "Observation"
+   },
+   {
+    "display": "Clindamycin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#1>",
+    "type": "Observation"
+   },
+   {
+    "display": "Erythromycin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#4>",
+    "type": "Observation"
+   },
+   {
+    "display": "Trimethoprim+Sulfamethoxazole [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#18>",
+    "type": "Observation"
+   },
+   {
+    "display": "Tetracycline [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#17>",
+    "type": "Observation"
+   },
+   {
+    "display": "Levofloxacin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#2>",
+    "type": "Observation"
+   },
+   {
+    "display": "Linezolid [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#10>",
+    "type": "Observation"
+   },
+   {
+    "display": "Daptomycin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#13>",
+    "type": "Observation"
+   },
+   {
+    "display": "Gentamicin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+    "reference": "Observation/<Observation#5>",
+    "type": "Observation"
+   }
+  ],
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
+  "class": {
+   "code": "IMP",
+   "display": "inpatient encounter",
+   "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode"
+  },
+  "id": "<Encounter#1>",
+  "identifier": [
+   {
+    "system": "urn:uuid:<Encounter#1>",
+    "value": "<Encounter#1>"
+   }
+  ],
+  "period": {
+   "start": "2026-10-21T20:00:00+00:00"
+  },
+  "reasonCode": [
+   {}
+  ],
+  "resourceType": "Encounter",
+  "status": "finished",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "type": [
+   {
+    "coding": [
+     {
+      "code": "185349003",
+      "display": "Encounter for check up (procedure)",
+      "system": "http://snomed.info/sct"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "authoredOn": "2026-10-21T00:00:00+00:00",
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "community",
+      "display": "Home/Community",
+      "system": "http://terminology.hl7.org/CodeSystem/medicationrequest-category"
+     }
+    ]
+   }
+  ],
+  "dispenseRequest": {
+   "numberOfRepeatsAllowed": 0
+  },
+  "dosageInstruction": [
+   {
+    "route": {
+     "coding": [
+      {
+       "code": "C38276",
+       "system": "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl"
+      }
+     ]
+    }
+   }
+  ],
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<MedicationRequest#1>",
+  "intent": "order",
+  "medicationCodeableConcept": {
+   "coding": [
+    {
+     "code": "1807513",
+     "display": "vancomycin 1000 MG Injection",
+     "system": "http://www.nlm.nih.gov/research/umls/rxnorm"
+    }
+   ]
+  },
+  "reportedBoolean": false,
+  "resourceType": "MedicationRequest",
+  "status": "completed",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
+  "authoredOn": "2026-10-22T00:00:00+00:00",
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "community",
+      "display": "Home/Community",
+      "system": "http://terminology.hl7.org/CodeSystem/medicationrequest-category"
+     }
+    ]
+   }
+  ],
+  "dispenseRequest": {
+   "numberOfRepeatsAllowed": 0
+  },
+  "dosageInstruction": [
+   {
+    "route": {
+     "coding": [
+      {
+       "code": "C38276",
+       "system": "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl"
+      }
+     ]
+    }
+   }
+  ],
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<MedicationRequest#2>",
+  "intent": "order",
+  "medicationCodeableConcept": {
+   "coding": [
+    {
+     "code": "1665060",
+     "display": "cefazolin 2000 MG Injection",
+     "system": "http://www.nlm.nih.gov/research/umls/rxnorm"
+    }
+   ]
+  },
+  "reportedBoolean": false,
+  "resourceType": "MedicationRequest",
+  "status": "active",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "193-3",
+     "display": "Clindamycin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T18:00:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#1>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "S",
+      "display": "Susceptible",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "note": [
+   {}
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#2>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueString": "<= 0.25"
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "20396-8",
+     "display": "Levofloxacin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T18:00:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#2>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "S",
+      "display": "Susceptible",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "note": [
+   {}
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#2>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueString": "<= 0.12"
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "2160-0",
+     "display": "Creatinine [Mass/volume] in Serum or Plasma",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-21T21:10:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#3>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "N",
+      "display": "No",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "note": [
+   {}
+  ],
+  "referenceRange": [
+   {
+    "high": {
+     "code": "mg/dL",
+     "system": "http://unitsofmeasure.org",
+     "unit": "mg/dL",
+     "value": 1.3
+    },
+    "low": {
+     "code": "mg/dL",
+     "system": "http://unitsofmeasure.org",
+     "unit": "mg/dL",
+     "value": 0.7
+    }
+   }
+  ],
+  "resourceType": "Observation",
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueQuantity": {
+   "code": "mg/dL",
+   "system": "http://unitsofmeasure.org",
+   "unit": "mg/dL",
+   "value": 1
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "233-7",
+     "display": "Erythromycin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T18:00:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#4>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "S",
+      "display": "Susceptible",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "note": [
+   {}
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#2>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueString": "<= 0.25"
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "267-5",
+     "display": "Gentamicin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T18:00:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#5>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "S",
+      "display": "Susceptible",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "note": [
+   {}
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#2>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueString": "<= 0.5"
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "vital-signs",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "2708-6",
+     "display": "Oxygen saturation in Arterial blood",
+     "system": "http://loinc.org"
+    },
+    {
+     "code": "59408-5",
+     "display": "Oxygen saturation in Arterial blood by Pulse oximetry",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "component": [
+   {
+    "code": {
+     "coding": [
+      {
+       "code": "3151-8",
+       "display": "Inhaled oxygen flow rate",
+       "system": "http://loinc.org"
+      }
+     ]
+    },
+    "dataAbsentReason": {
+     "coding": [
+      {
+       "code": "unknown",
+       "display": "Unknown",
+       "system": "http://terminology.hl7.org/CodeSystem/data-absent-reason"
+      }
+     ]
+    }
+   },
+   {
+    "code": {
+     "coding": [
+      {
+       "code": "3150-0",
+       "display": "Inhaled oxygen concentration",
+       "system": "http://loinc.org"
+      }
+     ]
+    },
+    "dataAbsentReason": {
+     "coding": [
+      {
+       "code": "unknown",
+       "display": "Unknown",
+       "system": "http://terminology.hl7.org/CodeSystem/data-absent-reason"
+      }
+     ]
+    }
+   }
+  ],
+  "effectiveDateTime": "2026-10-23T12:00:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#6>",
+  "resourceType": "Observation",
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "vital-signs",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "2708-6",
+     "display": "Oxygen saturation in Arterial blood",
+     "system": "http://loinc.org"
+    },
+    {
+     "code": "59408-5",
+     "display": "Oxygen saturation in Arterial blood by Pulse oximetry",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "component": [
+   {
+    "code": {
+     "coding": [
+      {
+       "code": "3151-8",
+       "display": "Inhaled oxygen flow rate",
+       "system": "http://loinc.org"
+      }
+     ]
+    },
+    "dataAbsentReason": {
+     "coding": [
+      {
+       "code": "unknown",
+       "display": "Unknown",
+       "system": "http://terminology.hl7.org/CodeSystem/data-absent-reason"
+      }
+     ]
+    }
+   },
+   {
+    "code": {
+     "coding": [
+      {
+       "code": "3150-0",
+       "display": "Inhaled oxygen concentration",
+       "system": "http://loinc.org"
+      }
+     ]
+    },
+    "dataAbsentReason": {
+     "coding": [
+      {
+       "code": "unknown",
+       "display": "Unknown",
+       "system": "http://terminology.hl7.org/CodeSystem/data-absent-reason"
+      }
+     ]
+    }
+   }
+  ],
+  "effectiveDateTime": "2026-10-21T20:10:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#7>",
+  "resourceType": "Observation",
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "vital-signs",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "2708-6",
+     "display": "Oxygen saturation in Arterial blood",
+     "system": "http://loinc.org"
+    },
+    {
+     "code": "59408-5",
+     "display": "Oxygen saturation in Arterial blood by Pulse oximetry",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "component": [
+   {
+    "code": {
+     "coding": [
+      {
+       "code": "3151-8",
+       "display": "Inhaled oxygen flow rate",
+       "system": "http://loinc.org"
+      }
+     ]
+    },
+    "dataAbsentReason": {
+     "coding": [
+      {
+       "code": "unknown",
+       "display": "Unknown",
+       "system": "http://terminology.hl7.org/CodeSystem/data-absent-reason"
+      }
+     ]
+    }
+   },
+   {
+    "code": {
+     "coding": [
+      {
+       "code": "3150-0",
+       "display": "Inhaled oxygen concentration",
+       "system": "http://loinc.org"
+      }
+     ]
+    },
+    "dataAbsentReason": {
+     "coding": [
+      {
+       "code": "unknown",
+       "display": "Unknown",
+       "system": "http://terminology.hl7.org/CodeSystem/data-absent-reason"
+      }
+     ]
+    }
+   }
+  ],
+  "effectiveDateTime": "2026-10-21T20:10:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#8>",
+  "resourceType": "Observation",
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueQuantity": {
+   "code": "%",
+   "system": "http://unitsofmeasure.org",
+   "unit": "%",
+   "value": 95
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "vital-signs",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "2708-6",
+     "display": "Oxygen saturation in Arterial blood",
+     "system": "http://loinc.org"
+    },
+    {
+     "code": "59408-5",
+     "display": "Oxygen saturation in Arterial blood by Pulse oximetry",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "component": [
+   {
+    "code": {
+     "coding": [
+      {
+       "code": "3151-8",
+       "display": "Inhaled oxygen flow rate",
+       "system": "http://loinc.org"
+      }
+     ]
+    },
+    "dataAbsentReason": {
+     "coding": [
+      {
+       "code": "unknown",
+       "display": "Unknown",
+       "system": "http://terminology.hl7.org/CodeSystem/data-absent-reason"
+      }
+     ]
+    }
+   },
+   {
+    "code": {
+     "coding": [
+      {
+       "code": "3150-0",
+       "display": "Inhaled oxygen concentration",
+       "system": "http://loinc.org"
+      }
+     ]
+    },
+    "dataAbsentReason": {
+     "coding": [
+      {
+       "code": "unknown",
+       "display": "Unknown",
+       "system": "http://terminology.hl7.org/CodeSystem/data-absent-reason"
+      }
+     ]
+    }
+   }
+  ],
+  "effectiveDateTime": "2026-10-23T12:00:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#9>",
+  "resourceType": "Observation",
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueQuantity": {
+   "code": "%",
+   "system": "http://unitsofmeasure.org",
+   "unit": "%",
+   "value": 97
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "29254-0",
+     "display": "Linezolid [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T18:00:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#10>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "S",
+      "display": "Susceptible",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "note": [
+   {}
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#2>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueQuantity": {
+   "code": "ug/mL",
+   "system": "http://unitsofmeasure.org",
+   "unit": "ug/mL",
+   "value": 2
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "35788-9",
+     "display": "Daptomycin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T18:00:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#13>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "S",
+      "display": "Susceptible",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "note": [
+   {}
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#2>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueQuantity": {
+   "code": "ug/mL",
+   "system": "http://unitsofmeasure.org",
+   "unit": "ug/mL",
+   "value": 0.5
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "383-0",
+     "display": "Oxacillin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T18:00:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#14>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "S",
+      "display": "Susceptible",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "note": [
+   {}
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#2>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueString": "<= 0.25"
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "496-0",
+     "display": "Tetracycline [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T18:00:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#17>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "S",
+      "display": "Susceptible",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "note": [
+   {}
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#2>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueString": "<= 1"
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "516-5",
+     "display": "Trimethoprim+Sulfamethoxazole [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T18:00:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#18>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "S",
+      "display": "Susceptible",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "note": [
+   {}
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#2>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueString": "<= 10"
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "524-9",
+     "display": "Vancomycin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T18:00:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#19>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "S",
+      "display": "Susceptible",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "note": [
+   {}
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#2>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueQuantity": {
+   "code": "ug/mL",
+   "system": "http://unitsofmeasure.org",
+   "unit": "ug/mL",
+   "value": 1
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "600-7",
+     "display": "Bacteria identified in Blood by Culture",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T18:00:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#22>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "N",
+      "display": "No",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "note": [
+   {}
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#3>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueString": "417943000 (Methicillin susceptible Staphylococcus aureus)"
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "6690-2",
+     "display": "Leukocytes [#/volume] in Blood by Automated count",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-21T21:10:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#23>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "H",
+      "display": "High",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "note": [
+   {}
+  ],
+  "referenceRange": [
+   {
+    "high": {
+     "code": "10*3/uL",
+     "system": "http://unitsofmeasure.org",
+     "unit": "10*3/uL",
+     "value": 11
+    },
+    "low": {
+     "code": "10*3/uL",
+     "system": "http://unitsofmeasure.org",
+     "unit": "10*3/uL",
+     "value": 4
+    }
+   }
+  ],
+  "resourceType": "Observation",
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueQuantity": {
+   "code": "10*3/uL",
+   "system": "http://unitsofmeasure.org",
+   "unit": "10*3/uL",
+   "value": 15.2
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "laboratory",
+      "display": "Laboratory",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "6932-8",
+     "display": "Penicillin [Susceptibility] by Minimum inhibitory concentration (MIC)",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-22T18:00:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#24>",
+  "interpretation": [
+   {
+    "coding": [
+     {
+      "code": "R",
+      "display": "Resistant",
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+     }
+    ]
+   }
+  ],
+  "note": [
+   {}
+  ],
+  "resourceType": "Observation",
+  "specimen": {
+   "reference": "Specimen/<Specimen#2>",
+   "type": "Specimen"
+  },
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueString": ">= 0.5"
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "vital-signs",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "8310-5",
+     "display": "Body Temperature",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-23T12:00:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#31>",
+  "resourceType": "Observation",
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueQuantity": {
+   "code": "[degF]",
+   "system": "http://unitsofmeasure.org",
+   "unit": "degF",
+   "value": 100.7
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "vital-signs",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "8310-5",
+     "display": "Body Temperature",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-21T20:10:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#32>",
+  "resourceType": "Observation",
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueQuantity": {
+   "code": "[degF]",
+   "system": "http://unitsofmeasure.org",
+   "unit": "degF",
+   "value": 103
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "vital-signs",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "85353-1",
+     "display": "Vital signs, weight, height, head circumference, oxygen saturation and BMI panel",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-23T12:00:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "hasMember": [
+   {
+    "display": "Respiratory Rate",
+    "reference": "Observation/<Observation#41>",
+    "type": "Observation"
+   },
+   {
+    "display": "Heart rate",
+    "reference": "Observation/<Observation#40>",
+    "type": "Observation"
+   },
+   {
+    "display": "Oxygen saturation in Arterial blood",
+    "reference": "Observation/<Observation#9>",
+    "type": "Observation"
+   },
+   {
+    "display": "Oxygen saturation in Arterial blood by Pulse oximetry",
+    "reference": "Observation/<Observation#6>",
+    "type": "Observation"
+   },
+   {
+    "display": "Body Temperature",
+    "reference": "Observation/<Observation#31>",
+    "type": "Observation"
+   },
+   {
+    "display": "Temperature Location",
+    "reference": "Observation/<Observation#33>",
+    "type": "Observation"
+   },
+   {
+    "display": "Body height",
+    "reference": "Observation/<Observation#29>",
+    "type": "Observation"
+   },
+   {
+    "display": "Head Occipital-frontal circumference",
+    "reference": "Observation/<Observation#45>",
+    "type": "Observation"
+   },
+   {
+    "display": "Body weight",
+    "reference": "Observation/<Observation#11>",
+    "type": "Observation"
+   },
+   {
+    "display": "Body mass index (BMI) [Ratio]",
+    "reference": "Observation/<Observation#15>",
+    "type": "Observation"
+   },
+   {
+    "display": "Blood pressure systolic and diastolic",
+    "reference": "Observation/<Observation#37>",
+    "type": "Observation"
+   }
+  ],
+  "id": "<Observation#35>",
+  "resourceType": "Observation",
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "vital-signs",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "85353-1",
+     "display": "Vital signs, weight, height, head circumference, oxygen saturation and BMI panel",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-21T20:10:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "hasMember": [
+   {
+    "display": "Respiratory Rate",
+    "reference": "Observation/<Observation#42>",
+    "type": "Observation"
+   },
+   {
+    "display": "Heart rate",
+    "reference": "Observation/<Observation#39>",
+    "type": "Observation"
+   },
+   {
+    "display": "Oxygen saturation in Arterial blood",
+    "reference": "Observation/<Observation#8>",
+    "type": "Observation"
+   },
+   {
+    "display": "Oxygen saturation in Arterial blood by Pulse oximetry",
+    "reference": "Observation/<Observation#7>",
+    "type": "Observation"
+   },
+   {
+    "display": "Body Temperature",
+    "reference": "Observation/<Observation#32>",
+    "type": "Observation"
+   },
+   {
+    "display": "Temperature Location",
+    "reference": "Observation/<Observation#34>",
+    "type": "Observation"
+   },
+   {
+    "display": "Body height",
+    "reference": "Observation/<Observation#30>",
+    "type": "Observation"
+   },
+   {
+    "display": "Head Occipital-frontal circumference",
+    "reference": "Observation/<Observation#46>",
+    "type": "Observation"
+   },
+   {
+    "display": "Body weight",
+    "reference": "Observation/<Observation#12>",
+    "type": "Observation"
+   },
+   {
+    "display": "Body mass index (BMI) [Ratio]",
+    "reference": "Observation/<Observation#16>",
+    "type": "Observation"
+   },
+   {
+    "display": "Blood pressure systolic and diastolic",
+    "reference": "Observation/<Observation#38>",
+    "type": "Observation"
+   }
+  ],
+  "id": "<Observation#36>",
+  "resourceType": "Observation",
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "vital-signs",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "85354-9",
+     "display": "Blood pressure systolic and diastolic",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "component": [
+   {
+    "code": {
+     "coding": [
+      {
+       "code": "8480-6",
+       "display": "Systolic blood pressure",
+       "system": "http://loinc.org"
+      }
+     ]
+    },
+    "valueQuantity": {
+     "code": "mm[Hg]",
+     "system": "http://unitsofmeasure.org",
+     "unit": "mm[Hg]",
+     "value": 118
+    }
+   },
+   {
+    "code": {
+     "coding": [
+      {
+       "code": "8462-4",
+       "display": "Diastolic blood pressure",
+       "system": "http://loinc.org"
+      }
+     ]
+    },
+    "valueQuantity": {
+     "code": "mm[Hg]",
+     "system": "http://unitsofmeasure.org",
+     "unit": "mm[Hg]",
+     "value": 70
+    }
+   }
+  ],
+  "effectiveDateTime": "2026-10-23T12:00:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#37>",
+  "resourceType": "Observation",
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "vital-signs",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "85354-9",
+     "display": "Blood pressure systolic and diastolic",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "component": [
+   {
+    "code": {
+     "coding": [
+      {
+       "code": "8480-6",
+       "display": "Systolic blood pressure",
+       "system": "http://loinc.org"
+      }
+     ]
+    },
+    "valueQuantity": {
+     "code": "mm[Hg]",
+     "system": "http://unitsofmeasure.org",
+     "unit": "mm[Hg]",
+     "value": 98
+    }
+   },
+   {
+    "code": {
+     "coding": [
+      {
+       "code": "8462-4",
+       "display": "Diastolic blood pressure",
+       "system": "http://loinc.org"
+      }
+     ]
+    },
+    "valueQuantity": {
+     "code": "mm[Hg]",
+     "system": "http://unitsofmeasure.org",
+     "unit": "mm[Hg]",
+     "value": 60
+    }
+   }
+  ],
+  "effectiveDateTime": "2026-10-21T20:10:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#38>",
+  "resourceType": "Observation",
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "vital-signs",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "8867-4",
+     "display": "Heart rate",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-21T20:10:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#39>",
+  "resourceType": "Observation",
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueQuantity": {
+   "code": "/min",
+   "system": "http://unitsofmeasure.org",
+   "unit": "/min",
+   "value": 120
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "vital-signs",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "8867-4",
+     "display": "Heart rate",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-23T12:00:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#40>",
+  "resourceType": "Observation",
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueQuantity": {
+   "code": "/min",
+   "system": "http://unitsofmeasure.org",
+   "unit": "/min",
+   "value": 98
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "vital-signs",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "9279-1",
+     "display": "Respiratory Rate",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-23T12:00:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#41>",
+  "resourceType": "Observation",
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueQuantity": {
+   "code": "/min",
+   "system": "http://unitsofmeasure.org",
+   "unit": "/min",
+   "value": 18
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "vital-signs",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "9279-1",
+     "display": "Respiratory Rate",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "effectiveDateTime": "2026-10-21T20:10:00+00:00",
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<Observation#42>",
+  "resourceType": "Observation",
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "valueQuantity": {
+   "code": "/min",
+   "system": "http://unitsofmeasure.org",
+   "unit": "/min",
+   "value": 22
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "vital-signs",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "96607-7",
+     "display": "Blood pressure panel mean systolic and mean diastolic",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "component": [
+   {
+    "code": {
+     "coding": [
+      {
+       "code": "96608-5",
+       "display": "Systolic blood pressure mean",
+       "system": "http://loinc.org"
+      }
+     ]
+    },
+    "valueQuantity": {
+     "code": "mm[Hg]",
+     "system": "http://unitsofmeasure.org",
+     "unit": "mm[Hg]",
+     "value": 108
+    }
+   },
+   {
+    "code": {
+     "coding": [
+      {
+       "code": "96609-3",
+       "display": "Diastolic blood pressure mean",
+       "system": "http://loinc.org"
+      }
+     ]
+    },
+    "valueQuantity": {
+     "code": "mm[Hg]",
+     "system": "http://unitsofmeasure.org",
+     "unit": "mm[Hg]",
+     "value": 65
+    }
+   }
+  ],
+  "effectivePeriod": {
+   "end": "2026-10-23T12:00:00+00:00",
+   "start": "2026-10-21T20:10:00+00:00"
+  },
+  "id": "<Observation#43>",
+  "resourceType": "Observation",
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "vital-signs",
+      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+     }
+    ]
+   }
+  ],
+  "code": {
+   "coding": [
+    {
+     "code": "96607-7",
+     "display": "Blood pressure panel mean systolic and mean diastolic",
+     "system": "http://loinc.org"
+    }
+   ]
+  },
+  "component": [
+   {
+    "code": {
+     "coding": [
+      {
+       "code": "96608-5",
+       "display": "Systolic blood pressure mean",
+       "system": "http://loinc.org"
+      }
+     ]
+    },
+    "valueQuantity": {
+     "code": "mm[Hg]",
+     "system": "http://unitsofmeasure.org",
+     "unit": "mm[Hg]",
+     "value": 108
+    }
+   },
+   {
+    "code": {
+     "coding": [
+      {
+       "code": "96609-3",
+       "display": "Diastolic blood pressure mean",
+       "system": "http://loinc.org"
+      }
+     ]
+    },
+    "valueQuantity": {
+     "code": "mm[Hg]",
+     "system": "http://unitsofmeasure.org",
+     "unit": "mm[Hg]",
+     "value": 65
+    }
+   }
+  ],
+  "effectivePeriod": {
+   "end": "2026-10-23T12:00:00+00:00",
+   "start": "2026-10-21T20:10:00+00:00"
+  },
+  "id": "<Observation#44>",
+  "resourceType": "Observation",
+  "status": "final",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
+  "active": true,
+  "birthDate": "1968-08-04",
+  "communication": [
+   {
+    "language": {
+     "coding": [
+      {
+       "code": "unknown",
+       "display": "Unknown",
+       "system": "http://terminology.hl7.org/CodeSystem/data-absent-reason"
+      }
+     ]
+    }
+   }
+  ],
+  "deceasedBoolean": false,
+  "extension": [
+   {
+    "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex",
+    "valueCode": "M"
+   },
+   {
+    "extension": [
+     {
+      "url": "ombCategory",
+      "valueCoding": {
+       "code": "UNK",
+       "display": "Unknown",
+       "system": "http://terminology.hl7.org/CodeSystem/v3-NullFlavor"
+      }
+     },
+     {
+      "url": "text",
+      "valueString": "Unknown"
+     }
+    ],
+    "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race"
+   },
+   {
+    "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-sex",
+    "valueCoding": {
+     "code": "unknown",
+     "display": "Unknown",
+     "system": "DataAbsentReason"
+    }
+   },
+   {
+    "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-interpreter-needed",
+    "valueCoding": {
+     "code": "unknown",
+     "display": "Unknown",
+     "system": "http://terminology.hl7.org/CodeSystem/data-absent-reason"
+    }
+   }
+  ],
+  "gender": "male",
+  "id": "<Patient#1>",
+  "identifier": [
+   {
+    "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+    "type": {
+     "coding": [
+      {
+       "code": "PT",
+       "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+      }
+     ]
+    },
+    "use": "official",
+    "value": "LV-bsi-mssa-cefazolin-negative-01"
+   }
+  ],
+  "name": [
+   {
+    "family": "Casebook",
+    "given": [
+     "Hal"
+    ],
+    "use": "official"
+   }
+  ],
+  "resourceType": "Patient"
+ },
+ {
+  "authoredOn": "2026-10-21T20:20:00+00:00",
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "108252007",
+      "display": "Laboratory procedure",
+      "system": "http://snomed.info/sct"
+     }
+    ]
+   }
+  ],
+  "code": {},
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<ServiceRequest#1>",
+  "intent": "order",
+  "performerType": {
+   "coding": [
+    {
+     "code": "159001",
+     "display": "Laboratory technician",
+     "system": "http://snomed.info/sct"
+    }
+   ]
+  },
+  "priority": "routine",
+  "resourceType": "ServiceRequest",
+  "status": "active",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
+  "authoredOn": "2026-10-21T20:30:00+00:00",
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "108252007",
+      "display": "Laboratory procedure",
+      "system": "http://snomed.info/sct"
+     }
+    ]
+   }
+  ],
+  "code": {},
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<ServiceRequest#2>",
+  "intent": "order",
+  "performerType": {
+   "coding": [
+    {
+     "code": "159001",
+     "display": "Laboratory technician",
+     "system": "http://snomed.info/sct"
+    }
+   ]
+  },
+  "priority": "routine",
+  "resourceType": "ServiceRequest",
+  "status": "active",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
+  "authoredOn": "2026-10-23T11:00:00+00:00",
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "108252007",
+      "display": "Laboratory procedure",
+      "system": "http://snomed.info/sct"
+     }
+    ]
+   }
+  ],
+  "code": {},
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<ServiceRequest#3>",
+  "intent": "order",
+  "performerType": {
+   "coding": [
+    {
+     "code": "159001",
+     "display": "Laboratory technician",
+     "system": "http://snomed.info/sct"
+    }
+   ]
+  },
+  "priority": "routine",
+  "resourceType": "ServiceRequest",
+  "status": "active",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
+  "accessionIdentifier": {
+   "type": {
+    "coding": [
+     {
+      "code": "ACSN",
+      "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+     }
+    ]
+   },
+   "value": "LV5"
+  },
+  "collection": {
+   "collectedDateTime": "2026-10-23T11:00:00+00:00"
+  },
+  "id": "<Specimen#1>",
+  "identifier": [
+   {
+    "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+    "value": "LV5-1"
+   }
+  ],
+  "resourceType": "Specimen",
+  "status": "available",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "type": {
+   "coding": [
+    {
+     "code": "119297000",
+     "display": "Blood specimen",
+     "system": "http://snomed.info/sct"
+    }
+   ]
+  }
+ },
+ {
+  "accessionIdentifier": {
+   "type": {
+    "coding": [
+     {
+      "code": "ACSN",
+      "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+     }
+    ]
+   },
+   "value": "LV4"
+  },
+  "collection": {
+   "collectedDateTime": "2026-10-21T20:30:00+00:00"
+  },
+  "id": "<Specimen#2>",
+  "identifier": [
+   {
+    "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+    "value": "LV4-1"
+   }
+  ],
+  "resourceType": "Specimen",
+  "status": "available",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "type": {
+   "coding": [
+    {
+     "code": "119297000",
+     "display": "Blood specimen",
+     "system": "http://snomed.info/sct"
+    }
+   ]
+  }
+ },
+ {
+  "accessionIdentifier": {
+   "type": {
+    "coding": [
+     {
+      "code": "ACSN",
+      "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+     }
+    ]
+   },
+   "value": "LV4"
+  },
+  "collection": {
+   "collectedDateTime": "2026-10-21T20:30:00+00:00"
+  },
+  "id": "<Specimen#3>",
+  "identifier": [
+   {
+    "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+    "value": "LV4-1"
+   }
+  ],
+  "resourceType": "Specimen",
+  "status": "available",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  },
+  "type": {
+   "coding": [
+    {
+     "code": "119297000",
+     "display": "Blood specimen",
+     "system": "http://snomed.info/sct"
+    }
+   ]
+  }
+ }
+]

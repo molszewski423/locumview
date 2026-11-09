@@ -11,15 +11,25 @@ import unittest
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from lvrules import Knowledge, evaluate, from_case  # noqa: E402
+from lvrules import Knowledge, evaluate, from_case, from_fhir  # noqa: E402
 
 CASES = HERE.parent / "scenarios" / "cases"
+FIXTURES = HERE / "fixtures" / "fhir"
+SITE_TZ = "America/New_York"   # the cases' offsets; OpenEMR returns UTC
 CITATIONS = json.loads((HERE.parent / "scenarios" / "citations.json").read_text())["citations"]
 KB = Knowledge.load()
 
 
 def case(name):
     return json.loads((CASES / f"{name}.json").read_text())
+
+
+def fixture(name):
+    return json.loads((FIXTURES / f"{name}.json").read_text())
+
+
+def fhir_keys(resources, modules):
+    return sorted(f.key() for f in evaluate(from_fhir(resources, KB, SITE_TZ), KB, modules))
 
 
 def keys(c, modules=None):
@@ -170,6 +180,98 @@ class RuleBoundaryTests(unittest.TestCase):
     def test_as_of_is_the_newest_charted_time(self):
         s = from_case(case("uti-esbl-mismatch-01"), KB)
         self.assertEqual(s.as_of.isoformat(), "2026-10-22T09:40:00-04:00")
+
+
+class FhirAdapterTests(unittest.TestCase):
+    """The same rules over OpenEMR's FHIR read-back of each case (fixtures/fhir, recorded with patches 0001 and 0002
+    and the loader's start dates) give the same snapshot and the same findings as over the case file."""
+
+    def test_every_case_has_a_fixture(self):
+        self.assertEqual(sorted(p.stem for p in FIXTURES.glob("*.json")), sorted(p.stem for p in CASES.glob("*.json")))
+
+    def test_every_fixture_gives_the_case_file_findings(self):
+        for path in sorted(CASES.glob("*.json")):
+            c = json.loads(path.read_text())
+            with self.subTest(case=c["id"]):
+                self.assertEqual(fhir_keys(fixture(c["id"]), set(c["modules"])), keys(c))
+
+    def test_every_fixture_gives_the_case_file_snapshot(self):
+        def rx(s):
+            return sorted((p.agent or "", p.route, p.start, p.active_on(s.as_of.date())) for p in s.prescriptions)
+
+        def cultures(s):
+            return sorted((c.specimen, c.final, c.organism_code or "", c.collected,
+                           sorted((x.loinc, x.interpretation) for x in c.susceptibilities)) for c in s.cultures)
+
+        def vitals(s):
+            return [(v.taken, v.temperature_f, v.pulse, v.respiration, v.oxygen_saturation, v.systolic)
+                    for v in s.vitals]
+
+        for path in sorted(CASES.glob("*.json")):
+            c = json.loads(path.read_text())
+            a, b = from_case(c, KB), from_fhir(fixture(c["id"]), KB, SITE_TZ)
+            with self.subTest(case=c["id"]):
+                self.assertEqual((a.as_of, a.encounter_start, a.birth_date), (b.as_of, b.encounter_start, b.birth_date))
+                self.assertEqual(rx(a), rx(b))
+                self.assertEqual(sorted(p.icd10 for p in a.problems), sorted(p.icd10 for p in b.problems))
+                self.assertEqual(cultures(a), cultures(b))
+                self.assertEqual(vitals(a), vitals(b))
+
+    def test_dates_are_judged_in_the_site_time_zone(self):
+        # The newest charted time is 23:35 in New York, 03:35 the next day in UTC.
+        s = from_fhir(fixture("meningitis-listeria-gap-01"), KB, SITE_TZ)
+        self.assertEqual(s.as_of.isoformat(), "2026-10-24T23:35:00-04:00")
+        self.assertEqual(from_fhir(fixture("meningitis-listeria-gap-01"), KB, "UTC").as_of.date().isoformat(),
+                         "2026-10-25")
+
+    def test_without_problem_codes_the_condition_rules_stay_silent(self):
+        # What unpatched OpenEMR 8.4.1 returns: problems as text only (docs/upstream/openemr-8.4.1.md, item 9).
+        resources = fixture("meningitis-listeria-gap-01")
+        for r in resources:
+            if r["resourceType"] == "Condition":
+                r["code"].pop("coding", None)
+        self.assertEqual(fhir_keys(resources, {"stewardship"}), [])
+
+    def test_a_prescription_without_a_start_date_is_left_out(self):
+        resources = fixture("uti-esbl-mismatch-01")
+        for r in resources:
+            if r["resourceType"] == "MedicationRequest":
+                r.pop("authoredOn")
+        self.assertEqual(from_fhir(resources, KB, SITE_TZ).prescriptions, [])
+
+    def test_a_dosage_bounds_period_wins_over_authored_on(self):
+        resources = fixture("cellulitis-duration-01")
+        for r in resources:
+            if r["resourceType"] == "MedicationRequest" and r["status"] == "active":
+                r["dosageInstruction"][0]["timing"] = {"repeat": {"boundsPeriod": {"start": "2026-10-16",
+                                                                                   "end": "2026-10-21"}}}
+        self.assertEqual(fhir_keys(resources, {"stewardship"}), [])   # stopped by day 12: nothing to review
+
+    def test_a_completed_order_is_not_active(self):
+        resources = fixture("bsi-mssa-vancomycin-01")
+        for r in resources:
+            if r["resourceType"] == "MedicationRequest":
+                r["status"] = "completed"
+        self.assertEqual(fhir_keys(resources, {"stewardship", "iv-to-po"}), [])
+
+    def test_a_temperature_in_celsius_is_converted(self):
+        resources = fixture("pyelo-matched-negative-01")   # febrile at 101.6 F: no IV to PO
+        for r in resources:
+            if r["resourceType"] == "Observation" and r["code"]["coding"][0]["code"] == "8310-5":
+                f = r["valueQuantity"]["value"]
+                r["valueQuantity"] = {"value": round((f - 32) * 5 / 9, 2), "unit": "Cel", "code": "Cel",
+                                      "system": "http://unitsofmeasure.org"}
+        s = from_fhir(resources, KB, SITE_TZ)
+        self.assertEqual(max(s.vitals, key=lambda v: v.taken).temperature_f, 101.6)
+
+    def test_no_growth_is_a_final_culture_without_an_isolate(self):
+        resources = fixture("uti-esbl-mismatch-01")
+        for r in resources:
+            if r["resourceType"] == "Observation" and r.get("valueString", "").startswith("112283007"):
+                r["valueString"] = "264868006 (No growth)"
+        s = from_fhir(resources, KB, SITE_TZ)
+        self.assertEqual([(c.final, c.organism_code) for c in s.cultures], [(True, None)])
+        self.assertEqual(fhir_keys(resources, {"stewardship"}), [])
 
 
 if __name__ == "__main__":

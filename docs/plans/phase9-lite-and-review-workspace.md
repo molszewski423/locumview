@@ -97,8 +97,9 @@ one MFA sign-in. Demo access to the EHR is a separate change (changelog
 ### M4. Rules and explanation pipeline
 
 **In progress**, started 2026-11-09 alongside ADR 0019's build. Step 1 done: the stewardship and IV to PO rules in
-`clinical/agent/` give exactly each case's expected findings, checked in CI (changelog #110). Next: the FHIR adapter,
-the service and the app's alert queue, then the explanations.
+`clinical/agent/` give exactly each case's expected findings, checked in CI (changelog #110). Step 2 done: the same rules over
+OpenEMR's FHIR read-back of every case give the same snapshot and findings, after an OpenEMR fix for problem codes
+(changelog #112). Next: the service and the app's alert queue, then the explanations.
 
 - The agent service (Python, FastAPI): stewardship rule set first, then IV to PO.
 - Every rule cites its guideline source in the repository. Every case in the library has a test: the rules must

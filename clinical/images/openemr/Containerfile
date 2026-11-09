@@ -7,14 +7,18 @@
 FROM docker.io/openemr/openemr@sha256:786e7dd867ba82db408a56c9c0cf7336cfa7ac24644c9354bdd8a5a194e83c55 AS upstream
 
 FROM docker.io/library/python@sha256:073ffebb96ae4d0ed73ccad59f08c47bd84af8a79f5258130f8458ac50ad9ff4 AS patcher
-ARG FILE=src/RestControllers/Authorization/BearerTokenAuthorizationStrategy.php
-COPY --from=upstream /var/www/localhost/htdocs/openemr/${FILE} /w/${FILE}
+ARG AUTH=src/RestControllers/Authorization/BearerTokenAuthorizationStrategy.php
+ARG PROBLEMS=src/Services/FHIR/Condition/FhirConditionProblemListItemService.php
+COPY --from=upstream /var/www/localhost/htdocs/openemr/${AUTH} /w/${AUTH}
+COPY --from=upstream /var/www/localhost/htdocs/openemr/${PROBLEMS} /w/${PROBLEMS}
 COPY clinical/spike/patches/ /patches/
 RUN cd /w && for p in /patches/*.diff; do patch -p1 --fuzz=0 --no-backup-if-mismatch < "$p"; done
 
 FROM docker.io/openemr/openemr@sha256:786e7dd867ba82db408a56c9c0cf7336cfa7ac24644c9354bdd8a5a194e83c55
-ARG FILE=src/RestControllers/Authorization/BearerTokenAuthorizationStrategy.php
-COPY --from=patcher --chown=apache:apache --chmod=400 /w/${FILE} /var/www/localhost/htdocs/openemr/${FILE}
+ARG AUTH=src/RestControllers/Authorization/BearerTokenAuthorizationStrategy.php
+ARG PROBLEMS=src/Services/FHIR/Condition/FhirConditionProblemListItemService.php
+COPY --from=patcher --chown=apache:apache --chmod=400 /w/${AUTH} /var/www/localhost/htdocs/openemr/${AUTH}
+COPY --from=patcher --chown=apache:apache --chmod=400 /w/${PROBLEMS} /var/www/localhost/htdocs/openemr/${PROBLEMS}
 LABEL org.opencontainers.image.title="LocumView OpenEMR" \
-      org.opencontainers.image.description="OpenEMR 8.4.1 with LocumView's SMART launch fix" \
+      org.opencontainers.image.description="OpenEMR 8.4.1 with LocumView's SMART launch and problem-list code fixes" \
       org.opencontainers.image.base.name="docker.io/openemr/openemr:8.4.1"

@@ -1,8 +1,8 @@
 """The patient snapshot the rules read, and the adapter that builds it from a case file (locumview-case/1).
 
 Rules never read a case file or FHIR directly: each source gets an adapter that produces this snapshot, so the tests
-over the case library and the runtime over OpenEMR's FHIR API exercise the same rules. The FHIR adapter is the next
-step of plan M4.
+over the case library and the runtime over OpenEMR's FHIR API exercise the same rules. The FHIR adapter is
+fhir.py.
 """
 from __future__ import annotations
 
@@ -19,9 +19,10 @@ class Prescription:
     route: str                 # IV, PO, IM, SC
     start: date
     end: date | None
+    ended: bool = False        # stopped with no end date given (FHIR status completed or stopped)
 
     def active_on(self, day: date) -> bool:
-        return self.start <= day and (self.end is None or self.end > day)
+        return not self.ended and self.start <= day and (self.end is None or self.end > day)
 
 
 @dataclass(frozen=True)
