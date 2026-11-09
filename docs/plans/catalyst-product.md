@@ -16,51 +16,55 @@ AI accelerates explanation, implementation and review while the person develops 
 Progress means being able to explain a design, debug a failure, write a meaningful test and maintain a system.
 Generated code or course completion alone is not evidence of those skills.
 
-## Why Alpine, and which languages
+## Why Debian, where Alpine fits, and which languages
 
-Alpine provides a small foundation built around musl and BusyBox, with apk for packages and OpenRC for services.
-Those choices fit a lightweight, explicit and inspectable engineering workspace, useful on modest hardware and
-in VDI guests. Packages are added deliberately and configuration stays reviewable. Resource efficiency must be
-measured for the actual workload; a small OS alone is not evidence of secure clinical delivery. See
-[Alpine's rationale](https://alpinelinux.org/about/).
+Owner decision, 2026-11-02 (Catalyst ADR 0005): **one platform, two bases by role.** Debian stable (Debian 13 today)
+is the base for the workstation and headless developer profiles. Contributors' toolchains assume glibc, the advice
+for a prototype is to pick one stable distribution and stay on it, the LocumView cluster nodes already run Debian 13,
+and Ubuntu users find it familiar. Package policy: Debian stable first, backports second, containers only when a
+tool truly needs something newer.
 
-Alpine is also an intentional learning choice: gain fluency in lightweight and containerized Linux platforms
-and the resource optimization important to medical devices and embedded health technology. Learners should
-understand dependencies, packaging, service boundaries and resource limits, then measure memory, CPU, storage
-and response time against a project's requirements. Device gateways and simulated telemetry provide practical
-contexts for those skills.
+Alpine stays as the base for edge nodes and gateway images: a small footprint and attack surface for constrained
+hardware, and static Rust builds for musl. Developers work on Debian; Alpine is a build target and an appliance they
+deploy to, not a system they develop on. The earlier Alpine workstation is kept in history, and its lessons carry
+over: learners should understand dependencies, packaging, service boundaries and resource limits, then measure
+memory, CPU, storage and response time against a project's requirements. Device gateways and simulated telemetry
+provide practical contexts for those skills.
 
 C and Rust are core to the systems and embedded development direction. Planned exercises cover device
-interfaces, C interoperability, cross-compilation, debugging and resource-aware programming. Alpine is the
-development and Linux learning environment; firmware may target bare-metal hardware, an RTOS or another Linux
+interfaces, C interoperability, cross-compilation, debugging and resource-aware programming. Debian is the
+development environment; firmware may target bare-metal hardware, an RTOS, an Alpine gateway image or another Linux
 system. Each target needs its own toolchain, simulator or hardware evidence and resource measurements. See the
 [Embedded Rust Book](https://docs.rust-embedded.org/book/intro/index.html) for embedded and C/Rust foundations.
 
 Catalyst is designed for development in any language through the appropriate native toolchain, project container
 or supported runtime. Rust, C, Python, Go and TypeScript are the shared starting stack, not a restriction. Additional
-languages and prebuilt tools need compatibility and editor/debugger checks, including musl/glibc boundaries.
+languages and prebuilt tools need compatibility and editor/debugger checks, including musl/glibc boundaries
+when building for Alpine targets.
 
 Within LocumView, the main use case is a secure VDI development workspace for clinical technology: interoperability
 services, synthetic workflows, device simulators, AI evaluation and supporting infrastructure. General-purpose
-standalone use remains available. The hosted security, identity, transport, persistence, reconnect and isolation
-acceptance gates below are still Planned; the current local VM is not evidence that hosted VDI is ready.
+standalone use remains available. Hosted delivery is In progress: a Catalyst desktop opens in the browser
+through the LocumView access layer with MFA, and the first contributor development workspace runs as a persistent
+VM. Transport encryption to the desktop, storage, reconnect, isolation and AI data permissions keep their own
+acceptance gates; working sessions are not evidence that hosted VDI is ready.
 
 ## Product boundaries
 
 | Offering | Primary role | Independent acceptance |
 |---|---|---|
 | LocumView workspace | Organization-led Linux workspace with data sovereignty as its goal; clinical reference built on RHEL | RHEL evidence is specific to that build; SUSE / openSUSE In progress, Debian Planned, and every target needs distribution-specific delivery and hardening evidence |
-| Catalyst | AI-focused engineering workstation, practical learning and open-source contribution | Alpine workstation, toolchains/editors, AI permissions, learning and public-release evidence |
+| Catalyst | AI-focused engineering workstation, practical learning and open-source contribution | Debian workstation and headless profiles, toolchains/editors, AI permissions, learning and public-release evidence |
 
 Catalyst shares LocumView's design philosophy and product family. Its standalone installation requires no
 LocumView subscription, account, cluster or clinical desktop. Optional hosted delivery is a later adapter with
-its own transport, identity, storage, persistence and access review. Do not replace Alpine, rename runtime
+its own transport, identity, storage, persistence and access review. Do not rename runtime
 interfaces or apply RHEL/SUSE controls to Catalyst by assertion.
 
 ## Build sequence and acceptance
 
-1. **Engineering foundation.** Preserve the working Alpine/OpenRC/Sway stack, Fish, Git, LazyVim, VSCodium and
-   rootless containers. Rust is strategic; retain C, Python, Go and TypeScript. Prove both editor tool bridges,
+1. **Engineering foundation.** The Debian/systemd/Sway stack with Fish, Git, LazyVim, VSCodium and rootless
+   containers. Rust is strategic; retain C, Python, Go and TypeScript. Prove both editor tool bridges,
    formatting, diagnostics, tests, debugging and bounded C interoperability. Then prove clean build, recovery,
    overrides and selected physical hardware. Existing VM results do not establish a finished distribution.
 2. **AI-assisted building.** Reuse the existing OpenCode, Codex and Claude Code clients and Vera persona plan.
@@ -95,13 +99,15 @@ early collaborators through the existing contact route while public implementati
 
 ## Evidence and safety boundaries
 
-Verified implementation evidence includes a working Alpine VM desktop, a dependency-free native Rust/C example
-with fmt, strict Clippy, four boundary tests, deliberate compiler/lint diagnostics and GDB, plus managed LazyVim
-Rust hover, definition, completion, formatting and diagnostic appearance/clearing. These are bounded engineering
-checks, not a complete editor, agent, hardware or hosted-product acceptance.
+Verified implementation evidence: Debian 13 Catalyst installed with an encrypted root on a laptop that is the
+owner's daily workstation, the desktop profile converging in disposable Debian VMs, and a Debian guest's desktop
+opened in the browser through the LocumView access layer with MFA. The earlier prototype passed a dependency-free
+native Rust/C example with fmt, strict Clippy, four boundary tests, deliberate compiler/lint diagnostics and GDB,
+plus managed LazyVim Rust hover, definition, completion, formatting and diagnostic appearance/clearing. These are
+bounded engineering checks, not a complete editor, agent, hardware or hosted-product acceptance.
 
-Vera's unified runtime, persistent Learning Mode, selectable domain profiles, starter-project library and
-Catalyst browser VDI are Planned. Use synthetic clinical data and simulated devices. Domain correctness,
+Vera's unified runtime, persistent Learning Mode, selectable domain profiles, and starter-project library are
+Planned; Catalyst browser VDI is In progress. Use synthetic clinical data and simulated devices. Domain correctness,
 privacy, clinical validation and human review are separate from language-level memory safety. Public learning
 materials contain no personal progress, private endpoints, credentials or real patient information.
 
