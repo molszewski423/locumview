@@ -1,6 +1,6 @@
 # LocumView roadmap
 
-Status as of 2026-10-29. Labels: **Done** (built and verified), **Open** (version-one work not finished), **In progress** (work has started outside version one, not finished or shipped), **Planned** (after version one, or alongside it only if it doesn't delay it), **Parked** (deliberately not pursued for now). The build log ([notes/phase1-changelog.md](notes/phase1-changelog.md)) and [docs/PLAN.md](docs/PLAN.md) hold the detail.
+Status as of 2026-11-09. Labels: **Done** (built and verified), **Open** (version-one work not finished), **In progress** (work has started outside version one, not finished or shipped), **Planned** (after version one, or alongside it only if it doesn't delay it), **Parked** (deliberately not pursued for now). The build log ([notes/phase1-changelog.md](notes/phase1-changelog.md)) and [docs/PLAN.md](docs/PLAN.md) hold the detail.
 
 ## Core product portfolio
 
@@ -12,7 +12,7 @@ their own builds and validation. Catalyst is a core development and learning pro
 | ID | Product | Purpose | Status | Release scope |
 |---|---|---|---|---|
 | workspace | LocumView workspace | An organization-led Linux workspace designed for data sovereignty and control over distribution, infrastructure and jurisdiction | **Built**: the clinical reference implementation runs on RHEL; version one and the Phase 4 core release milestone verified | Linux distribution agnostic by design; RHEL evidence applies to the RHEL build, and other targets require independent validation |
-| catalyst | Catalyst | An AI-focused development platform helping clinicians and other domain experts deepen IT engineering and building skills | **In progress**: Alpine VM desktop, native Rust/C workflow and managed LazyVim Rust language-server checks verified | Core LocumView product and open-source contribution project; public source release, unified Vera, persistent Learning Mode and hosted delivery remain Planned |
+| catalyst | Catalyst | An AI-focused development platform helping clinicians and other domain experts deepen IT engineering and building skills | **In progress**: Debian 13 desktop installed with an encrypted root and in daily use on a laptop; desktop opened in the browser through the LocumView access layer with MFA; first contributor development workspace running | Core LocumView product and open-source contribution project; public source release, unified Vera, persistent Learning Mode and hosted delivery remain Planned |
 
 ## Workspace deployment targets
 
@@ -32,17 +32,18 @@ help implement and support review while learners develop their own command of Li
 testing, APIs, infrastructure and maintainable systems. Engineering Mode remains the default; optional Learning
 Mode supports guided practice and increasing independence. See [the product build plan](docs/plans/catalyst-product.md).
 
-Alpine also supports learning lightweight and containerized Linux and resource optimization for constrained
-medical and embedded technology. C and Rust are core to the planned systems/embedded learning path, including
-device simulation, target-specific tooling and measured resource use.
+One platform, two bases by role (owner decision, 2026-11-02): Debian stable for the workstation and headless
+developer profiles, because contributors' toolchains assume glibc and one stable base keeps troubleshooting simple;
+Alpine for edge nodes and gateway images, where a small footprint matters. C and Rust are core to the planned
+systems/embedded learning path, including device simulation, target-specific tooling and measured resource use.
 
 | ID | Workstream | Status | Acceptance |
 |---|---|---|---|
-| workstation | Reproducible engineering workstation | **In progress**: Alpine/OpenRC/Sway VM and native Rust fmt, Clippy, tests, C FFI, GDB and managed LazyVim LSP checks pass | Prove clean rebuild and recovery, both editors, rootless project workflows and the selected hardware; a working VM is not a released distribution |
+| workstation | Reproducible engineering workstation | **In progress**: Debian 13 with systemd and Sway installed on a laptop with an encrypted root, and the desktop profile converges in disposable Debian VMs; the earlier prototype's native Rust fmt, Clippy, tests, C FFI, GDB and managed LazyVim LSP checks are to be repeated on Debian | Prove clean rebuild and recovery, both editors, rootless project workflows and the selected hardware; a working VM is not a released distribution |
 | ai-workflow | Vera and AI-assisted engineering | **Planned**: persona and backend contracts exist; clients are provisioned, but unified Vera and authenticated end-to-end tool use are unverified | Show actual provider, scoped project context, reviewable diffs, tests and safe failure without silent cloud escalation |
 | learning | Optional persistent Learning Mode | **Planned**: mode contract and private progress design only | Original practical exercises, including lightweight Linux/containers and C/Rust embedded projects with measured resource use; feedback, private progress across restarts and demonstrated independent explanation, debugging and testing |
 | contribution | Public source and contribution program | **Planned**: open-source direction and Apache-2.0 selected; public implementation repository and formal license adoption pending | Reviewed license and notices, public source, reproducible quick start, contribution guide, code of conduct, issue templates and a small tested starter project |
-| integration | LocumView secure VDI development workspace | **Planned**: primary LocumView use case is developing clinical technology; standalone use stays available, but hosted delivery is unverified | Independently test transport, identity, storage, reconnect, isolation and AI data permissions; existing RHEL/SUSE security evidence does not transfer automatically |
+| integration | LocumView secure VDI development workspace | **In progress**: a Catalyst desktop opens in the browser through the LocumView access layer with MFA, and the first contributor development workspace runs as a persistent VM with its own directory account; standalone use stays available | Independently test transport, identity, storage, reconnect, isolation and AI data permissions; existing RHEL/SUSE security evidence does not transfer automatically |
 
 ## Version one (scope locked by ADR 0009)
 
