@@ -19,11 +19,11 @@ images:
     # commit 200a11c, clinical-images run 291; signature and SBOM attestation verified by CI 2026-11-09
     digest: sha256:d4a6e5f2851f11efd93a6215e49be3eccbbe1c63aae9aa6a3c1c5fa161acfae6
   - name: git.lan/mike/locumview-clinical-gateway
-    # commit 200a11c, clinical-images run 291; signature and SBOM attestation verified by CI 2026-11-09
-    digest: sha256:fde821c5e5fd564de2e760ae186098b789d0e1b19ba4cb7d80e8a09b72805d77
+    # commit d2cc459, clinical-images run 296; signature and SBOM attestation verified by CI 2026-11-10
+    digest: sha256:b7e7d84ca6eec6477f4f45286ba13cfd2f192c3b0c27a09064351c153bdf16c6
   - name: git.lan/mike/locumview-clinical-agent
-    # commit 200a11c, clinical-images run 291; signature and SBOM attestation verified by CI 2026-11-09
-    digest: sha256:313cf7c9eb4eca825789f2ad9152142e296ce5285f03cf612d774da80326e0d4
+    # commit d2cc459, clinical-images run 296; signature and SBOM attestation verified by CI 2026-11-10
+    digest: sha256:230da554b83c481c97faf0c6ef7bdbb5964f1c7a28a78e77fc1e7a7d28aed2ee
 
 # Site values (not secret, but site-specific): read from site.env by the replacements below and never applied.
 configMapGenerator:
