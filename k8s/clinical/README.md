@@ -53,4 +53,13 @@ OpenEMR 8.4.1 with LocumView's fix (`clinical/images/openemr/`), MariaDB, and th
    - `scripts/clinical/verify-images.sh`, then `kubectl apply -k k8s/clinical` (oauth2-proxy, the `sso` middleware on
      both Ingresses, the `/lv-sso` routes).
 
+9. The agent service (Phase 9 lite M4; `agent.yaml`, `clinical/images/agent/`): the rules behind the app's findings.
+   It holds no EHR credential and no Secret; only the gateway may reach it, and it reaches nothing. After the change
+   that adds it merges, `clinical-images.yml` builds and signs `locumview-clinical-agent` (and rebuilds OpenEMR when
+   its patches change). A follow-up commit pins the new digests in `kustomization.yaml`, lists `agent.yaml`, takes
+   `SITE_TZ` from `site.env` and gives the gateway `AGENT_URL` and egress to the agent. Then:
+   `scripts/clinical/verify-images.sh`, `kubectl diff -k k8s/clinical`, `kubectl apply -k k8s/clinical`. If the
+   OpenEMR image changed, rerun `scripts/clinical/load-scenarios.sh` on a fresh load so prescriptions carry their
+   start dates (changelog #112).
+
 Nothing in these steps displays a password, the client secret or a private key.
