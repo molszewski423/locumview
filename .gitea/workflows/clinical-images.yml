@@ -1,5 +1,5 @@
 # Build, push, sign and attest the Phase 9 lite clinical images (k8s/clinical/): OpenEMR with LocumView's fixes, and
-# the clinical app with its gateway. The same runner, key and formats as the desktop image (image.yml): signatures and
+# the clinical app with its gateway, and the agent service (rules). The same runner, key and formats as the desktop image (image.yml): signatures and
 # SBOM attestations in cosign's classic format, signed offline with the project key; verify with
 #   cosign verify --key image/desktop/signing/cosign.pub --insecure-ignore-tlog git.lan/mike/<image>@<digest>
 # Each build is pushed as :<commit> and :testing. A deployment pins a digest in k8s/clinical/kustomization.yaml.
@@ -12,6 +12,8 @@ name: clinical-images
       - clinical/images/**
       - clinical/app/**
       - clinical/spike/patches/**
+      - clinical/agent/**
+      - clinical/scenarios/citations.json
       - .gitea/workflows/clinical-images.yml
   workflow_dispatch:
 
@@ -25,6 +27,7 @@ jobs:
         include:
           - {name: locumview-openemr, containerfile: clinical/images/openemr/Containerfile}
           - {name: locumview-clinical-gateway, containerfile: clinical/images/gateway/Containerfile}
+          - {name: locumview-clinical-agent, containerfile: clinical/images/agent/Containerfile}
     concurrency:
       group: clinical-image-${{ matrix.name }}
       cancel-in-progress: false
