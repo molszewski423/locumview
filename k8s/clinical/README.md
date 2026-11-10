@@ -69,4 +69,17 @@ OpenEMR 8.4.1 with LocumView's fix (`clinical/images/openemr/`), MariaDB, and th
      dates the rules need (changelog #112, #115). Then launch the app from a scenario patient's chart; the findings
      appear under each module.
 
+10. Finding explanations (Phase 9 lite M4 step 5; `clinical/agent/README.md`, Explanations): the agent asks the
+   in-cluster Ollama server to explain each finding, sending the finding only. The model and its digest are pinned in
+   `clinical/agent/model.json`; the agent refuses to explain if the server's copy differs.
+   - Add `OLLAMA_URL`, `OLLAMA_NAMESPACE` and `OLLAMA_APP` to `k8s/clinical/site.env` (see `site.env.example`). The
+     agent's network policy then allows it out to those pods, on their container port named `ollama`, and nowhere
+     else. If Ollama's namespace gets its own ingress policy, it must admit the agent (namespace `clinical`, label
+     `app=agent`).
+   - After the change merges, CI builds new agent and gateway images; a follow-up commit pins them. Then
+     `scripts/clinical/verify-images.sh`, `kubectl diff -k k8s/clinical` (the agent's ConfigMap gains `OLLAMA_URL`,
+     its policy the egress rule, both Deployments new images), `kubectl apply -k k8s/clinical`.
+   - Launch the app from a scenario patient's chart: each finding shows "Explaining…", then the explanation, or says
+     why there is none. The first one after the model was unloaded takes longer (it loads, about 18 s).
+
 Nothing in these steps displays a password, the client secret or a private key.

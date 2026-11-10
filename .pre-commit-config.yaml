@@ -54,8 +54,8 @@ repos:
         files: ^clinical/scenarios/
 
       - id: clinical-rules
-        name: Phase 9 lite rules give every case's expected findings
-        entry: python3 clinical/agent/test_rules.py
+        name: Phase 9 lite rules give every case's expected findings; explanations are guarded
+        entry: sh -c 'cd clinical/agent && python3 test_rules.py && python3 test_explain.py'
         language: system
         pass_filenames: false
         files: ^clinical/(agent|scenarios)/

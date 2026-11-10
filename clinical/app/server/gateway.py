@@ -8,8 +8,9 @@ API does not answer CORS preflight requests, so the app cannot talk to it from t
 - forwards read-only FHIR searches (GET, an allow-list of resource types), pinned to the launched patient, so a
   clinician-scoped token cannot be used to read another patient through the app;
 - serves the built app (clinical/app/dist) from the same origin;
-- asks the agent service for findings (/api/findings): it reads the launched patient's chart itself and posts it to
-  AGENT_URL, so the agent never holds an EHR credential (Phase 9 lite M4, owner decision 2026-11-09).
+- asks the agent service for findings (/api/findings) and their explanations by the local model (/api/explanations):
+  it reads the launched patient's chart itself and posts it to AGENT_URL, so the agent never holds an EHR credential
+  (Phase 9 lite M4, owner decisions 2026-11-09).
 
 Settings (environment): EHR_FHIR_BASE (the EHR's FHIR base, the only accepted iss), CLIENT_ID,
 CLIENT_SECRET_FILE, PUBLIC_URL (this gateway's external https URL), STATIC_DIR, EHR_TLS_CA (a CA bundle for the
@@ -44,6 +45,8 @@ PENDING_TTL = 600       # seconds a launch may take to come back from the EHR's 
 MAX_PAGES = 20          # bound on following a search's next links
 # What the agent's rules read (clinical/agent/lvrules/fhir.py), besides the Patient.
 FINDINGS_INPUT = ("Encounter", "Condition", "MedicationRequest", "Observation", "Specimen", "ServiceRequest")
+# The local model explains each finding in turn (a few seconds each once loaded; loading it takes about 18 s).
+EXPLANATION_TIMEOUT = 180
 
 
 @dataclass
@@ -221,8 +224,7 @@ def create_app(settings: Settings, transport: httpx.BaseTransport | None = None,
         return JSONResponse({"resourceType": "Bundle", "type": "searchset", "total": len(resources),
                              "entry": [{"resource": r} for r in resources]})
 
-    @app.get("/api/findings")
-    def findings(request: Request):
+    def ask_agent(request: Request, path: str, timeout: float) -> dict:
         session = session_for(request)
         if not settings.agent_url:
             raise HTTPException(503, "The findings service is not set up")
@@ -230,12 +232,24 @@ def create_app(settings: Settings, transport: httpx.BaseTransport | None = None,
         for resource_type in FINDINGS_INPUT:
             resources += patient_search(session, resource_type)
         try:
-            reply = agent.post(f"{settings.agent_url}/v1/findings", json={"resources": resources})
+            reply = agent.post(f"{settings.agent_url}{path}", json={"resources": resources}, timeout=timeout)
         except httpx.HTTPError:
             raise HTTPException(502, "The findings service could not be reached") from None
+        if reply.status_code == 503 and path == "/v1/explanations":
+            # No model, or not the pinned one; the agent's own reason stays in the agent (no detail is relayed).
+            raise HTTPException(503, "the explanation model is not available")
         if reply.status_code != 200:
             raise HTTPException(502, f"The findings service returned HTTP {reply.status_code}")
         return reply.json()
+
+    @app.get("/api/findings")
+    def findings(request: Request):
+        return ask_agent(request, "/v1/findings", 30)
+
+    # The agent reruns the rules on the chart and explains its own findings: the browser never names a finding.
+    @app.get("/api/explanations")
+    def explanations(request: Request):
+        return ask_agent(request, "/v1/explanations", EXPLANATION_TIMEOUT)
 
     if settings.static_dir:
         app.mount("/", StaticFiles(directory=settings.static_dir, html=True), name="app")

@@ -5,7 +5,9 @@
 # 2. the app built (npm ci, build) and the gateway registered as a confidential SMART client (e2e/setup.py)
 # 3. the agent service on http://127.0.0.1:8090 and the gateway on https://127.0.0.1:8443 (throwaway certificate)
 # 4. Playwright's Chromium: a clinician launches the app from the patient's chart; it must open on that patient and
-#    show exactly the case's expected findings
+#    show exactly the case's expected findings. With OLLAMA_URL set (an Ollama server holding the model pinned in
+#    clinical/agent/model.json), every finding must also show the model's explanation; without it, each must say
+#    it has none and still show its data.
 # Screenshots go to $E2E_OUT (default: a new temporary directory). Everything is torn down unless --keep.
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
@@ -35,13 +37,14 @@ clinical/app/server/run.sh serve "$STATE/gateway.env" "$STATE/gw-cert.pem" "$STA
 for _ in $(seq 1 60); do curl -ksf -o /dev/null https://127.0.0.1:8443/index.html && break; sleep 2; done
 
 status=0
-podman run --rm --network host --userns keep-id --env-file "$STATE/e2e.env" \
+podman run --rm --network host --userns keep-id --env-file "$STATE/e2e.env" -e "EXPECT_EXPLAINED=${OLLAMA_URL:+1}" \
   -v "$PWD/clinical/app/e2e:/e2e:ro,Z" -v "$OUT:/out:Z" "$PLAYWRIGHT" \
   sh -c 'cd /tmp && npm i -s --no-audit --no-fund playwright-core@1.64.0 >/dev/null 2>&1 && cp /e2e/launch.mjs . && node launch.mjs' \
   >"$OUT/result.json" 2>"$OUT/test.log" || status=$?
 grep '^{' "$OUT/result.json" | python3 -I -c 'import json, sys
 d = json.loads(sys.stdin.read() or "{}")
 print("app:", d.get("context")); print("cultures:", d.get("organisms")); print("findings:", d.get("findings"), d.get("unavailable") or "")
+print("explanations:", d.get("explanations"))
 print("granted:", (d.get("granted") or {}).get("scope"))
 print("error:", d.get("error"))' || true
 echo "$( [[ $status == 0 ]] && echo PASS || echo FAIL ) (screenshots and logs: $OUT)"

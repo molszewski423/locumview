@@ -2,11 +2,12 @@
 
 The deterministic part of the agent service in [ADR 0017](../../docs/adr/0017-clinical-ai-workspace-architecture.md)
 and plan M4 ([docs/plans/phase9-lite-and-review-workspace.md](../../docs/plans/phase9-lite-and-review-workspace.md)):
-rules decide what is flagged; the local model will only explain a finding, never add or remove one. Standard library
-only, so the tests run unchanged in pre-commit and CI.
+rules decide what is flagged; the local model only explains a finding, never adds or removes one. The rules and the
+explanation guard use the standard library only, so their tests run unchanged in pre-commit and CI.
 
 ```fish
 python3 clinical/agent/test_rules.py      # every case's expected findings, and each rule's boundaries (no packages)
+python3 clinical/agent/test_explain.py    # the explanation guard over every case's findings, against a fake model
 clinical/agent/run.sh test                # the service's tests too, in the pinned Python image (CI runs the same)
 SITE_TZ=America/New_York clinical/agent/run.sh serve     # the service on http://127.0.0.1:8090, for local tests
 ```
@@ -16,12 +17,34 @@ SITE_TZ=America/New_York clinical/agent/run.sh serve     # the service on http:/
 `service.py` is the agent service of ADR 0017 (FastAPI). The clinical app's gateway reads the launched patient's chart
 from the EHR and posts it to `POST /v1/findings` as `{"resources": [...]}`; the service returns each finding with its
 evidence and its references (title, source, PubMed id or DOI), the knowledge-base version and the snapshot's "now".
-It holds no EHR credential and makes no outbound request (owner decision, 2026-11-09): the model that will explain
-findings later sits here, away from EHR tokens. It refuses a request without exactly one Patient and an Encounter,
+It holds no EHR credential (owner decision, 2026-11-09); its only outbound request is to the model server, for
+explanations. It refuses a request without exactly one Patient and an Encounter,
 with unknown modules, or with more than 5,000 resources, and does not echo chart content in errors. `GET /healthz`
-reports the knowledge-base version. Settings: `SITE_TZ` (required), `KNOWLEDGE_FILE`, `CITATIONS_FILE`. Packages:
-`requirements.txt` (FastAPI and Uvicorn, hash-pinned, taken from the gateway's), `requirements-test.txt` (httpx for
-the test client). Its image, Kubernetes manifests and network policy are the next step.
+reports the knowledge-base version. Settings: `SITE_TZ` (required), `KNOWLEDGE_FILE`, `CITATIONS_FILE`, `OLLAMA_URL`
+and `MODEL_FILE`. Packages: `requirements.txt` (FastAPI and Uvicorn, hash-pinned, taken from the gateway's),
+`requirements-test.txt` (httpx for the test client). Image: `clinical/images/agent/`; deployment:
+`k8s/clinical/agent.yaml`.
+
+## Explanations
+
+`POST /v1/explanations` takes the same request as `/v1/findings`, runs the same rules, and has the local model
+(`explain.py`) explain each finding the rules made. Nobody can ask it to explain a finding of their own: the gateway
+sends only the chart. Owner decisions, 2026-11-09: `gemma4:26b` on the existing Ollama server, and explanations load
+after the findings, so a slow or missing model never holds the findings back.
+
+- **What the model sees:** one finding: its type, drug, summary, the data the rule used and its references' titles.
+  Never the chart.
+- **Pinned:** `model.json` names the model, its digest, the prompt file (`prompts/explain-v1.txt`) and the
+  generation options (temperature 0, a fixed seed). The service refuses to explain (503) unless the Ollama server's
+  copy of the model has that digest, so an evaluation build's explanations come from one known model. A new prompt is
+  a new file, and `model.json` points at it.
+- **Guard:** an explanation is shown only if every number in it and every antimicrobial it names is already in the
+  finding; antimicrobials are caught by their name stems, so one the knowledge base does not list is caught too,
+  while classes (cephalosporins, carbapenems) are allowed. A reply that fails is withheld, never repaired; the app
+  says so and the finding stands. It is a floor, not proof that the prose is right: a pharmacist reads it against the
+  data shown beside it.
+- **Reply:** per finding `status` `ok` with `text`, `withheld` with `reason`, or `unavailable`, plus the model's name,
+  digest and prompt.
 
 ## How it fits together
 

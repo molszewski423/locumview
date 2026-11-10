@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 
 from lvrules import Knowledge
 from service import DEFAULT_CITATIONS, MAX_RESOURCES, create_app
+from test_explain import FakeOllama, explainer
 
 HERE = Path(__file__).resolve().parent
 CITATIONS = json.loads(DEFAULT_CITATIONS.read_text())["citations"]
@@ -84,6 +85,52 @@ class ServiceTests(unittest.TestCase):
     def test_no_api_documentation_is_served(self):
         for path in ("/docs", "/redoc", "/openapi.json"):
             self.assertEqual(self.client.get(path).status_code, 404, path)
+
+
+class ExplanationTests(unittest.TestCase):
+    def client(self, fake):
+        return TestClient(create_app(Knowledge.load(), CITATIONS, "America/New_York", explainer(fake) if fake else None))
+
+    def test_each_of_the_services_own_findings_is_explained(self):
+        fake = FakeOllama(reply="Levofloxacin is given IV while the patient is stable.")
+        reply = self.client(fake).post("/v1/explanations", json={"resources": fixture("cap-levofloxacin-ivpo-01")})
+        self.assertEqual(reply.status_code, 200)
+        body = reply.json()
+        self.assertEqual(body["model"], {"name": "gemma4:26b", "digest": "sha256:" + "ab" * 32, "prompt": "prompts/explain-v1.txt"})
+        (e,) = body["explanations"]
+        self.assertEqual((e["type"], e["drug"], e["status"]), ("iv-to-po-switch", "Levofloxacin", "ok"))
+        chat = [b for m, u, b in fake.requests if u.endswith("/api/chat")]
+        self.assertEqual(len(chat), 1)
+        sent = json.dumps(chat[0])
+        self.assertNotIn("birthDate", sent)          # the finding goes to the model, never the chart
+        self.assertNotIn("LV-cap-levofloxacin", sent)
+
+    def test_a_reply_that_adds_a_drug_is_withheld(self):
+        fake = FakeOllama(reply="Switch to doxycycline.")
+        (e,) = self.client(fake).post("/v1/explanations",
+                                      json={"resources": fixture("cap-levofloxacin-ivpo-01")}).json()["explanations"]
+        self.assertEqual(e["status"], "withheld")
+        self.assertNotIn("text", e)
+
+    def test_no_findings_no_model_call(self):
+        fake = FakeOllama(fail=True)
+        reply = self.client(fake).post("/v1/explanations",
+                                       json={"resources": fixture("cap-levofloxacin-ivpo-01"), "modules": ["stewardship"]})
+        self.assertEqual(reply.json()["explanations"], [])
+        self.assertEqual(fake.requests, [])
+
+    def test_without_a_model_or_with_the_wrong_one_the_route_says_so(self):
+        body = {"resources": fixture("cap-levofloxacin-ivpo-01")}
+        self.assertEqual(self.client(None).post("/v1/explanations", json=body).status_code, 503)
+        wrong = FakeOllama(models=[{"name": "gemma4:26b", "digest": "cd" * 32}])
+        reply = self.client(wrong).post("/v1/explanations", json=body)
+        self.assertEqual(reply.status_code, 503)
+        self.assertEqual([u for m, u, b in wrong.requests if u.endswith("/api/chat")], [])
+
+    def test_the_same_refusals_as_findings(self):
+        resources = [r for r in fixture("cap-levofloxacin-ivpo-01") if r["resourceType"] != "Encounter"]
+        self.assertEqual(self.client(FakeOllama()).post("/v1/explanations", json={"resources": resources}).status_code,
+                         422)
 
 
 if __name__ == "__main__":

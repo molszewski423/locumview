@@ -215,6 +215,19 @@ class FindingsTests(unittest.TestCase):
             raise httpx.ConnectError("refused", request=request)
         self.assertEqual(self.app(down).get("/api/findings").status_code, 502)
 
+    def test_explanations_take_the_same_chart_and_no_token(self):
+        agent = FakeAgent()
+        self.assertEqual(self.app(agent).get("/api/explanations").status_code, 200)
+        (request,) = agent.requests
+        self.assertEqual(str(request.url), "http://agent.internal:8080/v1/explanations")
+        self.assertNotIn("authorization", {k.lower() for k in request.headers})
+        self.assertEqual(set(json.loads(request.content)), {"resources"})   # no finding comes from the browser
+
+    def test_a_model_problem_is_reported_without_its_detail(self):
+        r = self.app(FakeAgent(status=503)).get("/api/explanations")
+        self.assertEqual(r.json(), {"detail": "the explanation model is not available"})
+        self.assertEqual(self.app(FakeAgent(status=422)).get("/api/explanations").status_code, 502)
+
 
 if __name__ == "__main__":
     unittest.main()

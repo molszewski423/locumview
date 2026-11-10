@@ -45,6 +45,8 @@ ul { margin: 0; padding-left: 1.1rem; }
 .finding h3 { margin: 0 0 0.35rem; }
 .finding p { margin: 0 0 0.4rem; }
 .finding h4 { font-size: 0.85rem; margin: 0.6rem 0 0.25rem; color: var(--muted); }
+.finding .explanation { border-left: 2px solid var(--muted); padding-left: 0.6rem; margin: 0.4rem 0; }
+.finding .explanation p { margin: 0 0 0.25rem; }
 .finding summary { cursor: pointer; color: var(--accent); font-size: 0.9rem; }
 .pill { display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 0.05rem 0.45rem; border-radius: 999px;
   background: var(--accent); color: var(--accent-ink); vertical-align: middle; }
