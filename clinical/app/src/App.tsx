@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import type { Chart } from "./gateway";
-import { citationLink, forModule, loadFindings, typeLabel, type Finding, type FindingsState } from "./findings";
+import {
+  citationLink, explanationFor, forModule, loadExplanations, loadFindings, typeLabel,
+  type ExplanationsState, type Finding, type FindingsState,
+} from "./findings";
 import { age, labs, latestVitals, patientName, patientNumber, route, text, value, when } from "./fhir/chart";
 import { cultures, formatMic, INTERPRETATIONS } from "./fhir/micro";
 
@@ -11,12 +14,19 @@ const MODULES = [
 ] as const;
 type View = "home" | "patient" | (typeof MODULES)[number]["id"];
 
-export function App({ chart, initialFindings }: { chart: Chart; initialFindings?: FindingsState }) {
+export function App({ chart, initialFindings, initialExplanations }:
+  { chart: Chart; initialFindings?: FindingsState; initialExplanations?: ExplanationsState }) {
   const [view, setView] = useState<View>("patient");
   const [findings, setFindings] = useState<FindingsState>(initialFindings ?? { status: "loading" });
+  const [explanations, setExplanations] = useState<ExplanationsState>(initialExplanations ?? { status: "loading" });
   useEffect(() => {
     if (!initialFindings) loadFindings().then(setFindings);
   }, [initialFindings]);
+  // Only once there are findings to explain: the findings never wait for the model.
+  const toExplain = findings.status === "ready" && findings.reply.findings.length > 0;
+  useEffect(() => {
+    if (toExplain && !initialExplanations) loadExplanations().then(setExplanations);
+  }, [toExplain, initialExplanations]);
   const p = chart.patient;
   return (
     <div className="shell">
@@ -36,8 +46,9 @@ export function App({ chart, initialFindings }: { chart: Chart; initialFindings?
       </nav>
       <main>
         {view === "home" && <Home findings={findings} />}
-        {MODULES.map((m) => view === m.id && <Queue key={m.id} id={m.id} name={m.name} findings={findings} />)}
-        {view === "patient" && <PatientView chart={chart} findings={findings} />}
+        {MODULES.map((m) => view === m.id &&
+          <Queue key={m.id} id={m.id} name={m.name} findings={findings} explanations={explanations} />)}
+        {view === "patient" && <PatientView chart={chart} findings={findings} explanations={explanations} />}
       </main>
     </div>
   );
@@ -61,32 +72,36 @@ function Home({ findings }: { findings: FindingsState }) {
   );
 }
 
-function Queue({ id, name, findings }: { id: string; name: string; findings: FindingsState }) {
+function Queue({ id, name, findings, explanations }:
+  { id: string; name: string; findings: FindingsState; explanations: ExplanationsState }) {
   return (
     <section>
       <h1>{name} <span className="meta">this patient</span></h1>
-      <FindingList findings={findings} module={id} />
+      <FindingList findings={findings} explanations={explanations} module={id} />
     </section>
   );
 }
 
-function FindingList({ findings, module }: { findings: FindingsState; module?: string }) {
+function FindingList({ findings, explanations, module }:
+  { findings: FindingsState; explanations: ExplanationsState; module?: string }) {
   if (findings.status === "loading") return <p className="empty">Checking the rules…</p>;
   if (findings.status === "unavailable") {
     return <p className="empty" role="status">Findings are unavailable: {findings.message}</p>;
   }
   const list = module ? forModule(findings, module) : findings.reply.findings;
   if (list.length === 0) return <p className="empty">No findings for this patient.</p>;
-  return <>{list.map((f, i) => <FindingCard key={`${f.rule}-${f.drug}-${i}`} finding={f} />)}</>;
+  return <>{list.map((f, i) =>
+    <FindingCard key={`${f.rule}-${f.drug}-${i}`} finding={f} explanations={explanations} />)}</>;
 }
 
-function FindingCard({ finding }: { finding: Finding }) {
+function FindingCard({ finding, explanations }: { finding: Finding; explanations: ExplanationsState }) {
   const module = MODULES.find((m) => m.id === finding.module)?.name ?? finding.module;
   return (
     <article className="finding" aria-label={`${typeLabel(finding.type)}: ${finding.drug}`}
       data-module={finding.module} data-type={finding.type} data-drug={finding.drug}>
       <h3><span className="pill">{module}</span> {typeLabel(finding.type)}: {finding.drug}</h3>
       <p>{finding.summary}</p>
+      <ExplanationBlock finding={finding} explanations={explanations} />
       <details>
         <summary>Data and references</summary>
         <h4>Data the rule used</h4>
@@ -104,7 +119,29 @@ function FindingCard({ finding }: { finding: Finding }) {
   );
 }
 
-function PatientView({ chart, findings }: { chart: Chart; findings: FindingsState }) {
+function ExplanationBlock({ finding, explanations }: { finding: Finding; explanations: ExplanationsState }) {
+  if (explanations.status === "loading") return <p className="explanation empty">Explaining…</p>;
+  if (explanations.status === "unavailable") {
+    return <p className="explanation empty">No explanation: {explanations.message}</p>;
+  }
+  const e = explanationFor(explanations, finding);
+  const model = explanations.reply.model;
+  if (!e || e.status === "unavailable") return <p className="explanation empty">No explanation: the model did not answer.</p>;
+  if (e.status === "withheld") {
+    return <p className="explanation empty" data-explanation="withheld">Explanation withheld: it named data the finding
+      does not contain. The finding and its data stand.</p>;
+  }
+  return (
+    <div className="explanation" data-explanation="ok">
+      <p>{e.text}</p>
+      <p className="meta">Written by a local model ({model.name}, prompt {model.prompt.replace(/^prompts\//, "")}) from
+        this finding only; check it against the data below.</p>
+    </div>
+  );
+}
+
+function PatientView({ chart, findings, explanations }:
+  { chart: Chart; findings: FindingsState; explanations: ExplanationsState }) {
   const vitals = latestVitals(chart.observations);
   const results = labs(chart.observations);
   const micro = cultures(chart.observations, chart.specimens);
@@ -112,11 +149,11 @@ function PatientView({ chart, findings }: { chart: Chart; findings: FindingsStat
   return (
     <section className="patient">
       <Panel title="Findings">
-        <FindingList findings={findings} />
+        <FindingList findings={findings} explanations={explanations} />
         {findings.status === "ready" && (
           <p className="note">Decided by deterministic rules (knowledge base {findings.reply.knowledge_version}), as of
             the newest charted time, {when(findings.reply.as_of)}. A pharmacist reviews every finding; nothing is
-            ordered or changed. Explanations by a local model come next.</p>
+            ordered or changed. A local model explains each finding; it cannot add, change or remove one.</p>
         )}
       </Panel>
       <div className="grid">

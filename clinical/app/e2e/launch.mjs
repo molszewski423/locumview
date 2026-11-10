@@ -7,7 +7,8 @@ import { chromium } from "playwright-core";
 import { mkdirSync } from "node:fs";
 
 const EMR = "https://127.0.0.1:18443";
-const { OE_USER, OE_PASS, PID, APP_NAME, APP_URL, EXPECT_NAME, EXPECT_ORGANISM, EXPECT_MODULES = "", EXPECT_FINDINGS = "", OUT = "/out" } = process.env;
+const { OE_USER, OE_PASS, PID, APP_NAME, APP_URL, EXPECT_NAME, EXPECT_ORGANISM, EXPECT_MODULES = "", EXPECT_FINDINGS = "",
+  EXPECT_EXPLAINED = "", OUT = "/out" } = process.env;
 mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch();
 // The site's time zone, as on a clinician's desktop: the agent writes its evidence in SITE_TZ, the browser shows the
@@ -83,6 +84,8 @@ await view.waitForSelector(".context", { timeout: 20000 });
 // Findings come from the agent service through the gateway (M4); wait until the rules have answered.
 await view.waitForSelector(".finding, .patient .empty", { timeout: 20000 });
 await view.waitForFunction(() => !document.body.textContent.includes("Checking the rules"), null, { timeout: 20000 });
+// Explanations follow the findings, one model call per finding (the first may load the model).
+await view.waitForFunction(() => !document.body.textContent.includes("Explaining…"), null, { timeout: 200000 });
 await shot(view, "app");
 await view.locator(".finding details").first().evaluate((d) => { d.open = true; }).catch(() => {});
 await shot(view, "finding-detail");
@@ -95,11 +98,15 @@ const findings = (await view.locator(".patient .finding").evaluateAll((els) =>
   els.map((e) => `${e.dataset.module}|${e.dataset.type}|${e.dataset.drug}`)))
   .filter((f) => modules.includes(f.split("|")[0])).sort();
 const unavailable = await view.locator(".patient [role=status]").textContent().catch(() => null);
+// Per finding: "ok" (the model's explanation shown), "withheld" (failed the guard) or "none" (no model or no answer).
+const explanations = await view.locator(".patient .finding").evaluateAll((els) =>
+  els.map((e) => e.querySelector(".explanation")?.dataset.explanation ?? (e.querySelector(".explanation") ? "none" : "missing")));
 // Cookie names and attributes only (never values), to diagnose session problems.
 const cookies = (await context.cookies(APP_URL)).map((c) => `${c.name} sameSite=${c.sameSite} secure=${c.secure} path=${c.path}`);
-console.log(JSON.stringify({ url: app.url().split("?")[0], context: context_, error, organisms, findings, unavailable, failures, cookies, granted }));
+console.log(JSON.stringify({ url: app.url().split("?")[0], context: context_, error, organisms, findings, explanations, unavailable, failures, cookies, granted }));
 await browser.close();
 const expected = EXPECT_FINDINGS.split(";").filter(Boolean).sort();
 const ok = context_?.includes(EXPECT_NAME) && (!EXPECT_ORGANISM || organisms.some((o) => o.includes(EXPECT_ORGANISM))) &&
-  JSON.stringify(findings) === JSON.stringify(expected);
+  JSON.stringify(findings) === JSON.stringify(expected) &&
+  explanations.every((e) => (EXPECT_EXPLAINED ? e === "ok" : e === "none"));
 process.exit(ok ? 0 : 1);

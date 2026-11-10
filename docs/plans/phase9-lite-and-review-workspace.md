@@ -101,8 +101,11 @@ one MFA sign-in. Demo access to the EHR is a separate change (changelog
 OpenEMR's FHIR read-back of every case give the same snapshot and findings, after an OpenEMR fix for problem codes
 (changelog #112). Step 3 done: the agent service (no EHR credential; the gateway posts it the launched patient's
 chart) and the patient's findings in the app, with evidence and references, passing the browser launch test (changelog
-#113; owner decisions 2026-11-09: a separate agent service, patient view first). Next: its image and deployment, then
-the local model's explanations; the cross-patient queue needs its own access design.
+#113; owner decisions 2026-11-09: a separate agent service, patient view first). Step 4: its image and deployment
+(changelog #114, #115). Step 5: the local model's explanations (changelog #116; owner decisions 2026-11-09:
+`gemma4:26b`, loaded after the findings): the model sees one finding, never the chart; model, digest, prompt and
+options are pinned in `clinical/agent/model.json`; a guard withholds any explanation with a number or antimicrobial
+the finding lacks. The cross-patient queue needs its own access design.
 
 - The agent service (Python, FastAPI): stewardship rule set first, then IV to PO.
 - Every rule cites its guideline source in the repository. Every case in the library has a test: the rules must

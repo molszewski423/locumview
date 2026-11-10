@@ -1,7 +1,8 @@
 # The agent service (clinical/images/agent/, signed by CI; the digest is set in kustomization.yaml): the Phase 9 lite
 # rules over one patient's FHIR resources, which the gateway posts to it (clinical/agent/README.md). It holds no EHR
 # credential and needs no Secret. Meets the restricted profile. Its network policy is here with it: only the gateway
-# may reach it, and it may reach nothing (the cluster DNS rule in networkpolicy.yaml applies to every pod).
+# may reach it, and it may reach only the Ollama server's pods that explain findings (the cluster DNS rule in
+# networkpolicy.yaml applies to every pod). Ollama's URL, namespace and app label are site values (site.env).
 apiVersion: v1
 kind: Service
 metadata: {name: agent, namespace: clinical}
@@ -14,6 +15,7 @@ kind: ConfigMap
 metadata: {name: agent, namespace: clinical}
 data:
   SITE_TZ: SITE_TZ   # set from site.env: the site's IANA time zone, for example America/New_York
+  OLLAMA_URL: OLLAMA_URL   # set from site.env: the in-cluster Ollama Service, for finding explanations
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -64,4 +66,9 @@ spec:
   ingress:
     - from: [{podSelector: {matchLabels: {app: gateway}}}]
       ports: [{protocol: TCP, port: 8080}]
-  egress: []
+  egress:
+    # The Ollama server's pods (namespace and app label set from site.env), on the container port named "ollama".
+    - to:
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: OLLAMA_NAMESPACE}}
+          podSelector: {matchLabels: {app: OLLAMA_APP}}
+      ports: [{protocol: TCP, port: ollama}]

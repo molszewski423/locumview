@@ -1,5 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { citationLink, forModule, loadFindings, typeLabel, type FindingsReply } from "./findings";
+import {
+  citationLink, explanationFor, forModule, loadExplanations, loadFindings, typeLabel,
+  type ExplanationsReply, type FindingsReply,
+} from "./findings";
 
 const reply: FindingsReply = {
   knowledge_version: "0.1.0",
@@ -10,6 +13,15 @@ const reply: FindingsReply = {
       summary: "s", evidence: ["e"], citations: [{ ref: "clsi-m100", title: "M100" }] },
     { rule: "iv-to-po-switch", module: "iv-to-po", type: "iv-to-po-switch", drug: "Levofloxacin",
       summary: "s", evidence: ["e"], citations: [] },
+  ],
+};
+
+const explained: ExplanationsReply = {
+  model: { name: "gemma4:26b", digest: "ab".repeat(32), prompt: "prompts/explain-v1.txt" },
+  explanations: [
+    { rule: "iv-to-po-switch", module: "iv-to-po", type: "iv-to-po-switch", drug: "Levofloxacin", status: "ok", text: "t" },
+    { rule: "bug-drug-mismatch", module: "stewardship", type: "bug-drug-mismatch", drug: "Ceftriaxone",
+      status: "withheld", reason: "r" },
   ],
 };
 
@@ -45,5 +57,22 @@ describe("findings", () => {
   it("does not break the chart when the network fails", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => { throw new TypeError("network"); }));
     expect((await loadFindings()).status).toBe("unavailable");
+  });
+
+  it("matches each explanation to its finding by what identifies it, not by position", () => {
+    const state = { status: "ready" as const, reply: explained };
+    expect(explanationFor(state, reply.findings[0])?.status).toBe("withheld");
+    expect(explanationFor(state, reply.findings[1])?.text).toBe("t");
+    expect(explanationFor(state, { ...reply.findings[1], drug: "Other" })).toBeUndefined();
+    expect(explanationFor({ status: "loading" }, reply.findings[1])).toBeUndefined();
+  });
+
+  it("asks the gateway for explanations and survives the model being down", async () => {
+    const fetch = vi.fn(async () => new Response(JSON.stringify(explained), { status: 200 }));
+    vi.stubGlobal("fetch", fetch);
+    expect(await loadExplanations()).toEqual({ status: "ready", reply: explained });
+    expect(fetch.mock.calls[0][0]).toBe("api/explanations");
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({ detail: "x" }), { status: 502 })));
+    expect((await loadExplanations()).status).toBe("unavailable");
   });
 });
