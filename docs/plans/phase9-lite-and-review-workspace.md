@@ -1,7 +1,7 @@
 # Plan: Phase 9 lite and the Clinical Review Workspace
 
 Status: **In progress**. Written 2026-10-22. Phase 4's core release milestone is Done (changelog #70); M1, the
-OpenEMR spike, is Done (changelog #72); the owner chose its option 4 (section 9). M2 is Done (changelog #73 to #75); M3 is in progress: its checks passed on a desktop (changelog #76 to #93); it closes once ADR 0019 (Proposed) is built. M4 is in progress alongside it: the rules give every case's expected findings (changelog #110). Decisions: ADR 0017 (and its update of 2026-10-22),
+OpenEMR spike, is Done (changelog #72); the owner chose its option 4 (section 9). M2 is Done (changelog #73 to #75); M3 is in progress: its checks passed on a desktop (changelog #76 to #93); it closes once ADR 0019 (Proposed) is built. M4 is Done (changelog #110 to #118): rules, the patient's findings and the local model's explanations, live on the cluster since 2026-11-10. M5 is next. Decisions: ADR 0017 (and its update of 2026-10-22),
 ADR 0018. Data rules: `docs/policy/synthetic-data-and-independence.md`. Status of record: ROADMAP.md.
 
 ## 1. Sequence
@@ -96,7 +96,8 @@ one MFA sign-in. Demo access to the EHR is a separate change (changelog
 
 ### M4. Rules and explanation pipeline
 
-**In progress**, started 2026-11-09 alongside ADR 0019's build. Step 1 done: the stewardship and IV to PO rules in
+**Done** (2026-11-10), started 2026-11-09 alongside ADR 0019's build. Live on the cluster: launched from a scenario
+patient's chart, the app shows the rules' finding and the local model's explanation (changelog #118). Step 1 done: the stewardship and IV to PO rules in
 `clinical/agent/` give exactly each case's expected findings, checked in CI (changelog #110). Step 2 done: the same rules over
 OpenEMR's FHIR read-back of every case give the same snapshot and findings, after an OpenEMR fix for problem codes
 (changelog #112). Step 3 done: the agent service (no EHR credential; the gateway posts it the launched patient's
