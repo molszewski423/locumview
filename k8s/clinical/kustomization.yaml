@@ -10,16 +10,20 @@ resources:
   - gateway.yaml
   - ingress.yaml
   - sso.yaml
+  - agent.yaml
 
 # The images CI built and signed (.gitea/workflows/clinical-images.yml), by digest. Updated by a commit after each
 # build that is to be deployed; verify first: scripts/clinical/verify-images.sh
 images:
   - name: git.lan/mike/locumview-openemr
-    # commit de5a0ac, clinical-images run 162; signature and SBOM attestation (1,099 packages) verified 2026-10-25
-    digest: sha256:1e1ba9903481b6c3ec875f09d52e849266b74eb6bced419b89c1c4e53123a295
+    # commit 200a11c, clinical-images run 291; signature and SBOM attestation verified by CI 2026-11-09
+    digest: sha256:d4a6e5f2851f11efd93a6215e49be3eccbbe1c63aae9aa6a3c1c5fa161acfae6
   - name: git.lan/mike/locumview-clinical-gateway
-    # commit de5a0ac, clinical-images run 162; signature and SBOM attestation (130 packages) verified 2026-10-25
-    digest: sha256:f3c169a37d656465849749c4b6d80a29424c1f79a27a46a9ecaacbbac4d70071
+    # commit 200a11c, clinical-images run 291; signature and SBOM attestation verified by CI 2026-11-09
+    digest: sha256:fde821c5e5fd564de2e760ae186098b789d0e1b19ba4cb7d80e8a09b72805d77
+  - name: git.lan/mike/locumview-clinical-agent
+    # commit 200a11c, clinical-images run 291; signature and SBOM attestation verified by CI 2026-11-09
+    digest: sha256:313cf7c9eb4eca825789f2ad9152142e296ce5285f03cf612d774da80326e0d4
 
 # Site values (not secret, but site-specific): read from site.env by the replacements below and never applied.
 configMapGenerator:
@@ -39,3 +43,9 @@ replacements:
         fieldPaths: ["spec.template.spec.nodeSelector.[kubernetes.io/hostname]"]
       - select: {kind: Deployment, name: oauth2-proxy}
         fieldPaths: ["spec.template.spec.nodeSelector.[kubernetes.io/hostname]"]
+      - select: {kind: Deployment, name: agent}
+        fieldPaths: ["spec.template.spec.nodeSelector.[kubernetes.io/hostname]"]
+  - source: {kind: ConfigMap, name: site-values, fieldPath: data.SITE_TZ}
+    targets:
+      - select: {kind: ConfigMap, name: agent}
+        fieldPaths: [data.SITE_TZ]

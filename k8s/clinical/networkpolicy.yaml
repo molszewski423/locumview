@@ -60,6 +60,8 @@ spec:
   egress:
     - to: [{podSelector: {matchLabels: {app: openemr}}}]
       ports: [{protocol: TCP, port: 80}]
+    - to: [{podSelector: {matchLabels: {app: agent}}}]   # the findings (agent.yaml)
+      ports: [{protocol: TCP, port: 8080}]
 ---
 # oauth2-proxy (sso.yaml): Traefik's ForwardAuth and the /lv-sso paths in; out only to Keycloak in the locumview
 # namespace, to redeem codes and fetch its keys (browsers reach Keycloak at its public address).

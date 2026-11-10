@@ -182,7 +182,10 @@ def message(case, pid, encounter, orders):
 
 def load(case):
     number = f"LV-{case['id']}"
-    if sql(f"SELECT pid FROM patient_data WHERE pubpid = {quote(number)};"):
+    if existing := sql(f"SELECT pid FROM patient_data WHERE pubpid = {quote(number)};"):
+        # A case loaded before the start-date fix (changelog #112) gets it now; the update is a no-op otherwise.
+        sql(f"UPDATE prescriptions SET date_added = start_date WHERE patient_id = {int(existing[0][0])} "
+            f"AND date_added IS NULL;")
         print(f"{case['id']}: already loaded, skipped")
         return
     p, e = case["patient"], case["encounter"]

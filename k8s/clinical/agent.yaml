@@ -2,8 +2,6 @@
 # rules over one patient's FHIR resources, which the gateway posts to it (clinical/agent/README.md). It holds no EHR
 # credential and needs no Secret. Meets the restricted profile. Its network policy is here with it: only the gateway
 # may reach it, and it may reach nothing (the cluster DNS rule in networkpolicy.yaml applies to every pod).
-# Not yet listed in kustomization.yaml: it is added there, with its image digest, SITE_TZ from site.env and the
-# gateway's AGENT_URL and egress, once CI has built and signed the image.
 apiVersion: v1
 kind: Service
 metadata: {name: agent, namespace: clinical}
