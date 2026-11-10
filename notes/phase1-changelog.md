@@ -1986,3 +1986,10 @@ Agent: Claude Code
 - **Verification:** agent 60 tests (11 new for the explanation step: the guard over every case's real findings, against a fake model; 5 new service tests), gateway 18 (2 new), app 16 (2 new) and the type-checked build. Against the real server (Ollama 0.33.2, digest matching the pin): `try_explanations.py` gave 9 of 9 findings an explanation that passed the guard, about 4 s each with the model loaded, in each of two runs with the final prompt (and two before it). `clinical/app/e2e.sh` with `OLLAMA_URL`: PASS for LV-cap-levofloxacin-ivpo-01 and LV-bsi-enterobacter-ampc-01 (exact findings, each explained); without it: PASS, the finding shown with "No explanation: the explanation model is not available". The agent image built locally and run read-only with no capabilities, as uid 10001: it explained the ESBL case's finding through the real model. `kustomize build` with a sample `site.env` and `kubeconform -strict`: 24 resources valid, no placeholder left. Not done here: the image build, pin and apply (after merge: README step 10).
 
 Agent: Claude Code
+
+## 117. Phase 9 lite M4 step 5: the explanation images pinned (2026-11-10)
+
+- **Done:** `kustomization.yaml` pins the agent (with `/v1/explanations`) and the gateway (with `/api/explanations`) that clinical-images run 296 built and signed from commit d2cc459. OpenEMR stays at run 291's image: its sources did not change, and the rebuild in run 296 is not deployed.
+- **Verification:** digests copied from run 296's Verify steps, where CI verified each signature and SBOM attestation; `scripts/clinical/verify-images.sh` checks them again before applying (`k8s/clinical/README.md` step 10, which also lists the three `OLLAMA_*` site values).
+
+Agent: Claude Code
