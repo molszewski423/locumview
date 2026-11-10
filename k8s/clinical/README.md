@@ -54,12 +54,19 @@ OpenEMR 8.4.1 with LocumView's fix (`clinical/images/openemr/`), MariaDB, and th
      both Ingresses, the `/lv-sso` routes).
 
 9. The agent service (Phase 9 lite M4; `agent.yaml`, `clinical/images/agent/`): the rules behind the app's findings.
-   It holds no EHR credential and no Secret; only the gateway may reach it, and it reaches nothing. After the change
-   that adds it merges, `clinical-images.yml` builds and signs `locumview-clinical-agent` (and rebuilds OpenEMR when
-   its patches change). A follow-up commit pins the new digests in `kustomization.yaml`, lists `agent.yaml`, takes
-   `SITE_TZ` from `site.env` and gives the gateway `AGENT_URL` and egress to the agent. Then:
-   `scripts/clinical/verify-images.sh`, `kubectl diff -k k8s/clinical`, `kubectl apply -k k8s/clinical`. If the
-   OpenEMR image changed, rerun `scripts/clinical/load-scenarios.sh` on a fresh load so prescriptions carry their
-   start dates (changelog #112).
+   It holds no EHR credential and no Secret; only the gateway may reach it, and it reaches nothing. The gateway gets
+   `AGENT_URL` and egress to it on 8080.
+   - Add `SITE_TZ` to `k8s/clinical/site.env` (see `site.env.example`): the site's IANA time zone, for example
+     `America/New_York`. The agent will not start with an unknown zone.
+   - `scripts/clinical/verify-images.sh`: three images now, OpenEMR with the problem-list patch, the gateway with
+     `/api/findings`, and the agent.
+   - `kubectl diff -k k8s/clinical` should show: the new agent Service, ConfigMap, Deployment and NetworkPolicy; the
+     gateway's ConfigMap (`AGENT_URL`), NetworkPolicy (egress to the agent) and image; OpenEMR's image. Then
+     `kubectl apply -k k8s/clinical`, and wait for each:
+     `for d in agent gateway openemr; do kubectl -n clinical rollout status deploy/$d; done`.
+   - OpenEMR's new image returns problem-list codes for the problems already loaded. Then rerun
+     `scripts/clinical/load-scenarios.sh`: cases already present are skipped, but their prescriptions get the start
+     dates the rules need (changelog #112, #115). Then launch the app from a scenario patient's chart; the findings
+     appear under each module.
 
 Nothing in these steps displays a password, the client secret or a private key.

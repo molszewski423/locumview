@@ -17,6 +17,7 @@ data:
   PUBLIC_URL: https://clinical.corp.locumview.com
   FRAME_ANCESTORS: https://emr.corp.locumview.com
   CLIENT_SECRET_FILE: /run/gateway/client-secret
+  AGENT_URL: http://agent.clinical.svc.cluster.local:8080
 ---
 apiVersion: apps/v1
 kind: Deployment
