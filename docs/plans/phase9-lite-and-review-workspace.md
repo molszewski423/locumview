@@ -99,7 +99,10 @@ one MFA sign-in. Demo access to the EHR is a separate change (changelog
 **In progress**, started 2026-11-09 alongside ADR 0019's build. Step 1 done: the stewardship and IV to PO rules in
 `clinical/agent/` give exactly each case's expected findings, checked in CI (changelog #110). Step 2 done: the same rules over
 OpenEMR's FHIR read-back of every case give the same snapshot and findings, after an OpenEMR fix for problem codes
-(changelog #112). Next: the service and the app's alert queue, then the explanations.
+(changelog #112). Step 3 done: the agent service (no EHR credential; the gateway posts it the launched patient's
+chart) and the patient's findings in the app, with evidence and references, passing the browser launch test (changelog
+#113; owner decisions 2026-11-09: a separate agent service, patient view first). Next: its image and deployment, then
+the local model's explanations; the cross-patient queue needs its own access design.
 
 - The agent service (Python, FastAPI): stewardship rule set first, then IV to PO.
 - Every rule cites its guideline source in the repository. Every case in the library has a test: the rules must

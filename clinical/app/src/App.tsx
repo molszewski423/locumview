@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Chart } from "./gateway";
+import { citationLink, forModule, loadFindings, typeLabel, type Finding, type FindingsState } from "./findings";
 import { age, labs, latestVitals, patientName, patientNumber, route, text, value, when } from "./fhir/chart";
 import { cultures, formatMic, INTERPRETATIONS } from "./fhir/micro";
 
@@ -10,8 +11,12 @@ const MODULES = [
 ] as const;
 type View = "home" | "patient" | (typeof MODULES)[number]["id"];
 
-export function App({ chart }: { chart: Chart }) {
+export function App({ chart, initialFindings }: { chart: Chart; initialFindings?: FindingsState }) {
   const [view, setView] = useState<View>("patient");
+  const [findings, setFindings] = useState<FindingsState>(initialFindings ?? { status: "loading" });
+  useEffect(() => {
+    if (!initialFindings) loadFindings().then(setFindings);
+  }, [initialFindings]);
   const p = chart.patient;
   return (
     <div className="shell">
@@ -30,45 +35,90 @@ export function App({ chart }: { chart: Chart }) {
         <button aria-current={view === "patient"} onClick={() => setView("patient")}>Patient</button>
       </nav>
       <main>
-        {view === "home" && <Home />}
-        {MODULES.map((m) => view === m.id && <Queue key={m.id} name={m.name} />)}
-        {view === "patient" && <PatientView chart={chart} />}
+        {view === "home" && <Home findings={findings} />}
+        {MODULES.map((m) => view === m.id && <Queue key={m.id} id={m.id} name={m.name} findings={findings} />)}
+        {view === "patient" && <PatientView chart={chart} findings={findings} />}
       </main>
     </div>
   );
 }
 
-function Home() {
+function Home({ findings }: { findings: FindingsState }) {
   return (
     <section>
-      <h1>Triage</h1>
+      <h1>Triage <span className="meta">this patient</span></h1>
       <div className="cards">
         {MODULES.map((m) => (
-          <div className="card" key={m.id}><div className="count">0</div><div>{m.name}</div></div>
+          <div className="card" key={m.id}>
+            <div className="count">{findings.status === "ready" ? forModule(findings, m.id).length : "–"}</div>
+            <div>{m.name}</div>
+          </div>
         ))}
       </div>
-      <p className="note">No findings yet: the rules service arrives in milestone M4. Every finding will show the data and
-        guideline it rests on, and a local model's explanation of it.</p>
+      <p className="note">Counts are for the patient the app was opened on. A queue across all patients needs its own
+        access design and comes later. ADE Monitoring has no rules yet.</p>
     </section>
   );
 }
 
-function Queue({ name }: { name: string }) {
+function Queue({ id, name, findings }: { id: string; name: string; findings: FindingsState }) {
   return (
     <section>
-      <h1>{name}</h1>
-      <p className="empty">The queue is empty. Findings appear here once the rules service is built (M4).</p>
+      <h1>{name} <span className="meta">this patient</span></h1>
+      <FindingList findings={findings} module={id} />
     </section>
   );
 }
 
-function PatientView({ chart }: { chart: Chart }) {
+function FindingList({ findings, module }: { findings: FindingsState; module?: string }) {
+  if (findings.status === "loading") return <p className="empty">Checking the rules…</p>;
+  if (findings.status === "unavailable") {
+    return <p className="empty" role="status">Findings are unavailable: {findings.message}</p>;
+  }
+  const list = module ? forModule(findings, module) : findings.reply.findings;
+  if (list.length === 0) return <p className="empty">No findings for this patient.</p>;
+  return <>{list.map((f, i) => <FindingCard key={`${f.rule}-${f.drug}-${i}`} finding={f} />)}</>;
+}
+
+function FindingCard({ finding }: { finding: Finding }) {
+  const module = MODULES.find((m) => m.id === finding.module)?.name ?? finding.module;
+  return (
+    <article className="finding" aria-label={`${typeLabel(finding.type)}: ${finding.drug}`}
+      data-module={finding.module} data-type={finding.type} data-drug={finding.drug}>
+      <h3><span className="pill">{module}</span> {typeLabel(finding.type)}: {finding.drug}</h3>
+      <p>{finding.summary}</p>
+      <details>
+        <summary>Data and references</summary>
+        <h4>Data the rule used</h4>
+        <ul>{finding.evidence.map((e, i) => <li key={i}>{e}</li>)}</ul>
+        <h4>References</h4>
+        <ul>
+          {finding.citations.map((c) => {
+            const href = citationLink(c);
+            return <li key={c.ref}>{href ? <a href={href} target="_blank" rel="noreferrer">{c.title}</a> : c.title}
+              {c.source ? <span className="meta"> · {c.source}</span> : null}</li>;
+          })}
+        </ul>
+      </details>
+    </article>
+  );
+}
+
+function PatientView({ chart, findings }: { chart: Chart; findings: FindingsState }) {
   const vitals = latestVitals(chart.observations);
   const results = labs(chart.observations);
   const micro = cultures(chart.observations, chart.specimens);
   const active = chart.medications.filter((m) => m.status === "active");
   return (
     <section className="patient">
+      <Panel title="Findings">
+        <FindingList findings={findings} />
+        {findings.status === "ready" && (
+          <p className="note">Decided by deterministic rules (knowledge base {findings.reply.knowledge_version}), as of
+            the newest charted time, {when(findings.reply.as_of)}. A pharmacist reviews every finding; nothing is
+            ordered or changed. Explanations by a local model come next.</p>
+        )}
+      </Panel>
       <div className="grid">
         <Panel title="Problems">
           <List items={chart.conditions.map((c) => text(c.code))} empty="No problems recorded" />

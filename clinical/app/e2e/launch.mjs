@@ -1,15 +1,18 @@
-// Phase 9 lite M3: SMART EHR launch, end to end, in a real browser (Playwright's Chromium).
+// Phase 9 lite M3 and M4: SMART EHR launch and the patient's findings, end to end, in a real browser (Playwright's Chromium).
 // A clinician signs in to the local OpenEMR, opens a case patient's chart, launches the app from the chart's
-// "SMART Enabled Apps" card, approves OpenEMR's authorization screens, and the app must open on that patient.
+// "SMART Enabled Apps" card, approves OpenEMR's authorization screens, and the app must open on that patient and show
+// exactly the case's expected findings in the modules the case lists (from the agent service, through the gateway).
 // Run by clinical/app/e2e.sh; credentials arrive as environment variables from the run's tmpfs state.
 import { chromium } from "playwright-core";
 import { mkdirSync } from "node:fs";
 
 const EMR = "https://127.0.0.1:18443";
-const { OE_USER, OE_PASS, PID, APP_NAME, APP_URL, EXPECT_NAME, EXPECT_ORGANISM, OUT = "/out" } = process.env;
+const { OE_USER, OE_PASS, PID, APP_NAME, APP_URL, EXPECT_NAME, EXPECT_ORGANISM, EXPECT_MODULES = "", EXPECT_FINDINGS = "", OUT = "/out" } = process.env;
 mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch();
-const context = await browser.newContext({ ignoreHTTPSErrors: true, viewport: { width: 1280, height: 900 } });
+// The site's time zone, as on a clinician's desktop: the agent writes its evidence in SITE_TZ, the browser shows the
+// chart's times in its own zone, and the two agree only when they are the same.
+const context = await browser.newContext({ ignoreHTTPSErrors: true, viewport: { width: 1280, height: 900 }, timezoneId: "America/New_York" });
 const page = await context.newPage();
 // Report requests that fail or are refused, with their CORS headers: browser apps fail on these first.
 const failures = [];
@@ -77,15 +80,26 @@ await page.waitForTimeout(800);
 const view = await context.newPage();
 await view.goto(`${APP_URL}index.html`);
 await view.waitForSelector(".context", { timeout: 20000 });
-await view.locator(".culture").first().scrollIntoViewIfNeeded().catch(() => {});
+// Findings come from the agent service through the gateway (M4); wait until the rules have answered.
+await view.waitForSelector(".finding, .patient .empty", { timeout: 20000 });
+await view.waitForFunction(() => !document.body.textContent.includes("Checking the rules"), null, { timeout: 20000 });
 await shot(view, "app");
+await view.locator(".finding details").first().evaluate((d) => { d.open = true; }).catch(() => {});
+await shot(view, "finding-detail");
 const context_ = await app.locator(".context").textContent().catch(() => null);
 const error = await app.locator(".status.error").textContent().catch(() => null);
 const organisms = await app.locator(".culture h3").allTextContents().catch(() => []);
 const granted = await app.evaluate(() => fetch("api/context").then((r) => r.json()).catch(() => null));
+const modules = EXPECT_MODULES.split(",").filter(Boolean);
+const findings = (await view.locator(".patient .finding").evaluateAll((els) =>
+  els.map((e) => `${e.dataset.module}|${e.dataset.type}|${e.dataset.drug}`)))
+  .filter((f) => modules.includes(f.split("|")[0])).sort();
+const unavailable = await view.locator(".patient [role=status]").textContent().catch(() => null);
 // Cookie names and attributes only (never values), to diagnose session problems.
 const cookies = (await context.cookies(APP_URL)).map((c) => `${c.name} sameSite=${c.sameSite} secure=${c.secure} path=${c.path}`);
-console.log(JSON.stringify({ url: app.url().split("?")[0], context: context_, error, organisms, failures, cookies, granted }));
+console.log(JSON.stringify({ url: app.url().split("?")[0], context: context_, error, organisms, findings, unavailable, failures, cookies, granted }));
 await browser.close();
-const ok = context_?.includes(EXPECT_NAME) && organisms.some((o) => o.includes(EXPECT_ORGANISM));
+const expected = EXPECT_FINDINGS.split(";").filter(Boolean).sort();
+const ok = context_?.includes(EXPECT_NAME) && (!EXPECT_ORGANISM || organisms.some((o) => o.includes(EXPECT_ORGANISM))) &&
+  JSON.stringify(findings) === JSON.stringify(expected);
 process.exit(ok ? 0 : 1);

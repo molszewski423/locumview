@@ -7,14 +7,17 @@ API does not answer CORS preflight requests, so the app cannot talk to it from t
 - keeps the tokens server-side; the browser holds only an HttpOnly, Secure, SameSite=Lax session cookie;
 - forwards read-only FHIR searches (GET, an allow-list of resource types), pinned to the launched patient, so a
   clinician-scoped token cannot be used to read another patient through the app;
-- serves the built app (clinical/app/dist) from the same origin.
+- serves the built app (clinical/app/dist) from the same origin;
+- asks the agent service for findings (/api/findings): it reads the launched patient's chart itself and posts it to
+  AGENT_URL, so the agent never holds an EHR credential (Phase 9 lite M4, owner decision 2026-11-09).
 
 Settings (environment): EHR_FHIR_BASE (the EHR's FHIR base, the only accepted iss), CLIENT_ID,
 CLIENT_SECRET_FILE, PUBLIC_URL (this gateway's external https URL), STATIC_DIR, EHR_TLS_CA (a CA bundle for the
 EHR; default system roots), EHR_TLS_VERIFY=false (local test instance only), FRAME_ANCESTORS (origins allowed to
 frame the app: the EHR's), EHR_INTERNAL_URL (optional: an origin such as http://openemr.clinical.svc to which the
 gateway's own requests for the EHR's public origin are sent, so in-cluster traffic stays on the Service; launches
-are still checked against the public EHR_FHIR_BASE). Sessions live in memory: one replica.
+are still checked against the public EHR_FHIR_BASE), AGENT_URL (the agent service's base URL, for example
+http://agent.clinical.svc:8080; without it /api/findings answers 503). Sessions live in memory: one replica.
 """
 from __future__ import annotations
 
@@ -39,6 +42,8 @@ READABLE = {"Encounter", "Condition", "AllergyIntolerance", "MedicationRequest",
 COOKIE = "lv_clinical_session"
 PENDING_TTL = 600       # seconds a launch may take to come back from the EHR's authorization screens
 MAX_PAGES = 20          # bound on following a search's next links
+# What the agent's rules read (clinical/agent/lvrules/fhir.py), besides the Patient.
+FINDINGS_INPUT = ("Encounter", "Condition", "MedicationRequest", "Observation", "Specimen", "ServiceRequest")
 
 
 @dataclass
@@ -51,6 +56,7 @@ class Settings:
     tls_verify: bool | str = True
     frame_ancestors: str = "'self'"
     ehr_internal_url: str | None = None
+    agent_url: str | None = None
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -63,7 +69,8 @@ class Settings:
                    client_secret=secret, public_url=os.environ["PUBLIC_URL"].rstrip("/"),
                    static_dir=os.environ.get("STATIC_DIR"), tls_verify=verify,
                    frame_ancestors=os.environ.get("FRAME_ANCESTORS", "'self'"),
-                   ehr_internal_url=(os.environ.get("EHR_INTERNAL_URL") or "").rstrip("/") or None)
+                   ehr_internal_url=(os.environ.get("EHR_INTERNAL_URL") or "").rstrip("/") or None,
+                   agent_url=(os.environ.get("AGENT_URL") or "").rstrip("/") or None)
 
 
 @dataclass
@@ -91,10 +98,13 @@ def pkce() -> tuple[str, str]:
     return verifier, challenge
 
 
-def create_app(settings: Settings, transport: httpx.BaseTransport | None = None) -> FastAPI:
+def create_app(settings: Settings, transport: httpx.BaseTransport | None = None,
+               agent_transport: httpx.BaseTransport | None = None) -> FastAPI:
     app = FastAPI(title="LocumView clinical gateway", docs_url=None, redoc_url=None, openapi_url=None)
     store = Store()
     client = httpx.Client(transport=transport, verify=settings.tls_verify, timeout=30, follow_redirects=False)
+    # A separate client: the agent is an in-cluster service, never the EHR, and gets no EHR token or TLS settings.
+    agent = httpx.Client(transport=agent_transport, timeout=30, follow_redirects=False)
     ehr_origin = "{0.scheme}://{0.netloc}".format(urlsplit(settings.ehr_fhir_base))
 
     def internal(url: str) -> str:
@@ -185,13 +195,9 @@ def create_app(settings: Settings, transport: httpx.BaseTransport | None = None)
         session = session_for(request)
         return ehr_get(session, f"{settings.ehr_fhir_base}/Patient/{session.patient}")
 
-    @app.get("/api/fhir/{resource_type}")
-    def search(resource_type: str, request: Request):
-        session = session_for(request)
-        if resource_type not in READABLE:
-            raise HTTPException(404, "Not a resource type this app reads")
-        # The launched patient, always: a patient or subject parameter from the browser is replaced.
-        params = {k: v for k, v in request.query_params.items() if k not in ("patient", "subject", "_id")}
+    def patient_search(session: Session, resource_type: str, params: dict | None = None) -> list[dict]:
+        """Every page of one search, pinned to the launched patient."""
+        params = {k: v for k, v in (params or {}).items() if k not in ("patient", "subject", "_id")}
         params["patient"] = session.patient
         bundle = ehr_get(session, f"{settings.ehr_fhir_base}/{resource_type}", params)
         entries = list(bundle.get("entry", []))
@@ -203,8 +209,33 @@ def create_app(settings: Settings, transport: httpx.BaseTransport | None = None)
                 raise HTTPException(502, "The EHR's next page is outside its FHIR base")
             bundle = ehr_get(session, nxt)
             entries += bundle.get("entry", [])
-        return JSONResponse({"resourceType": "Bundle", "type": "searchset", "total": len(entries),
-                             "entry": [{"resource": e["resource"]} for e in entries]})
+        return [e["resource"] for e in entries]
+
+    @app.get("/api/fhir/{resource_type}")
+    def search(resource_type: str, request: Request):
+        session = session_for(request)
+        if resource_type not in READABLE:
+            raise HTTPException(404, "Not a resource type this app reads")
+        # The launched patient, always: a patient or subject parameter from the browser is replaced.
+        resources = patient_search(session, resource_type, dict(request.query_params))
+        return JSONResponse({"resourceType": "Bundle", "type": "searchset", "total": len(resources),
+                             "entry": [{"resource": r} for r in resources]})
+
+    @app.get("/api/findings")
+    def findings(request: Request):
+        session = session_for(request)
+        if not settings.agent_url:
+            raise HTTPException(503, "The findings service is not set up")
+        resources = [ehr_get(session, f"{settings.ehr_fhir_base}/Patient/{session.patient}")]
+        for resource_type in FINDINGS_INPUT:
+            resources += patient_search(session, resource_type)
+        try:
+            reply = agent.post(f"{settings.agent_url}/v1/findings", json={"resources": resources})
+        except httpx.HTTPError:
+            raise HTTPException(502, "The findings service could not be reached") from None
+        if reply.status_code != 200:
+            raise HTTPException(502, f"The findings service returned HTTP {reply.status_code}")
+        return reply.json()
 
     if settings.static_dir:
         app.mount("/", StaticFiles(directory=settings.static_dir, html=True), name="app")
