@@ -16,8 +16,8 @@ resources:
 # build that is to be deployed; verify first: scripts/clinical/verify-images.sh
 images:
   - name: git.lan/mike/locumview-openemr
-    # commit 200a11c, clinical-images run 291; signature and SBOM attestation verified by CI 2026-11-09
-    digest: sha256:d4a6e5f2851f11efd93a6215e49be3eccbbe1c63aae9aa6a3c1c5fa161acfae6
+    # commit 609736e, clinical-images run 303 (patch 0003); signature and SBOM attestation verified by CI 2026-11-11
+    digest: sha256:dbeeff6a8bf8a6caa801a0611f4b6ef029a6b434baa6c826cb7cc816194559d7
   - name: git.lan/mike/locumview-clinical-gateway
     # commit d2cc459, clinical-images run 296; signature and SBOM attestation verified by CI 2026-11-10
     digest: sha256:b7e7d84ca6eec6477f4f45286ba13cfd2f192c3b0c27a09064351c153bdf16c6

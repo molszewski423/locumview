@@ -2010,3 +2010,10 @@ Agent: Claude Code
 - **Verification:** the `pharmacist` account holds `patients`/`med` (MedicationRequest and AllergyIntolerance, which check it, answered 200 in the same launch). `podman build` of the OpenEMR image: every patch applies at `--fuzz=0`; the patched file keeps apache:apache 400, has both changed checks, and passes `php -l`. `clinical/app/e2e.sh` on a fresh local OpenEMR with all three patches and the real model: PASS (LV-bsi-enterobacter-ampc-01, exact finding, explanation shown). Not done here: a launch by a non-admin account on the local instance; that is the M5 rerun on the cluster after this image is pinned and deployed.
 
 Agent: Claude Code
+
+## 120. OpenEMR image with patch 0003 pinned (2026-11-11)
+
+- **Done:** `kustomization.yaml` pins the OpenEMR image that clinical-images run 303 built and signed from commit 609736e (patches 0001 to 0003). The agent and gateway stay at run 296's images: their sources did not change.
+- **Verification:** digest copied from run 303's Verify step, where CI verified its signature and SBOM attestation; `scripts/clinical/verify-images.sh` checks it again before applying. Deploy: the owner's script from #118 (verify, diff, confirm, apply, rollouts); the diff should show only OpenEMR's Deployment. Then the M5 rerun on the desktop as the non-admin `pharmacist` account.
+
+Agent: Claude Code
