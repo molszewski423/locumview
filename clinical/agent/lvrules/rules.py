@@ -201,6 +201,9 @@ def iv_to_po_switch(s: Snapshot, kb: Knowledge) -> list[Finding]:
     stable, evidence = _stable(s, kb)
     if not stable:
         return []
+    # The guideline for each charted condition the knowledge base knows, after the stewardship guideline.
+    condition_refs = tuple(dict.fromkeys(ref for problem in s.problems for name in kb.condition_of(problem.icd10)
+                                         for ref in kb.conditions[name].get("refs", ())))
     out = []
     for p in s.active_antimicrobials():
         if p.route != "IV":
@@ -211,7 +214,7 @@ def iv_to_po_switch(s: Snapshot, kb: Knowledge) -> list[Finding]:
                                 f"Clinically stable on IV {kb.display(p.agent).lower()}; oral options the data "
                                 f"supports: {'; '.join(options)}. Confirm the patient is taking food and drink "
                                 "by mouth before switching.",
-                                evidence + [f"Active: {p.text}, started {p.start}"]))
+                                evidence + [f"Active: {p.text}, started {p.start}"], condition_refs))
     return out
 
 

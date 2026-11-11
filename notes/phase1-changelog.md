@@ -2026,3 +2026,14 @@ Agent: Claude Code
 - **M5 Done:** the plan's criterion (a pharmacist at the LocumView desktop, launching from an OpenEMR chart in patient context, sees at least one stewardship and one IV to PO finding with the agent's explanation, on synthetic data and local models) is met. Next: M6, the owner's review of every case, and ADR 0019's build, which closes M3.
 
 Agent: Claude Code
+
+## 122. Phase 9 lite M6: condition-specific IV to PO references; explanation prompt v2 (2026-11-11)
+
+The first two items of the owner's case review (M6), both found during M4 (#116).
+
+- **IV to PO references (knowledge base 0.2.0):** the IV to PO rule cited the community-acquired pneumonia guideline for every case, including the two pyelonephritis cases. It now cites the stewardship guideline plus the guideline of each charted condition the knowledge base knows: pneumonia `ats-idsa-cap-2019`, and a new condition `pyelonephritis` (ICD-10 N10) with `idsa-cuti-2025`, the reference both pyelonephritis cases cite. A pyelonephritis condition has no recommended duration, so the duration rule ignores it. New tests: every finding cites only references its case cites (the cases' citations passed the owner's clinical review in M2; the old pneumonia citation fails it), and IV to PO cites the condition's guideline. For the owner: the cases mark `idsa-cuti-2025` "owner to confirm" as the current oral step-down guidance.
+- **Explanation prompt v2 (`prompts/explain-v2.txt`, `model.json`; v1 unchanged):** with v1 the meningitis explanation ended by repeating the rule's summary, "add ampicillin" included, because v1 asked the model to end with the summary's confirmation request. A first v2 that keyed on a sentence beginning "Confirm" did not stop it (one run even prefixed the repeated summary with "Confirm"). The summary, with any confirmation it asks for, is shown directly above the explanation, so v2 asks the model not to repeat any sentence of it and to end on why the finding matters, with no request or recommendation. The finding itself still asks the pharmacist to confirm oral intake (owner decision, 2026-11-09).
+- **Verification:** agent `run.sh test`: 62 tests (35 rules, 2 new). `try_explanations.py` with `gemma4:26b` and v2, two runs: 9 of 9 explanations pass the guard in each, none repeats the summary or adds a request, and the pyelonephritis explanations name the cUTI guideline. Noted for the review: one cellulitis explanation left out the "day 12 of about 5" context, which the summary above it states.
+- **Deploy:** the agent image changes (knowledge base, prompt); after merge, CI builds it and a follow-up commit pins it.
+
+Agent: Claude Code

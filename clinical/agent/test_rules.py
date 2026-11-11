@@ -68,6 +68,22 @@ class KnowledgeTests(unittest.TestCase):
         for name, agent in KB.agents.items():
             self.assertTrue(set(agent) <= {"display", *rule_flags}, name)
 
+    def test_every_finding_cites_only_what_its_reviewed_case_cites(self):
+        # The cases' citations were approved in the owner's clinical review (M2); a rule citing anything else, such
+        # as the pneumonia guideline for pyelonephritis (fixed in M6), is a knowledge-base error.
+        for path in sorted(CASES.glob("*.json")):
+            c = json.loads(path.read_text())
+            cited = {r if isinstance(r, str) else r["ref"] for r in c["citations"]}
+            for f in evaluate(from_case(c, KB), KB, set(c["modules"])):
+                with self.subTest(case=c["id"], rule=f.rule):
+                    self.assertEqual(set(f.refs) - cited, set())
+
+    def test_iv_to_po_cites_the_guideline_of_the_condition(self):
+        refs = {c: set(evaluate(from_case(case(c), KB), KB, {"iv-to-po"})[0].refs)
+                for c in ("cap-levofloxacin-ivpo-01", "pyelo-ivpo-ambiguous-01")}
+        self.assertEqual(refs["cap-levofloxacin-ivpo-01"], {"idsa-shea-asp-2016", "ats-idsa-cap-2019"})
+        self.assertEqual(refs["pyelo-ivpo-ambiguous-01"], {"idsa-shea-asp-2016", "idsa-cuti-2025"})
+
     def test_every_finding_cites_its_rule_references(self):
         c = case("uti-esbl-mismatch-01")
         for f in evaluate(from_case(c, KB), KB):

@@ -80,7 +80,7 @@ class ServiceTests(unittest.TestCase):
             create_app(Knowledge.load(), CITATIONS, "Mars/Olympus_Mons")
 
     def test_health_reports_the_knowledge_version(self):
-        self.assertEqual(self.client.get("/healthz").json(), {"status": "ok", "knowledge_version": "0.1.0"})
+        self.assertEqual(self.client.get("/healthz").json(), {"status": "ok", "knowledge_version": "0.2.0"})
 
     def test_no_api_documentation_is_served(self):
         for path in ("/docs", "/redoc", "/openapi.json"):
@@ -96,7 +96,7 @@ class ExplanationTests(unittest.TestCase):
         reply = self.client(fake).post("/v1/explanations", json={"resources": fixture("cap-levofloxacin-ivpo-01")})
         self.assertEqual(reply.status_code, 200)
         body = reply.json()
-        self.assertEqual(body["model"], {"name": "gemma4:26b", "digest": "sha256:" + "ab" * 32, "prompt": "prompts/explain-v1.txt"})
+        self.assertEqual(body["model"], {"name": "gemma4:26b", "digest": "sha256:" + "ab" * 32, "prompt": "prompts/explain-v2.txt"})
         (e,) = body["explanations"]
         self.assertEqual((e["type"], e["drug"], e["status"]), ("iv-to-po-switch", "Levofloxacin", "ok"))
         chat = [b for m, u, b in fake.requests if u.endswith("/api/chat")]
