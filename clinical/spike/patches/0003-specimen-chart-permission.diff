@@ -1,0 +1,24 @@
+--- a/apis/routes/_rest_routes_fhir_r4_us_core_3_1_0.inc.php
++++ b/apis/routes/_rest_routes_fhir_r4_us_core_3_1_0.inc.php
+@@ -549,7 +549,9 @@
+             // only allow access to data of binded patient
+             $return = (new FhirSpecimenRestController())->getAll($getParams, $request->getPatientUUIDString());
+         } else {
+-            RestConfig::request_authorization_check($request, "admin", "super");
++            // LocumView fix: a specimen is chart data, as its order (ServiceRequest) is; read it with the same chart
++            // permission instead of the superuser-only check, so clinicians, not only administrators, can read it.
++            RestConfig::request_authorization_check($request, "patients", "med");
+             $return = (new FhirSpecimenRestController())->getAll($getParams);
+         }
+ 
+@@ -560,7 +562,9 @@
+             // only allow access to data of binded patient
+             $return = (new FhirSpecimenRestController())->getOne($uuid, $request->getPatientUUIDString());
+         } else {
+-            RestConfig::request_authorization_check($request, "admin", "super");
++            // LocumView fix: a specimen is chart data, as its order (ServiceRequest) is; read it with the same chart
++            // permission instead of the superuser-only check, so clinicians, not only administrators, can read it.
++            RestConfig::request_authorization_check($request, "patients", "med");
+             $return = (new FhirSpecimenRestController())->getOne($uuid);
+         }
+ 
