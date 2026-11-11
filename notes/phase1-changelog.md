@@ -2017,3 +2017,12 @@ Agent: Claude Code
 - **Verification:** digest copied from run 303's Verify step, where CI verified its signature and SBOM attestation; `scripts/clinical/verify-images.sh` checks it again before applying. Deploy: the owner's script from #118 (verify, diff, confirm, apply, rollouts); the diff should show only OpenEMR's Deployment. Then the M5 rerun on the desktop as the non-admin `pharmacist` account.
 
 Agent: Claude Code
+
+## 121. Phase 9 lite M5 Done: the demo walkthrough on a desktop (2026-11-11)
+
+- **Walkthrough (owner run, 2026-11-11, after #120 was deployed):** on the desktop lv-test17 (on mikepc, opened through Guacamole), the owner signed in with an IdM account, opened the EHR from the image's launcher, passed Keycloak with TOTP, and signed in to OpenEMR as `pharmacist`, a new account in the Physicians access group with no administrator rights. From the chart of LV-bsi-enterobacter-ampc-01 the SMART launch opened the app on that patient with the stewardship finding "Suboptimal agent: Ceftriaxone" and the local model's explanation (culture, drug and start date, and the IDSA 2024 guidance). From LV-cap-levofloxacin-ivpo-01 it showed "IV to PO switch: Levofloxacin" with its explanation, which ended with the summary's request to confirm oral intake; the data and references were shown beside it. Both explanations were marked as written by `gemma4:26b` with prompt explain-v1.
+- **Before that:** the deploy of #120 (owner run of the script from #118): all 3 images verified, only OpenEMR's Deployment changed, rollouts complete, the agent's pinned-model check passed.
+- **Noted:** the IV to PO explanation took about a minute to appear: the first request after the model was unloaded loads it on the Ollama server. The app shows "Explaining…" meanwhile and the finding stands without it.
+- **M5 Done:** the plan's criterion (a pharmacist at the LocumView desktop, launching from an OpenEMR chart in patient context, sees at least one stewardship and one IV to PO finding with the agent's explanation, on synthetic data and local models) is met. Next: M6, the owner's review of every case, and ADR 0019's build, which closes M3.
+
+Agent: Claude Code

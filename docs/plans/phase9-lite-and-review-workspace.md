@@ -1,7 +1,7 @@
 # Plan: Phase 9 lite and the Clinical Review Workspace
 
 Status: **In progress**. Written 2026-10-22. Phase 4's core release milestone is Done (changelog #70); M1, the
-OpenEMR spike, is Done (changelog #72); the owner chose its option 4 (section 9). M2 is Done (changelog #73 to #75); M3 is in progress: its checks passed on a desktop (changelog #76 to #93); it closes once ADR 0019 (Proposed) is built. M4 is Done (changelog #110 to #118): rules, the patient's findings and the local model's explanations, live on the cluster since 2026-11-10. M5 is next. Decisions: ADR 0017 (and its update of 2026-10-22),
+OpenEMR spike, is Done (changelog #72); the owner chose its option 4 (section 9). M2 is Done (changelog #73 to #75); M3 is in progress: its checks passed on a desktop (changelog #76 to #93); it closes once ADR 0019 (Proposed) is built. M4 is Done (changelog #110 to #118): rules, the patient's findings and the local model's explanations, live on the cluster since 2026-11-10. M5 is Done (changelog #119 to #121): the demo walkthrough passed on a desktop on 2026-11-11. M6 is next. Decisions: ADR 0017 (and its update of 2026-10-22),
 ADR 0018. Data rules: `docs/policy/synthetic-data-and-independence.md`. Status of record: ROADMAP.md.
 
 ## 1. Sequence
@@ -116,6 +116,11 @@ the finding lacks. The cross-patient queue needs its own access design.
 - Prompts, model name and version, and the knowledge base are versioned in the repository.
 
 ### M5. Phase 9 lite demo criterion
+
+**Done** (2026-11-11, changelog #121): on the desktop lv-test17, a non-admin OpenEMR pharmacist account launched the
+app from two scenario charts and saw a stewardship and an IV to PO finding, each with the local model's explanation.
+The rehearsal first found that OpenEMR let only administrators read specimens; patch 0003 fixed it (changelog #119,
+#120).
 
 ADR 0017's walkthrough passes: a pharmacist signs in at the LocumView desktop, opens the clinical app from its icon,
 launches it from an OpenEMR chart in patient context, and sees at least one stewardship and one IV to PO finding with
