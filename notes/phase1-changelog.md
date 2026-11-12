@@ -2112,3 +2112,11 @@ Owner decisions of 2026-11-12, after an OpenEvidence answer (secondary sources) 
 - **Deploy:** the agent image changes; after merge CI builds it and a follow-up commit pins it.
 
 Agent: Claude Code
+
+## 129. Pin the agent image with #128 (2026-11-12)
+
+- **Done:** `kustomization.yaml` pins the agent image that the clinical-images run for merge commit 5427088 (#128; Gitea run 572) built and signed: knowledge base 0.5.0. OpenEMR and the gateway stay at their pinned images.
+- **Verification:** digest transcribed from that run's Verify step for `locumview-clinical-agent`; `scripts/clinical/verify-images.sh` verified the signature and SBOM attestation of all three pinned images ("all 3 images verified"), which also confirms the transcription.
+- **Deploy:** the owner's script from #118; the diff should show only the agent Deployment. Then recheck LV-pyelo-ivpo-ambiguous-01 (oral option "an oral third-generation cephalosporin such as cefpodoxime") and LV-cellulitis-duration-01 (explanation includes day 12 and about 5 days).
+
+Agent: Claude Code
