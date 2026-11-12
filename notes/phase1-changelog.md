@@ -2037,3 +2037,12 @@ The first two items of the owner's case review (M6), both found during M4 (#116)
 - **Deploy:** the agent image changes (knowledge base, prompt); after merge, CI builds it and a follow-up commit pins it.
 
 Agent: Claude Code
+
+## 123. Phase 9 lite M6: owner confirms the 2025 IDSA complicated UTI guideline (2026-11-12)
+
+- **Owner confirmation (2026-11-12):** the owner read the oral step-down guidance in `idsa-cuti-2025` (Trautner BW et al., PMID 41419213), which #122 put on screen under the IV to PO finding for pyelonephritis. It supports IV to oral step-down in improving complicated UTI and pyelonephritis on the rule's criteria (stable vitals, afebrile 24 hours, taking food and drink by mouth); an oral beta-lactam chosen by the cefazolin urinary surrogate (`pyelo-ivpo-ambiguous-01`); a fluoroquinolone or trimethoprim-sulfamethoxazole when susceptible (`pyelo-enterobacter-ambiguous-01`); and no switch while febrile, tachycardic or vomiting (`pyelo-matched-negative-01`'s reference answer).
+- **Changed:** the citation's note in `clinical/scenarios/citations.json` and the three cases' `supports` text now record the confirmation instead of "owner to confirm". No rule, threshold or reference answer changed.
+- **Still open for the owner:** four cases cite `idsa-amr-gn-2026` "owner to confirm the AmpC (or ESBL) recommendations are unchanged". Also noted for the case review: `pyelo-enterobacter-ambiguous-01`'s reference answer flags the AmpC concern as well, but the suboptimal-agent rule only fires for bacteremia, so only the IV to PO finding appears; `pyelo-ivpo-ambiguous-01`'s reference answer presents completing IV therapy and a longer total oral duration, which the finding's summary does not mention.
+- **Deploy:** the agent image includes `citations.json`, so CI rebuilds it after this merge. That build contains #122 too, so a single follow-up commit pins it, instead of pinning #122's build first.
+
+Agent: Claude Code
