@@ -1,0 +1,190 @@
+{
+  "schema": "locumview-case/1",
+  "id": "pyelo-kaerogenes-ivpo-01",
+  "version": "0.1.0",
+  "title": "Klebsiella aerogenes pyelonephritis, stable on ceftriaxone, ciprofloxacin the only oral option",
+  "kind": "finding",
+  "modules": [
+    "stewardship",
+    "iv-to-po"
+  ],
+  "provenance": {
+    "source": "synthetic",
+    "author": "Claude Code (draft for owner review)",
+    "created": "2026-11-12",
+    "clinical_review": {
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-12",
+      "notes": "Owner approved revision 2 of the M6 library-growth draft (with OpenEvidence's review)."
+    }
+  },
+  "story": "A 44-year-old woman with acute pyelonephritis is on IV ceftriaxone, hospital day 3. She has been afebrile for 36 hours, is eating, and her vital signs are normal. The urine grows Klebsiella aerogenes; blood cultures have no growth.",
+  "patient": {
+    "family": "Casebook",
+    "given": "Pia",
+    "birth_date": "1982-06-21",
+    "sex": "female"
+  },
+  "encounter": {
+    "class_code": "IMP",
+    "start": "2026-10-20T15:00:00-04:00",
+    "reason": "Fever, flank pain"
+  },
+  "problems": [
+    {
+      "title": "Acute pyelonephritis",
+      "diagnosis": "ICD10:N10",
+      "begdate": "2026-10-20"
+    }
+  ],
+  "prescriptions": [
+    {
+      "drug": "ceftriaxone 1000 MG Injection",
+      "rxnorm": "1665021",
+      "route": "IV",
+      "instructions": "1 g IV every 24 hours",
+      "start": "2026-10-20"
+    }
+  ],
+  "vitals": [
+    {
+      "taken": "2026-10-20T15:10:00-04:00",
+      "temperature_f": 102.0,
+      "pulse": 108,
+      "bps": 112,
+      "bpd": 70,
+      "respiration": 20,
+      "oxygen_saturation": 97
+    },
+    {
+      "taken": "2026-10-22T20:00:00-04:00",
+      "temperature_f": 98.8,
+      "pulse": 82,
+      "bps": 120,
+      "bpd": 74,
+      "respiration": 16,
+      "oxygen_saturation": 98
+    }
+  ],
+  "labs": [
+    {
+      "order_code": "LV-BMP",
+      "order_text": "Basic labs",
+      "collected": "2026-10-20T15:20:00-04:00",
+      "resulted": "2026-10-20T16:10:00-04:00",
+      "results": [
+        {
+          "loinc": "2160-0",
+          "text": "Creatinine [Mass/volume] in Serum or Plasma",
+          "value": "0.8",
+          "units": "mg/dL",
+          "range": "0.5-1.0",
+          "flag": "N"
+        },
+        {
+          "loinc": "6690-2",
+          "text": "Leukocytes [#/volume] in Blood by Automated count",
+          "value": "14.1",
+          "units": "10*3/uL",
+          "range": "4.0-11.0",
+          "flag": "H"
+        }
+      ]
+    }
+  ],
+  "cultures": [
+    {
+      "order_code": "630-4",
+      "order_text": "Bacteria identified in Urine by Culture",
+      "specimen": {
+        "snomed": "122575003",
+        "text": "Urine specimen"
+      },
+      "collected": "2026-10-20T15:30:00-04:00",
+      "resulted": "2026-10-22T09:00:00-04:00",
+      "organism": {
+        "snomed": "62592009",
+        "text": "Klebsiella aerogenes"
+      },
+      "colony_count": {
+        "loinc": "19090-0",
+        "text": "Colony count [#/volume] in Urine",
+        "value": ">100000",
+        "units": "CFU/mL"
+      },
+      "susceptibilities": [
+        {
+          "loinc": "28-1",
+          "drug": "Ampicillin",
+          "mic": ">=32",
+          "units": "ug/mL",
+          "interpretation": "R"
+        },
+        {
+          "loinc": "76-0",
+          "drug": "Cefazolin",
+          "mic": ">=64",
+          "units": "ug/mL",
+          "interpretation": "R"
+        },
+        {
+          "loinc": "141-2",
+          "drug": "Ceftriaxone",
+          "mic": "<=1",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "6644-9",
+          "drug": "Cefepime",
+          "mic": "<=1",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "185-9",
+          "drug": "Ciprofloxacin",
+          "mic": "<=0.25",
+          "units": "ug/mL",
+          "interpretation": "S"
+        },
+        {
+          "loinc": "516-5",
+          "drug": "Trimethoprim+Sulfamethoxazole",
+          "mic": ">=320",
+          "units": "ug/mL",
+          "interpretation": "R"
+        }
+      ]
+    }
+  ],
+  "expected_findings": [
+    {
+      "module": "iv-to-po",
+      "type": "iv-to-po-switch",
+      "drug": "Ceftriaxone",
+      "summary": "Clinically stable; ciprofloxacin is the susceptible oral option, with the AmpC note."
+    }
+  ],
+  "reference_answer": "Switch to ciprofloxacin 500 mg by mouth every 12 hours for 5 to 7 days in total, counting the IV days (IDSA 2025 cUTI); no oral cephalosporin for an AmpC organism. No AmpC finding is expected by design (no bacteremia); this is not an endorsement of continuing ceftriaxone for an AmpC organism in pyelonephritis, where IDSA's caution about invasive infection is debatable.",
+  "rationale": "Tests Klebsiella aerogenes (one SNOMED CT concept that also carries the former name Enterobacter aerogenes) end to end, and IV to PO for pyelonephritis without an oral cephalosporin option for an AmpC organism.",
+  "citations": [
+    {
+      "ref": "idsa-cuti-2025-ivpo",
+      "supports": "Oral switch once improving with an effective oral option; checked against IDSA's PDF 2026-11-12."
+    },
+    {
+      "ref": "idsa-cuti-2025-duration",
+      "supports": "5 to 7 days of a fluoroquinolone; checked against IDSA's PDF 2026-11-12."
+    },
+    {
+      "ref": "idsa-amr-gn-2026",
+      "supports": "Oral fluoroquinolone transition for AmpC organisms (Question 2.7); checked 2026-11-12."
+    },
+    {
+      "ref": "idsa-shea-asp-2016",
+      "supports": "Prospective audit and feedback of antibiotic therapy as a stewardship intervention."
+    }
+  ]
+}

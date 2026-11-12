@@ -81,7 +81,7 @@ trimethoprim-sulfamethoxazole); otherwise an oral agent every final isolate test
 urinary surrogate counts only for urine isolates, and nitrofurantoin is never offered as a step-down. IV to PO is
 not offered for meningitis or *S. aureus* bacteremia.
 
-## Known limits (version 0.6.0)
+## Known limits (version 0.7.0)
 
 - **Oral intake is not charted** in a structured form, in the cases or in OpenEMR. Owner decision, 2026-11-09: the
   IV to PO rule does not read it, and the finding asks the pharmacist to confirm intake before switching.
@@ -100,5 +100,5 @@ not offered for meningitis or *S. aureus* bacteremia.
 - **Reasons are fixed lines, not model output.** Each finding's data ends with a reviewed "Why it matters" line from the knowledge base (`why`), which the model restates; `try_explanations.py` reports whether each explanation keeps the line's key term. Criteria the model must not compare (such as the Listeria age criterion) go in the summary, not the data: given as data, the model once wrote that a 67-year-old "does not meet" an over-50 criterion.
 - **Fever, not severity, gates the AmpC exception.** With a temperature of 100.4 F or more in the last 24 hours (the IV to PO threshold and window), the bacteremia finding says the empiric-course exception does not apply yet; without fever it states the exception, since IDSA 2026 does not exclude bacteremia.
 - **Organisms are matched by SNOMED CT code.** A culture reported by name only matches no organism rule. Klebsiella aerogenes (62592009) is one concept that also carries its former name, Enterobacter aerogenes.
-- The knowledge base holds what the 14 cases need and the closest related agents. An agent, organism or test it does
+- The knowledge base holds what the 23 cases need and the closest related agents. An agent, organism or test it does
   not know is ignored, never guessed.

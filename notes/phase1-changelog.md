@@ -2181,3 +2181,19 @@ Agent: Claude Code
 - **Noted:** WHO 2025 is shown without a link (no DOI or PubMed record); its ISBN identifies it.
 
 Agent: Claude Code
+
+## 136. Phase 9 lite M6: library growth to 23 cases (2026-11-12)
+
+Eight cases drafted by Claude Code, reviewed by the owner with OpenEvidence (revision 2, approved 2026-11-12); knowledge base 0.7.0 adds two drug products checked in RxNorm (cefepime 2 g injection 1665088, ampicillin 2 g injection 1721476). The rules do not change.
+
+- **bsi-citrobacter-ampc-01 (ambiguous):** Citrobacter freundii bacteremia from pyelonephritis, afebrile and improving on ceftriaxone, prostatitis not suspected. Findings: suboptimal agent (the exception wording, afebrile) and IV to PO (ciprofloxacin; TMP-SMX; AmpC note). Acceptable answers ranked: oral non-beta-lactam step-down, cefepime, completing ceftriaxone (least preferred).
+- **pyelo-kaerogenes-ivpo-01 (finding):** Klebsiella aerogenes pyelonephritis; IV to PO with ciprofloxacin only, no oral cephalosporin for an AmpC organism; no AmpC finding by design (no bacteremia), stated as not an endorsement of ceftriaxone.
+- **bsi-kaerogenes-cefepime-negative-01:** cefepime at MIC 4 (SDD) with no ESBL gene: no finding, per IDSA 2026 Question 2.3 ("cefepime MIC is ≤8 µg/mL, provided an ESBL gene has not been identified", checked in IDSA's text).
+- **bsi-ecoli-esbl-mismatch-01 (finding):** ceftriaxone-resistant E. coli bacteremia: bug-drug mismatch on a blood isolate; reference answer per IDSA 2026 Questions 1.3 and 1.4 (carbapenem; piperacillin-tazobactam not with concomitant bacteremia) and the FDA ertapenem label (500 mg daily at a creatinine clearance of 30 or below), both checked.
+- **Negative controls:** `ciai-piptazo-alone-negative-01` (one anaerobic agent), `cellulitis-stop-date-negative-01` (a regression check: an order with a stop date, which OpenEMR stores as completed, is not reviewed; it cannot isolate the stop-date logic), `cap-febrile-iv-negative-01` (not yet stable for IV to PO), `meningitis-ampicillin-covered-negative-01` (Listeria already covered).
+- **Library:** 23 cases: 4 ambiguous, 10 finding, 9 negative-control.
+- **Gaps recorded for rule changes (not cases):** Listeria risk factors other than age (priority: a transplant recipient on vancomycin and ceftriaxone would be missed; the review notes that for the immunocompromised the cephalosporin backbone may also differ), severe CAP and the excluded groups, uncomplicated cystitis with the cefazolin surrogate, prostatitis-length courses in men, renal dose adjustment.
+- **Verification:** case checker 23 cases OK and its tests OK; agent tests 71 OK; every case gives exactly its expected findings from its case file and from its FHIR fixture (the 8 new fixtures recorded from a disposable local OpenEMR, then destroyed). `try_explanations.py` with `gemma4:26b`, prompt v2: 14 of 14 explanations pass the guard and keep their why key term; the new ones were read for misstatements.
+- **Deploy:** the agent image changes (knowledge base); after merge CI builds it and a follow-up commit pins it; the deploy script's scenario step loads the 8 new cases.
+
+Agent: Claude Code
