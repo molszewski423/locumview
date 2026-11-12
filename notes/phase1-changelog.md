@@ -2086,3 +2086,15 @@ Agent: Claude Code
 - **Deploy:** the owner's script from #118 (verify, diff, confirm, apply, rollouts, agent model check); the diff should show only the agent Deployment. Then recheck in the app: the pyelonephritis IV to PO finding cites the 2025 cUTI IV to oral paper, and the Enterobacter bacteremia finding shows the IDSA 2026 wording.
 
 Agent: Claude Code
+
+## 127. Phase 9 lite M6: #126 deployed and checked in the app (2026-11-12)
+
+- **Deploy (owner run, after #126 was merged):** the script from #118 on the operator laptop at main a5f6971: all 3 images verified, only `Deployment.clinical.agent` changed, rollouts complete, the agent's pinned-model check passed (gemma4:26b). Read-only checks from node1: the Deployment runs `locumview-clinical-agent@sha256:29b3e2ce...`, the pod is ready, and `/healthz` reports knowledge version 0.4.0.
+- **Walkthrough (owner, lv-test17, OpenEMR as `pharmacist`, SMART launch from the chart):**
+  - LV-pyelo-ivpo-ambiguous-01: "IV to PO switch: Ceftriaxone" offers "an oral cephalosporin the cefazolin urinary surrogate supports, such as cefpodoxime", with no longer-course or completing-IV wording; references are the stewardship guideline and the 2025 cUTI "Timing of Intravenous to Oral Antibiotics Transition" paper (Suppl 3, i68-i78).
+  - LV-bsi-enterobacter-ampc-01: "Suboptimal agent: Ceftriaxone" shows the IDSA 2026 wording (generally avoided even when susceptible; completing an empirically started course only if non-severe, improving and source controlled; cefepime the usual alternative) and cites only the 2026 guidance.
+  - Both explanations were written by `gemma4:26b` with prompt explain-v2 and restate only the finding's data.
+- **Found:** the first Guacamole connection to lv-test17 failed with "remote desktop server is currently unreachable"; guacd's log gave "DNS lookup failed (incorrect hostname?)" for the desktop's IdM name. A few minutes later the name resolved in IdM, AdGuard and inside the guacd pod, CoreDNS had logged no errors, and the reconnect worked. A transient lookup failure about two hours after node1 rebooted for updates; cause not found. If it recurs, capture guacd and CoreDNS logs at the moment of failure.
+- **Noted:** the 2026 AMR guidance shows "Clin Infect Dis. 2026 Aug 8" without volume and pages, as published online; add them when PubMed has them.
+
+Agent: Claude Code
