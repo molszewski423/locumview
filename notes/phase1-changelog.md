@@ -2138,3 +2138,13 @@ Agent: Claude Code
 - **Apply (owner, operator laptop):** `kubectl diff -k k8s/locumview` should change only the cloudflared Deployment (image and args); then `kubectl apply -k k8s/locumview` and `kubectl -n locumview rollout status deploy/cloudflared`. The rolling restart replaces both connector pods one at a time; an open Guacamole session may drop once and reconnect.
 
 Agent: Claude Code
+
+## 132. guacd NetworkPolicy: record the live Catalyst SSH rules in git; corrections to #131 (2026-11-12)
+
+- **Found:** the owner's `kubectl diff -k k8s/locumview` for #131 showed that `apply -k` would remove two guacd egress rules that exist only on the cluster: SSH (port 22) to the Catalyst desktop already in `CATALYST_VDI_CIDR` (its VNC rule, #105) and SSH to a second address. They serve the Guacamole "Catalyst terminal" SSH connections and were added live, outside git; this repository's history has no record of them. The owner applied #131 with `kubectl apply -f k8s/locumview/cloudflared.yaml` instead, so the rules stayed.
+- **Change (owner approved):** `networkpolicy.yaml` now has the same two rules in the same positions (egress[2] SSH to `CATALYST_VDI_CIDR`, egress[3] SSH to a new site value `CATALYST_VDI2_CIDR`), with kustomize replacements and a `site.env.example` line. Real addresses stay in the git-ignored `site.env`. Rendered with placeholder values, the guacd policy has the live structure: RDP to the desktop network, VNC and SSH to the first Catalyst desktop, SSH to the second.
+- **Open:** the second address did not answer ARP from node1 at the time of this change, and the Catalyst desktop VM on node1 had no LAN neighbour entry either, so which desktop it belongs to is the owner's to confirm. The rule mirrors the live one unchanged.
+- **Corrections to #131:** cloudflared 2026.9.3 already logged at info level (its default): the old pods' logs show tunnel registrations with timestamps, so `--loglevel info` changed nothing. Those logs show the last edge connection loss on the checked pod at 2026-11-11 17:13 UTC (a QUIC idle timeout, reconnected within a second) and none during the 2026-11-12 drops, so tunnel reconnects are unlikely to be their cause (the second old pod could not be checked before it terminated). The drops more likely happen between the Cloudflare edge and the browser. The upgrade to 2026.10.7 stays.
+- **Apply (owner, operator laptop):** add `CATALYST_VDI2_CIDR` (the second address from the live policy, as a /32) to `k8s/locumview/site.env`, then `kubectl diff -k k8s/locumview`: the guacd policy should show no rule change. Then `kubectl apply -k k8s/locumview` is safe again.
+
+Agent: Claude Code

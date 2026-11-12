@@ -80,6 +80,13 @@ spec:
     # so this is narrower than the RDP rule. Each guest also accepts VNC only from the k3s nodes.
     - to: [{ipBlock: {cidr: CATALYST_VDI_CIDR}}]   # egress[1]: kustomization.yaml replacements
       ports: [{protocol: TCP, port: 5900}]
+    # Catalyst terminal connections (SSH) to the Catalyst desktops, by exact address (site values CATALYST_VDI_CIDR and
+    # CATALYST_VDI2_CIDR). These rules were added live on the cluster and are recorded here so `kubectl apply -k`
+    # keeps them (changelog #132).
+    - to: [{ipBlock: {cidr: CATALYST_VDI_CIDR}}]   # egress[2]: kustomization.yaml replacements
+      ports: [{protocol: TCP, port: 22}]
+    - to: [{ipBlock: {cidr: CATALYST_VDI2_CIDR}}]  # egress[3]: kustomization.yaml replacements
+      ports: [{protocol: TCP, port: 22}]
 ---
 # Keycloak: serves Guacamole's server-side JWKS fetch (browsers reach it via port-forward now, the tunnel later).
 apiVersion: networking.k8s.io/v1
