@@ -2205,3 +2205,12 @@ Agent: Claude Code
 - **Deploy:** the owner's script from #118; the diff should show only the agent Deployment, and its scenario step loads the eight new cases from #136. Then check LV-bsi-citrobacter-ampc-01 (two findings: suboptimal agent with the exception wording, IV to PO with ciprofloxacin and TMP-SMX) and one negative control.
 
 Agent: Claude Code
+
+## 138. Scenario loader assigns FHIR ids after loading (OpenEMR first-read race) (2026-11-12)
+
+- **Found (after #137 was deployed):** opening the app on a newly loaded patient (LV-bsi-citrobacter-ampc-01) failed: "The clinical app could not open: The EHR returned HTTP 500". The gateway logged `GET /api/fhir/Observation` 502; OpenEMR logged `Record has changed since last read in table 'procedure_report'; try restarting transaction` on `UPDATE procedure_report SET uuid = ?`. OpenEMR assigns a record's FHIR id on its first FHIR read, and the app reads resource types in parallel, so two first reads of the new patient's results raced and OpenEMR returned 500 without retrying. A second launch worked (the ids were then set) and showed both expected findings. The fixtures were recorded with sequential reads, which never race. Recorded as `docs/upstream/openemr-8.4.1.md` item 13.
+- **Change (owner approved):** `clinical/scenarios/load.py` ends every load with OpenEMR's own `UuidRegistry::populateAllMissingUuids()`, run inside the OpenEMR container like the HL7 importer (no credential leaves the cluster). It runs even when every case is skipped, so the next deploy also assigns ids to the cases loaded in #137 that had not been opened yet.
+- **Verification:** on a fresh local OpenEMR, loading `bsi-citrobacter-ampc-01` printed the new step, and afterwards no row lacked a uuid: procedure_order 3 of 3, procedure_report 5 of 5, procedure_result 17 of 17 had one (the cluster failure above shows they are unset after a load without the step). The local OpenEMR was destroyed. pre-commit exit 0.
+- **Deploy:** no image changes; the owner's deploy script runs the loader (scenario step), which now includes the step.
+
+Agent: Claude Code

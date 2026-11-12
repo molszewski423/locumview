@@ -57,6 +57,27 @@ echo json_encode(['result' => $result, 'match' => $match]), "\n";
 """
 
 
+UUIDS_PHP = r"""<?php
+// Gives every row that lacks one its FHIR id (uuid), with OpenEMR's own UuidRegistry. OpenEMR otherwise assigns them
+// on the first FHIR read, and two concurrent first reads (the app fetches resource types in parallel) can collide:
+// "Record has changed since last read in table 'procedure_report'" and HTTP 500 (docs/upstream/openemr-8.4.1.md #13).
+$_GET['site'] = 'default';
+$ignoreAuth = true;
+require_once '/var/www/localhost/htdocs/openemr/interface/globals.php';
+\OpenEMR\Common\Uuid\UuidRegistry::populateAllMissingUuids(false);
+echo "ok\n";
+"""
+
+
+def assign_missing_uuids():
+    """Assign FHIR ids to newly loaded records before any FHIR read (runs on every load, so it also covers records
+    loaded before this step existed)."""
+    done = target.php(target.install("uuids.php", UUIDS_PHP))
+    if done.returncode or done.stdout.strip().splitlines()[-1:] != ["ok"]:
+        raise SystemExit(f"assigning FHIR ids failed: {done.stdout[-400:]} {done.stderr[-400:]}")
+    print("FHIR ids assigned to records that had none")
+
+
 def run(*args, stdin=None):
     return subprocess.run([str(SPIKE / "run.sh"), *args], input=stdin, text=True, capture_output=True, check=True).stdout
 
@@ -292,6 +313,7 @@ def main(argv):
             load_background()
         for path in paths:
             load(json.loads(path.read_text()))
+        assign_missing_uuids()
 
 
 if __name__ == "__main__":
