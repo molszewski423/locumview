@@ -2120,3 +2120,11 @@ Agent: Claude Code
 - **Deploy:** the owner's script from #118; the diff should show only the agent Deployment. Then recheck LV-pyelo-ivpo-ambiguous-01 (oral option "an oral third-generation cephalosporin such as cefpodoxime") and LV-cellulitis-duration-01 (explanation includes day 12 and about 5 days).
 
 Agent: Claude Code
+
+## 130. Phase 9 lite M6: #129 deployed and checked in the app (2026-11-12)
+
+- **Deploy (owner run of the script from #118 at main 46c0e78):** all 3 images verified, only the agent Deployment changed, rollouts complete, model check passed. Read-only from node1: the agent runs `sha256:58b784aa...`, `/healthz` reports knowledge version 0.5.0.
+- **Walkthrough (owner, lv-test17, `pharmacist`):** LV-pyelo-ivpo-ambiguous-01's IV to PO finding offers "an oral third-generation cephalosporin such as cefpodoxime", with no cefazolin surrogate wording, citing the stewardship guideline and the 2025 cUTI IV to oral paper. LV-cellulitis-duration-01's data lists "Day 12 of antibiotics, since 2026-10-14" and "Recommended course about 5 days", and the explanation (gemma4:26b, prompt v2) now states both. LV-bsi-enterobacter-ampc-01 is unchanged under 0.5.0, as expected.
+- **Found:** the browser's connection to Guacamole dropped twice more during the walkthrough ("The Guacamole server is not currently reachable", then an automatic reconnect). Sessions before the drops lasted about 5 min 45 s, 17 min 45 s and 2 min 30 s; Guacamole, guacd and both cloudflared pods logged no errors, and at one drop Guacamole had not yet seen the disconnect, which points at the path between the browser and the cluster. cloudflared reports its version (2026.9.3) is outdated (2026.10.7 available). Investigation continues; no change made.
+
+Agent: Claude Code
