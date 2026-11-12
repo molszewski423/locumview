@@ -2128,3 +2128,13 @@ Agent: Claude Code
 - **Found:** the browser's connection to Guacamole dropped twice more during the walkthrough ("The Guacamole server is not currently reachable", then an automatic reconnect). Sessions before the drops lasted about 5 min 45 s, 17 min 45 s and 2 min 30 s; Guacamole, guacd and both cloudflared pods logged no errors, and at one drop Guacamole had not yet seen the disconnect, which points at the path between the browser and the cluster. cloudflared reports its version (2026.9.3) is outdated (2026.10.7 available). Investigation continues; no change made.
 
 Agent: Claude Code
+
+## 131. cloudflared 2026.10.7 with info logging, to trace Guacamole session drops (2026-11-12)
+
+- **Why:** the browser's connection to Guacamole dropped several times on 2026-11-12 (#127, #130) with no error in Guacamole, guacd or cloudflared, which logged only warnings. cloudflared's metrics show QUIC connection closures to the Cloudflare edge (2 and 4 on the two pods since 2026-11-10) and edge-location changes, but at warning level there are no timestamps to match them to the drops. The owner's machine showed no link, address or interface-error events at the drop times.
+- **Change (owner approved):** `k8s/locumview/cloudflared.yaml` moves from 2026.9.3 (which reports itself outdated) to 2026.10.7, pinned by the multi-arch index digest from Docker Hub (the same lookup returns the digest already pinned for 2026.9.3), and adds `--loglevel info` so each edge connection registration and loss is logged with a time. 2026.10.7 has been out since 2026-10-30; 2026.11.0, released today, is left for later. The release notes on GitHub list checksums only.
+- **Next, depending on the logs:** if edge connection losses line up with the drops, consider `--protocol http2` (TCP) instead of QUIC (UDP) in a separate change.
+- **Correction:** a `kubectl diff -k k8s/locumview` run from node1 failed silently because `site.env` exists only on the operator laptop; the owner's diff there is the check.
+- **Apply (owner, operator laptop):** `kubectl diff -k k8s/locumview` should change only the cloudflared Deployment (image and args); then `kubectl apply -k k8s/locumview` and `kubectl -n locumview rollout status deploy/cloudflared`. The rolling restart replaces both connector pods one at a time; an open Guacamole session may drop once and reconnect.
+
+Agent: Claude Code
