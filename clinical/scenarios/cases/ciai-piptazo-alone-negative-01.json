@@ -1,0 +1,113 @@
+{
+  "schema": "locumview-case/1",
+  "id": "ciai-piptazo-alone-negative-01",
+  "version": "0.1.0",
+  "title": "Perforated appendicitis on piperacillin-tazobactam alone after source control",
+  "kind": "negative-control",
+  "modules": [
+    "stewardship",
+    "iv-to-po"
+  ],
+  "provenance": {
+    "source": "synthetic",
+    "author": "Claude Code (draft for owner review)",
+    "created": "2026-11-12",
+    "clinical_review": {
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-12",
+      "notes": "Owner approved revision 2 of the M6 library-growth draft (with OpenEvidence's review)."
+    }
+  },
+  "story": "A 33-year-old woman had a laparoscopic appendectomy for perforated appendicitis with localized peritonitis. Source control is adequate; she is on piperacillin-tazobactam 4.5 g IV every 6 hours alone and improving on postoperative day 1.",
+  "patient": {
+    "family": "Casebook",
+    "given": "Rue",
+    "birth_date": "1993-02-11",
+    "sex": "female"
+  },
+  "encounter": {
+    "class_code": "IMP",
+    "start": "2026-10-22T02:00:00-04:00",
+    "reason": "Abdominal pain, fever"
+  },
+  "problems": [
+    {
+      "title": "Perforated appendicitis with localized peritonitis",
+      "diagnosis": "ICD10:K35.32",
+      "begdate": "2026-10-22"
+    }
+  ],
+  "prescriptions": [
+    {
+      "drug": "piperacillin 4000 MG / tazobactam 500 MG Injection",
+      "rxnorm": "1659149",
+      "start": "2026-10-22",
+      "route": "IV",
+      "instructions": "4.5 g IV every 6 hours"
+    }
+  ],
+  "vitals": [
+    {
+      "taken": "2026-10-22T02:10:00-04:00",
+      "temperature_f": 101.2,
+      "pulse": 106,
+      "bps": 118,
+      "bpd": 72,
+      "respiration": 20,
+      "oxygen_saturation": 98
+    },
+    {
+      "taken": "2026-10-23T08:00:00-04:00",
+      "temperature_f": 99.1,
+      "pulse": 86,
+      "bps": 122,
+      "bpd": 76,
+      "respiration": 16,
+      "oxygen_saturation": 98
+    }
+  ],
+  "labs": [
+    {
+      "order_code": "LV-BMP",
+      "order_text": "Basic labs",
+      "collected": "2026-10-22T02:20:00-04:00",
+      "resulted": "2026-10-22T03:10:00-04:00",
+      "results": [
+        {
+          "loinc": "2160-0",
+          "text": "Creatinine [Mass/volume] in Serum or Plasma",
+          "value": "0.7",
+          "units": "mg/dL",
+          "range": "0.5-1.0",
+          "flag": "N"
+        },
+        {
+          "loinc": "6690-2",
+          "text": "Leukocytes [#/volume] in Blood by Automated count",
+          "value": "16.9",
+          "units": "10*3/uL",
+          "range": "4.0-11.0",
+          "flag": "H"
+        }
+      ]
+    }
+  ],
+  "expected_findings": [],
+  "reference_answer": "No intervention: a single agent with anaerobic activity; plan about 4 days of antibiotics after source control.",
+  "rationale": "Negative control for the double-anaerobic-coverage rule: one agent that covers anaerobes must not trigger it.",
+  "citations": [
+    {
+      "ref": "idsa-ciai-2010",
+      "supports": "Single agents with anaerobic activity for complicated intra-abdominal infection."
+    },
+    {
+      "ref": "sis-iai-2024",
+      "supports": "Current SIS guideline, including duration after source control; its text is not yet read (see its citation note)."
+    },
+    {
+      "ref": "idsa-shea-asp-2016",
+      "supports": "Prospective audit and feedback of antibiotic therapy as a stewardship intervention."
+    }
+  ]
+}

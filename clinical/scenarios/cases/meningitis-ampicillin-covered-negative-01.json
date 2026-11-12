@@ -1,0 +1,125 @@
+{
+  "schema": "locumview-case/1",
+  "id": "meningitis-ampicillin-covered-negative-01",
+  "version": "0.1.0",
+  "title": "Suspected bacterial meningitis at 72 with ampicillin already in the regimen",
+  "kind": "negative-control",
+  "modules": [
+    "stewardship",
+    "iv-to-po"
+  ],
+  "provenance": {
+    "source": "synthetic",
+    "author": "Claude Code (draft for owner review)",
+    "created": "2026-11-12",
+    "clinical_review": {
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-12",
+      "notes": "Owner approved revision 2 of the M6 library-growth draft (with OpenEvidence's review)."
+    }
+  },
+  "story": "A 72-year-old woman, not immunocompromised, presents with fever, headache and neck stiffness; CSF shows a neutrophilic pleocytosis with low glucose. Empiric vancomycin, ceftriaxone 2 g every 12 hours, ampicillin 2 g every 4 hours and dexamethasone (with or before the first antibiotic dose) are started; cultures are pending.",
+  "patient": {
+    "family": "Casebook",
+    "given": "Wren",
+    "birth_date": "1954-07-08",
+    "sex": "female"
+  },
+  "encounter": {
+    "class_code": "IMP",
+    "start": "2026-10-24T19:00:00-04:00",
+    "reason": "Fever, headache, neck stiffness"
+  },
+  "problems": [
+    {
+      "title": "Suspected acute bacterial meningitis",
+      "diagnosis": "ICD10:G00.9",
+      "begdate": "2026-10-24"
+    }
+  ],
+  "prescriptions": [
+    {
+      "drug": "vancomycin 1000 MG Injection",
+      "rxnorm": "1807513",
+      "start": "2026-10-24",
+      "route": "IV",
+      "instructions": "Loading dose then 15 to 20 mg/kg IV every 8 to 12 hours, pharmacy to dose"
+    },
+    {
+      "drug": "ceftriaxone 2000 MG Injection",
+      "rxnorm": "1665046",
+      "start": "2026-10-24",
+      "route": "IV",
+      "instructions": "2 g IV every 12 hours"
+    },
+    {
+      "drug": "ampicillin 2000 MG Injection",
+      "rxnorm": "1721476",
+      "start": "2026-10-24",
+      "route": "IV",
+      "instructions": "2 g IV every 4 hours"
+    },
+    {
+      "drug": "dexamethasone phosphate 10 MG/ML Injectable Solution",
+      "rxnorm": "309696",
+      "start": "2026-10-24",
+      "route": "IV",
+      "instructions": "0.15 mg/kg (10 mg) IV every 6 hours, first dose with or before the first antibiotic dose"
+    }
+  ],
+  "vitals": [
+    {
+      "taken": "2026-10-24T19:10:00-04:00",
+      "temperature_f": 102.9,
+      "pulse": 112,
+      "bps": 132,
+      "bpd": 78,
+      "respiration": 22,
+      "oxygen_saturation": 96
+    }
+  ],
+  "labs": [
+    {
+      "order_code": "LV-BMP",
+      "order_text": "Basic labs",
+      "collected": "2026-10-24T19:30:00-04:00",
+      "resulted": "2026-10-24T20:20:00-04:00",
+      "results": [
+        {
+          "loinc": "2160-0",
+          "text": "Creatinine [Mass/volume] in Serum or Plasma",
+          "value": "0.8",
+          "units": "mg/dL",
+          "range": "0.5-1.0",
+          "flag": "N"
+        },
+        {
+          "loinc": "6690-2",
+          "text": "Leukocytes [#/volume] in Blood by Automated count",
+          "value": "19.2",
+          "units": "10*3/uL",
+          "range": "4.0-11.0",
+          "flag": "H"
+        }
+      ]
+    }
+  ],
+  "expected_findings": [],
+  "reference_answer": "No intervention: the empiric regimen covers Listeria (age over 50). Continue dexamethasone only if pneumococcal; narrow when cultures return.",
+  "rationale": "Negative control for the Listeria rule: ampicillin in the regimen must keep it silent.",
+  "citations": [
+    {
+      "ref": "idsa-meningitis-2004",
+      "supports": "Empiric vancomycin, ampicillin and a third-generation cephalosporin for adults over 50; dexamethasone."
+    },
+    {
+      "ref": "escmid-meningitis-2016",
+      "supports": "Empiric amoxicillin or ampicillin for Listeria in adults over 50."
+    },
+    {
+      "ref": "who-meningitis-2025",
+      "supports": "Ampicillin or amoxicillin added with Listeria risk factors, including age over 60; checked against the WHO document 2026-11-12."
+    }
+  ]
+}

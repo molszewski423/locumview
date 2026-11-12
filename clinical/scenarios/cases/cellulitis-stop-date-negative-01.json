@@ -1,0 +1,84 @@
+{
+  "schema": "locumview-case/1",
+  "id": "cellulitis-stop-date-negative-01",
+  "version": "0.1.0",
+  "title": "Cellulitis on cephalexin with a stop date set: regression check",
+  "kind": "negative-control",
+  "modules": [
+    "stewardship",
+    "iv-to-po"
+  ],
+  "provenance": {
+    "source": "synthetic",
+    "author": "Claude Code (draft for owner review)",
+    "created": "2026-11-12",
+    "clinical_review": {
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-12",
+      "notes": "Owner approved revision 2 of the M6 library-growth draft (with OpenEvidence's review)."
+    }
+  },
+  "story": "A 52-year-old man with cellulitis of the right forearm is on cephalexin 500 mg every 6 hours, day 6, with a stop date at the end of day 6 entered on day 1; he is improving.",
+  "patient": {
+    "family": "Casebook",
+    "given": "Sol",
+    "birth_date": "1974-09-03",
+    "sex": "male"
+  },
+  "encounter": {
+    "class_code": "IMP",
+    "start": "2026-10-18T09:00:00-04:00",
+    "reason": "Arm redness and swelling"
+  },
+  "problems": [
+    {
+      "title": "Cellulitis of the right upper limb",
+      "diagnosis": "ICD10:L03.113",
+      "begdate": "2026-10-18"
+    }
+  ],
+  "prescriptions": [
+    {
+      "drug": "cephalexin 500 MG Oral Capsule",
+      "rxnorm": "309114",
+      "start": "2026-10-18",
+      "end": "2026-10-23",
+      "route": "PO",
+      "instructions": "500 mg by mouth every 6 hours"
+    }
+  ],
+  "vitals": [
+    {
+      "taken": "2026-10-18T09:10:00-04:00",
+      "temperature_f": 100.6,
+      "pulse": 96,
+      "bps": 128,
+      "bpd": 80,
+      "respiration": 16,
+      "oxygen_saturation": 99
+    },
+    {
+      "taken": "2026-10-23T08:00:00-04:00",
+      "temperature_f": 98.2,
+      "pulse": 72,
+      "bps": 124,
+      "bpd": 78,
+      "respiration": 14,
+      "oxygen_saturation": 99
+    }
+  ],
+  "expected_findings": [],
+  "reference_answer": "No intervention: a 6-day course with a stop date fits IDSA 2014 (5 days, extended if not improving).",
+  "rationale": "A regression check: an order with a stop date is not sent for duration review. OpenEMR marks any order with an end date as completed, so this case cannot separate 'has a stop date' from 'not active'; both paths must stay silent. An active order with a future stop date cannot be stored in OpenEMR 8.4.1 (agent README, known limits).",
+  "citations": [
+    {
+      "ref": "idsa-ssti-2014",
+      "supports": "Five days for cellulitis, extended if not improved."
+    },
+    {
+      "ref": "idsa-shea-asp-2016",
+      "supports": "Prospective audit and feedback of antibiotic therapy as a stewardship intervention."
+    }
+  ]
+}

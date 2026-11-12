@@ -1,0 +1,109 @@
+{
+  "schema": "locumview-case/1",
+  "id": "cap-febrile-iv-negative-01",
+  "version": "0.1.0",
+  "title": "Community-acquired pneumonia on IV levofloxacin, day 2, still febrile and tachycardic",
+  "kind": "negative-control",
+  "modules": [
+    "stewardship",
+    "iv-to-po"
+  ],
+  "provenance": {
+    "source": "synthetic",
+    "author": "Claude Code (draft for owner review)",
+    "created": "2026-11-12",
+    "clinical_review": {
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-12",
+      "notes": "Owner approved revision 2 of the M6 library-growth draft (with OpenEvidence's review)."
+    }
+  },
+  "story": "A 63-year-old woman with community-acquired pneumonia is on IV levofloxacin 750 mg daily, hospital day 2: temperature 101.2 F, heart rate 108, oxygen saturation 92% on 2 L. She is not in the ICU and has no MRSA or Pseudomonas risk factors.",
+  "patient": {
+    "family": "Casebook",
+    "given": "Una",
+    "birth_date": "1963-05-27",
+    "sex": "female"
+  },
+  "encounter": {
+    "class_code": "IMP",
+    "start": "2026-10-22T16:00:00-04:00",
+    "reason": "Cough, fever, dyspnea"
+  },
+  "problems": [
+    {
+      "title": "Community-acquired pneumonia",
+      "diagnosis": "ICD10:J18.9",
+      "begdate": "2026-10-22"
+    }
+  ],
+  "prescriptions": [
+    {
+      "drug": "150 ML levofloxacin 5 MG/ML Injection",
+      "rxnorm": "1665515",
+      "start": "2026-10-22",
+      "route": "IV",
+      "instructions": "750 mg IV every 24 hours"
+    }
+  ],
+  "vitals": [
+    {
+      "taken": "2026-10-22T16:10:00-04:00",
+      "temperature_f": 102.4,
+      "pulse": 114,
+      "bps": 116,
+      "bpd": 70,
+      "respiration": 24,
+      "oxygen_saturation": 90
+    },
+    {
+      "taken": "2026-10-23T16:00:00-04:00",
+      "temperature_f": 101.2,
+      "pulse": 108,
+      "bps": 118,
+      "bpd": 72,
+      "respiration": 22,
+      "oxygen_saturation": 92
+    }
+  ],
+  "labs": [
+    {
+      "order_code": "LV-BMP",
+      "order_text": "Basic labs",
+      "collected": "2026-10-22T16:20:00-04:00",
+      "resulted": "2026-10-22T17:10:00-04:00",
+      "results": [
+        {
+          "loinc": "2160-0",
+          "text": "Creatinine [Mass/volume] in Serum or Plasma",
+          "value": "0.8",
+          "units": "mg/dL",
+          "range": "0.5-1.0",
+          "flag": "N"
+        },
+        {
+          "loinc": "6690-2",
+          "text": "Leukocytes [#/volume] in Blood by Automated count",
+          "value": "15.8",
+          "units": "10*3/uL",
+          "range": "4.0-11.0",
+          "flag": "H"
+        }
+      ]
+    }
+  ],
+  "expected_findings": [],
+  "reference_answer": "No intervention yet: reassess for oral levofloxacin 750 mg daily (bioequivalent, same dose) once clinically stable; at least 5 days in total for this regimen.",
+  "rationale": "Negative control for the IV to PO stability gate in pneumonia: febrile and tachycardic on day 2, before the duration review.",
+  "citations": [
+    {
+      "ref": "ats-idsa-cap-2019",
+      "supports": "Clinical stability before switching to oral therapy."
+    },
+    {
+      "ref": "idsa-shea-asp-2016",
+      "supports": "Prospective audit and feedback of antibiotic therapy as a stewardship intervention."
+    }
+  ]
+}
