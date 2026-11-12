@@ -3,7 +3,7 @@
   "id": "meningitis-alcohol-negative-01",
   "version": "0.1.0",
   "title": "Suspected bacterial meningitis at 48 with alcohol use disorder, on vancomycin and ceftriaxone without ampicillin",
-  "kind": "negative-control",
+  "kind": "ambiguous",
   "modules": [
     "stewardship"
   ],
@@ -18,7 +18,7 @@
       "notes": "Owner clinical review: revised text approved after conversion to a negative control."
     }
   },
-  "story": "A 48-year-old man with alcohol use disorder presents with fever, headache and neck stiffness; CSF shows a neutrophilic pleocytosis with low glucose. Empiric vancomycin, ceftriaxone and dexamethasone are started; cultures are pending. Ampicillin is not ordered; he is not immunocompromised.",
+  "story": "A 48-year-old man with alcohol use disorder presents with fever, headache and neck stiffness; CSF shows a neutrophilic pleocytosis with low glucose. Empiric vancomycin, ceftriaxone and dexamethasone are started; cultures are pending. Ampicillin is not ordered; he is not immunocompromised and has no cirrhosis.",
   "patient": {
     "family": "Casebook",
     "given": "Ned",
@@ -157,12 +157,24 @@
     }
   ],
   "expected_findings": [],
-  "reference_answer": "No intervention. Vancomycin plus a third-generation cephalosporin with dexamethasone is the empiric regimen for an adult under 50 who is not immunocompromised; alcohol use disorder is not an indication for empiric ampicillin. Narrow therapy when cultures return.",
-  "rationale": "A negative control at the age boundary: under 50, not immunocompromised, with alcohol use disorder. Alcohol use disorder is not a risk factor that calls for Listeria coverage (owner's clinical review, 2026-10-25). A rule that adds ampicillin for comorbidities other than age and immunocompromise fails this case.",
+  "reference_answer": "The Listeria rule does not fire: at 48 he is under the IDSA 2004 and ESCMID 2016 age criterion and not immunocompromised. Adding ampicillin is still defensible: WHO 2025 lists alcohol use disease as a Listeria risk factor. Narrow therapy when cultures return.",
+  "rationale": "An ambiguous case (owner review, 2026-11-12): the society guidelines the rule follows (IDSA 2004, ESCMID 2016) base Listeria coverage on age over 50 and immunocompromise, while WHO 2025 also lists alcohol use disease and liver cirrhosis. The rule must not fire on the society criteria, and a pharmacist who adds ampicillin is not wrong.",
   "citations": [
     {
       "ref": "idsa-meningitis-2004",
       "supports": "Empiric therapy by age and risk: ampicillin added for adults over 50 and the immunocompromised."
+    },
+    {
+      "ref": "escmid-meningitis-2016",
+      "supports": "Empiric amoxicillin or ampicillin for Listeria in adults over 50 and the immunocompromised."
+    },
+    {
+      "ref": "who-meningitis-2025",
+      "supports": "Listeria risk factors include alcohol use disease and liver cirrhosis besides age over 60; checked against the WHO document and approved by the owner, 2026-11-12."
     }
+  ],
+  "acceptable_answers": [
+    "Continue vancomycin, ceftriaxone and dexamethasone without ampicillin: he meets no IDSA 2004 or ESCMID 2016 criterion for Listeria coverage.",
+    "Add ampicillin 2 g IV every 4 hours until cultures exclude Listeria, because WHO 2025 lists alcohol use disease as a risk factor."
   ]
 }

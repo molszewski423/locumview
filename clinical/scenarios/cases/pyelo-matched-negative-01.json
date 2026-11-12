@@ -19,7 +19,7 @@
       "notes": "Owner clinical review: cases look good."
     }
   },
-  "story": "A 45-year-old woman admitted with acute pyelonephritis on IV ceftriaxone. On hospital day 2 the urine culture grows E. coli susceptible to ceftriaxone. She is still febrile and vomiting, and is not taking anything by mouth.",
+  "story": "A 45-year-old woman admitted with acute pyelonephritis on IV ceftriaxone. On hospital day 2 the urine culture grows E. coli susceptible to ceftriaxone. She is still febrile, tachycardic and vomiting, and is not taking anything by mouth.",
   "patient": {
     "family": "Casebook",
     "given": "Bea",

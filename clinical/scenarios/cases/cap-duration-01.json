@@ -1,0 +1,129 @@
+{
+  "schema": "locumview-case/1",
+  "id": "cap-duration-01",
+  "version": "0.1.0",
+  "title": "Nonsevere community-acquired pneumonia, stable, day 6 of oral levofloxacin without a stop date",
+  "kind": "finding",
+  "modules": [
+    "stewardship",
+    "iv-to-po"
+  ],
+  "provenance": {
+    "source": "synthetic",
+    "author": "Claude Code (draft for owner review)",
+    "created": "2026-11-12",
+    "clinical_review": {
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-12",
+      "notes": "Owner approved the positive pneumonia duration case (M6 review)."
+    }
+  },
+  "story": "A 54-year-old woman is admitted to a medical ward (not the ICU) with nonsevere community-acquired pneumonia and treated with oral levofloxacin 750 mg daily from admission. She was clinically stable by hospital day 3: afebrile, normal heart rate, respiratory rate, blood pressure and oxygen saturation, eating, and mentally normal. Blood and sputum cultures grew no S. aureus or Pseudomonas, and imaging shows no empyema. On day 6 levofloxacin is still active with no stop date.",
+  "patient": {
+    "family": "Casebook",
+    "given": "Nell",
+    "birth_date": "1972-04-17",
+    "sex": "female"
+  },
+  "encounter": {
+    "class_code": "IMP",
+    "start": "2026-10-18T10:00:00-04:00",
+    "reason": "Cough, fever"
+  },
+  "problems": [
+    {
+      "title": "Community-acquired pneumonia",
+      "diagnosis": "ICD10:J18.9",
+      "begdate": "2026-10-18"
+    }
+  ],
+  "prescriptions": [
+    {
+      "drug": "levofloxacin 750 MG Oral Tablet",
+      "rxnorm": "311296",
+      "start": "2026-10-18",
+      "route": "PO",
+      "instructions": "750 mg by mouth every 24 hours"
+    }
+  ],
+  "vitals": [
+    {
+      "taken": "2026-10-18T10:10:00-04:00",
+      "temperature_f": 101.4,
+      "pulse": 102,
+      "bps": 124,
+      "bpd": 76,
+      "respiration": 22,
+      "oxygen_saturation": 93
+    },
+    {
+      "taken": "2026-10-20T08:00:00-04:00",
+      "temperature_f": 98.6,
+      "pulse": 80,
+      "bps": 126,
+      "bpd": 78,
+      "respiration": 16,
+      "oxygen_saturation": 96
+    },
+    {
+      "taken": "2026-10-23T08:00:00-04:00",
+      "temperature_f": 98.2,
+      "pulse": 74,
+      "bps": 122,
+      "bpd": 74,
+      "respiration": 14,
+      "oxygen_saturation": 97
+    }
+  ],
+  "labs": [
+    {
+      "order_code": "LV-BMP",
+      "order_text": "Basic labs",
+      "collected": "2026-10-18T10:20:00-04:00",
+      "resulted": "2026-10-18T11:00:00-04:00",
+      "results": [
+        {
+          "loinc": "2160-0",
+          "text": "Creatinine [Mass/volume] in Serum or Plasma",
+          "value": "0.8",
+          "units": "mg/dL",
+          "range": "0.5-1.0",
+          "flag": "N"
+        },
+        {
+          "loinc": "6690-2",
+          "text": "Leukocytes [#/volume] in Blood by Automated count",
+          "value": "12.4",
+          "units": "10*3/uL",
+          "range": "4.0-11.0",
+          "flag": "H"
+        }
+      ]
+    }
+  ],
+  "expected_findings": [
+    {
+      "module": "stewardship",
+      "type": "duration-review",
+      "drug": "Levofloxacin",
+      "summary": "Day 6 of levofloxacin for nonsevere pneumonia, clinically stable since day 3, with no stop date; ATS 2025 suggests fewer than 5 days (at least 3) once stable."
+    }
+  ],
+  "reference_answer": "Set a stop date: she has been clinically stable since day 3 with nonsevere pneumonia, so ATS 2025 supports a total of fewer than 5 days (at least 3); stop levofloxacin now. A longer course would need a reason such as S. aureus, Pseudomonas, empyema or slow response, none of which applies.",
+  "rationale": "The positive pneumonia duration case (owner review, 2026-11-12). The duration rule follows ATS 2025 and fires from day 5 without a stop date; it does not judge severity or the excluded groups, so the story states nonsevere disease, no ICU, no S. aureus or Pseudomonas and no empyema, keeping the case valid when severity and complication checks are added. IV to PO does not apply: the drug is already oral.",
+  "citations": [
+    {
+      "ref": "ats-cap-2025",
+      "supports": "Fewer than 5 days (at least 3) once clinically stable in nonsevere CAP; 5 days or more in severe CAP; content from summaries, owner approved 2026-11-12."
+    },
+    {
+      "ref": "ats-idsa-cap-2019",
+      "supports": "Clinical stability criteria and agent choice for community-acquired pneumonia."
+    },
+    {
+      "ref": "idsa-shea-asp-2016",
+      "supports": "Stewardship review of antibiotic duration."
+    }
+  ]
+}

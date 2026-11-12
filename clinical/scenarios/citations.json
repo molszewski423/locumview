@@ -41,6 +41,14 @@
       "content_check": "owner",
       "note": "Checked 2026-11-12 against IDSA's published PDF on idsociety.org; owner approved. 5-7 days of a fluoroquinolone (conditional, moderate certainty) or 7 days of a non-fluoroquinolone (conditional, very low certainty) rather than 10-14 days, from the first day of effective therapy; no longer course for oral beta-lactams, though higher doses may be required; 10-14 days only for men with suspected prostatitis."
     },
+    "fda-cefpodoxime-label": {
+      "authors": "US Food and Drug Administration (manufacturer labeling)",
+      "title": "Cefpodoxime proxetil tablets, film coated: prescribing information",
+      "source": "DailyMed setid ce5646cb-a450-4c2c-8499-6ecf71b12b0e (published 2026-10-26)",
+      "metadata_checked": "2026-11-12",
+      "content_check": "owner",
+      "note": "Checked 2026-11-12 against the DailyMed label; owner approved: urinary indication is uncomplicated UTI (cystitis) only, 100 mg every 12 hours for 7 days; creatinine clearance below 30 mL/min every 24 hours; on hemodialysis 3 times a week after dialysis; food increases absorption; high-dose antacids or H2 blockers reduce it."
+    },
     "idsa-amr-gn-2024": {
       "authors": "Tamma PD, Heil EL, Justo JA, et al.",
       "title": "Infectious Diseases Society of America 2024 Guidance on the Treatment of Antimicrobial-Resistant Gram-Negative Infections",
@@ -114,6 +122,14 @@
       "metadata_checked": "2026-10-25",
       "content_check": "owner"
     },
+    "idsa-escmid-sab-2026": {
+      "authors": "Infectious Diseases Society of America; European Society of Clinical Microbiology and Infectious Diseases",
+      "title": "IDSA/ESCMID 2026 Consensus Statements on Staphylococcus aureus Bacteremia: Risk Stratification, Diagnostic Evaluation, and Management of Adults and Children",
+      "source": "idsociety.org/practice-guideline/staphylococcus-aureus-bacteremia/, published 2026-09-09, accessed 2026-11-12",
+      "metadata_checked": "2026-11-12",
+      "content_check": "owner",
+      "note": "Not yet in PubMed; update the source when it is. Checked 2026-11-12 on IDSA's page: initial evaluation includes follow-up blood cultures and transthoracic echocardiography; Consensus Statement 4: TEE may be unnecessary in adults with a negative good-quality TTE and no endocarditis increased-risk features. Management of MSSA and MRSA bacteremia is a future part."
+    },
     "idsa-ciai-2010": {
       "authors": "Solomkin JS, Mazuski JE, Bradley JS, et al.",
       "title": "Diagnosis and management of complicated intra-abdominal infection in adults and children: guidelines by the Surgical Infection Society and the Infectious Diseases Society of America",
@@ -123,6 +139,16 @@
       "note": "The 2024 IDSA update (Bonomo RA et al., PMID 38965057 and companions) covers risk assessment, imaging and microbiology, not antibiotic selection.",
       "metadata_checked": "2026-10-25",
       "content_check": "owner"
+    },
+    "sis-iai-2024": {
+      "authors": "Huston JM, Barie PS, Dellinger EP, et al.",
+      "title": "The Surgical Infection Society Guidelines on the Management of Intra-Abdominal Infection: 2024 Update",
+      "source": "Surg Infect (Larchmt). 2024;25(6):419-435",
+      "pmid": "38990709",
+      "doi": "10.1089/sur.2024.137",
+      "metadata_checked": "2026-11-12",
+      "content_check": "owner",
+      "note": "Metadata checked; the text is not yet read. Its abstract confirms recommendations on duration. Per a secondary summary, its new 4-day recommendations cover specific groups (percutaneous source control, sepsis, higher-risk patients) and 8 days for the critically ill; confirm that it carries forward the general 4-day course after adequate source control (STOP-IT) before a case relies on it."
     },
     "ats-idsa-cap-2019": {
       "authors": "Metlay JP, Waterer GW, Long AC, et al.",

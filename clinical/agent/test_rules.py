@@ -101,11 +101,19 @@ class KnowledgeTests(unittest.TestCase):
                 self.assertIn(("stewardship", "suboptimal-agent", "Ceftriaxone"), keys(c))
 
     def test_ampc_findings_limit_the_ceftriaxone_exception_to_an_empiric_course(self):
-        (f,) = [f for f in evaluate(from_case(case("bsi-enterobacter-ampc-01"), KB), KB)
-                if f.type == "suboptimal-agent"]
+        ampc = lambda c: [f for f in evaluate(from_case(c, KB), KB) if f.type == "suboptimal-agent"]
+        (f,) = ampc(case("bsi-enterobacter-ampc-01"))                     # febrile on day 2
         self.assertIn("moderate risk of inducible AmpC", f.summary)
-        self.assertIn("if it was started empirically, completing the course may be reasonable only if", f.summary)
+        self.assertIn("does not apply yet: fever in the last 24 hours", f.summary)
+        self.assertNotIn("may be reasonable", f.summary)
         self.assertIn("idsa-amr-gn-2026", f.refs)
+        # Bacteremic but afebrile: IDSA 2026 does not exclude bacteremia, so the exception wording stays.
+        c = case("bsi-enterobacter-ampc-01")
+        for v in c["vitals"]:
+            v["temperature_f"] = 98.6
+        (f,) = ampc(c)
+        self.assertIn("If it was started empirically, completing the course may be reasonable only if", f.summary)
+        self.assertNotIn("does not apply yet", f.summary)
         (f,) = evaluate(from_case(case("pyelo-enterobacter-ambiguous-01"), KB), KB, {"iv-to-po"})
         self.assertIn("if ceftriaxone was started empirically, completing the course may be reasonable", f.summary)
         self.assertIn("idsa-amr-gn-2026", f.refs)
@@ -144,6 +152,22 @@ class KnowledgeTests(unittest.TestCase):
         (f,) = evaluate(from_case(c, KB), KB, {"stewardship"})
         self.assertNotIn("who-meningitis-2025", f.refs)
         self.assertIn("lacks Listeria coverage", f.summary)            # IDSA and ESCMID: over 50
+
+    def test_every_finding_carries_its_reviewed_why_line(self):
+        for path in sorted(CASES.glob("*.json")):
+            c = json.loads(path.read_text())
+            for f in evaluate(from_case(c, KB), KB, set(c["modules"])):
+                with self.subTest(case=c["id"], rule=f.rule):
+                    why = [e for e in f.evidence if e.startswith("Why it matters: ")]
+                    self.assertEqual(len(why), 1)
+                    self.assertIn(why[0][len("Why it matters: "):],
+                                  [w["text"] for k, w in KB.why.items() if k.split("/")[0] == f.rule])
+
+    def test_listeria_finding_states_its_criteria(self):
+        (f,) = evaluate(from_case(case("meningitis-listeria-gap-01"), KB), KB, {"stewardship"})
+        self.assertIn("(Criterion: age over 50, IDSA 2004 and ESCMID 2016; WHO 2025, age over 60, cited as "
+                      "supporting evidence.)", f.summary)
+        self.assertFalse(any("riterion" in e for e in f.evidence))   # never as data the model may misread
 
     def test_every_finding_cites_its_rule_references(self):
         c = case("uti-esbl-mismatch-01")

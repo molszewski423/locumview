@@ -18,6 +18,7 @@ class Knowledge:
         self.conditions = data["conditions"]
         self.thresholds = data["thresholds"]
         self.rules = data["rules"]
+        self.why = {k: v for k, v in data.get("why", {}).items() if not k.startswith("_")}
 
     @classmethod
     def load(cls, path: Path = DEFAULT) -> "Knowledge":

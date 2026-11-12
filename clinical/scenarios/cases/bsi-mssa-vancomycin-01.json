@@ -196,12 +196,16 @@
       "summary": "MSSA bacteremia on vancomycin: an anti-staphylococcal beta-lactam (cefazolin, nafcillin or oxacillin) is preferred once oxacillin susceptibility is known."
     }
   ],
-  "reference_answer": "Change vancomycin to cefazolin 2 g IV every 8 hours (or nafcillin or oxacillin 2 g IV every 4 hours), adjusted for renal function. Repeat blood cultures to document clearance. No oral switch yet.",
+  "reference_answer": "Change vancomycin to cefazolin 2 g IV every 8 hours (or nafcillin or oxacillin 2 g IV every 4 hours), adjusted for renal function. Repeat blood cultures to document clearance, obtain a transthoracic echocardiogram (transesophageal by endocarditis risk), and request infectious diseases consultation. No oral switch yet.",
   "rationale": "Beta-lactams are more effective than vancomycin for MSSA bacteremia, and the switch also narrows therapy. The finding needs the organism, its oxacillin result and the current drug together. The IV to PO module should stay silent in early S. aureus bacteremia.",
   "citations": [
     {
       "ref": "idsa-crbsi-2009",
       "supports": "MSSA catheter-related bacteremia: a beta-lactam rather than vancomycin."
+    },
+    {
+      "ref": "idsa-escmid-sab-2026",
+      "supports": "Follow-up blood cultures and transthoracic echocardiography for every adult with S. aureus bacteremia; Consensus Statement 4: TEE by endocarditis risk after a negative good-quality TTE; checked on IDSA's page 2026-11-12."
     },
     {
       "ref": "clsi-m100",
