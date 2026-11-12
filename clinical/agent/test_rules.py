@@ -113,6 +113,7 @@ class KnowledgeTests(unittest.TestCase):
     def test_cuti_caution_only_for_amoxicillin_not_an_oral_third_generation_cephalosporin(self):
         # IDSA 2025 cUTI (owner decision, 2026-11-12): no warning for cefpodoxime after ceftriaxone; caution for amoxicillin.
         caution = "IDSA 2025 advises using amoxicillin cautiously"
+        # (pyelo-ivpo-ambiguous-01: ampicillin R, so amoxicillin is never its option)
         summary = lambda c: evaluate(from_case(c, KB), KB, {"iv-to-po"})[0].summary
         self.assertNotIn(caution, summary(case("pyelo-ivpo-ambiguous-01")))
         for gone in ("longer total course", "completing IV", "weaker supporting evidence"):
@@ -237,15 +238,28 @@ class RuleBoundaryTests(unittest.TestCase):
         c["cultures"] = []
         self.assertEqual(keys(c), [])
 
-    def test_iv_to_po_does_not_use_the_urinary_surrogate_for_another_specimen(self):
+    def test_iv_to_po_never_offers_the_cefazolin_surrogate_outside_uncomplicated_uti(self):
+        # CLSI limits the cefazolin urinary surrogate to uncomplicated UTI (owner decision, 2026-11-12).
+        for specimen in ({"snomed": "122575003", "text": "Urine specimen"}, {"snomed": "119297000", "text": "Blood specimen"}):
+            c = case("pyelo-ivpo-ambiguous-01")
+            c["cultures"][0]["specimen"] = specimen
+            for f in evaluate(from_case(c, KB), KB, {"iv-to-po"}):
+                self.assertNotIn("cefazolin urinary surrogate", f.summary)
+
+    def test_oral_third_generation_cephalosporin_after_ceftriaxone_in_complicated_uti_only(self):
+        caption = "an oral third-generation cephalosporin such as cefpodoxime"
+        (f,) = evaluate(from_case(case("pyelo-ivpo-ambiguous-01"), KB), KB, {"iv-to-po"})
+        self.assertIn(caption, f.summary)                                  # E. coli, ceftriaxone S, IDSA 2025
+        (f,) = evaluate(from_case(case("pyelo-enterobacter-ambiguous-01"), KB), KB, {"iv-to-po"})
+        self.assertNotIn(caption, f.summary)                               # AmpC organism: IDSA 2026
         c = case("pyelo-ivpo-ambiguous-01")
-        c["cultures"][0]["specimen"] = {"snomed": "119297000", "text": "Blood specimen"}
-        self.assertEqual(keys(c, {"iv-to-po"}), [])
+        c["problems"] = [{"title": "Community-acquired pneumonia", "diagnosis": "ICD10:J18.9", "begdate": "2026-10-19"}]
+        self.assertEqual(keys(c, {"iv-to-po"}), [])                        # not a complicated UTI
 
     def test_iv_to_po_never_offers_nitrofurantoin(self):
         c = case("pyelo-ivpo-ambiguous-01")
         c["cultures"][0]["susceptibilities"] = [x for x in c["cultures"][0]["susceptibilities"]
-                                                if x["loinc"] != "85422-4"]
+                                                if x["loinc"] not in ("85422-4", "141-2")]
         self.assertEqual(keys(c), [])
 
     def test_iv_to_po_asks_the_pharmacist_to_confirm_oral_intake(self):

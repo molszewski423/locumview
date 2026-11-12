@@ -1,6 +1,6 @@
 {
   "_note": "Knowledge base for the Phase 9 lite rules (plan M4). Versioned with the rules: raise version on every change. Every rule names the references in clinical/scenarios/citations.json it rests on. Codes: RxNorm (prescribed products), LOINC (susceptibility results), SNOMED CT (organisms, specimens), ICD-10-CM (problems). Group inducible-ampc holds IDSA 2026's moderate-risk AmpC organisms (Enterobacter cloacae complex, Klebsiella aerogenes, Citrobacter freundii, Hafnia alvei) by SNOMED CT code; 62592009 is one concept that also carries the former name Enterobacter aerogenes. IDSA's low-risk Serratia, Morganella and Providencia are deliberately not in it.",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "agents": {
     "amoxicillin": {"display": "Amoxicillin"},
     "ampicillin": {"display": "Ampicillin", "covers_listeria": true},
@@ -39,8 +39,8 @@
     "28-1": {"agent": "ampicillin", "oral_step_down": "amoxicillin", "cuti_caution": "IDSA 2025 advises using amoxicillin cautiously and with optimized dosing in complicated UTI."},
     "32-3": {"agent": "ampicillin-sulbactam"},
     "76-0": {"agent": "cefazolin"},
-    "85422-4": {"agent": "cefazolin", "urinary_surrogate": true, "oral_step_down": "an oral cephalosporin the cefazolin urinary surrogate supports, such as cefpodoxime"},
-    "141-2": {"agent": "ceftriaxone"},
+    "85422-4": {"agent": "cefazolin", "urinary_surrogate": true, "oral_step_down": "an oral cephalosporin the cefazolin urinary surrogate supports, such as cefpodoxime", "uncomplicated_uti_only": true},
+    "141-2": {"agent": "ceftriaxone", "oral_step_down": "an oral third-generation cephalosporin such as cefpodoxime", "complicated_uti_after_ceftriaxone": true},
     "185-9": {"agent": "ciprofloxacin", "oral_step_down": "ciprofloxacin"},
     "20396-8": {"agent": "levofloxacin", "oral_step_down": "levofloxacin"},
     "267-5": {"agent": "gentamicin"},
@@ -77,7 +77,7 @@
     "bacterial-meningitis": {"icd10_prefixes": ["G00"]},
     "cellulitis": {"icd10_prefixes": ["L03"], "recommended_days": 5, "review_after_days": 7, "refs": ["idsa-ssti-2014"]},
     "community-acquired-pneumonia": {"icd10_prefixes": ["J18"], "review_after_days": 4, "duration_text": "ATS 2025 suggests fewer than 5 days (at least 3) once clinically stable in nonsevere pneumonia, and 5 days or more in severe pneumonia", "refs": ["ats-idsa-cap-2019"], "duration_refs": ["ats-cap-2025"]},
-    "pyelonephritis": {"icd10_prefixes": ["N10"], "refs": ["idsa-cuti-2025-ivpo"], "cuti_oral_caution": true}
+    "pyelonephritis": {"icd10_prefixes": ["N10"], "refs": ["idsa-cuti-2025-ivpo"], "complicated_uti": true}
   },
   "thresholds": {
     "fever_f": 100.4,

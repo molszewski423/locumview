@@ -145,7 +145,10 @@ def duration_review(s: Snapshot, kb: Knowledge) -> list[Finding]:
                     out.append(_finding(kb, "duration-review", "duration-review", p.agent,
                                         f"Day {day} of antibiotics for {problem.title.lower()}; {guidance}; "
                                         f"{kb.display(p.agent).lower()} has no stop date.",
-                                        [f"Antibiotics since {start}", f"Active without stop date: {p.text}"],
+                                        [f"Day {day} of antibiotics, since {start}",
+                                         *([f"Recommended course about {cond['recommended_days']} days"]
+                                           if "recommended_days" in cond else []),
+                                         f"Active without stop date: {p.text}"],
                                         tuple(cond.get("duration_refs", cond.get("refs", ())))))
     return out
 
@@ -175,7 +178,7 @@ def _stable(s: Snapshot, kb: Knowledge) -> tuple[bool, list[str]]:
     return all(checks) and not recent_fever, evidence
 
 
-def _oral_options(s: Snapshot, p: Prescription, kb: Knowledge) -> list[str]:
+def _oral_options(s: Snapshot, p: Prescription, kb: Knowledge, cuti: bool = False) -> list[str]:
     """Oral agents the data supports: the same drug when it is bioequivalent by mouth, otherwise an oral agent every
     final isolate tests susceptible to. With no final isolate and no bioequivalent form there is no option."""
     if kb.has(p.agent, "oral_bioequivalent"):
@@ -191,6 +194,15 @@ def _oral_options(s: Snapshot, p: Prescription, kb: Knowledge) -> list[str]:
             if x.interpretation != "S" or "oral_step_down" not in test:
                 continue
             if test.get("urinary_surrogate") and c.specimen != "urine":
+                continue
+            # CLSI's cefazolin surrogate predicts oral cephalosporins only in uncomplicated UTI (owner decision,
+            # 2026-11-12); no condition in the knowledge base is an uncomplicated UTI yet, so it is not offered.
+            if test.get("uncomplicated_uti_only"):
+                continue
+            # IDSA 2025 cUTI: after improvement on ceftriaxone, an oral third-generation cephalosporin is a reasonable
+            # switch; IDSA 2026: not for moderate-risk AmpC organisms, where oral transition is TMP-SMX or a quinolone.
+            if test.get("complicated_uti_after_ceftriaxone") and not (
+                    cuti and p.agent == "ceftriaxone" and not kb.organism_in(c.organism_code, "inducible-ampc")):
                 continue
             options.add(test["oral_step_down"])
         per_isolate.append(options)
@@ -215,13 +227,13 @@ def iv_to_po_switch(s: Snapshot, kb: Knowledge) -> list[Finding]:
                                          for ref in kb.conditions[name].get("refs", ())))
     conditions = {name for problem in s.problems for name in kb.condition_of(problem.icd10)}
     cautions = {t["oral_step_down"]: t["cuti_caution"] for t in kb.tests.values() if t.get("cuti_caution")}
-    cuti = any(kb.conditions[n].get("cuti_oral_caution") for n in conditions)
+    cuti = any(kb.conditions[n].get("complicated_uti") for n in conditions)
     ampc = any(kb.organism_in(c.organism_code, "inducible-ampc") for c in s.final_isolates())
     out = []
     for p in s.active_antimicrobials():
         if p.route != "IV":
             continue
-        options = _oral_options(s, p, kb)
+        options = _oral_options(s, p, kb, cuti)
         if not options:
             continue
         drug = kb.display(p.agent).lower()
