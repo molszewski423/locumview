@@ -2197,3 +2197,11 @@ Eight cases drafted by Claude Code, reviewed by the owner with OpenEvidence (rev
 - **Deploy:** the agent image changes (knowledge base); after merge CI builds it and a follow-up commit pins it; the deploy script's scenario step loads the 8 new cases.
 
 Agent: Claude Code
+
+## 137. Pin the agent image with #136 (2026-11-12)
+
+- **Done:** `kustomization.yaml` pins the agent image that the clinical-images run for merge commit a2b81d9 (#136; Gitea run 598) built and signed: knowledge base 0.7.0. OpenEMR and the gateway stay at their pinned images.
+- **Verification:** digest transcribed from that run's Verify step for `locumview-clinical-agent`; `scripts/clinical/verify-images.sh` verified the signature and SBOM attestation of all three pinned images.
+- **Deploy:** the owner's script from #118; the diff should show only the agent Deployment, and its scenario step loads the eight new cases from #136. Then check LV-bsi-citrobacter-ampc-01 (two findings: suboptimal agent with the exception wording, IV to PO with ciprofloxacin and TMP-SMX) and one negative control.
+
+Agent: Claude Code
