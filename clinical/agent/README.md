@@ -34,7 +34,7 @@ after the findings, so a slow or missing model never holds the findings back.
 
 - **What the model sees:** one finding: its type, drug, summary, the data the rule used and its references' titles.
   Never the chart.
-- **Pinned:** `model.json` names the model, its digest, the prompt file (`prompts/explain-v1.txt`) and the
+- **Pinned:** `model.json` names the model, its digest, the prompt file (`prompts/explain-v2.txt`; v1 kept as it was) and the
   generation options (temperature 0, a fixed seed). The service refuses to explain (503) unless the Ollama server's
   copy of the model has that digest, so an evaluation build's explanations come from one known model. A new prompt is
   a new file, and `model.json` points at it.
@@ -74,14 +74,14 @@ after the findings, so a slow or missing model never holds the findings back.
 | `meningitis-listeria` | stewardship, missing-empiric-coverage | Empiric therapy for bacterial meningitis (ICD-10 G00) at age 50 or over without a Listeria-active agent | idsa-meningitis-2004, escmid-meningitis-2016 |
 | `double-anaerobic-coverage` | stewardship, redundant-coverage | An anaerobe-only agent (metronidazole) beside another agent that covers anaerobes | idsa-ciai-2010 |
 | `duration-review` | stewardship, duration-review | An active course with no stop date past the review point for cellulitis or pneumonia | idsa-shea-asp-2016 and the condition's guideline |
-| `iv-to-po-switch` | iv-to-po, iv-to-po-switch | An IV antimicrobial, a stable patient (newest vitals within limits, no fever for 24 hours) and an oral option the data supports | idsa-shea-asp-2016, ats-idsa-cap-2019 |
+| `iv-to-po-switch` | iv-to-po, iv-to-po-switch | An IV antimicrobial, a stable patient (newest vitals within limits, no fever for 24 hours) and an oral option the data supports | idsa-shea-asp-2016 and the guideline of each charted condition (pneumonia: ats-idsa-cap-2019; pyelonephritis: idsa-cuti-2025) |
 
 An oral option is the same drug when it is bioequivalent by mouth (levofloxacin, ciprofloxacin, metronidazole,
 trimethoprim-sulfamethoxazole); otherwise an oral agent every final isolate tests susceptible to. The cefazolin
 urinary surrogate counts only for urine isolates, and nitrofurantoin is never offered as a step-down. IV to PO is
 not offered for meningitis or *S. aureus* bacteremia.
 
-## Known limits (version 0.1.0)
+## Known limits (version 0.2.0)
 
 - **Oral intake is not charted** in a structured form, in the cases or in OpenEMR. Owner decision, 2026-11-09: the
   IV to PO rule does not read it, and the finding asks the pharmacist to confirm intake before switching.

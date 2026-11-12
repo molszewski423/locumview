@@ -96,7 +96,7 @@ class ExplainerTests(unittest.TestCase):
         self.assertEqual((method, url), ("POST", "http://ollama.test:11434/api/chat"))
         self.assertEqual((body["model"], body["stream"], body["think"]), ("gemma4:26b", False, False))
         self.assertEqual(body["options"], {"temperature": 0, "seed": 7, "num_predict": 400})
-        self.assertEqual(body["messages"][0]["content"], (HERE / "prompts" / "explain-v1.txt").read_text())
+        self.assertEqual(body["messages"][0]["content"], (HERE / "prompts" / "explain-v2.txt").read_text())
 
     def test_an_unguarded_reply_is_withheld_not_repaired(self):
         reply = explainer(FakeOllama(reply="Switch to doxycycline 100 mg.")).explain(self.finding)

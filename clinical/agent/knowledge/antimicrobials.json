@@ -1,6 +1,6 @@
 {
   "_note": "Knowledge base for the Phase 9 lite rules (plan M4). Versioned with the rules: raise version on every change. Every rule names the references in clinical/scenarios/citations.json it rests on. Codes: RxNorm (prescribed products), LOINC (susceptibility results), SNOMED CT (organisms, specimens), ICD-10-CM (problems).",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "agents": {
     "amoxicillin": {"display": "Amoxicillin"},
     "ampicillin": {"display": "Ampicillin", "covers_listeria": true},
@@ -72,7 +72,8 @@
   "conditions": {
     "bacterial-meningitis": {"icd10_prefixes": ["G00"]},
     "cellulitis": {"icd10_prefixes": ["L03"], "recommended_days": 5, "review_after_days": 7, "refs": ["idsa-ssti-2014"]},
-    "community-acquired-pneumonia": {"icd10_prefixes": ["J18"], "recommended_days": 5, "review_after_days": 7, "refs": ["ats-idsa-cap-2019"]}
+    "community-acquired-pneumonia": {"icd10_prefixes": ["J18"], "recommended_days": 5, "review_after_days": 7, "refs": ["ats-idsa-cap-2019"]},
+    "pyelonephritis": {"icd10_prefixes": ["N10"], "refs": ["idsa-cuti-2025"]}
   },
   "thresholds": {
     "fever_f": 100.4,
@@ -87,6 +88,6 @@
     "meningitis-listeria": {"module": "stewardship", "refs": ["idsa-meningitis-2004", "escmid-meningitis-2016"]},
     "double-anaerobic-coverage": {"module": "stewardship", "refs": ["idsa-ciai-2010"]},
     "duration-review": {"module": "stewardship", "refs": ["idsa-shea-asp-2016"]},
-    "iv-to-po-switch": {"module": "iv-to-po", "refs": ["idsa-shea-asp-2016", "ats-idsa-cap-2019"]}
+    "iv-to-po-switch": {"module": "iv-to-po", "refs": ["idsa-shea-asp-2016"]}
   }
 }
