@@ -38,7 +38,7 @@
       "doi": "10.1093/cid/ciag481",
       "metadata_checked": "2026-10-25",
       "content_check": "owner",
-      "note": "Newer than the drafting agent's knowledge; read and confirmed by the owner before a case relies on it."
+      "note": "Newer than the drafting agent's knowledge. 2026-11-12 (M6): the AmpC and ESBL changes were checked against IDSA's published 2026 text and approved by the owner: Hafnia alvei added as moderate AmpC risk; completing an empirically started ceftriaxone course may be reasonable in a non-severe infection with clinical improvement and source control (non-severe is not defined); presumed ESBL at a ceftriaxone MIC of 4 ug/mL or more; piperacillin-tazobactam an alternative for ESBL complicated UTI. Its uncomplicated cystitis wording is not yet checked."
     },
     "idsa-shea-asp-2016": {
       "authors": "Barlam TF, Cosgrove SE, Abbo LM, et al.",

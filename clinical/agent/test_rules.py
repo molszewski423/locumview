@@ -84,6 +84,40 @@ class KnowledgeTests(unittest.TestCase):
         self.assertEqual(refs["cap-levofloxacin-ivpo-01"], {"idsa-shea-asp-2016", "ats-idsa-cap-2019"})
         self.assertEqual(refs["pyelo-ivpo-ambiguous-01"], {"idsa-shea-asp-2016", "idsa-cuti-2025"})
 
+    def test_ampc_group_is_exactly_idsa_2026_moderate_risk_organisms(self):
+        # E. cloacae complex, K. aerogenes (62592009 also carries the former name Enterobacter aerogenes),
+        # C. freundii and its complex, H. alvei. Low-risk Serratia, Morganella and Providencia stay out (over-alerting).
+        group = {code for code in KB.organisms if KB.organism_in(code, "inducible-ampc")}
+        self.assertEqual(group, {"414102007", "62592009", "6265002", "782522004", "76694001"})
+
+    def test_ampc_rule_fires_for_each_moderate_risk_organism(self):
+        for code, name in (("62592009", "Klebsiella aerogenes"), ("6265002", "Citrobacter freundii"),
+                           ("782522004", "Citrobacter freundii complex"), ("76694001", "Hafnia alvei")):
+            c = case("bsi-enterobacter-ampc-01")
+            for culture in c["cultures"]:
+                culture["organism"] = {"snomed": code, "text": name}
+            with self.subTest(organism=name):
+                self.assertIn(("stewardship", "suboptimal-agent", "Ceftriaxone"), keys(c))
+
+    def test_ampc_findings_limit_the_ceftriaxone_exception_to_an_empiric_course(self):
+        (f,) = [f for f in evaluate(from_case(case("bsi-enterobacter-ampc-01"), KB), KB)
+                if f.type == "suboptimal-agent"]
+        self.assertIn("moderate risk of inducible AmpC", f.summary)
+        self.assertIn("if it was started empirically, completing the course may be reasonable only if", f.summary)
+        self.assertIn("idsa-amr-gn-2026", f.refs)
+        (f,) = evaluate(from_case(case("pyelo-enterobacter-ambiguous-01"), KB), KB, {"iv-to-po"})
+        self.assertIn("if ceftriaxone was started empirically, completing the course may be reasonable", f.summary)
+        self.assertIn("idsa-amr-gn-2026", f.refs)
+
+    def test_oral_beta_lactam_caveat_only_for_pyelonephritis_with_beta_lactam_options_only(self):
+        caveat = "Oral beta-lactams are alternative agents for pyelonephritis"
+        summary = {c: evaluate(from_case(case(c), KB), KB, {"iv-to-po"})[0].summary
+                   for c in ("pyelo-ivpo-ambiguous-01", "pyelo-enterobacter-ambiguous-01", "cap-levofloxacin-ivpo-01")}
+        self.assertIn(caveat, summary["pyelo-ivpo-ambiguous-01"])
+        self.assertNotIn(caveat, summary["pyelo-enterobacter-ambiguous-01"])   # fluoroquinolone and TMP-SMX options
+        self.assertNotIn(caveat, summary["cap-levofloxacin-ivpo-01"])
+        self.assertNotIn("AmpC", summary["pyelo-ivpo-ambiguous-01"])           # E. coli
+
     def test_every_finding_cites_its_rule_references(self):
         c = case("uti-esbl-mismatch-01")
         for f in evaluate(from_case(c, KB), KB):

@@ -51,17 +51,24 @@ def bug_drug_mismatch(s: Snapshot, kb: Knowledge) -> list[Finding]:
 
 
 def ampc_third_generation_cephalosporin(s: Snapshot, kb: Knowledge) -> list[Finding]:
-    """A third-generation cephalosporin for bacteremia with an organism that carries an inducible AmpC."""
+    """A third-generation cephalosporin for bacteremia with an organism at moderate risk of inducible AmpC.
+
+    IDSA 2026: generally avoided even when susceptible; completing an empirically started course may be reasonable in
+    a non-severe infection with clinical improvement and source control. The guidance does not define non-severe, so
+    the finding states the condition and leaves that judgment to the pharmacist (owner decision, 2026-11-12)."""
     out = []
     for p in s.active_antimicrobials():
         if not kb.has(p.agent, "third_generation_cephalosporin"):
             continue
+        drug = kb.display(p.agent).lower()
         for c in s.final_isolates():
             if c.specimen == "blood" and kb.organism_in(c.organism_code, "inducible-ampc"):
                 out.append(_finding(kb, "ampc-third-generation-cephalosporin", "suboptimal-agent", p.agent,
-                                    f"{c.organism} bacteremia on {kb.display(p.agent).lower()}: the organism can "
-                                    "derepress an inducible AmpC on therapy even when it tests susceptible; "
-                                    "cefepime is the usual alternative.",
+                                    f"{c.organism} bacteremia on {drug}: the organism has a moderate risk of "
+                                    f"inducible AmpC, so {drug} is generally avoided even when susceptible; if it "
+                                    "was started empirically, completing the course may be reasonable only if the "
+                                    "infection is non-severe, the patient is improving and the source is "
+                                    "controlled. Cefepime is the usual alternative.",
                                     [f"Blood culture collected {c.collected:%Y-%m-%d %H:%M}: {c.organism}",
                                      f"Active: {p.text}, started {p.start}"]))
                 break
@@ -204,17 +211,34 @@ def iv_to_po_switch(s: Snapshot, kb: Knowledge) -> list[Finding]:
     # The guideline for each charted condition the knowledge base knows, after the stewardship guideline.
     condition_refs = tuple(dict.fromkeys(ref for problem in s.problems for name in kb.condition_of(problem.icd10)
                                          for ref in kb.conditions[name].get("refs", ())))
+    conditions = {name for problem in s.problems for name in kb.condition_of(problem.icd10)}
+    beta_lactam_options = {t["oral_step_down"] for t in kb.tests.values() if t.get("oral_beta_lactam")}
+    ampc = any(kb.organism_in(c.organism_code, "inducible-ampc") for c in s.final_isolates())
     out = []
     for p in s.active_antimicrobials():
         if p.route != "IV":
             continue
         options = _oral_options(s, p, kb)
-        if options:
-            out.append(_finding(kb, "iv-to-po-switch", "iv-to-po-switch", p.agent,
-                                f"Clinically stable on IV {kb.display(p.agent).lower()}; oral options the data "
-                                f"supports: {'; '.join(options)}. Confirm the patient is taking food and drink "
-                                "by mouth before switching.",
-                                evidence + [f"Active: {p.text}, started {p.start}"], condition_refs))
+        if not options:
+            continue
+        drug = kb.display(p.agent).lower()
+        notes, refs = [], condition_refs
+        if ampc and kb.has(p.agent, "third_generation_cephalosporin"):
+            # IDSA 2026 (owner decision, 2026-11-12): the exception covers an empirically started course only.
+            notes.append(f"The organism has a moderate risk of inducible AmpC; if {drug} was started empirically, "
+                         "completing the course may be reasonable if the infection is non-severe, the patient is "
+                         "improving and the source is controlled; the susceptible oral options avoid the question.")
+            refs = refs + ("idsa-amr-gn-2026",)
+        if set(options) <= beta_lactam_options and any(kb.conditions[n].get("oral_beta_lactams_alternative")
+                                                       for n in conditions):
+            notes.append("Oral beta-lactams are alternative agents for pyelonephritis with weaker supporting "
+                         "evidence; if used, optimize dosing and consider a longer total course; completing IV "
+                         "therapy is also reasonable.")
+        out.append(_finding(kb, "iv-to-po-switch", "iv-to-po-switch", p.agent,
+                            " ".join([f"Clinically stable on IV {drug}; oral options the data supports: "
+                                      f"{'; '.join(options)}.", *notes,
+                                      "Confirm the patient is taking food and drink by mouth before switching."]),
+                            evidence + [f"Active: {p.text}, started {p.start}"], refs))
     return out
 
 
