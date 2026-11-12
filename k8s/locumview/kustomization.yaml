@@ -48,7 +48,9 @@ replacements:
   - source: {kind: ConfigMap, name: site-values, fieldPath: data.DESKTOP_CIDR}
     targets: [{select: {kind: NetworkPolicy, name: guacd}, fieldPaths: [spec.egress.0.to.0.ipBlock.cidr]}]
   - source: {kind: ConfigMap, name: site-values, fieldPath: data.CATALYST_VDI_CIDR}
-    targets: [{select: {kind: NetworkPolicy, name: guacd}, fieldPaths: [spec.egress.1.to.0.ipBlock.cidr]}]
+    targets: [{select: {kind: NetworkPolicy, name: guacd}, fieldPaths: [spec.egress.1.to.0.ipBlock.cidr, spec.egress.2.to.0.ipBlock.cidr]}]
+  - source: {kind: ConfigMap, name: site-values, fieldPath: data.CATALYST_VDI2_CIDR}
+    targets: [{select: {kind: NetworkPolicy, name: guacd}, fieldPaths: [spec.egress.3.to.0.ipBlock.cidr]}]
   - source: {kind: ConfigMap, name: site-values, fieldPath: data.IDM_CIDR}
     targets: [{select: {kind: NetworkPolicy, name: keycloak}, fieldPaths: [spec.egress.2.to.0.ipBlock.cidr]}]
   - source: {kind: ConfigMap, name: site-values, fieldPath: data.DB_NODE}
