@@ -19,7 +19,7 @@
       "notes": "Owner clinical review: cases look good."
     }
   },
-  "story": "A 74-year-old woman on postoperative day 2 after hip fracture repair develops dysuria and frequency without fever, flank pain or bacteremia. She has an ileus and takes nothing by mouth. Urine grows Enterobacter cloacae complex, resistant to the usual oral agents; she is on IV ceftriaxone.",
+  "story": "A 74-year-old woman on postoperative day 2 after hip fracture repair develops dysuria and frequency without fever, flank pain or bacteremia; she has no indwelling urinary catheter. She has an ileus and takes nothing by mouth. Urine grows Enterobacter cloacae complex, resistant to the usual oral agents; she is on IV ceftriaxone.",
   "patient": {
     "family": "Casebook",
     "given": "Fern",

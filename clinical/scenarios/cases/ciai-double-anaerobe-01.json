@@ -115,6 +115,10 @@
       "supports": "Single-agent regimens with anaerobic activity, including piperacillin-tazobactam, for complicated intra-abdominal infection; about 4 days after adequate source control."
     },
     {
+      "ref": "sis-iai-2024",
+      "supports": "Current SIS guideline on intra-abdominal infection, including duration; its text is not yet read (see its citation note)."
+    },
+    {
       "ref": "idsa-shea-asp-2016",
       "supports": "Prospective audit and feedback of antibiotic therapy as a stewardship intervention."
     }

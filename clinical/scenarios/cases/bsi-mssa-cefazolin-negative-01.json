@@ -212,7 +212,7 @@
     }
   ],
   "expected_findings": [],
-  "reference_answer": "No intervention: cefazolin is a preferred agent for MSSA bacteremia, the catheter is out, and repeat cultures are pending. No oral switch this early in S. aureus bacteremia.",
+  "reference_answer": "No intervention: cefazolin is a preferred agent for MSSA bacteremia, the catheter is out, and repeat cultures are pending. No oral switch this early in S. aureus bacteremia. Persistent fever on day 3 calls for echocardiography, with TEE if fever or bacteremia persists.",
   "rationale": "A negative control for de-escalation and IV to PO: therapy is already the preferred beta-lactam. Early oral step-down is not a standard recommendation for S. aureus bacteremia while febrile with clearance unconfirmed.",
   "citations": [
     {
@@ -226,6 +226,10 @@
     {
       "ref": "idsa-shea-asp-2016",
       "supports": "Stewardship programs promoting timely IV to oral transition once criteria are met."
+    },
+    {
+      "ref": "idsa-escmid-sab-2026",
+      "supports": "Transthoracic echocardiography for every adult with S. aureus bacteremia; TEE by endocarditis risk (Consensus Statement 4); checked on IDSA's page 2026-11-12."
     }
   ]
 }

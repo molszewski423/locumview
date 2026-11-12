@@ -28,10 +28,21 @@ class Finding:
 
 
 def _finding(kb: Knowledge, rule: str, type_: str, agent: str, summary: str, evidence: list[str],
-             extra_refs: tuple[str, ...] = ()) -> Finding:
+             extra_refs: tuple[str, ...] = (), variant: str = "") -> Finding:
     spec = kb.rules[rule]
+    # A reviewed reason the model restates instead of writing its own (owner decision, 2026-11-12).
+    why = kb.why.get(f"{rule}/{variant}" if variant else rule)
+    if why:
+        evidence = evidence + [f"Why it matters: {why['text']}"]
     return Finding(rule, spec["module"], type_, kb.display(agent), summary, tuple(evidence),
                    tuple(spec["refs"]) + extra_refs)
+
+
+def _recent_fever(s: Snapshot, kb: Knowledge) -> bool:
+    """A temperature at or above the fever threshold within the afebrile window before the newest charted time."""
+    window = s.as_of - timedelta(hours=kb.thresholds["afebrile_hours"])
+    return any(v.temperature_f is not None and v.temperature_f >= kb.thresholds["fever_f"]
+               for v in s.vitals if v.taken >= window)
 
 
 def bug_drug_mismatch(s: Snapshot, kb: Knowledge) -> list[Finding]:
@@ -63,14 +74,27 @@ def ampc_third_generation_cephalosporin(s: Snapshot, kb: Knowledge) -> list[Find
         drug = kb.display(p.agent).lower()
         for c in s.final_isolates():
             if c.specimen == "blood" and kb.organism_in(c.organism_code, "inducible-ampc"):
+                evidence = [f"Blood culture collected {c.collected:%Y-%m-%d %H:%M}: {c.organism}",
+                            f"Active: {p.text}, started {p.start}"]
+                # Same fever threshold and window as the IV to PO rule; "yet": the exception can apply once the
+                # fever resolves (owner decision, 2026-11-12).
+                if _recent_fever(s, kb):
+                    exception = ("The exception for completing an empirically started course (non-severe "
+                                 "infection, clinical improvement, source control) does not apply yet: fever in "
+                                 "the last 24 hours.")
+                    evidence.append(f"Temperature of {kb.thresholds['fever_f']} F or more in the last "
+                                    f"{kb.thresholds['afebrile_hours']} hours")
+                    variant = "febrile"
+                else:
+                    exception = ("If it was started empirically, completing the course may be reasonable only if "
+                                 "the infection is non-severe, the patient is improving and the source is "
+                                 "controlled.")
+                    variant = ""
                 out.append(_finding(kb, "ampc-third-generation-cephalosporin", "suboptimal-agent", p.agent,
                                     f"{c.organism} bacteremia on {drug}: the organism has a moderate risk of "
-                                    f"inducible AmpC, so {drug} is generally avoided even when susceptible; if it "
-                                    "was started empirically, completing the course may be reasonable only if the "
-                                    "infection is non-severe, the patient is improving and the source is "
-                                    "controlled. Cefepime is the usual alternative.",
-                                    [f"Blood culture collected {c.collected:%Y-%m-%d %H:%M}: {c.organism}",
-                                     f"Active: {p.text}, started {p.start}"]))
+                                    f"inducible AmpC, so {drug} is generally avoided even when susceptible. "
+                                    f"{exception} Cefepime is the usual alternative.",
+                                    evidence, variant=variant))
                 break
     return out
 
@@ -104,9 +128,14 @@ def meningitis_listeria(s: Snapshot, kb: Knowledge) -> list[Finding]:
         return []
     # WHO 2025 sets its Listeria age risk at over 60 (IDSA 2004, ESCMID 2016: over 50), so it is cited only above 60.
     who = ("who-meningitis-2025",) if age > kb.thresholds["listeria_age_who"] else ()
+    # The criterion is in the summary, not the data: given it as data, gemma4:26b wrote that the patient "does not
+    # meet" it (2026-11-12), an inversion the guard cannot catch.
     return [_finding(kb, "meningitis-listeria", "missing-empiric-coverage", "ampicillin",
                      f"Empiric therapy for suspected bacterial meningitis at age {age} lacks Listeria coverage: "
-                     "cephalosporins and vancomycin do not cover Listeria monocytogenes; add ampicillin.",
+                     "cephalosporins and vancomycin do not cover Listeria monocytogenes; add ampicillin. "
+                     f"(Criterion: age over {kb.thresholds['listeria_age']}, IDSA 2004 and ESCMID 2016"
+                     + (f"; WHO 2025, age over {kb.thresholds['listeria_age_who']}, cited as supporting evidence."
+                        if who else ".") + ")",
                      [f"Age {age}", "Problem: suspected bacterial meningitis",
                       "Active: " + ", ".join(kb.display(p.agent) for p in active)], who)]
 
@@ -166,9 +195,7 @@ def _stable(s: Snapshot, kb: Knowledge) -> tuple[bool, list[str]]:
         latest.oxygen_saturation is not None and latest.oxygen_saturation >= t["min_oxygen_saturation"],
         latest.systolic is not None and latest.systolic >= t["min_systolic"],
     ]
-    window = s.as_of - timedelta(hours=kb.thresholds["afebrile_hours"])
-    recent_fever = any(v.temperature_f is not None and v.temperature_f >= kb.thresholds["fever_f"]
-                       for v in s.vitals if v.taken >= window)
+    recent_fever = _recent_fever(s, kb)
     def n(x):
         return "?" if x is None else f"{x:g}"
     evidence = [f"Vitals {latest.taken:%Y-%m-%d %H:%M}: T {n(latest.temperature_f)} F, HR {n(latest.pulse)}, "

@@ -175,11 +175,11 @@
     }
   ],
   "acceptable_answers": [
-    "Switch to an oral third-generation cephalosporin (for example cefpodoxime), the isolate being ceftriaxone susceptible, with optimized dosing, for a total course of about 7 days (IDSA 2025).",
+    "Switch to an oral third-generation cephalosporin (for example cefpodoxime), the isolate being ceftriaxone susceptible, as cefpodoxime 200 to 400 mg every 12 hours (IDSA 2025 Table 1.2; above the labeled dose, which covers uncomplicated UTI only), taken with food (antacids and H2 blockers reduce absorption), every 24 hours below a creatinine clearance of 30 mL/min and three times a week after hemodialysis, for a total course of about 7 days (IDSA 2025).",
     "Continue IV ceftriaxone to complete a short course when oral therapy is not practical, documenting the reason.",
     "Discuss with the team or infectious diseases before switching, given the very low certainty of the evidence for short non-fluoroquinolone courses."
   ],
-  "reference_answer": "Flag the patient as meeting clinical IV to PO criteria with an oral third-generation cephalosporin such as cefpodoxime, supported by the isolate's ceftriaxone susceptibility: IDSA 2025 calls this a reasonable switch after improvement on ceftriaxone, with optimized dosing and a total course of about 7 days. The finding should not present the switch as the only defensible choice.",
+  "reference_answer": "Flag the patient as meeting clinical IV to PO criteria with an oral third-generation cephalosporin such as cefpodoxime, supported by the isolate's ceftriaxone susceptibility: IDSA 2025 calls this a reasonable switch after improvement on ceftriaxone, as cefpodoxime 200 to 400 mg every 12 hours (IDSA 2025 Table 1.2; above the labeled dose, which covers uncomplicated UTI only), taken with food (antacids and H2 blockers reduce absorption), every 24 hours below a creatinine clearance of 30 mL/min and three times a week after hemodialysis, for a total course of about 7 days. The finding should not present the switch as the only defensible choice.",
   "rationale": "She meets clinical switch criteria, and the only susceptible oral agents are beta-lactams. The 2011 IDSA guideline considered oral beta-lactams less effective for pyelonephritis and advised a longer course; the 2025 IDSA complicated UTI guideline supersedes it: after improvement on ceftriaxone an oral third-generation cephalosporin is a reasonable switch, with optimized dosing and 7 days total for a non-fluoroquinolone (very low certainty), and no longer course for beta-lactams. Nitrofurantoin does not reach renal tissue. It stays an ambiguous case because the evidence for short oral beta-lactam courses is limited (owner review, 2026-11-12).",
   "citations": [
     {
@@ -193,6 +193,10 @@
     {
       "ref": "idsa-cuti-2025-duration",
       "supports": "7 days of a non-fluoroquinolone rather than 10-14 days; no longer course for oral beta-lactams, though higher doses may be required; checked against IDSA's published PDF and approved by the owner, 2026-11-12."
+    },
+    {
+      "ref": "fda-cefpodoxime-label",
+      "supports": "Cefpodoxime's labeled urinary use is uncomplicated UTI only; renal adjustment, food and acid suppression; checked against the DailyMed label and approved by the owner, 2026-11-12."
     },
     {
       "ref": "clsi-m100",

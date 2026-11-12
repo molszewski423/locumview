@@ -159,7 +159,7 @@
       "summary": "Empiric therapy for suspected bacterial meningitis in a patient over 50 lacks ampicillin: cephalosporins and vancomycin do not cover Listeria monocytogenes."
     }
   ],
-  "reference_answer": "Add ampicillin 2 g IV every 4 hours (adjusted for renal function) to vancomycin, ceftriaxone and dexamethasone until cultures exclude Listeria. With a serious penicillin allergy, trimethoprim-sulfamethoxazole is the usual alternative for Listeria coverage. Narrow therapy once CSF and blood cultures and Gram stain results return.",
+  "reference_answer": "Add ampicillin 2 g IV every 4 hours (12 g a day; a full first dose, then longer intervals in renal impairment) to vancomycin, ceftriaxone and dexamethasone until cultures exclude Listeria. With a serious penicillin allergy, trimethoprim-sulfamethoxazole is the usual alternative for Listeria coverage. Narrow therapy once CSF and blood cultures and Gram stain results return.",
   "rationale": "Adults older than 50 have a higher risk of Listeria monocytogenes meningitis, which is intrinsically resistant to cephalosporins. IDSA and ESCMID empiric regimens for this age group add ampicillin (or amoxicillin) to vancomycin and a third-generation cephalosporin. The finding rests on age, the working diagnosis and the absence of an ampicillin order; no culture result is needed, so it should fire while cultures are still pending.",
   "citations": [
     {

@@ -80,7 +80,7 @@ class ServiceTests(unittest.TestCase):
             create_app(Knowledge.load(), CITATIONS, "Mars/Olympus_Mons")
 
     def test_health_reports_the_knowledge_version(self):
-        self.assertEqual(self.client.get("/healthz").json(), {"status": "ok", "knowledge_version": "0.5.0"})
+        self.assertEqual(self.client.get("/healthz").json(), {"status": "ok", "knowledge_version": "0.6.0"})
 
     def test_no_api_documentation_is_served(self):
         for path in ("/docs", "/redoc", "/openapi.json"):

@@ -110,12 +110,16 @@
       "summary": "Clinically stable, afebrile for 48 hours and eating: IV levofloxacin can change to the same dose by mouth."
     }
   ],
-  "reference_answer": "Change to levofloxacin 750 mg by mouth once daily, completing a 5-day total course if he stays clinically stable.",
+  "reference_answer": "Change to levofloxacin 750 mg by mouth once daily, completing a total course of 3 to 5 days if he stays clinically stable (ATS 2025: fewer than 5 days, at least 3, once stable in nonsevere pneumonia). Give oral levofloxacin at least 2 hours apart from magnesium or aluminum antacids, sucralfate, iron and zinc.",
   "rationale": "Levofloxacin's oral bioavailability is close to complete, so the oral dose matches the IV dose. He meets clinical stability criteria. The stewardship module has nothing to flag: the agent and dose are appropriate.",
   "citations": [
     {
       "ref": "ats-idsa-cap-2019",
       "supports": "Clinical stability and total duration of at least 5 days for community-acquired pneumonia; oral therapy once stable."
+    },
+    {
+      "ref": "ats-cap-2025",
+      "supports": "Antibiotic duration: fewer than 5 days (at least 3) once clinically stable in nonsevere CAP; content from summaries, owner approved 2026-11-12."
     },
     {
       "ref": "idsa-shea-asp-2016",

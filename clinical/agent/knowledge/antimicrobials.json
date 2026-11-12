@@ -1,6 +1,6 @@
 {
   "_note": "Knowledge base for the Phase 9 lite rules (plan M4). Versioned with the rules: raise version on every change. Every rule names the references in clinical/scenarios/citations.json it rests on. Codes: RxNorm (prescribed products), LOINC (susceptibility results), SNOMED CT (organisms, specimens), ICD-10-CM (problems). Group inducible-ampc holds IDSA 2026's moderate-risk AmpC organisms (Enterobacter cloacae complex, Klebsiella aerogenes, Citrobacter freundii, Hafnia alvei) by SNOMED CT code; 62592009 is one concept that also carries the former name Enterobacter aerogenes. IDSA's low-risk Serratia, Morganella and Providencia are deliberately not in it.",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "agents": {
     "amoxicillin": {"display": "Amoxicillin"},
     "ampicillin": {"display": "Ampicillin", "covers_listeria": true},
@@ -31,6 +31,7 @@
     "1665050": "cefazolin",
     "1665060": "cefazolin",
     "1665515": "levofloxacin",
+    "311296": "levofloxacin",
     "1807513": "vancomycin",
     "309114": "cephalexin",
     "311683": "metronidazole"
@@ -84,6 +85,17 @@
     "stability": {"max_temperature_f": 100.3, "max_pulse": 100, "max_respiration": 24, "min_oxygen_saturation": 90, "min_systolic": 90},
     "afebrile_hours": 24,
     "listeria_age": 50, "listeria_age_who": 60
+  },
+  "why": {
+    "_note": "One fixed line per rule (and variant) that the finding's data carries as 'Why it matters', so the model restates a reviewed reason instead of writing its own; 'key' is the term try_explanations.py checks the explanation keeps (owner decision, 2026-11-12).",
+    "bug-drug-mismatch": {"text": "the isolate tests resistant to the current antimicrobial, so it is not expected to treat this infection", "key": "resistant"},
+    "ampc-third-generation-cephalosporin": {"text": "the organism can derepress an inducible AmpC during therapy and become resistant to third-generation cephalosporins even when it first tests susceptible; completing an empirically started course is reasonable only in a non-severe, improving, source-controlled infection", "key": "AmpC"},
+    "ampc-third-generation-cephalosporin/febrile": {"text": "the organism can derepress an inducible AmpC during therapy and become resistant to third-generation cephalosporins even when it first tests susceptible; the exception for an empirically started course needs clinical improvement, which ongoing fever argues against", "key": "AmpC"},
+    "mssa-vancomycin": {"text": "for methicillin-susceptible S. aureus bacteremia, an anti-staphylococcal beta-lactam is preferred over vancomycin", "key": "beta-lactam"},
+    "meningitis-listeria": {"text": "Listeria monocytogenes is intrinsically resistant to cephalosporins and is not covered by vancomycin", "key": "Listeria"},
+    "double-anaerobic-coverage": {"text": "the other agent already covers anaerobes, so the second anaerobic agent adds no coverage", "key": "anaerob"},
+    "duration-review": {"text": "antibiotics continued past the recommended course add adverse effects and resistance pressure", "key": "adverse effects"},
+    "iv-to-po-switch": {"text": "switching a clinically stable patient to an effective oral agent avoids IV catheter complications and cost", "key": "catheter"}
   },
   "rules": {
     "bug-drug-mismatch": {"module": "stewardship", "refs": ["clsi-m100", "idsa-shea-asp-2016"]},
