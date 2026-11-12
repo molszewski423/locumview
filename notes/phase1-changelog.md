@@ -2078,3 +2078,11 @@ The owner asked that the local model be given the most current guidelines. The m
 - **Deploy:** the agent image changes; after merge CI builds it, and one follow-up commit pins it (it contains #122 to #125).
 
 Agent: Claude Code
+
+## 126. Pin the agent image with #122 to #125 (2026-11-12)
+
+- **Done:** `kustomization.yaml` pins the agent image that clinical-images run 320 built and signed from commit d5d2fd1 (merge of #125). It contains #122 (condition-specific IV to PO references, prompt v2), #123, #124 (IDSA 2026 AmpC wording and organisms) and #125 (current guidelines, knowledge base 0.4.0). The intermediate builds of #122 to #124 were never pinned. OpenEMR and the gateway stay at their pinned images: their sources did not change.
+- **Verification:** digest transcribed from run 320's Verify step for `locumview-clinical-agent`; `scripts/clinical/verify-images.sh` then verified the signature and SBOM attestation of all three pinned images against the project key ("all 3 images verified"), which also confirms the transcription.
+- **Deploy:** the owner's script from #118 (verify, diff, confirm, apply, rollouts, agent model check); the diff should show only the agent Deployment. Then recheck in the app: the pyelonephritis IV to PO finding cites the 2025 cUTI IV to oral paper, and the Enterobacter bacteremia finding shows the IDSA 2026 wording.
+
+Agent: Claude Code
