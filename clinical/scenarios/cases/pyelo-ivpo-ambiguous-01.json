@@ -171,24 +171,28 @@
       "module": "iv-to-po",
       "type": "iv-to-po-switch",
       "drug": "Ceftriaxone",
-      "summary": "Clinical criteria for an oral switch are met, but the only susceptible oral options for pyelonephritis are beta-lactams."
+      "summary": "Clinical criteria for an oral switch are met; the susceptible oral option is an oral cephalosporin the cefazolin urinary surrogate supports, such as cefpodoxime."
     }
   ],
   "acceptable_answers": [
-    "Switch to an oral cephalosporin the cefazolin surrogate supports (for example cefpodoxime), completing a longer total course than with a fluoroquinolone, and document the reasoning.",
-    "Continue IV ceftriaxone to complete the course, given that oral beta-lactams are considered less effective for pyelonephritis than fluoroquinolones or TMP-SMX.",
-    "Discuss with the team or infectious diseases before choosing between the two."
+    "Switch to an oral third-generation cephalosporin the cefazolin surrogate supports (for example cefpodoxime) with optimized dosing, for a total course of about 7 days (IDSA 2025).",
+    "Continue IV ceftriaxone to complete a short course when oral therapy is not practical, documenting the reason.",
+    "Discuss with the team or infectious diseases before switching, given the very low certainty of the evidence for short non-fluoroquinolone courses."
   ],
-  "reference_answer": "Flag the patient as meeting clinical IV to PO criteria and present both options: an oral cephalosporin with a longer total duration, or completing IV therapy. Either is defensible; the finding should not claim a single correct choice.",
-  "rationale": "An ambiguous case: reasonable pharmacists differ. She meets clinical switch criteria, but the susceptible oral agents are beta-lactams, which the 2011 IDSA guideline considers less effective for pyelonephritis, recommending a longer course if used. Nitrofurantoin does not reach renal tissue. The newer IDSA complicated UTI guideline may change this balance; the owner reviews it before this case is approved.",
+  "reference_answer": "Flag the patient as meeting clinical IV to PO criteria with an oral third-generation cephalosporin the cefazolin surrogate supports, such as cefpodoxime: IDSA 2025 calls this a reasonable switch after improvement on ceftriaxone, with optimized dosing and a total course of about 7 days. The finding should not present the switch as the only defensible choice.",
+  "rationale": "She meets clinical switch criteria, and the only susceptible oral agents are beta-lactams. The 2011 IDSA guideline considered oral beta-lactams less effective for pyelonephritis and advised a longer course; the 2025 IDSA complicated UTI guideline supersedes it: after improvement on ceftriaxone an oral third-generation cephalosporin is a reasonable switch, with optimized dosing and 7 days total for a non-fluoroquinolone (very low certainty), and no longer course for beta-lactams. Nitrofurantoin does not reach renal tissue. It stays an ambiguous case because the evidence for short oral beta-lactam courses is limited (owner review, 2026-11-12).",
   "citations": [
     {
-      "ref": "idsa-uti-2011",
-      "supports": "Oral beta-lactams for pyelonephritis: less effective than other agents, longer duration when used."
+      "ref": "idsa-cuti-2025-ivpo",
+      "supports": "Switch to oral therapy once improving, able to take oral medication, with an effective oral option; after improvement on ceftriaxone an oral third-generation cephalosporin is a reasonable choice; checked against IDSA's published PDF and approved by the owner, 2026-11-12."
     },
     {
       "ref": "idsa-cuti-2025",
-      "supports": "Current guidance on oral step-down for complicated UTI and pyelonephritis; owner confirmed 2026-11-12."
+      "supports": "Oral agents for complicated UTI: oral third-generation cephalosporins may be comparable to fluoroquinolones or TMP-SMX; cephalexin, amoxicillin and low-bioavailability cephalosporins only with caution and optimized dosing; checked against IDSA's published PDF and approved by the owner, 2026-11-12."
+    },
+    {
+      "ref": "idsa-cuti-2025-duration",
+      "supports": "7 days of a non-fluoroquinolone rather than 10-14 days; no longer course for oral beta-lactams, though higher doses may be required; checked against IDSA's published PDF and approved by the owner, 2026-11-12."
     },
     {
       "ref": "clsi-m100",

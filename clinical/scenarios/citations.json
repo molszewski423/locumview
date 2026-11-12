@@ -8,17 +8,38 @@
       "pmid": "21292654",
       "doi": "10.1093/cid/ciq257",
       "metadata_checked": "2026-10-25",
-      "content_check": "owner"
+      "content_check": "owner",
+      "note": "Superseded for pyelonephritis by the 2025 cUTI series, which classifies pyelonephritis as complicated; still IDSA's guideline for uncomplicated cystitis. No case cites it since 2026-11-12."
     },
     "idsa-cuti-2025": {
       "authors": "Trautner BW, et al.",
-      "title": "Infectious Diseases Society of America 2025 Guideline on Management and Treatment of Complicated Urinary Tract Infections (series)",
-      "source": "Clin Infect Dis. Published 2026 Aug 24 (PubMed record date)",
+      "title": "Clinical Practice Guidelines by Infectious Diseases Society of America: 2025 Guideline on Management and Treatment of Complicated Urinary Tract Infections-Selection of Antibiotic Therapy for Complicated Urinary Tract Infections",
+      "source": "Clin Infect Dis. 2026;82(Suppl 3):i36-i67",
       "pmid": "41419213",
       "doi": "10.1093/cid/ciaf460",
-      "metadata_checked": "2026-10-25",
+      "metadata_checked": "2026-11-12",
       "content_check": "owner",
-      "note": "Newer than the drafting agent's knowledge. Owner confirmed 2026-11-12 (M6): supports IV to oral step-down in improving complicated UTI and pyelonephritis (stable vitals, afebrile 24 hours, taking food and drink by mouth); an oral beta-lactam step-down chosen by the cefazolin urinary surrogate; a fluoroquinolone or trimethoprim-sulfamethoxazole when susceptible; and no switch while febrile, tachycardic or vomiting."
+      "note": "Part of the 2025 cUTI series (with idsa-cuti-2025-ivpo and idsa-cuti-2025-duration). Checked 2026-11-12 against IDSA's published PDF on idsociety.org; owner approved. Oral agents: fluoroquinolones and TMP-SMX preferred; oral third-generation cephalosporins may be comparable; cephalexin, amoxicillin, amoxicillin-clavulanate and low-bioavailability cephalosporins such as cefdinir to be used cautiously and with optimized dosing. Correction: #123 recorded an earlier confirmation that rested on secondary summaries."
+    },
+    "idsa-cuti-2025-ivpo": {
+      "authors": "Trautner BW, et al.",
+      "title": "Clinical Practice Guidelines by Infectious Diseases Society of America: 2025 Guidelines on Management and Treatment of Complicated Urinary Tract Infections - Timing of Intravenous to Oral Antibiotics Transition for Complicated Urinary Tract Infections",
+      "source": "Clin Infect Dis. 2026;82(Suppl 3):i68-i78",
+      "pmid": "41414903",
+      "doi": "10.1093/cid/ciaf461",
+      "metadata_checked": "2026-11-12",
+      "content_check": "owner",
+      "note": "Checked 2026-11-12 against IDSA's published PDF on idsociety.org; owner approved. Recommendation I: switch to oral therapy in complicated UTI including acute pyelonephritis when clinically improving, able to take oral medication and an effective oral option is available (conditional, low certainty); supporting trials mostly enrolled patients who were afebrile, hemodynamically stable and had source control. After improvement on ceftriaxone, an oral third-generation cephalosporin is a reasonable choice."
+    },
+    "idsa-cuti-2025-duration": {
+      "authors": "Trautner BW, et al.",
+      "title": "Clinical Practice Guidelines by Infectious Diseases Society of America (IDSA): 2025 Guidelines on Management and Treatment of Complicated Urinary Tract Infections--Duration of Antibiotics for Complicated UTI",
+      "source": "Clin Infect Dis. 2026;82(Suppl 3):i79-i88",
+      "pmid": "41419448",
+      "doi": "10.1093/cid/ciaf462",
+      "metadata_checked": "2026-11-12",
+      "content_check": "owner",
+      "note": "Checked 2026-11-12 against IDSA's published PDF on idsociety.org; owner approved. 5-7 days of a fluoroquinolone (conditional, moderate certainty) or 7 days of a non-fluoroquinolone (conditional, very low certainty) rather than 10-14 days, from the first day of effective therapy; no longer course for oral beta-lactams, though higher doses may be required; 10-14 days only for men with suspected prostatitis."
     },
     "idsa-amr-gn-2024": {
       "authors": "Tamma PD, Heil EL, Justo JA, et al.",
@@ -52,10 +73,10 @@
     "clsi-m100": {
       "authors": "Clinical and Laboratory Standards Institute",
       "title": "Performance Standards for Antimicrobial Susceptibility Testing (M100)",
-      "source": "CLSI, current edition (breakpoint tables for Enterobacterales)",
-      "metadata_checked": "2026-10-25",
+      "source": "CLSI M100, 36th ed. (2026), breakpoint tables for Enterobacterales and Staphylococcus",
+      "metadata_checked": "2026-11-12",
       "content_check": "owner",
-      "note": "A standard, not a journal article; the edition is recorded when the owner confirms the breakpoints a case uses."
+      "note": "A standard, not a journal article. The 36th edition (January 2026) is current and FDA-recognized; the breakpoints the cases use have not been rechecked against it."
     },
     "idsa-meningitis-2004": {
       "authors": "Tunkel AR, Hartman BJ, Kaplan SL, et al.",
@@ -74,7 +95,15 @@
       "doi": "10.1016/j.cmi.2016.01.007",
       "metadata_checked": "2026-10-25",
       "content_check": "owner",
-      "note": "A WHO bacterial meningitis guideline (2025) also exists; it is not indexed in PubMed and has not been added."
+      "note": "WHO 2025 (who-meningitis-2025) is newer; IDSA 2004 and ESCMID 2016 remain the current society guidelines."
+    },
+    "who-meningitis-2025": {
+      "authors": "World Health Organization",
+      "title": "WHO guidelines on meningitis diagnosis, treatment and care",
+      "source": "Geneva: World Health Organization; 2025. ISBN 978-92-4-010804-2 (electronic)",
+      "metadata_checked": "2026-11-12",
+      "content_check": "owner",
+      "note": "Not indexed in PubMed. Checked 2026-11-12 against the WHO document; owner approved: add ampicillin or amoxicillin to the initial empiric regimen with any Listeria risk factor: age over 60 years, pregnancy, immunosuppressive therapy, organ transplantation, malignancy, advanced HIV disease, diabetes mellitus, end-stage kidney disease, liver cirrhosis, alcohol use disease. Its age threshold (60) is higher than IDSA 2004 and ESCMID 2016 (50); the rule keeps 50 and cites WHO only above 60."
     },
     "idsa-crbsi-2009": {
       "authors": "Mermel LA, Allon M, Bouza E, et al.",
@@ -103,6 +132,16 @@
       "doi": "10.1164/rccm.201908-1581ST",
       "metadata_checked": "2026-10-25",
       "content_check": "owner"
+    },
+    "ats-cap-2025": {
+      "authors": "Jones BE, Ramirez JA, Oren E, et al.",
+      "title": "Diagnosis and Management of Community-acquired Pneumonia: An Official American Thoracic Society Clinical Practice Guideline",
+      "source": "Am J Respir Crit Care Med. 2026;212(1):24-44",
+      "pmid": "40679934",
+      "doi": "10.1164/rccm.202507-1692ST",
+      "metadata_checked": "2026-11-12",
+      "content_check": "owner",
+      "note": "Updates four questions of the 2019 guideline, including antibiotic duration; ats-idsa-cap-2019 remains the reference for antibiotic choice. IDSA did not endorse this update (it disagreed on two antibiotic-choice questions). Duration as reported in summaries, owner approved for the duration rule 2026-11-12; the guideline's own text is not yet checked: fewer than 5 days (minimum 3) once clinically stable in nonsevere CAP (conditional, low quality); 5 days or more in severe CAP."
     },
     "idsa-ssti-2014": {
       "authors": "Stevens DL, Bisno AL, Chambers HF, et al.",

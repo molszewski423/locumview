@@ -169,6 +169,10 @@
     {
       "ref": "escmid-meningitis-2016",
       "supports": "Empiric amoxicillin or ampicillin for Listeria in adults over 50, added to a third-generation cephalosporin."
+    },
+    {
+      "ref": "who-meningitis-2025",
+      "supports": "Add ampicillin or amoxicillin to the initial empiric regimen with any Listeria risk factor, including age over 60 years; checked against the WHO document and approved by the owner, 2026-11-12."
     }
   ]
 }

@@ -178,12 +178,12 @@
   "rationale": "A negative control for both modules. The organism is susceptible to the current therapy, so there is no bug-drug mismatch; ceftriaxone is a reasonable agent for pyelonephritis, so de-escalation is not expected. IV to PO criteria (clinical improvement, afebrile, able to take oral medication) are not met.",
   "citations": [
     {
-      "ref": "idsa-uti-2011",
-      "supports": "Treatment of acute pyelonephritis, including parenteral therapy for hospitalized patients and oral step-down after improvement."
+      "ref": "idsa-cuti-2025-ivpo",
+      "supports": "Oral switch only once clinically improving and able to take oral medication; the supporting trials enrolled patients who were afebrile and hemodynamically stable; checked against IDSA's published PDF and approved by the owner, 2026-11-12."
     },
     {
       "ref": "idsa-cuti-2025",
-      "supports": "Current guideline for complicated UTI; owner confirmed 2026-11-12 that it agrees with the reference answer."
+      "supports": "Antibiotic selection for complicated UTI, including ceftriaxone as initial therapy when the isolate is susceptible; checked against IDSA's published PDF and approved by the owner, 2026-11-12."
     },
     {
       "ref": "idsa-shea-asp-2016",

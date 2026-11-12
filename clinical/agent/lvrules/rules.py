@@ -102,11 +102,13 @@ def meningitis_listeria(s: Snapshot, kb: Knowledge) -> list[Finding]:
         return []
     if any(kb.has(p.agent, "covers_listeria") for p in active):
         return []
+    # WHO 2025 sets its Listeria age risk at over 60 (IDSA 2004, ESCMID 2016: over 50), so it is cited only above 60.
+    who = ("who-meningitis-2025",) if age > kb.thresholds["listeria_age_who"] else ()
     return [_finding(kb, "meningitis-listeria", "missing-empiric-coverage", "ampicillin",
                      f"Empiric therapy for suspected bacterial meningitis at age {age} lacks Listeria coverage: "
                      "cephalosporins and vancomycin do not cover Listeria monocytogenes; add ampicillin.",
                      [f"Age {age}", "Problem: suspected bacterial meningitis",
-                      "Active: " + ", ".join(kb.display(p.agent) for p in active)])]
+                      "Active: " + ", ".join(kb.display(p.agent) for p in active)], who)]
 
 
 def double_anaerobic_coverage(s: Snapshot, kb: Knowledge) -> list[Finding]:
@@ -139,12 +141,12 @@ def duration_review(s: Snapshot, kb: Knowledge) -> list[Finding]:
             day = (s.as_of.date() - start).days + 1
             for p in s.active_antimicrobials():
                 if p.end is None and day > cond["review_after_days"]:
+                    guidance = cond.get("duration_text") or f"the recommended course is about {cond['recommended_days']} days"
                     out.append(_finding(kb, "duration-review", "duration-review", p.agent,
-                                        f"Day {day} of antibiotics for {problem.title.lower()}; the recommended "
-                                        f"course is about {cond['recommended_days']} days and "
+                                        f"Day {day} of antibiotics for {problem.title.lower()}; {guidance}; "
                                         f"{kb.display(p.agent).lower()} has no stop date.",
                                         [f"Antibiotics since {start}", f"Active without stop date: {p.text}"],
-                                        tuple(cond.get("refs", ()))))
+                                        tuple(cond.get("duration_refs", cond.get("refs", ())))))
     return out
 
 
@@ -212,7 +214,8 @@ def iv_to_po_switch(s: Snapshot, kb: Knowledge) -> list[Finding]:
     condition_refs = tuple(dict.fromkeys(ref for problem in s.problems for name in kb.condition_of(problem.icd10)
                                          for ref in kb.conditions[name].get("refs", ())))
     conditions = {name for problem in s.problems for name in kb.condition_of(problem.icd10)}
-    beta_lactam_options = {t["oral_step_down"] for t in kb.tests.values() if t.get("oral_beta_lactam")}
+    cautions = {t["oral_step_down"]: t["cuti_caution"] for t in kb.tests.values() if t.get("cuti_caution")}
+    cuti = any(kb.conditions[n].get("cuti_oral_caution") for n in conditions)
     ampc = any(kb.organism_in(c.organism_code, "inducible-ampc") for c in s.final_isolates())
     out = []
     for p in s.active_antimicrobials():
@@ -229,11 +232,10 @@ def iv_to_po_switch(s: Snapshot, kb: Knowledge) -> list[Finding]:
                          "completing the course may be reasonable if the infection is non-severe, the patient is "
                          "improving and the source is controlled; the susceptible oral options avoid the question.")
             refs = refs + ("idsa-amr-gn-2026",)
-        if set(options) <= beta_lactam_options and any(kb.conditions[n].get("oral_beta_lactams_alternative")
-                                                       for n in conditions):
-            notes.append("Oral beta-lactams are alternative agents for pyelonephritis with weaker supporting "
-                         "evidence; if used, optimize dosing and consider a longer total course; completing IV "
-                         "therapy is also reasonable.")
+        if cuti:
+            # IDSA 2025 cUTI (owner decision, 2026-11-12): caution for amoxicillin and similar oral beta-lactams only;
+            # an oral third-generation cephalosporin after improvement on ceftriaxone is a reasonable switch.
+            notes += [cautions[o] for o in options if o in cautions]
         out.append(_finding(kb, "iv-to-po-switch", "iv-to-po-switch", p.agent,
                             " ".join([f"Clinically stable on IV {drug}; oral options the data supports: "
                                       f"{'; '.join(options)}.", *notes,
