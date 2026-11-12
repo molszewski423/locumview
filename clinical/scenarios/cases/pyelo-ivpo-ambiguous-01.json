@@ -171,15 +171,15 @@
       "module": "iv-to-po",
       "type": "iv-to-po-switch",
       "drug": "Ceftriaxone",
-      "summary": "Clinical criteria for an oral switch are met; the susceptible oral option is an oral cephalosporin the cefazolin urinary surrogate supports, such as cefpodoxime."
+      "summary": "Clinical criteria for an oral switch are met; with the isolate susceptible to ceftriaxone, the oral option is a third-generation cephalosporin such as cefpodoxime."
     }
   ],
   "acceptable_answers": [
-    "Switch to an oral third-generation cephalosporin the cefazolin surrogate supports (for example cefpodoxime) with optimized dosing, for a total course of about 7 days (IDSA 2025).",
+    "Switch to an oral third-generation cephalosporin (for example cefpodoxime), the isolate being ceftriaxone susceptible, with optimized dosing, for a total course of about 7 days (IDSA 2025).",
     "Continue IV ceftriaxone to complete a short course when oral therapy is not practical, documenting the reason.",
     "Discuss with the team or infectious diseases before switching, given the very low certainty of the evidence for short non-fluoroquinolone courses."
   ],
-  "reference_answer": "Flag the patient as meeting clinical IV to PO criteria with an oral third-generation cephalosporin the cefazolin surrogate supports, such as cefpodoxime: IDSA 2025 calls this a reasonable switch after improvement on ceftriaxone, with optimized dosing and a total course of about 7 days. The finding should not present the switch as the only defensible choice.",
+  "reference_answer": "Flag the patient as meeting clinical IV to PO criteria with an oral third-generation cephalosporin such as cefpodoxime, supported by the isolate's ceftriaxone susceptibility: IDSA 2025 calls this a reasonable switch after improvement on ceftriaxone, with optimized dosing and a total course of about 7 days. The finding should not present the switch as the only defensible choice.",
   "rationale": "She meets clinical switch criteria, and the only susceptible oral agents are beta-lactams. The 2011 IDSA guideline considered oral beta-lactams less effective for pyelonephritis and advised a longer course; the 2025 IDSA complicated UTI guideline supersedes it: after improvement on ceftriaxone an oral third-generation cephalosporin is a reasonable switch, with optimized dosing and 7 days total for a non-fluoroquinolone (very low certainty), and no longer course for beta-lactams. Nitrofurantoin does not reach renal tissue. It stays an ambiguous case because the evidence for short oral beta-lactam courses is limited (owner review, 2026-11-12).",
   "citations": [
     {
@@ -196,7 +196,7 @@
     },
     {
       "ref": "clsi-m100",
-      "supports": "Cefazolin as a surrogate for oral cephalosporins in urinary isolates."
+      "supports": "Enterobacterales breakpoints behind the panel. Its cefazolin urinary surrogate predicts oral cephalosporins only in uncomplicated UTI (E. coli, K. pneumoniae, P. mirabilis; Bryson et al., J Clin Microbiol 2024), so it is not the basis for step-down in pyelonephritis (owner, 2026-11-12)."
     },
     {
       "ref": "idsa-shea-asp-2016",

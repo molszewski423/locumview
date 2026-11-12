@@ -81,7 +81,7 @@ trimethoprim-sulfamethoxazole); otherwise an oral agent every final isolate test
 urinary surrogate counts only for urine isolates, and nitrofurantoin is never offered as a step-down. IV to PO is
 not offered for meningitis or *S. aureus* bacteremia.
 
-## Known limits (version 0.4.0)
+## Known limits (version 0.5.0)
 
 - **Oral intake is not charted** in a structured form, in the cases or in OpenEMR. Owner decision, 2026-11-09: the
   IV to PO rule does not read it, and the finding asks the pharmacist to confirm intake before switching.
@@ -94,8 +94,9 @@ not offered for meningitis or *S. aureus* bacteremia.
   to the start date) and marks any order with an end date `completed`, so a future stop date reads as stopped.
   A dosage timing `boundsPeriod`, when an EHR sends one, is used instead.
 - **Severity and source control are not judged.** IDSA 2026 allows completing an empirically started ceftriaxone course for a moderate-risk AmpC organism in a non-severe infection with clinical improvement and source control, but does not define non-severe. The AmpC and IV to PO findings state that condition and leave the judgment to the pharmacist (owner decision, 2026-11-12).
-- **Pneumonia severity is not judged.** The duration review for pneumonia follows ATS 2025 (fewer than 5 days, at least 3, once stable in nonsevere CAP; 5 or more in severe CAP): it fires from day 5 without a stop date and states both, leaving severity to the pharmacist (owner decision, 2026-11-12).
+- **Pneumonia severity is not judged.** The duration review for pneumonia follows ATS 2025 (fewer than 5 days, at least 3, once stable in nonsevere CAP; 5 or more in severe CAP): it fires from day 5 without a stop date and states both, leaving severity to the pharmacist (owner decision, 2026-11-12). It does not check the groups the duration trials excluded (S. aureus, P. aeruginosa, empyema, necrotizing pneumonia), which reviews say need longer courses; ATS 2025's own text on them is not yet read.
 - **Listeria age threshold.** The rule fires above 50 (IDSA 2004, ESCMID 2016) and cites WHO 2025 only above 60, its own threshold. WHO 2025's other risk factors (pregnancy, transplantation, malignancy, diabetes and others) are not checked yet.
+- **Oral cephalosporins in urinary infection.** CLSI's cefazolin urinary surrogate is for uncomplicated UTI only, and no condition in the knowledge base is an uncomplicated UTI yet, so it is never offered. For pyelonephritis the IV to PO rule offers an oral third-generation cephalosporin only when the patient is on ceftriaxone, the isolate is ceftriaxone susceptible and it is not a moderate-risk AmpC organism (IDSA 2025 cUTI, IDSA 2026).
 - **Organisms are matched by SNOMED CT code.** A culture reported by name only matches no organism rule. Klebsiella aerogenes (62592009) is one concept that also carries its former name, Enterobacter aerogenes.
 - The knowledge base holds what the 14 cases need and the closest related agents. An agent, organism or test it does
   not know is ignored, never guessed.

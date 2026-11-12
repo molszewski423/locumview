@@ -201,8 +201,8 @@
       "summary": "Enterobacter cloacae complex bacteremia on ceftriaxone: the organism carries an inducible AmpC, so ceftriaxone is not recommended for this invasive infection even though it tests susceptible; cefepime is susceptible (MIC <=1)."
     }
   ],
-  "reference_answer": "Change ceftriaxone to cefepime, for example 2 g IV every 8 hours, adjusted for renal function. A carbapenem is not needed while the cefepime MIC is 2 or lower; reserve it for cefepime susceptible-dose dependent results or failure. Piperacillin-tazobactam is not a preferred alternative for serious AmpC infections. Remove or replace the urinary catheter as a source, and repeat blood cultures if he stays febrile. No IV to PO switch yet; once he improves, an oral agent the isolate is susceptible to (trimethoprim-sulfamethoxazole or a fluoroquinolone) can be considered for step-down.",
-  "rationale": "E. cloacae complex is one of the organisms with a moderate to high risk of clinically significant AmpC production. Third-generation cephalosporins such as ceftriaxone can select derepressed mutants during therapy, so IDSA guidance does not suggest ceftriaxone for invasive infections with these organisms (it may be reasonable for uncomplicated cystitis), and suggests cefepime when the cefepime MIC is 2 or lower. A susceptibility report alone does not show this: the finding needs the organism, the source and the current drug together. The IV to PO module should not fire on day 2 of bacteremia while febrile.",
+  "reference_answer": "Change ceftriaxone to cefepime, for example 2 g IV every 8 hours, adjusted for renal function. IDSA 2026 suggests cefepime while its MIC is susceptible or susceptible dose-dependent (8 ug/mL or lower); a carbapenem is not needed unless cefepime tests resistant, an ESBL is identified, or therapy fails. Piperacillin-tazobactam is not a preferred alternative for serious AmpC infections. Remove or replace the urinary catheter as a source, and repeat blood cultures if he stays febrile. No IV to PO switch yet; once he improves, an oral agent the isolate is susceptible to (trimethoprim-sulfamethoxazole or a fluoroquinolone) can be considered for step-down.",
+  "rationale": "E. cloacae complex is one of the organisms with a moderate to high risk of clinically significant AmpC production. Third-generation cephalosporins such as ceftriaxone can select derepressed mutants during therapy, so IDSA guidance does not suggest ceftriaxone for invasive infections with these organisms (it may be reasonable for uncomplicated cystitis), and suggests cefepime when the cefepime MIC is 8 ug/mL or lower (IDSA 2026; 2024 said 2 or lower). A susceptibility report alone does not show this: the finding needs the organism, the source and the current drug together. The IV to PO module should not fire on day 2 of bacteremia while febrile.",
   "citations": [
     {
       "ref": "idsa-amr-gn-2024",
@@ -210,7 +210,7 @@
     },
     {
       "ref": "idsa-amr-gn-2026",
-      "supports": "Current version of the same guidance; owner confirmed 2026-11-12 against IDSA's 2026 text: generally avoid ceftriaxone for moderate-risk AmpC organisms (Hafnia alvei added); completing an empirically started course may be reasonable in a non-severe infection with improvement and source control."
+      "supports": "Current version of the same guidance; owner confirmed 2026-11-12 against IDSA's 2026 text: generally avoid ceftriaxone for moderate-risk AmpC organisms (Hafnia alvei added); completing an empirically started course may be reasonable in a non-severe infection with improvement and source control. Cefepime is suggested when its MIC is susceptible or susceptible dose-dependent, 8 ug/mL or lower (Question 2.3), checked 2026-11-12."
     },
     {
       "ref": "clsi-m100",
