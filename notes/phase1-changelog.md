@@ -2165,3 +2165,11 @@ The owner's verdicts on the 14 cases (reviewed with OpenEvidence; approved with 
 - **Deploy:** the agent image changes; after merge CI builds it and a follow-up commit pins it. The new case is loaded into the cluster's OpenEMR by the deploy script's scenario step.
 
 Agent: Claude Code
+
+## 134. Pin the agent image with #133 (2026-11-12)
+
+- **Done:** `kustomization.yaml` pins the agent image that the clinical-images run for merge commit 86d4a12 (#133; Gitea run 588) built and signed: knowledge base 0.6.0. OpenEMR and the gateway stay at their pinned images.
+- **Verification:** digest transcribed from that run's Verify step for `locumview-clinical-agent`; `scripts/clinical/verify-images.sh` verified the signature and SBOM attestation of all three pinned images.
+- **Deploy:** the owner's script from #118; the diff should show only the agent Deployment, and its scenario step loads the new case `cap-duration-01`. Then check LV-cap-duration-01 (duration review with the ATS 2025 wording), LV-bsi-enterobacter-ampc-01 ("does not apply yet: fever in the last 24 hours") and LV-meningitis-listeria-gap-01 (the criterion in the summary).
+
+Agent: Claude Code
