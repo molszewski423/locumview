@@ -2173,3 +2173,11 @@ Agent: Claude Code
 - **Deploy:** the owner's script from #118; the diff should show only the agent Deployment, and its scenario step loads the new case `cap-duration-01`. Then check LV-cap-duration-01 (duration review with the ATS 2025 wording), LV-bsi-enterobacter-ampc-01 ("does not apply yet: fever in the last 24 hours") and LV-meningitis-listeria-gap-01 (the criterion in the summary).
 
 Agent: Claude Code
+
+## 135. Phase 9 lite M6: #134 deployed and checked in the app (2026-11-12)
+
+- **Deploy (owner run of the script from #118):** only the agent Deployment changed; the scenario step loaded the new case `cap-duration-01`. Read-only from node1: the agent runs `sha256:5940020c...`, `/healthz` reports knowledge version 0.6.0.
+- **Walkthrough (owner, lv-test17, `pharmacist`):** LV-cap-duration-01 shows "Duration review: Levofloxacin" with "Day 6 of antibiotics for community-acquired pneumonia; ATS 2025 suggests fewer than 5 days (at least 3) once clinically stable in nonsevere pneumonia, and 5 days or more in severe pneumonia", citing the stewardship guideline and ATS 2025. LV-bsi-enterobacter-ampc-01 shows the fever-gated wording ("does not apply yet: fever in the last 24 hours"), the fever in the data and the febrile "why it matters" line. LV-meningitis-listeria-gap-01's summary ends with the criterion note, and its explanation states the age without the inversion seen in development. All three explanations restate the reviewed reason.
+- **Noted:** WHO 2025 is shown without a link (no DOI or PubMed record); its ISBN identifies it.
+
+Agent: Claude Code
