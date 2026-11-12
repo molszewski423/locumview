@@ -1,6 +1,6 @@
 {
-  "_note": "Knowledge base for the Phase 9 lite rules (plan M4). Versioned with the rules: raise version on every change. Every rule names the references in clinical/scenarios/citations.json it rests on. Codes: RxNorm (prescribed products), LOINC (susceptibility results), SNOMED CT (organisms, specimens), ICD-10-CM (problems).",
-  "version": "0.2.0",
+  "_note": "Knowledge base for the Phase 9 lite rules (plan M4). Versioned with the rules: raise version on every change. Every rule names the references in clinical/scenarios/citations.json it rests on. Codes: RxNorm (prescribed products), LOINC (susceptibility results), SNOMED CT (organisms, specimens), ICD-10-CM (problems). Group inducible-ampc holds IDSA 2026's moderate-risk AmpC organisms (Enterobacter cloacae complex, Klebsiella aerogenes, Citrobacter freundii, Hafnia alvei) by SNOMED CT code; 62592009 is one concept that also carries the former name Enterobacter aerogenes. IDSA's low-risk Serratia, Morganella and Providencia are deliberately not in it.",
+  "version": "0.3.0",
   "agents": {
     "amoxicillin": {"display": "Amoxicillin"},
     "ampicillin": {"display": "Ampicillin", "covers_listeria": true},
@@ -36,10 +36,10 @@
     "311683": "metronidazole"
   },
   "susceptibility_tests": {
-    "28-1": {"agent": "ampicillin", "oral_step_down": "amoxicillin"},
+    "28-1": {"agent": "ampicillin", "oral_step_down": "amoxicillin", "oral_beta_lactam": true},
     "32-3": {"agent": "ampicillin-sulbactam"},
     "76-0": {"agent": "cefazolin"},
-    "85422-4": {"agent": "cefazolin", "urinary_surrogate": true, "oral_step_down": "an oral cephalosporin the cefazolin urinary surrogate supports, such as cefpodoxime"},
+    "85422-4": {"agent": "cefazolin", "urinary_surrogate": true, "oral_step_down": "an oral cephalosporin the cefazolin urinary surrogate supports, such as cefpodoxime", "oral_beta_lactam": true},
     "141-2": {"agent": "ceftriaxone"},
     "185-9": {"agent": "ciprofloxacin", "oral_step_down": "ciprofloxacin"},
     "20396-8": {"agent": "levofloxacin", "oral_step_down": "levofloxacin"},
@@ -62,6 +62,10 @@
   "organisms": {
     "112283007": {"display": "Escherichia coli", "groups": []},
     "414102007": {"display": "Enterobacter cloacae complex", "groups": ["inducible-ampc"]},
+    "62592009": {"display": "Klebsiella aerogenes", "groups": ["inducible-ampc"]},
+    "6265002": {"display": "Citrobacter freundii", "groups": ["inducible-ampc"]},
+    "782522004": {"display": "Citrobacter freundii complex", "groups": ["inducible-ampc"]},
+    "76694001": {"display": "Hafnia alvei", "groups": ["inducible-ampc"]},
     "417943000": {"display": "Methicillin susceptible Staphylococcus aureus", "groups": ["staphylococcus-aureus"]}
   },
   "specimens": {
@@ -73,7 +77,7 @@
     "bacterial-meningitis": {"icd10_prefixes": ["G00"]},
     "cellulitis": {"icd10_prefixes": ["L03"], "recommended_days": 5, "review_after_days": 7, "refs": ["idsa-ssti-2014"]},
     "community-acquired-pneumonia": {"icd10_prefixes": ["J18"], "recommended_days": 5, "review_after_days": 7, "refs": ["ats-idsa-cap-2019"]},
-    "pyelonephritis": {"icd10_prefixes": ["N10"], "refs": ["idsa-cuti-2025"]}
+    "pyelonephritis": {"icd10_prefixes": ["N10"], "refs": ["idsa-cuti-2025"], "oral_beta_lactams_alternative": true}
   },
   "thresholds": {
     "fever_f": 100.4,
@@ -83,7 +87,7 @@
   },
   "rules": {
     "bug-drug-mismatch": {"module": "stewardship", "refs": ["clsi-m100", "idsa-shea-asp-2016"]},
-    "ampc-third-generation-cephalosporin": {"module": "stewardship", "refs": ["idsa-amr-gn-2024"]},
+    "ampc-third-generation-cephalosporin": {"module": "stewardship", "refs": ["idsa-amr-gn-2024", "idsa-amr-gn-2026"]},
     "mssa-vancomycin": {"module": "stewardship", "refs": ["idsa-crbsi-2009"]},
     "meningitis-listeria": {"module": "stewardship", "refs": ["idsa-meningitis-2004", "escmid-meningitis-2016"]},
     "double-anaerobic-coverage": {"module": "stewardship", "refs": ["idsa-ciai-2010"]},
