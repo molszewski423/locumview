@@ -237,7 +237,11 @@
     },
     {
       "ref": "idsa-cuti-2025",
-      "supports": "Current guidance on oral step-down for complicated UTI and pyelonephritis; owner confirmed 2026-11-12."
+      "supports": "Oral agents for complicated UTI: fluoroquinolones and TMP-SMX preferred; checked against IDSA's published PDF and approved by the owner, 2026-11-12."
+    },
+    {
+      "ref": "idsa-cuti-2025-ivpo",
+      "supports": "Switch to oral therapy once improving, able to take oral medication, with an effective oral option; checked against IDSA's published PDF and approved by the owner, 2026-11-12."
     },
     {
       "ref": "idsa-shea-asp-2016",

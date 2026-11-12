@@ -58,7 +58,8 @@ class LibraryTests(unittest.TestCase):
 class KnowledgeTests(unittest.TestCase):
     def test_every_reference_is_in_the_citation_list(self):
         refs = {r for rule in KB.rules.values() for r in rule["refs"]}
-        refs |= {r for cond in KB.conditions.values() for r in cond.get("refs", [])}
+        refs |= {r for cond in KB.conditions.values() for r in cond.get("refs", []) + cond.get("duration_refs", [])}
+        refs.add("who-meningitis-2025")   # added by the Listeria rule above its own age threshold
         self.assertEqual(refs - set(CITATIONS), set())
 
     def test_every_product_and_test_names_a_known_agent_where_a_rule_needs_it(self):
@@ -82,7 +83,7 @@ class KnowledgeTests(unittest.TestCase):
         refs = {c: set(evaluate(from_case(case(c), KB), KB, {"iv-to-po"})[0].refs)
                 for c in ("cap-levofloxacin-ivpo-01", "pyelo-ivpo-ambiguous-01")}
         self.assertEqual(refs["cap-levofloxacin-ivpo-01"], {"idsa-shea-asp-2016", "ats-idsa-cap-2019"})
-        self.assertEqual(refs["pyelo-ivpo-ambiguous-01"], {"idsa-shea-asp-2016", "idsa-cuti-2025"})
+        self.assertEqual(refs["pyelo-ivpo-ambiguous-01"], {"idsa-shea-asp-2016", "idsa-cuti-2025-ivpo"})
 
     def test_ampc_group_is_exactly_idsa_2026_moderate_risk_organisms(self):
         # E. cloacae complex, K. aerogenes (62592009 also carries the former name Enterobacter aerogenes),
@@ -109,14 +110,39 @@ class KnowledgeTests(unittest.TestCase):
         self.assertIn("if ceftriaxone was started empirically, completing the course may be reasonable", f.summary)
         self.assertIn("idsa-amr-gn-2026", f.refs)
 
-    def test_oral_beta_lactam_caveat_only_for_pyelonephritis_with_beta_lactam_options_only(self):
-        caveat = "Oral beta-lactams are alternative agents for pyelonephritis"
-        summary = {c: evaluate(from_case(case(c), KB), KB, {"iv-to-po"})[0].summary
-                   for c in ("pyelo-ivpo-ambiguous-01", "pyelo-enterobacter-ambiguous-01", "cap-levofloxacin-ivpo-01")}
-        self.assertIn(caveat, summary["pyelo-ivpo-ambiguous-01"])
-        self.assertNotIn(caveat, summary["pyelo-enterobacter-ambiguous-01"])   # fluoroquinolone and TMP-SMX options
-        self.assertNotIn(caveat, summary["cap-levofloxacin-ivpo-01"])
-        self.assertNotIn("AmpC", summary["pyelo-ivpo-ambiguous-01"])           # E. coli
+    def test_cuti_caution_only_for_amoxicillin_not_an_oral_third_generation_cephalosporin(self):
+        # IDSA 2025 cUTI (owner decision, 2026-11-12): no warning for cefpodoxime after ceftriaxone; caution for amoxicillin.
+        caution = "IDSA 2025 advises using amoxicillin cautiously"
+        summary = lambda c: evaluate(from_case(c, KB), KB, {"iv-to-po"})[0].summary
+        self.assertNotIn(caution, summary(case("pyelo-ivpo-ambiguous-01")))
+        for gone in ("longer total course", "completing IV", "weaker supporting evidence"):
+            self.assertNotIn(gone, summary(case("pyelo-ivpo-ambiguous-01")))
+        c = case("pyelo-ivpo-ambiguous-01")
+        for s in c["cultures"][0]["susceptibilities"]:
+            if s["loinc"] == "28-1":
+                s["interpretation"] = "S"
+        self.assertIn(caution, summary(c))
+        c["problems"] = [{"title": "Community-acquired pneumonia", "diagnosis": "ICD10:J18.9", "begdate": "2026-10-19"}]
+        self.assertNotIn(caution, summary(c))                          # the caution is for complicated UTI only
+
+    def test_cap_duration_follows_ats_2025(self):
+        c = case("cap-levofloxacin-ivpo-01")
+        self.assertNotIn(("stewardship", "duration-review", "Levofloxacin"), keys(c, {"stewardship"}))   # day 4
+        c["encounter"]["start"] = "2026-10-20T13:00:00-04:00"
+        c["prescriptions"][0]["start"] = "2026-10-21"                  # day 5 at the newest vitals
+        (f,) = [f for f in evaluate(from_case(c, KB), KB, {"stewardship"}) if f.type == "duration-review"]
+        self.assertIn("ATS 2025 suggests fewer than 5 days (at least 3) once clinically stable in nonsevere", f.summary)
+        self.assertEqual(set(f.refs), {"idsa-shea-asp-2016", "ats-cap-2025"})
+
+    def test_who_meningitis_cited_only_above_its_age_threshold(self):
+        c = case("meningitis-listeria-gap-01")
+        (f,) = evaluate(from_case(c, KB), KB, {"stewardship"})
+        self.assertIn("who-meningitis-2025", f.refs)                   # age 67
+        born = int(c["patient"]["birth_date"][:4])
+        c["patient"]["birth_date"] = str(born + 12) + c["patient"]["birth_date"][4:]   # age 55
+        (f,) = evaluate(from_case(c, KB), KB, {"stewardship"})
+        self.assertNotIn("who-meningitis-2025", f.refs)
+        self.assertIn("lacks Listeria coverage", f.summary)            # IDSA and ESCMID: over 50
 
     def test_every_finding_cites_its_rule_references(self):
         c = case("uti-esbl-mismatch-01")

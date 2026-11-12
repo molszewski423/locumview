@@ -212,8 +212,8 @@
     }
   ],
   "expected_findings": [],
-  "reference_answer": "No intervention. Ceftriaxone is a reasonable choice for uncomplicated cystitis even with an AmpC-risk organism; the oral options are resistant, and she cannot take oral medication. The AmpC rule must not fire for cystitis without upper tract or bloodstream involvement.",
-  "rationale": "The negative pair of the Enterobacter bacteremia case. IDSA guidance limits its caution about ceftriaxone for moderate to high AmpC-risk organisms to invasive infections; for uncomplicated cystitis ceftriaxone may be reasonable. A rule that fires on organism and drug alone, ignoring the site, fails this case. IV to PO does not apply: she is not taking anything by mouth and no susceptible oral agent exists.",
+  "reference_answer": "No AmpC finding: IDSA 2026 limits its caution about ceftriaxone for moderate-risk AmpC organisms to invasive infections, and this is cystitis without upper tract or bloodstream involvement. Its preferred agents for AmpC cystitis (nitrofurantoin, TMP-SMX) are resistant or cannot be taken by mouth; a single-dose aminoglycoside is a listed alternative a pharmacist may suggest, which is outside what the AmpC rule addresses.",
+  "rationale": "The negative pair of the Enterobacter bacteremia case. IDSA 2026 (Question 2.4) limits its caution about ceftriaxone for moderate-risk AmpC organisms to invasive infections, so the AmpC rule must stay silent here; a rule that fires on organism and drug alone, ignoring the site, fails this case. IDSA 2026 does not list ceftriaxone among its agents for AmpC cystitis; the choice of agent is outside the rules this case tests. IV to PO does not apply: she is not taking anything by mouth and no susceptible oral agent exists.",
   "citations": [
     {
       "ref": "idsa-amr-gn-2024",
@@ -221,7 +221,7 @@
     },
     {
       "ref": "idsa-amr-gn-2026",
-      "supports": "Current version of the same guidance; pending a check of its uncomplicated cystitis wording against IDSA's 2026 text (owner, 2026-11-12)."
+      "supports": "Current version: Question 2.4 limits the ceftriaxone caution to invasive infections; Question 2.7 prefers nitrofurantoin or TMP-SMX for AmpC uncomplicated cystitis, with a single-dose aminoglycoside among alternatives; checked against IDSA's published 2026 text and approved by the owner, 2026-11-12."
     },
     {
       "ref": "clsi-m100",
