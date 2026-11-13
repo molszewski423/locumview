@@ -330,13 +330,17 @@ def message(case, pid, encounter, orders):
     return "\r".join(segments) + "\r"
 
 
+CHARTS = json.loads((HERE / "charts.json").read_text())
+
+
 def load(case):
     number = f"LV-{case['id']}"
     if existing := sql(f"SELECT pid FROM patient_data WHERE pubpid = {quote(number)};"):
+        chart_extras(existing[0][0], number, CHARTS.get(case["id"], {}))
         # A case loaded before the start-date fix (changelog #112) gets it now; the update is a no-op otherwise.
         sql(f"UPDATE prescriptions SET date_added = start_date WHERE patient_id = {int(existing[0][0])} "
             f"AND date_added IS NULL;")
-        print(f"{case['id']}: already loaded, skipped")
+        print(f"{case['id']}: already loaded; chart details and photograph brought up to date")
         return
     p, e = case["patient"], case["encounter"]
     status, body = target.api("POST", "fhir/Patient", {
@@ -390,6 +394,7 @@ def load(case):
             raise SystemExit(f"{case['id']}: HL7 import problems: {done.stdout[-400:]} {done.stderr[-400:]}")
         if done.stderr.strip():
             print(f"{case['id']}: importer warnings: {done.stderr.strip()[-300:]}")
+    chart_extras(pid, number, CHARTS.get(case["id"], {}))
     print(f"{case['id']}: loaded (patient {number}, {len(orders)} orders)")
 
 

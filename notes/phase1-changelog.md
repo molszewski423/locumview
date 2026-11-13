@@ -2425,3 +2425,52 @@ Agent: Claude Code
   Local OpenEMR destroyed.
 
 Agent: Claude Code
+
+## 151. ADR 0019 step 3 tried on lv-test17: the certificate works; Remote Desktop lost its credentials (2026-11-13)
+
+- **Image:** CI run 377 (commit 79e87ba, `#147` included) built, scanned (STIG image profile: pass), signed and
+  attested `git.lan/mike/locumview-desktop@sha256:1117334e…360beb4`; the agent verified the signature with the
+  committed key and read the scan attestation. The owner switched lv-test17 to it with
+  `bootc switch --enforce-container-sigpolicy` (staged digest checked; booted image before: `8c94dcf4…`; rollback
+  `:stable` `50c14768…`) and rebooted.
+- **Works:** the system booted (disk unlocked, LocumView login on the console); at the owner's sign-in the helper
+  created his tpm2-pkcs11 token and obtained a certificate: subject `CN=lv-test17.corp.locumview.com`, issuer
+  `CN=LocumView desktop clients`, valid to 2026-11-16 (3 days); the dock shows the EHR launcher with OpenEMR's blue
+  logo; the EHR still asks for Keycloak with TOTP, as expected until step 4, then opens OpenEMR (patient list of 46:
+  the 20 background patients with their new data, the 26 cases still without contact details).
+- **Broke:** Guacamole could not connect. GNOME Remote Desktop (headless) started but refused every session:
+  "Couldn't initialize session: Credentials are not set". It keeps its RDP credentials in the TPM when it can reach
+  one and falls back to a file only when it cannot (GNOME commit "ctl: Use GKeyFile as fallback for TPM", 2022).
+  Provisioning stored the credentials while the desktop user had no TPM access, so in the file
+  (`~/.local/share/gnome-remote-desktop/credentials.ini`); the new sign-in hook gives the user TPM access, so Remote
+  Desktop now looks in the TPM and finds nothing.
+- **Stopgap (owner, over SSH):** the helper's timer stopped until the next reboot, the user's TPM access removed,
+  Remote Desktop restarted: it fell back to the file and the owner connected again (checked read-only: no user ACL on
+  `/dev/tpmrm0`, timer inactive, "RDP server started").
+- **Also seen:** MikePC's mouse slowed for a minute or two during lv-test17's reboot (the VM runs on it; about 7 GB in
+  swap with four VMs); no GPU errors; it recovered by itself.
+- **Next (step 3 fix):** at sign-in, before Remote Desktop starts, the hook copies the user's existing RDP
+  credentials from the file into the TPM backend, as the user and never displayed (also a gain: the password is then
+  sealed in the TPM rather than a plain file); then on lv-test17: a reboot test, the TPM lockout check from the build
+  plan, and Chrome reaching a test mTLS endpoint. Promotion of this image is not proposed until then.
+
+Agent: Claude Code
+
+## 152. Case patients: photographs and the chart details no rule reads (2026-11-13)
+
+- **Owner request:** photographs and details for every patient in OpenEMR; the 26 case patients had neither.
+- **`clinical/scenarios/charts.json`** (new; the reviewed case files are unchanged): per case, made up and consistent
+  with its age and sex: race and ethnicity, address in a Massachusetts town (as the background patients), 555 phone,
+  marital status, language, an emergency contact (spouse when married; otherwise a parent under 40 or a grown
+  child), insurance (Medicare at 65 or over, otherwise Medicaid or a commercial plan), and a portrait description.
+  Clinical history (past history, home medications, social history, immunizations) is not included: it follows the
+  owner's clinical review.
+- **Photographs:** 26 portraits from `portraits.py` (RealVisXL V5.0, locally), reviewed by eye on a contact sheet.
+- **Loader:** applies a case's chart details and photograph when the case is loaded and on every later run (the
+  same idempotent pass as the background patients, #148 to #150).
+- **Verification:** a fresh local OpenEMR with two cases, loaded twice: address, phone, race, ethnicity, marital
+  status, language, emergency contact, insurance and one photograph each, nothing duplicated; the FHIR read-back of
+  LV-bsi-citrobacter-ampc-01 still gives exactly its two expected findings; agent tests, case checker and its tests
+  pass. Local OpenEMR destroyed.
+
+Agent: Claude Code
