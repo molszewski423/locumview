@@ -2537,7 +2537,7 @@ Agent: Claude Code
 
 - **#155 confirmed (owner):** image run 671 signed through `COSIGN_PRIVATE_KEY_B64`; the SBOM step's environment
   shows `COSIGN_PRIVATE_KEY_B64: ***` and `COSIGN_PASSWORD: ***`; the agent verified the image's signature and its
-  scan attestation (pass), digest `sha256:0608c1f8…b0f208aa`. The old `COSIGN_PRIVATE_KEY` secret is deleted.
+  scan attestation (pass), digest `sha256:0608c1f8…b0f208aa`. The old `COSIGN_PRIVATE_KEY` secret is to be deleted.
 - **Found the same way:** `rpms.yml`'s Sign step put the multi-line GPG private key `RPM_SIGNING_KEY` (passphrase
   protected; the passphrase is a masked one-line secret) in its environment, so every rpms run printed it in full.
 - **Fix:** `RPM_SIGNING_KEY_B64` (one-line base64, masked), decoded inside the step's Python into the JSON that
