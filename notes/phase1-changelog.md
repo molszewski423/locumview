@@ -2361,5 +2361,29 @@ Agent: Claude Code
   installed and verified (`rpm -V`), its timer enabled, the reference `desktop-cert.conf` and Chrome policy installed,
   OpenEMR's logo copied from the pinned image and the icon made.
 - **Fix:** the check renders to a temporary file and removes it.
+## 148. Background patients: fuller charts and AI-generated photographs (2026-11-12)
+
+- **Owner request:** fill in the charts and give every patient a photograph (AI-generated, matched to the
+  demographics); start with the 20 Synthea background patients; drop Synthea's numbers from names.
+- **Converter** (`clinical/synthea/convert.py`): keeps Synthea's own race and ethnicity (OMB categories), address,
+  home phone (555 numbers), marital status, language, the most recent dose of each vaccine (CVX) and the most recent
+  smoking status; names without digits. `generate.sh` regenerated `background.json` from the same pinned Synthea
+  v4.0.0 run (seed 20261025). Still no encounters, medications, labs or cultures: no finding is possible.
+- **Photographs** (`clinical/photos/`, README): made locally on operator-laptop's GPU with RealVisXL V5.0
+  (CreativeML OpenRAIL++-M, pinned revision) by `portraits.py`, from age, sex, race and ethnicity, with a seed from
+  the patient number; 512 x 640 JPEG, 1.1 MB for 20. Every face is AI-generated; none shows a real person. Reviewed
+  by eye: some patients in their forties look older than their age (to tune later).
+- **Loader:** for every background patient, new or already present, it sets the name, demographics (mapped to
+  OpenEMR's list options by the standard code in each list's notes), adds each immunization once (vaccine and date),
+  and stores the photograph once through OpenEMR's own `Document` class in the "Patient Photograph" category, which
+  the patient summary shows. The smoking status is kept in the data but not loaded yet.
+- **Verification:** a fresh local OpenEMR loaded twice: 20 patients with names without digits, address, phone, race,
+  ethnicity, marital status and language as expected (`SYN-001`, `-012`, `-018` read back); 84 immunizations for 20
+  patients and 20 photographs, unchanged by the second run; an old numbered name corrected by the update pass;
+  FHIR Patient carries the race and ethnicity extensions and the address. Agent tests and the case checker pass. The
+  local OpenEMR was destroyed. Not checked: Immunization over FHIR (not in the loader's scopes; the app does not read
+  it).
+- **Next:** the 26 case charts (demographics, contacts, history, home medications, social history, immunizations)
+  as a draft for the owner's clinical review, then their photographs.
 
 Agent: Claude Code
