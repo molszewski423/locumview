@@ -9,7 +9,9 @@ containers, so no credential reaches this machine (targets.py). --reset (spike o
 result is a known state built only from the repository. Without it, cases already present (by patient number
 LV-<case id>) are skipped, so running it twice changes nothing. The Synthea background patients in
 clinical/synthea/background.json (patient numbers SYN-nnn) are loaded too, unless --no-background: demographics,
-problems and allergies only, so they can never produce a finding. Every case is checked first; an invalid case
+problems, allergies and immunizations only, so they can never produce a finding. Each patient's photograph
+(clinical/photos/<patient number>.jpg, AI-generated) is stored once; demographics and immunizations are brought up
+to date on every run, also for patients loaded earlier. Every case is checked first; an invalid case
 stops the load before anything is written.
 
 Load paths are those the M1 spike established (docs/evidence/clinical/20261025-openemr-m1-spike/): FHIR for the
@@ -67,6 +69,68 @@ require_once '/var/www/localhost/htdocs/openemr/interface/globals.php';
 \OpenEMR\Common\Uuid\UuidRegistry::populateAllMissingUuids(false);
 echo "ok\n";
 """
+
+
+PHOTO_PHP = r"""<?php
+// Stores a JPEG (base64 on stdin) as the patient's photograph, with OpenEMR's own Document class, unless the patient
+// already has one: the category the patient summary shows (global patient_photo_category_name).
+$_GET['site'] = 'default';
+$ignoreAuth = true;
+require_once '/var/www/localhost/htdocs/openemr/interface/globals.php';
+require_once $GLOBALS['fileroot'] . '/library/classes/Document.class.php';
+$pid = (int)$argv[1];
+$category = sqlQuery("SELECT id FROM categories WHERE name = ?", [$GLOBALS['patient_photo_category_name']])['id'] ?? 0;
+if (!$category) { echo "error: no photograph category\n"; exit(1); }
+$have = sqlQuery("SELECT COUNT(*) AS n FROM documents d JOIN categories_to_documents c ON c.document_id = d.id " .
+                 "WHERE d.foreign_id = ? AND c.category_id = ? AND d.deleted = 0", [$pid, $category])['n'];
+if ($have) { echo "present\n"; exit(0); }
+$data = base64_decode(stream_get_contents(STDIN), true);
+if ($data === false || strlen($data) < 1000) { echo "error: no image\n"; exit(1); }
+$document = new Document();
+$error = $document->createDocument($pid, $category, $argv[2], 'image/jpeg', $data);
+echo $error ? "error: $error\n" : "ok\n";
+"""
+PHOTOS = HERE.parent / "photos"
+
+
+def list_option(list_id, code):
+    """OpenEMR's list option id for a standard code kept in the list's notes (CDC race and ethnicity, HL7 marital
+    status, ISO 639-1 language)."""
+    rows = sql(f"SELECT option_id FROM list_options WHERE list_id = {quote(list_id)} AND notes = {quote(code)} "
+               f"AND activity = 1 LIMIT 1;")
+    return rows[0][0] if rows else ""
+
+
+def chart_extras(pid, number, demographics=None, immunizations=(), name=None):
+    """Fills what a chart shows beyond the case data, idempotently, also for a patient loaded earlier: demographics
+    (overwritten), immunizations (each added once, by vaccine and date) and the photograph (once)."""
+    if name:   # Synthea's numbered names on patients loaded before the owner's decision of 2026-11-12
+        sql(f"UPDATE patient_data SET fname = {quote(name[0])}, lname = {quote(name[1])} WHERE pid = {int(pid)};")
+    if demographics:
+        d = demographics
+        fields = {"street": d.get("street", ""), "city": d.get("city", ""), "state": d.get("state", ""),
+                  "postal_code": d.get("postal_code", ""), "country_code": "USA", "phone_home": d.get("phone_home", ""),
+                  "race": "|".join(filter(None, (list_option("race", r) for r in d.get("race", [])))),
+                  "ethnicity": "|".join(filter(None, (list_option("ethnicity", e) for e in d.get("ethnicity", [])))),
+                  "status": list_option("marital", d.get("marital", "")),
+                  "language": list_option("language", d.get("language", ""))}
+        sql("UPDATE patient_data SET " + ", ".join(f"{k} = {quote(v)}" for k, v in fields.items())
+            + f" WHERE pid = {int(pid)};")
+    for v in immunizations:
+        sql(f"INSERT INTO immunizations (patient_id, administered_date, cvx_code, note, create_date, update_date, "
+            f"created_by, updated_by, added_erroneously, completion_status, information_source) "
+            f"SELECT {int(pid)}, {quote(v['date'] + ' 00:00:00')}, {quote(v['cvx'])}, {quote(v['title'])}, NOW(), NOW(), "
+            f"1, 1, 0, 'Completed', 'hist_inf_src_unspecified' FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM immunizations "
+            f"WHERE patient_id = {int(pid)} AND cvx_code = {quote(v['cvx'])} "
+            f"AND administered_date = {quote(v['date'] + ' 00:00:00')});")
+    photo = PHOTOS / f"{number}.jpg"
+    if photo.exists():
+        import base64
+        done = target.php(target.install("photo.php", PHOTO_PHP), str(int(pid)), f"{number}.jpg",
+                          stdin=base64.b64encode(photo.read_bytes()).decode())
+        last = (done.stdout.strip().splitlines() or [""])[-1]
+        if done.returncode or last not in ("ok", "present"):
+            raise SystemExit(f"{number}: photograph not stored: {last} {done.stderr[-300:]}")
 
 
 def assign_missing_uuids():
@@ -268,7 +332,9 @@ def load_background():
     people = json.loads((HERE.parent / "synthea" / "background.json").read_text())["patients"]
     added = 0
     for p in people:
-        if sql(f"SELECT pid FROM patient_data WHERE pubpid = {quote(p['number'])};"):
+        if existing := sql(f"SELECT pid FROM patient_data WHERE pubpid = {quote(p['number'])};"):
+            chart_extras(existing[0][0], p["number"], p.get("demographics"), p.get("immunizations", []),
+                         (p["given"], p["family"]))
             continue
         status, body = target.api("POST", "fhir/Patient", {
             "resourceType": "Patient",
@@ -283,8 +349,11 @@ def load_background():
                 "title": x["title"], "begdate": x["begdate"], "diagnosis": f"SNOMED-CT:{x['snomed']}"}))
         for x in p["allergies"]:
             ok(f"{p['number']}: allergy", *target.api("POST", f"api/patient/{puuid}/allergy", allergy_body(x)))
+        pid = ok("patient lookup", *target.api("GET", f"api/patient/{puuid}"))["data"]["pid"]
+        chart_extras(pid, p["number"], p.get("demographics"), p.get("immunizations", []))
         added += 1
-    print(f"background: {added} loaded, {len(people) - added} already present")
+    print(f"background: {added} loaded, {len(people) - added} already present (demographics, immunizations and "
+          f"photographs brought up to date)")
 
 
 def main(argv):
