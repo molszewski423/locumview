@@ -2723,14 +2723,17 @@ Agent: Claude Code
   any program in a new session loads it through p11-kit, and that happened before the helper ran; `ensure_token`
   treated an existing database as a finished token and skipped creating the token and key. The timer then raised its
   ALERT for that user, as designed. (On lv-test17 the helper happened to run first.)
-- **Fix:** `ensure_token` decides by the key, not the file: it keeps a store holding the key; otherwise it creates the
-  primary object and token when missing (asking with `listobjects --label`, since `listtokens` in tpm2_ptool 1.9 needs
-  a primary id; parsing `id: N` as 1.9 prints it) and then the key, and fails loudly if the key is still missing.
+- **First fix, not enough:** deciding by the key and completing the existing store passed against swtpm, but on
+  lv-demo01 (owner run by hand) it still failed: read-only as root, the library-made store held no primary object and
+  no token after the attempt; tpm2_ptool did not set up a token in a database the library had created.
+- **Fix:** `ensure_token` keeps a store only if it holds the helper's key; otherwise it builds the token in a folder of
+  its own (`~/.tpm2_pkcs11.new`, which the library never opens: it uses `~/.tpm2_pkcs11`), checks the key there, then
+  replaces the store with it and checks again. This is the setup path that always worked on a fresh folder (the demo
+  user, lv-test17), made independent of the race.
 - **Verified** in an EL10 container against swtpm 0.9.0 behind tpm2-abrmd 3.0 (a resource manager, as `/dev/tpmrm0` is
   on the desktops; without one the software TPM runs out of object slots inside a single `tpm2_ptool` call): a fresh
-  user; the race (a 28 KB store pre-created by the library) completed; a second run changes nothing; a token without a
-  key gets one. The PKCS#11 library in that container would not use the resource manager, so the PKCS#11 read-back is
-  left to a real desktop (lv-test17 passed it in #162). Next: the fixed helper by hand on lv-demo01 for the owner's
-  token, then the next image.
+  user; the race (a store the library created first) replaced by a working one owned by the user; a second run
+  changes nothing. The PKCS#11 library in that container does not use the resource manager, so the read-back through
+  PKCS#11 is left to a real desktop.
 
 Agent: Claude Code
