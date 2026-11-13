@@ -52,19 +52,31 @@ for o in objs:
 ' || true
 }
 
+has_key() {  # has_key <store>: the token holds this helper's private key
+  objects "$1" | awk -v k="$KEY" '$2=="CKO_PRIVATE_KEY" && $4==k {found=1} END {exit !found}'
+}
+
 ensure_token() {  # ensure_token <user>: store, token (empty user PIN) and TPM key, owned by the user
-  local u=$1 store; store=$(store_of "$u")
-  if [ -f "$store/tpm2_pkcs11.sqlite3" ]; then return 0; fi
+  local u=$1 store pid; store=$(store_of "$u")
   install -d -m 0700 -o "$u" -g "$(id -gn "$u")" "$store"
-  quiet tpm2_ptool init --path="$store" >/dev/null
-  # The SO PIN is random and not kept: it only resets a user PIN, and this PIN is empty by design. A broken token is
-  # replaced by deleting the store; the next run creates a new key and certificate.
-  local so up; so=$(openssl rand -hex 16); up=$(openssl rand -hex 16)
-  quiet tpm2_ptool addtoken --path="$store" --pid=1 --label="$TOKEN" --sopin="$so" --userpin="$up" >/dev/null
-  quiet tpm2_ptool changepin --path="$store" --label="$TOKEN" --user=user --old="$up" --new="" >/dev/null
-  unset so up
+  if has_key "$store"; then return 0; fi
+  # The TPM PKCS#11 library creates an empty store when any program in the user's session loads it through p11-kit,
+  # which can happen before this runs (changelog #164): set up whatever is missing; never trust the file's presence.
+  # tpm2_ptool 1.9: "listtokens" needs a primary id, so ask for the token's objects instead ("No token labeled ...").
+  if tpm2_ptool listobjects --path="$store" --label="$TOKEN" 2>&1 | grep -q 'No token labeled'; then
+    pid=$(tpm2_ptool listprimaries --path="$store" 2>/dev/null | sed -n 's/^[ -]*id: *\([0-9][0-9]*\)$/\1/p' | head -n 1)
+    [ -n "$pid" ] || pid=$(tpm2_ptool init --path="$store" 2>/dev/null | sed -n 's/^[ -]*id: *\([0-9][0-9]*\)$/\1/p' | head -n 1)
+    [ -n "$pid" ] || { fail "$u: could not create a TPM primary object in $store"; return 1; }
+    # The SO PIN is random and not kept: it only resets a user PIN, and this PIN is empty by design. A broken token is
+    # replaced by deleting the store; the next run creates a new key and certificate.
+    local so up; so=$(openssl rand -hex 16); up=$(openssl rand -hex 16)
+    quiet tpm2_ptool addtoken --path="$store" --pid="$pid" --label="$TOKEN" --sopin="$so" --userpin="$up" >/dev/null
+    quiet tpm2_ptool changepin --path="$store" --label="$TOKEN" --user=user --old="$up" --new="" >/dev/null
+    unset so up
+  fi
   quiet tpm2_ptool addkey --path="$store" --label="$TOKEN" --userpin="" --algorithm=ecc256 --key-label="$KEY" >/dev/null
   chown -R "$u:$(id -gn "$u")" "$store"
+  has_key "$store" || { fail "$u: the TPM key could not be created in $store"; return 1; }
   log "token and TPM key created for $u"
 }
 

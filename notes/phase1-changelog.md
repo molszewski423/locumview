@@ -2714,5 +2714,23 @@ Agent: Claude Code
   commit, `kubectl apply -k k8s/clinical` (the sso Ingress and middleware annotations return).
 - **Verification so far:** `kubectl kustomize` renders the TLSOption, the Secret (`ca.crt`), both Ingresses with the
   option and no sso Ingress; shellcheck; pre-commit on all files; the whole-history gitleaks scan.
+## 164. Desktop certificate: a user's token could be left without its key (race with the PKCS#11 library) (2026-11-13)
+
+- **Found on lv-demo01** (image `sha256:1cb7cbad…`, promoted to `:stable` by the owner and applied with `bootc
+  upgrade` and a reboot): the TPM hardening service hardened it at boot; the demo user's always-on session got its
+  token, its certificate (valid 3 days) and its Remote Desktop credentials moved into the TPM. But the owner's own
+  login there failed: "no private key 'desktop' on token". The TPM PKCS#11 library creates an empty store database when
+  any program in a new session loads it through p11-kit, and that happened before the helper ran; `ensure_token`
+  treated an existing database as a finished token and skipped creating the token and key. The timer then raised its
+  ALERT for that user, as designed. (On lv-test17 the helper happened to run first.)
+- **Fix:** `ensure_token` decides by the key, not the file: it keeps a store holding the key; otherwise it creates the
+  primary object and token when missing (asking with `listobjects --label`, since `listtokens` in tpm2_ptool 1.9 needs
+  a primary id; parsing `id: N` as 1.9 prints it) and then the key, and fails loudly if the key is still missing.
+- **Verified** in an EL10 container against swtpm 0.9.0 behind tpm2-abrmd 3.0 (a resource manager, as `/dev/tpmrm0` is
+  on the desktops; without one the software TPM runs out of object slots inside a single `tpm2_ptool` call): a fresh
+  user; the race (a 28 KB store pre-created by the library) completed; a second run changes nothing; a token without a
+  key gets one. The PKCS#11 library in that container would not use the resource manager, so the PKCS#11 read-back is
+  left to a real desktop (lv-test17 passed it in #162). Next: the fixed helper by hand on lv-demo01 for the owner's
+  token, then the next image.
 
 Agent: Claude Code
