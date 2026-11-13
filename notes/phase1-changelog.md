@@ -2214,3 +2214,12 @@ Agent: Claude Code
 - **Deploy:** no image changes; the owner's deploy script runs the loader (scenario step), which now includes the step.
 
 Agent: Claude Code
+
+## 139. Phase 9 lite M6: #137 deployed and #138 run on the cluster (2026-11-12)
+
+- **Deploy of #137 (owner):** the agent runs the pinned image (knowledge base 0.7.0). LV-bsi-citrobacter-ampc-01 showed both expected findings (suboptimal agent with the exception wording; IV to PO with ciprofloxacin and TMP-SMX) once its FHIR ids were set (see #138).
+- **#138 on the cluster (owner):** after the merge, `scripts/clinical/load-scenarios.sh` skipped the 20 background patients and all 23 cases as already loaded, then printed "FHIR ids assigned to records that had none".
+- **App check (owner screenshot):** LV-bsi-kaerogenes-cefepime-negative-01 (cefepime 2 g every 8 hours, cefepime MIC 4 SDD) opened without an error and showed "No findings for this patient", decided by knowledge base 0.7.0, as expected for this negative control. This confirms the patient opens and the result is correct after the step; it does not reproduce the race itself, which #138 verified locally.
+- **Open:** the Listeria risk-factor rule (immunocompromise, WHO 2025 list) awaits the owner's design choice, then primary sources and an OpenEvidence packet.
+
+Agent: Claude Code
