@@ -1,0 +1,49 @@
+#!/bin/bash
+# LocumView desktop TPM hardening (ADR 0019, changelog #162). Runs as root.
+#
+# Once a desktop user may use the TPM for their certificate key (desktop-cert), the TPM's empty hierarchy passwords
+# matter: a user could clear the TPM (lockout hierarchy) or set an owner password, and either stops clevis from
+# unsealing the disk key at the next boot (recovery: the LUKS recovery passphrase). This:
+#   harden  (boot, after first-boot provisioning)  sets disableClear, then a random lockout password kept root-only in
+#           /etc/locumview/tpm-lockout.auth: the TPM can no longer be cleared, and its dictionary-attack settings
+#           changed only by root. The owner password must stay empty (clevis and tpm2-pkcs11 create their primary keys
+#           under the owner hierarchy without one), so it cannot be locked; instead:
+# The platform hierarchy can always clear a TPM; the desktop firmware (OVMF) must leave it with a random password
+# (checked on lv-test17, changelog #162).
+#   check   (also every 6 hours, from the desktop-cert timer)  fails with an ALERT in the journal when an owner or
+#           endorsement password was set, or the TPM lost its hardening.
+set -euo pipefail
+AUTH=/etc/locumview/tpm-lockout.auth
+log() { logger -t locumview-tpm -p "user.${2:-info}" -- "$1"; echo "$1"; }
+[ -e /dev/tpmrm0 ] || { echo "no TPM"; exit 0; }
+flag() { tpm2_getcap properties-variable | sed -n "s/^ *$1: *//p"; }
+
+check() {
+  local rc=0
+  if [ "$(flag ownerAuthSet)" != 0 ] || [ "$(flag endorsementAuthSet)" != 0 ]; then
+    log "ALERT: a TPM owner or endorsement password was set; the disk will not unlock by itself at the next boot (LUKS recovery passphrase needed)" err; rc=1
+  fi
+  if [ "$(flag disableClear)" != 1 ] || [ "$(flag lockoutAuthSet)" != 1 ]; then
+    log "ALERT: the TPM is not hardened (disableClear $(flag disableClear), lockout password set $(flag lockoutAuthSet))" err; rc=1
+  fi
+  return $rc
+}
+
+harden() {
+  if [ "$(flag lockoutAuthSet)" = 1 ]; then return 0; fi   # done before (or by someone else: check reports it)
+  [ -f /var/lib/locumview/provisioned ] || { echo "not provisioned yet; provisioning sets the TPM's limits first"; return 0; }
+  [ "$(flag disableClear)" = 1 ] || tpm2_clearcontrol -C l s   # "s": set (the tool clears by default)
+  install -d -m 0755 /etc/locumview
+  umask 077
+  # 64 hex characters (tpm2-tools reads a file: password as text); file: keeps it out of every process's arguments.
+  head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n' > "$AUTH.new"; chmod 0400 "$AUTH.new"
+  tpm2_changeauth -c lockout "file:$AUTH.new"
+  mv -f "$AUTH.new" "$AUTH"
+  log "TPM hardened: clear disabled, lockout password set (root-only $AUTH)"
+}
+
+case "${1:-}" in
+  harden) harden; check ;;
+  check) check ;;
+  *) echo "usage: $0 harden | check" >&2; exit 2 ;;
+esac

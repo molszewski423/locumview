@@ -160,6 +160,7 @@ all)
       log "ALERT $u: the desktop certificate expires within $ALERT_BEFORE_HOURS hours and could not be renewed" err; rc=1
     fi
   done
+  /usr/libexec/locumview/tpm-harden check || rc=1   # an owner password set by anyone breaks disk unlock (#162)
   exit $rc
   ;;
 *) echo "usage: $0 login|logout|renew <uid> | all" >&2; exit 2 ;;
