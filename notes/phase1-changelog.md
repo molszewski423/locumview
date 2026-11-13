@@ -2288,3 +2288,20 @@ Agent: Claude Code
   (four "Incorrect password" audit events); empty the box first, or do admin steps in a local browser.
 
 Agent: Claude Code
+
+## 143. ADR 0019 build plan and the IdM sub-CA script (step 2) (2026-11-12)
+
+- **Why:** the owner asked why the desktop asks for Keycloak and TOTP again before the EHR; ADR 0019 removes that
+  second prompt, and M3 closes when it is built. The owner agreed to build it next, then return to M6.
+- **Plan:** `docs/plans/adr-0019-build.md`: the owner decisions needed first (accept the ADR; client certificate
+  validity, recommended 3 days with renewal every 6 hours under 2 days left; the sub-CA lifetime, recommended to
+  accept IdM's fixed lifetime with a rotation runbook, since `ipa ca-add` takes no validity option; the EHR
+  launcher's icon, per site, OpenEMR's on the reference desktops, taken at build time after reading OpenEMR's brand
+  page), then steps 2 to 5.
+- **Step 2 script:** `scripts/clinical/idm-desktop-subca.sh` (owner run), derived from the spike's: sub-CA
+  `locumview-desktop-clients`, profile `locumviewDesktopClient` (EC, client auth only, validity from the owner's
+  decision), CA ACL for `locumview-desktops`; `up` creates only what is missing, `status` reads; no destructive mode
+  (changelog #98). It writes the sub-CA's public certificate to `k8s/clinical/desktop-client-ca.pem`. Not run yet.
+- **Verification:** `bash -n` and shellcheck; pre-commit.
+
+Agent: Claude Code
