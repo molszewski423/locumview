@@ -10,7 +10,7 @@
    "sex": "male",
    "demographics": {
     "race": [
-     "2106-3"
+     "2054-5"
     ],
     "ethnicity": [
      "2186-5"
@@ -24,6 +24,19 @@
     "language": "en"
    },
    "smoking": "Never smoked tobacco",
+   "insurance": "Dual Eligible",
+   "last_visit": {
+    "start": "2026-04-09T23:46:33+00:00",
+    "reason": "General examination of patient",
+    "vitals": {
+     "weight": 187.2,
+     "height": 68.6,
+     "bps": 103,
+     "bpd": 76,
+     "pulse": 77,
+     "respiration": 14
+    }
+   },
    "problems": [
     {
      "title": "Essential hypertension",
@@ -113,7 +126,12 @@
      "title": "Influenza, split virus, trivalent, PF",
      "date": "2026-04-09"
     }
-   ]
+   ],
+   "emergency_contact": {
+    "name": "Kevin Grant",
+    "relationship": "Son",
+    "phone": "555-816-8341"
+   }
   },
   {
    "number": "SYN-002",
@@ -137,6 +155,19 @@
     "language": "en"
    },
    "smoking": "Never smoked tobacco",
+   "insurance": "Medicare",
+   "last_visit": {
+    "start": "2026-02-24T07:48:27+00:00",
+    "reason": "General examination of patient",
+    "vitals": {
+     "weight": 180.8,
+     "height": 65.0,
+     "bps": 101,
+     "bpd": 67,
+     "pulse": 70,
+     "respiration": 16
+    }
+   },
    "problems": [
     {
      "title": "Gingivitis",
@@ -171,7 +202,12 @@
      "title": "Influenza, split virus, trivalent, PF",
      "date": "2026-02-24"
     }
-   ]
+   ],
+   "emergency_contact": {
+    "name": "James Funk",
+    "relationship": "Son",
+    "phone": "555-860-3146"
+   }
   },
   {
    "number": "SYN-003",
@@ -195,6 +231,19 @@
     "language": "en"
    },
    "smoking": "Never smoked tobacco",
+   "insurance": "Medicare",
+   "last_visit": {
+    "start": "2026-04-28T11:39:24+00:00",
+    "reason": "General examination of patient",
+    "vitals": {
+     "weight": 172.8,
+     "height": 66.5,
+     "bps": 110,
+     "bpd": 73,
+     "pulse": 92,
+     "respiration": 16
+    }
+   },
    "problems": [
     {
      "title": "Anemia",
@@ -244,7 +293,12 @@
      "title": "Influenza, split virus, trivalent, PF",
      "date": "2026-04-28"
     }
-   ]
+   ],
+   "emergency_contact": {
+    "name": "James Buckridge",
+    "relationship": "Spouse",
+    "phone": "555-867-4708"
+   }
   },
   {
    "number": "SYN-004",
@@ -268,6 +322,17 @@
     "language": "en"
    },
    "smoking": "Never smoked tobacco",
+   "insurance": "Medicare",
+   "last_visit": {
+    "start": "2026-04-12T16:17:26+00:00",
+    "reason": "General examination of patient",
+    "vitals": {
+     "weight": 192.2,
+     "height": 70.6,
+     "pulse": 96,
+     "respiration": 14
+    }
+   },
    "problems": [
     {
      "title": "Traumatic or nontraumatic brain injury",
@@ -312,7 +377,12 @@
      "title": "Influenza, split virus, trivalent, PF",
      "date": "2026-04-12"
     }
-   ]
+   ],
+   "emergency_contact": {
+    "name": "Grace Mann",
+    "relationship": "Daughter",
+    "phone": "555-970-5077"
+   }
   },
   {
    "number": "SYN-005",
@@ -336,6 +406,19 @@
     "language": "en"
    },
    "smoking": "Ex-smoker",
+   "insurance": "Medicare",
+   "last_visit": {
+    "start": "2026-08-03T21:43:24+00:00",
+    "reason": "General examination of patient",
+    "vitals": {
+     "weight": 155.2,
+     "height": 62.9,
+     "bps": 91,
+     "bpd": 74,
+     "pulse": 74,
+     "respiration": 13
+    }
+   },
    "problems": [
     {
      "title": "Anemia",
@@ -395,7 +478,12 @@
      "title": "Influenza, split virus, trivalent, PF",
      "date": "2026-08-03"
     }
-   ]
+   ],
+   "emergency_contact": {
+    "name": "Linda Sauer",
+    "relationship": "Daughter",
+    "phone": "555-294-7003"
+   }
   },
   {
    "number": "SYN-006",
@@ -419,6 +507,19 @@
     "language": "en"
    },
    "smoking": "Ex-smoker",
+   "insurance": "Medicare",
+   "last_visit": {
+    "start": "2026-08-19T20:09:25+00:00",
+    "reason": "General examination of patient",
+    "vitals": {
+     "weight": 171.5,
+     "height": 65.2,
+     "bps": 114,
+     "bpd": 73,
+     "pulse": 70,
+     "respiration": 16
+    }
+   },
    "problems": [
     {
      "title": "Seizure disorder",
@@ -488,7 +589,12 @@
      "title": "Influenza, split virus, trivalent, PF",
      "date": "2026-08-19"
     }
-   ]
+   ],
+   "emergency_contact": {
+    "name": "George Kautzer",
+    "relationship": "Son",
+    "phone": "555-175-4239"
+   }
   },
   {
    "number": "SYN-007",
@@ -512,6 +618,19 @@
     "language": "en"
    },
    "smoking": "Never smoked tobacco",
+   "insurance": "Dual Eligible",
+   "last_visit": {
+    "start": "2026-04-07T16:16:38+00:00",
+    "reason": "General examination of patient",
+    "vitals": {
+     "weight": 176.8,
+     "height": 66.3,
+     "bps": 136,
+     "bpd": 99,
+     "pulse": 67,
+     "respiration": 14
+    }
+   },
    "problems": [
     {
      "title": "Idiopathic atrophic hypothyroidism",
@@ -551,7 +670,12 @@
      "title": "Influenza, split virus, trivalent, PF",
      "date": "2026-04-07"
     }
-   ]
+   ],
+   "emergency_contact": {
+    "name": "Thomas Romaguera",
+    "relationship": "Son",
+    "phone": "555-246-8144"
+   }
   },
   {
    "number": "SYN-008",
@@ -575,6 +699,19 @@
     "language": "en"
    },
    "smoking": "Ex-smoker",
+   "insurance": "Medicare",
+   "last_visit": {
+    "start": "2026-01-07T16:44:18+00:00",
+    "reason": "Encounter for check up",
+    "vitals": {
+     "weight": 209.7,
+     "height": 73.5,
+     "bps": 126,
+     "bpd": 55,
+     "pulse": 62,
+     "respiration": 15
+    }
+   },
    "problems": [
     {
      "title": "Anemia",
@@ -624,7 +761,12 @@
      "title": "Influenza, split virus, trivalent, PF",
      "date": "2026-01-07"
     }
-   ]
+   ],
+   "emergency_contact": {
+    "name": "Karen Runolfsdottir",
+    "relationship": "Daughter",
+    "phone": "555-290-7278"
+   }
   },
   {
    "number": "SYN-009",
@@ -648,6 +790,19 @@
     "language": "en"
    },
    "smoking": "Never smoked tobacco",
+   "insurance": "Medicare",
+   "last_visit": {
+    "start": "2026-10-02T17:48:53+00:00",
+    "reason": "General examination of patient",
+    "vitals": {
+     "weight": 188.3,
+     "height": 68.9,
+     "bps": 124,
+     "bpd": 74,
+     "pulse": 99,
+     "respiration": 13
+    }
+   },
    "problems": [
     {
      "title": "Anemia",
@@ -713,7 +868,12 @@
      "title": "Influenza, split virus, trivalent, PF",
      "date": "2026-10-02"
     }
-   ]
+   ],
+   "emergency_contact": {
+    "name": "George Crooks",
+    "relationship": "Son",
+    "phone": "555-337-6659"
+   }
   },
   {
    "number": "SYN-010",
@@ -737,6 +897,19 @@
     "language": "en"
    },
    "smoking": "Never smoked tobacco",
+   "insurance": "Medicaid",
+   "last_visit": {
+    "start": "2026-04-29T09:48:06+00:00",
+    "reason": "General examination of patient",
+    "vitals": {
+     "weight": 208.8,
+     "height": 69.6,
+     "bps": 125,
+     "bpd": 99,
+     "pulse": 71,
+     "respiration": 14
+    }
+   },
    "problems": [
     {
      "title": "Anemia",
@@ -786,7 +959,12 @@
      "title": "Influenza, split virus, trivalent, PF",
      "date": "2026-04-29"
     }
-   ]
+   ],
+   "emergency_contact": {
+    "name": "Maria Armstrong",
+    "relationship": "Spouse",
+    "phone": "555-620-9294"
+   }
   },
   {
    "number": "SYN-011",
@@ -810,6 +988,19 @@
     "language": "en"
    },
    "smoking": "Ex-smoker",
+   "insurance": "UnitedHealthcare",
+   "last_visit": {
+    "start": "2026-08-28T19:55:24+00:00",
+    "reason": "General examination of patient",
+    "vitals": {
+     "weight": 194.7,
+     "height": 67.2,
+     "bps": 102,
+     "bpd": 81,
+     "pulse": 73,
+     "respiration": 13
+    }
+   },
    "problems": [
     {
      "title": "Hyperlipidemia",
@@ -849,7 +1040,12 @@
      "title": "Influenza, split virus, trivalent, PF",
      "date": "2026-08-28"
     }
-   ]
+   ],
+   "emergency_contact": {
+    "name": "Mark Heaney",
+    "relationship": "Son",
+    "phone": "555-736-0697"
+   }
   },
   {
    "number": "SYN-012",
@@ -873,6 +1069,19 @@
     "language": "en"
    },
    "smoking": "Ex-smoker",
+   "insurance": "Medicaid",
+   "last_visit": {
+    "start": "2026-03-10T16:42:46+00:00",
+    "reason": "General examination of patient",
+    "vitals": {
+     "weight": 191.6,
+     "height": 66.5,
+     "bps": 104,
+     "bpd": 69,
+     "pulse": 67,
+     "respiration": 13
+    }
+   },
    "problems": [
     {
      "title": "Chronic sinusitis",
@@ -922,7 +1131,12 @@
      "title": "Influenza, split virus, trivalent, PF",
      "date": "2026-03-10"
     }
-   ]
+   ],
+   "emergency_contact": {
+    "name": "Kevin Balistreri",
+    "relationship": "Spouse",
+    "phone": "555-441-7048"
+   }
   },
   {
    "number": "SYN-013",
@@ -946,6 +1160,19 @@
     "language": "en"
    },
    "smoking": "Never smoked tobacco",
+   "insurance": "Blue Cross Blue Shield",
+   "last_visit": {
+    "start": "2026-01-18T03:10:11+00:00",
+    "reason": "General examination of patient",
+    "vitals": {
+     "weight": 227.7,
+     "height": 75.4,
+     "bps": 129,
+     "bpd": 78,
+     "pulse": 88,
+     "respiration": 12
+    }
+   },
    "problems": [],
    "allergies": [],
    "immunizations": [
@@ -974,7 +1201,12 @@
      "title": "Influenza, split virus, trivalent, PF",
      "date": "2026-01-18"
     }
-   ]
+   ],
+   "emergency_contact": {
+    "name": "Linda Bayer",
+    "relationship": "Spouse",
+    "phone": "555-203-3135"
+   }
   },
   {
    "number": "SYN-014",
@@ -998,6 +1230,19 @@
     "language": "en"
    },
    "smoking": "Ex-smoker",
+   "insurance": "Humana",
+   "last_visit": {
+    "start": "2026-05-31T17:52:46+00:00",
+    "reason": "General examination of patient",
+    "vitals": {
+     "weight": 190.7,
+     "height": 66.9,
+     "bps": 101,
+     "bpd": 82,
+     "pulse": 94,
+     "respiration": 15
+    }
+   },
    "problems": [
     {
      "title": "Anemia",
@@ -1037,7 +1282,12 @@
      "title": "Influenza, split virus, trivalent, PF",
      "date": "2026-05-31"
     }
-   ]
+   ],
+   "emergency_contact": {
+    "name": "Susan Kshlerin",
+    "relationship": "Daughter",
+    "phone": "555-232-8414"
+   }
   },
   {
    "number": "SYN-015",
@@ -1061,6 +1311,19 @@
     "language": "en"
    },
    "smoking": "Ex-smoker",
+   "insurance": "Medicaid",
+   "last_visit": {
+    "start": "2025-05-06T05:21:57+00:00",
+    "reason": "Encounter for check up",
+    "vitals": {
+     "weight": 172.8,
+     "height": 65.9,
+     "bps": 123,
+     "bpd": 76,
+     "pulse": 95,
+     "respiration": 15
+    }
+   },
    "problems": [],
    "allergies": [],
    "immunizations": [
@@ -1084,7 +1347,12 @@
      "title": "Influenza, split virus, trivalent, PF",
      "date": "2025-05-06"
     }
-   ]
+   ],
+   "emergency_contact": {
+    "name": "Daniel Langosh",
+    "relationship": "Spouse",
+    "phone": "555-820-3736"
+   }
   },
   {
    "number": "SYN-016",
@@ -1108,6 +1376,14 @@
     "language": "en"
    },
    "smoking": "Never smoked tobacco",
+   "insurance": "Blue Cross Blue Shield",
+   "last_visit": {
+    "start": "2026-05-08T13:05:50+00:00",
+    "reason": "Encounter for symptom",
+    "vitals": {
+     "temperature": 98.9
+    }
+   },
    "problems": [
     {
      "title": "Recurrent urinary tract infection",
@@ -1137,7 +1413,12 @@
      "title": "Influenza, split virus, trivalent, PF",
      "date": "2025-03-07"
     }
-   ]
+   ],
+   "emergency_contact": {
+    "name": "George Donnelly",
+    "relationship": "Spouse",
+    "phone": "555-155-3773"
+   }
   },
   {
    "number": "SYN-017",
@@ -1161,6 +1442,19 @@
     "language": "en"
    },
    "smoking": "Never smoked tobacco",
+   "insurance": "Cigna Health",
+   "last_visit": {
+    "start": "2026-10-21T02:05:32+00:00",
+    "reason": "General examination of patient",
+    "vitals": {
+     "weight": 164.9,
+     "height": 62.7,
+     "bps": 123,
+     "bpd": 79,
+     "pulse": 74,
+     "respiration": 13
+    }
+   },
    "problems": [
     {
      "title": "Anemia",
@@ -1190,7 +1484,12 @@
      "title": "Influenza, split virus, trivalent, PF",
      "date": "2026-10-21"
     }
-   ]
+   ],
+   "emergency_contact": {
+    "name": "Edward Konopelski",
+    "relationship": "Spouse",
+    "phone": "555-963-7014"
+   }
   },
   {
    "number": "SYN-018",
@@ -1214,6 +1513,19 @@
     "language": "en"
    },
    "smoking": "Never smoked tobacco",
+   "insurance": "Anthem",
+   "last_visit": {
+    "start": "2026-10-28T18:01:50+00:00",
+    "reason": "General examination of patient",
+    "vitals": {
+     "weight": 191.4,
+     "height": 71.9,
+     "bps": 146,
+     "bpd": 104,
+     "pulse": 95,
+     "respiration": 15
+    }
+   },
    "problems": [
     {
      "title": "Essential hypertension",
@@ -1248,7 +1560,12 @@
      "title": "Influenza, split virus, trivalent, PF",
      "date": "2026-10-28"
     }
-   ]
+   ],
+   "emergency_contact": {
+    "name": "Grace Turner",
+    "relationship": "Spouse",
+    "phone": "555-522-7673"
+   }
   },
   {
    "number": "SYN-019",
@@ -1272,6 +1589,19 @@
     "language": "en"
    },
    "smoking": "Ex-smoker",
+   "insurance": null,
+   "last_visit": {
+    "start": "2024-12-24T09:07:12+00:00",
+    "reason": "General examination of patient",
+    "vitals": {
+     "weight": 142.6,
+     "height": 59.5,
+     "bps": 126,
+     "bpd": 79,
+     "pulse": 98,
+     "respiration": 14
+    }
+   },
    "problems": [],
    "allergies": [],
    "immunizations": [
@@ -1300,7 +1630,12 @@
      "title": "Influenza, split virus, trivalent, PF",
      "date": "2024-12-24"
     }
-   ]
+   ],
+   "emergency_contact": {
+    "name": "Karen Hintz",
+    "relationship": "Daughter",
+    "phone": "555-376-4405"
+   }
   },
   {
    "number": "SYN-020",
@@ -1324,6 +1659,19 @@
     "language": "en"
    },
    "smoking": "Never smoked tobacco",
+   "insurance": "Aetna",
+   "last_visit": {
+    "start": "2024-11-17T08:49:15+00:00",
+    "reason": "General examination of patient",
+    "vitals": {
+     "weight": 170.2,
+     "height": 65.8,
+     "bps": 139,
+     "bpd": 89,
+     "pulse": 61,
+     "respiration": 15
+    }
+   },
    "problems": [],
    "allergies": [],
    "immunizations": [
@@ -1347,7 +1695,12 @@
      "title": "Influenza, split virus, trivalent, PF",
      "date": "2024-11-17"
     }
-   ]
+   ],
+   "emergency_contact": {
+    "name": "Edward Price",
+    "relationship": "Son",
+    "phone": "555-938-8397"
+   }
   }
  ]
 }

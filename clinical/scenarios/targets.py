@@ -91,7 +91,10 @@ class Target:
 
     def sql(self, statement):
         """Run SQL in the database container; returns the result rows (tab-separated, header removed)."""
-        out = subprocess.run(self.db + DB_SQL, input=statement, text=True, capture_output=True, check=True).stdout
+        done = subprocess.run(self.db + DB_SQL, input=statement, text=True, capture_output=True)
+        if done.returncode:
+            raise SystemExit(f"SQL failed: {done.stderr.strip()[-400:]}\n  in: {statement[:300]}")
+        out = done.stdout
         rows = [line.split("\t") for line in out.splitlines()]
         return rows[1:] if rows else []
 
