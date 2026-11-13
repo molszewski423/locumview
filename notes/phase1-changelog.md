@@ -2276,7 +2276,9 @@ Agent: Claude Code
 - **Change (owner approved):** `register-gateway.sh` sets the client flag at registration, so a rebuilt namespace keeps
   it; `k8s/clinical/README.md` says so. The per-launch review of scopes goes away; access to OpenEMR is unchanged.
 - **Live:** the flag was set in the clinical OpenEMR with the owner's approval (read back: `is_enabled` 1,
-  `skip_ehr_launch_authorization_flow` 1); launch test from a chart pending.
+  `skip_ehr_launch_authorization_flow` 1). Verified by the owner on lv-test17, signed in to OpenEMR as his named
+  account: launching from LV-bsi-kaerogenes-cefepime-negative-01 opened the app directly (no second sign-in, no scope
+  screen) with the expected result (no findings, knowledge base 0.8.0).
 - **Named administrator (owner request):** the owner created an OpenEMR account for himself in Administrators
   (Admin > Users), with his own password typed in the form; `admin` stays as the break-glass account whose password
   the loader uses from the `clinical-db` Secret. Provider, calendar and provider type were set afterwards in the
