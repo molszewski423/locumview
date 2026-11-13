@@ -2492,6 +2492,11 @@ Agent: Claude Code
   `deny = 3`, `unlock_time = 0`, so until an administrator resets it). SSH with keys and Guacamole are unaffected;
   sudo and the console login wait for `faillock --user molszewski --reset` by the break-glass `lvadmin` (owner run,
   console). IdM's own lockout counter also saw those attempts.
+- **Break-glass use (attempted, 2026-11-13 00:50):** to reset that lock, the owner tried `lvadmin` over SSH from
+  operator-laptop; lv-test17 closed the connection after the password and briefly refused new connections from that
+  address (OpenSSH 9.9's per-source penalty after a failed login); `lvadmin` now has a failure record (contents
+  root-only). Likely another desktop's break-glass password; not retried. Open: confirm lv-test17's `lvadmin`
+  password from the owner's records, then reset `molszewski` (needed before the next `bootc switch`).
 - **Verification:** shellcheck of both scripts; the live run above.
 - **Next:** the next image carries the fix (merge, CI, pin to lv-test17's next switch); the TPM lockout check from
   the build plan; Chrome presenting the certificate to a test mTLS endpoint; then step 4.
