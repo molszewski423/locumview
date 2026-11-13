@@ -13,6 +13,9 @@
 #
 # Base pinned by digest (registry.redhat.io needs a Red Hat login): rhel10/rhel-bootc 10.2, pulled 2026-10-19.
 ARG BASE=registry.redhat.io/rhel10/rhel-bootc:10.2@sha256:e80d87d7eba68cdd0277d37214144adeef854ebb4343e5f410d7b8874e17d7a7
+# The reference deployment's EHR logo, for the launcher icon (step 3c): taken from the same pinned OpenEMR 8.4.1 release
+# the clinical image builds on (clinical/images/openemr/Containerfile), not committed here.
+FROM docker.io/openemr/openemr@sha256:786e7dd867ba82db408a56c9c0cf7336cfa7ac24644c9354bdd8a5a194e83c55 AS ehr-logo
 FROM ${BASE}
 
 # 1. Packages. The same environment and add-on groups as the hand-built reference desktop
@@ -138,6 +141,24 @@ RUN --mount=type=bind,target=/src \
     install -m 0644 /src/image/desktop/reference/desktop-cert.conf /etc/locumview/desktop-cert.conf; \
     grep -qx 'SUBCA=locumview-desktop-clients' /etc/locumview/desktop-cert.conf; \
     grep -qx 'EHR_URL=https://emr.corp.locumview.com/' /etc/locumview/ehr.conf
+# 3d. The EHR launcher shows the EHR's own icon (owner direction, 2026-11-12): OpenEMR's menu logo, unchanged, on a
+#     white tile (image/desktop/scripts/ehr-icon.py), through a launcher copy in the override directory that comes
+#     first in XDG_DATA_DIRS (no package file changes). OpenEMR is GPL-3.0 software of the OpenEMR project; its name
+#     and logo identify the EHR this launcher opens. A deployment with another EHR uses that EHR's logo here.
+COPY --from=ehr-logo /var/www/localhost/htdocs/openemr/public/images/logos/core/menu/primary/logo.svg /tmp/ehr-logo.svg
+RUN --mount=type=bind,target=/src \
+    set -euo pipefail; \
+    install -d -m 0755 /usr/share/locumview/ehr-icon; \
+    python3 -I /src/image/desktop/scripts/ehr-icon.py /tmp/ehr-logo.svg /usr/share/locumview/ehr-icon/ehr.svg; \
+    printf '%s\n' 'The EHR launcher icon is the OpenEMR logo (https://www.open-emr.org), from OpenEMR 8.4.1' \
+        '(public/images/logos/core/menu/primary/logo.svg), GPL-3.0. It identifies the EHR the launcher opens.' \
+        > /usr/share/locumview/ehr-icon/NOTICE; \
+    chmod 0644 /usr/share/locumview/ehr-icon/*; rm -f /tmp/ehr-logo.svg; \
+    sed 's|^Icon=.*|Icon=/usr/share/locumview/ehr-icon/ehr.svg|' /usr/share/applications/locumview-ehr.desktop \
+        > /usr/share/locumview/override/applications/locumview-ehr.desktop; \
+    chmod 0644 /usr/share/locumview/override/applications/locumview-ehr.desktop; \
+    grep -qx 'Icon=/usr/share/locumview/ehr-icon/ehr.svg' /usr/share/locumview/override/applications/locumview-ehr.desktop; \
+    rsvg-convert -w 64 /usr/share/locumview/ehr-icon/ehr.svg -o /dev/null
 
 # 4. DISA STIG with GUI, LocumView image profile (hardening/stig/README.md), applied at build time by oscap-im.
 #    It installs the packages some rules need (AIDE, fapolicyd, USBGuard, ...), so it gets the entitlement too.
