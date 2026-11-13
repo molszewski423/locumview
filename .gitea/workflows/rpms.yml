@@ -4,7 +4,7 @@
 # digest, signing with the LocumView RPM signing key, publishing to the Gitea RPM registry (el10). Each commit gives
 # a new release (1.<commit time>git<commit>); publishing a release that is already there is not an error.
 # Credentials come from Actions secrets (each also kept in SOPS, packaging/rpm/signing/rpm-signing.sops.yaml):
-#   RPM_SIGNING_KEY / RPM_SIGNING_PASSPHRASE   sign (public key: packaging/rpm/signing/RPM-GPG-KEY-locumview)
+#   RPM_SIGNING_KEY_B64 / RPM_SIGNING_PASSPHRASE   sign (the key as one-line base64, which the runner masks) (public key: packaging/rpm/signing/RPM-GPG-KEY-locumview)
 #   REGISTRY_TOKEN                             upload to the registry (Gitea token, package scope only)
 name: rpms
 "on":
@@ -51,7 +51,7 @@ jobs:
 
       - name: Sign
         env:
-          RPM_SIGNING_KEY: ${{ secrets.RPM_SIGNING_KEY }}
+          RPM_SIGNING_KEY_B64: ${{ secrets.RPM_SIGNING_KEY_B64 }}
           RPM_SIGNING_PASSPHRASE: ${{ secrets.RPM_SIGNING_PASSPHRASE }}
         run: |
           set -euo pipefail
@@ -60,10 +60,13 @@ jobs:
           # The same fields as the SOPS file, built in memory and handed over on stdin (as JSON, which is YAML:
           # the runner host has no PyYAML).
           python3 -I - "$FPR" <<'PY' | packaging/rpm/sign-rpms.sh "$JOB/rpms"
-          import json, os, sys
+          import base64, json, os, sys
           json.dump({"rpm_signing_fingerprint": sys.argv[1],
                           "rpm_signing_passphrase": os.environ["RPM_SIGNING_PASSPHRASE"],
-                          "rpm_signing_private_key": os.environ["RPM_SIGNING_KEY"]}, sys.stdout)
+                          # One-line base64 secret: a multi-line key in the step environment was printed in full
+                          # in the run log (changelog #155, #156).
+                          "rpm_signing_private_key": base64.b64decode(os.environ["RPM_SIGNING_KEY_B64"]).decode()},
+                         sys.stdout)
           PY
 
       - name: Publish
