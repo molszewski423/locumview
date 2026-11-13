@@ -1,0 +1,16 @@
+# Owner decision 2026-11-13 (changelog #165): the demo user may reach the EHR (TCP 443 to its addresses only), through
+# its otherwise closed egress fence. Restarted with the fence, which recreates its table.
+[Unit]
+Description=LocumView: demo user may reach the EHR through its egress fence
+ConditionPathExists=/etc/nftables/locumview-demo.nft
+Wants=network-online.target
+After=network-online.target locumview-demo-egress.service
+PartOf=locumview-demo-egress.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/locumview/demo-egress-ehr
+
+[Install]
+WantedBy=multi-user.target locumview-demo-egress.service
