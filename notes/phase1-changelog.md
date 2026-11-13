@@ -2675,9 +2675,11 @@ Agent: Claude Code
   refused; an owner password raises the alert.
 - **Platform hierarchy (owner, on lv-test17):** `tpm2_clearcontrol -C p s` as the desktop user: "authorization
   failure without DA implications": the firmware has given it a password, so it cannot clear the TPM.
-- **To verify on lv-test17 (owner run):** the platform hierarchy is not usable from the OS (firmware randomizes its
-  password; otherwise it could clear the TPM regardless); harden by hand; reboot; the disk unlocks by itself and the
-  certificate still works.
+- **Verified on lv-test17 (owner runs, agent checks read-only):** the fixed script by hand with sudo: "TPM hardened";
+  then a reboot through the hypervisor: the disk unlocked from the TPM by itself (SSH back within a minute), the flags
+  persisted (lockout password set, `disableClear` 1, owner and endorsement passwords empty, not in lockout), Remote
+  Desktop active, the user's TPM access back, and the user's token intact and readable through PKCS#11 as Chrome uses
+  it (private key, public key, EC P-256 certificate). The service itself arrives with the next image.
 - **Found on the way (again):** an edit placed a file-list line in the spec's `%install` section (as in #154); a build
   from the commit caught it, together with the missing `%files` line. RPMs now build from the commit with all files.
 - **lv-test18 destroyed (owner):** the October node3 test desktop, from `terraform/node3` in a separate operator
