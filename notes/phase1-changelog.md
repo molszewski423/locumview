@@ -2353,3 +2353,13 @@ Agent: Claude Code
   tests (including the TPM lockout check from the build plan).
 
 Agent: Claude Code
+
+## 147. Image build fix: the EHR icon's render check (2026-11-12)
+
+- **Found:** image runs #368 and #372 (merges of #145) failed at step 3d's last command: `rsvg-convert -o /dev/null`
+  refuses a target that is not a regular file. Every step before it passed in #372: the `locumview-desktop-cert` RPM
+  installed and verified (`rpm -V`), its timer enabled, the reference `desktop-cert.conf` and Chrome policy installed,
+  OpenEMR's logo copied from the pinned image and the icon made.
+- **Fix:** the check renders to a temporary file and removes it.
+
+Agent: Claude Code
