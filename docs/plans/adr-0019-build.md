@@ -2,7 +2,7 @@
 
 Written 2026-11-12. Decision: [ADR 0019](../adr/0019-ehr-reachable-only-from-desktops.md). The spike is done and
 fully undone (changelog #96, #98). M3 closes when this build passes its tests (owner decision, 2026-10-27).
-Status: Planned; nothing below is built yet.
+Status: In progress. Step 2 Done (2026-11-12, changelog #144).
 
 ## Why now
 
@@ -21,7 +21,7 @@ SMART launch no longer adds one. This build removes the second Keycloak prompt.
    validity option; upstream sources describe the lightweight sub-CA as getting Dogtag's CA default (20 years in
    practice; the spike's sub-CA had it), which cannot be overridden per CA without unsupported profile edits. The
    key never leaves IdM's CA; the runbook covers replacing the sub-CA (add the new one to Traefik's TLS option next
-   to the old, let desktops renew from it, then drop the old). To be confirmed with `ipa help ca-add` at step 2.
+   to the old, let desktops renew from it, then drop the old). Confirmed at step 2: the sub-CA ends 2046-10-05, the end of IdM's own CA, about 20 years.
 4. **The icon (owner direction, 2026-11-12):** the EHR launcher shows the EHR's own icon, set per site; the
    reference desktops use OpenEMR's, taken at build time from the pinned OpenEMR release (not committed), after
    reading OpenEMR's brand page; a neutral EHR icon is the fallback. It ships in the same desktop image as step 3.
