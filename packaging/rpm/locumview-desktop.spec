@@ -239,6 +239,7 @@ fi
 %dir %{_libexecdir}/locumview
 %{_libexecdir}/locumview/desktop-cert
 %{_libexecdir}/locumview/grd-credentials-to-tpm
+%{_libexecdir}/locumview/tpm-harden
 %dir %{_sysconfdir}/locumview
 %config(noreplace) %{_sysconfdir}/locumview/desktop-cert.conf
 %{_unitdir}/locumview-desktop-cert@.service
