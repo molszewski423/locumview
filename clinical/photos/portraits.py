@@ -6,8 +6,8 @@
 Runs on a workstation with an NVIDIA GPU, in a Python environment with torch (CUDA), diffusers, transformers,
 accelerate and pillow; never in CI. The model is RealVisXL V5.0 (SG161222/RealVisXL_V5.0, CreativeML OpenRAIL++-M),
 pinned by revision; set LOCUMVIEW_PORTRAIT_MODEL to the local path of RealVisXL_V5.0_fp16.safetensors at that
-revision. Each portrait follows the patient's recorded age, sex, race and ethnicity (and, for a case, its
-"portrait" text), with a seed derived from the patient number, so a photo can be made again. Output: a 512 x 640
+revision. Each portrait follows the patient's recorded age, sex, race and ethnicity (and, for a case, the
+"portrait" text in clinical/scenarios/charts.json), with a seed derived from the patient number, so a photo can be made again. Output: a 512 x 640
 JPEG per patient in this directory, named by patient number; the loader stores it as the patient's photograph.
 """
 import hashlib
@@ -47,10 +47,11 @@ def patients():
     for p in json.loads((HERE.parent / "synthea" / "background.json").read_text())["patients"]:
         d = p["demographics"]
         yield p["number"], describe(p["sex"], p["birth_date"], d["race"], d["ethnicity"])
+    charts = json.loads((HERE.parent / "scenarios" / "charts.json").read_text())
     for path in sorted((HERE.parent / "scenarios" / "cases").glob("*.json")):
         c = json.loads(path.read_text())
-        p, d = c["patient"], c.get("chart", {}).get("demographics")
-        if d:   # a case gets its photo once its chart has demographics
+        p, d = c["patient"], charts.get(c["id"], {}).get("demographics")
+        if d:   # a case gets its photo once clinical/scenarios/charts.json has its demographics
             yield f"LV-{c['id']}", describe(p["sex"], p["birth_date"], d["race"], d["ethnicity"], d.get("portrait", ""))
 
 

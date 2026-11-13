@@ -1,0 +1,627 @@
+{
+ "_note": "Chart details for the scenario cases that no rule reads (owner request, 2026-11-12): demographics, emergency contact and insurance, made up and consistent with each case's age and sex; plus the portrait description for clinical/photos/portraits.py. Clinical history (past history, home medications, social history, immunizations) is added only after the owner's clinical review. The loader applies this to new and already loaded cases.",
+ "bsi-citrobacter-ampc-01": {
+  "demographics": {
+   "race": [
+    "2106-3"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "183 Spring Street",
+   "city": "Springfield",
+   "state": "MA",
+   "postal_code": "01103",
+   "phone_home": "555-312-8807",
+   "marital": "M",
+   "language": "en",
+   "portrait": "short graying hair, clean-shaven"
+  },
+  "emergency_contact": {
+   "name": "Carol Casebook",
+   "relationship": "Spouse",
+   "phone": "555-267-4035"
+  },
+  "insurance": "Medicaid"
+ },
+ "bsi-ecoli-esbl-mismatch-01": {
+  "demographics": {
+   "race": [
+    "2054-5"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "613 Elm Avenue",
+   "city": "Worcester",
+   "state": "MA",
+   "postal_code": "01604",
+   "phone_home": "555-593-7230",
+   "marital": "W",
+   "language": "en",
+   "portrait": "short natural gray hair, reading glasses"
+  },
+  "emergency_contact": {
+   "name": "Carol Casebook",
+   "relationship": "Daughter",
+   "phone": "555-808-1213"
+  },
+  "insurance": "Medicare"
+ },
+ "bsi-enterobacter-ampc-01": {
+  "demographics": {
+   "race": [
+    "2106-3"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "996 Summer Street",
+   "city": "New Bedford",
+   "state": "MA",
+   "postal_code": "02740",
+   "phone_home": "555-403-5249",
+   "marital": "M",
+   "language": "en",
+   "portrait": "bald with a gray beard"
+  },
+  "emergency_contact": {
+   "name": "Grace Casebook",
+   "relationship": "Spouse",
+   "phone": "555-735-8821"
+  },
+  "insurance": "Medicare"
+ },
+ "bsi-kaerogenes-cefepime-negative-01": {
+  "demographics": {
+   "race": [
+    "2054-5"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "259 Maple Street",
+   "city": "Lowell",
+   "state": "MA",
+   "postal_code": "01852",
+   "phone_home": "555-700-1466",
+   "marital": "M",
+   "language": "en",
+   "portrait": "short gray hair, gray mustache"
+  },
+  "emergency_contact": {
+   "name": "Diane Casebook",
+   "relationship": "Spouse",
+   "phone": "555-326-2415"
+  },
+  "insurance": "Medicare"
+ },
+ "bsi-mssa-cefazolin-negative-01": {
+  "demographics": {
+   "race": [
+    "2106-3"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "518 Elm Avenue",
+   "city": "Lynn",
+   "state": "MA",
+   "postal_code": "01902",
+   "phone_home": "555-733-7887",
+   "marital": "S",
+   "language": "en",
+   "portrait": "thin face, short brown hair"
+  },
+  "emergency_contact": {
+   "name": "Steven Casebook",
+   "relationship": "Son",
+   "phone": "555-851-6115"
+  },
+  "insurance": "Medicaid"
+ },
+ "bsi-mssa-vancomycin-01": {
+  "demographics": {
+   "race": [
+    "2028-9"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "790 Central Street",
+   "city": "Waltham",
+   "state": "MA",
+   "postal_code": "02453",
+   "phone_home": "555-727-1164",
+   "marital": "M",
+   "language": "en",
+   "portrait": "short black hair with gray streaks"
+  },
+  "emergency_contact": {
+   "name": "Robert Casebook",
+   "relationship": "Spouse",
+   "phone": "555-352-0995"
+  },
+  "insurance": "UnitedHealthcare"
+ },
+ "cap-duration-01": {
+  "demographics": {
+   "race": [
+    "2106-3"
+   ],
+   "ethnicity": [
+    "2135-2"
+   ],
+   "street": "794 Elm Avenue",
+   "city": "New Bedford",
+   "state": "MA",
+   "postal_code": "02740",
+   "phone_home": "555-355-8633",
+   "marital": "M",
+   "language": "es",
+   "portrait": "shoulder-length dark hair"
+  },
+  "emergency_contact": {
+   "name": "Luis Casebook",
+   "relationship": "Spouse",
+   "phone": "555-492-8798"
+  },
+  "insurance": "Cigna Health"
+ },
+ "cap-febrile-iv-negative-01": {
+  "demographics": {
+   "race": [
+    "2106-3"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "778 Prospect Street",
+   "city": "Lynn",
+   "state": "MA",
+   "postal_code": "01902",
+   "phone_home": "555-856-7713",
+   "marital": "D",
+   "language": "en",
+   "portrait": "short blond-gray hair"
+  },
+  "emergency_contact": {
+   "name": "Thomas Casebook",
+   "relationship": "Son",
+   "phone": "555-148-5281"
+  },
+  "insurance": "Medicaid"
+ },
+ "cap-levofloxacin-ivpo-01": {
+  "demographics": {
+   "race": [
+    "2028-9"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "572 Summer Street",
+   "city": "Quincy",
+   "state": "MA",
+   "postal_code": "02169",
+   "phone_home": "555-988-1287",
+   "marital": "M",
+   "language": "en",
+   "portrait": "short black hair with gray at the temples"
+  },
+  "emergency_contact": {
+   "name": "Karen Casebook",
+   "relationship": "Spouse",
+   "phone": "555-635-4580"
+  },
+  "insurance": "Cigna Health"
+ },
+ "cellulitis-duration-01": {
+  "demographics": {
+   "race": [
+    "2028-9"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "380 Chestnut Street",
+   "city": "Brockton",
+   "state": "MA",
+   "postal_code": "02301",
+   "phone_home": "555-798-5931",
+   "marital": "M",
+   "language": "en",
+   "portrait": "long dark hair tied back, South Asian"
+  },
+  "emergency_contact": {
+   "name": "Steven Casebook",
+   "relationship": "Spouse",
+   "phone": "555-336-1807"
+  },
+  "insurance": "Cigna Health"
+ },
+ "cellulitis-stop-date-negative-01": {
+  "demographics": {
+   "race": [
+    "2106-3"
+   ],
+   "ethnicity": [
+    "2135-2"
+   ],
+   "street": "784 Maple Street",
+   "city": "Worcester",
+   "state": "MA",
+   "postal_code": "01604",
+   "phone_home": "555-687-0371",
+   "marital": "M",
+   "language": "es",
+   "portrait": "short dark hair, mustache"
+  },
+  "emergency_contact": {
+   "name": "Ana Casebook",
+   "relationship": "Spouse",
+   "phone": "555-248-2220"
+  },
+  "insurance": "Medicaid"
+ },
+ "ciai-double-anaerobe-01": {
+  "demographics": {
+   "race": [
+    "2054-5"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "731 Park Avenue",
+   "city": "Worcester",
+   "state": "MA",
+   "postal_code": "01604",
+   "phone_home": "555-784-1458",
+   "marital": "S",
+   "language": "en",
+   "portrait": "short black hair, trimmed beard"
+  },
+  "emergency_contact": {
+   "name": "Robert Casebook",
+   "relationship": "Son",
+   "phone": "555-799-1938"
+  },
+  "insurance": "Aetna"
+ },
+ "ciai-piptazo-alone-negative-01": {
+  "demographics": {
+   "race": [
+    "2106-3"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "820 Chestnut Street",
+   "city": "Waltham",
+   "state": "MA",
+   "postal_code": "02453",
+   "phone_home": "555-194-6948",
+   "marital": "M",
+   "language": "en",
+   "portrait": "auburn hair in a ponytail"
+  },
+  "emergency_contact": {
+   "name": "Steven Casebook",
+   "relationship": "Spouse",
+   "phone": "555-122-4850"
+  },
+  "insurance": "UnitedHealthcare"
+ },
+ "cystitis-enterobacter-negative-01": {
+  "demographics": {
+   "race": [
+    "2106-3"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "229 School Street",
+   "city": "Worcester",
+   "state": "MA",
+   "postal_code": "01604",
+   "phone_home": "555-960-2505",
+   "marital": "W",
+   "language": "en",
+   "portrait": "short white hair"
+  },
+  "emergency_contact": {
+   "name": "Edward Casebook",
+   "relationship": "Son",
+   "phone": "555-558-8695"
+  },
+  "insurance": "Medicare"
+ },
+ "meningitis-alcohol-negative-01": {
+  "demographics": {
+   "race": [
+    "2106-3"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "246 School Street",
+   "city": "Framingham",
+   "state": "MA",
+   "postal_code": "01702",
+   "phone_home": "555-987-2081",
+   "marital": "D",
+   "language": "en",
+   "portrait": "unshaven, short brown hair"
+  },
+  "emergency_contact": {
+   "name": "Diane Casebook",
+   "relationship": "Daughter",
+   "phone": "555-390-6845"
+  },
+  "insurance": "Harvard Pilgrim"
+ },
+ "meningitis-ampicillin-covered-negative-01": {
+  "demographics": {
+   "race": [
+    "2054-5"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "625 Chestnut Street",
+   "city": "Springfield",
+   "state": "MA",
+   "postal_code": "01103",
+   "phone_home": "555-427-2396",
+   "marital": "M",
+   "language": "en",
+   "portrait": "short gray curly hair"
+  },
+  "emergency_contact": {
+   "name": "Thomas Casebook",
+   "relationship": "Spouse",
+   "phone": "555-974-8623"
+  },
+  "insurance": "Medicare"
+ },
+ "meningitis-diabetes-gap-01": {
+  "demographics": {
+   "race": [
+    "2106-3"
+   ],
+   "ethnicity": [
+    "2135-2"
+   ],
+   "street": "903 Elm Avenue",
+   "city": "Brockton",
+   "state": "MA",
+   "postal_code": "02301",
+   "phone_home": "555-273-1826",
+   "marital": "M",
+   "language": "es",
+   "portrait": "short black hair"
+  },
+  "emergency_contact": {
+   "name": "Rosa Casebook",
+   "relationship": "Spouse",
+   "phone": "555-308-2397"
+  },
+  "insurance": "Medicaid"
+ },
+ "meningitis-listeria-gap-01": {
+  "demographics": {
+   "race": [
+    "2106-3"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "799 Summer Street",
+   "city": "Worcester",
+   "state": "MA",
+   "postal_code": "01604",
+   "phone_home": "555-699-4717",
+   "marital": "W",
+   "language": "en",
+   "portrait": "short gray hair, glasses"
+  },
+  "emergency_contact": {
+   "name": "Paul Casebook",
+   "relationship": "Son",
+   "phone": "555-816-7321"
+  },
+  "insurance": "Medicare"
+ },
+ "meningitis-steroid-covered-negative-01": {
+  "demographics": {
+   "race": [
+    "2106-3"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "443 Park Avenue",
+   "city": "Brockton",
+   "state": "MA",
+   "postal_code": "02301",
+   "phone_home": "555-565-5648",
+   "marital": "M",
+   "language": "en",
+   "portrait": "brown hair, slightly round face"
+  },
+  "emergency_contact": {
+   "name": "Mark Casebook",
+   "relationship": "Spouse",
+   "phone": "555-698-6938"
+  },
+  "insurance": "Tufts Health Plan"
+ },
+ "meningitis-transplant-gap-01": {
+  "demographics": {
+   "race": [
+    "2106-3"
+   ],
+   "ethnicity": [
+    "2135-2"
+   ],
+   "street": "704 Elm Avenue",
+   "city": "Somerville",
+   "state": "MA",
+   "postal_code": "02143",
+   "phone_home": "555-413-9952",
+   "marital": "M",
+   "language": "es",
+   "portrait": "shoulder-length dark brown hair"
+  },
+  "emergency_contact": {
+   "name": "Pedro Casebook",
+   "relationship": "Spouse",
+   "phone": "555-620-3147"
+  },
+  "insurance": "UnitedHealthcare"
+ },
+ "meningitis-young-negative-01": {
+  "demographics": {
+   "race": [
+    "2106-3"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "318 Prospect Street",
+   "city": "Framingham",
+   "state": "MA",
+   "postal_code": "01702",
+   "phone_home": "555-946-8948",
+   "marital": "S",
+   "language": "en",
+   "portrait": "short dark hair, light stubble, Middle Eastern"
+  },
+  "emergency_contact": {
+   "name": "Robert Casebook",
+   "relationship": "Father",
+   "phone": "555-990-5139"
+  },
+  "insurance": "UnitedHealthcare"
+ },
+ "pyelo-enterobacter-ambiguous-01": {
+  "demographics": {
+   "race": [
+    "2054-5"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "219 Maple Street",
+   "city": "Brockton",
+   "state": "MA",
+   "postal_code": "02301",
+   "phone_home": "555-372-3838",
+   "marital": "D",
+   "language": "en",
+   "portrait": "natural hair pulled back"
+  },
+  "emergency_contact": {
+   "name": "Ruth Casebook",
+   "relationship": "Daughter",
+   "phone": "555-546-2251"
+  },
+  "insurance": "Medicaid"
+ },
+ "pyelo-ivpo-ambiguous-01": {
+  "demographics": {
+   "race": [
+    "2106-3"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "694 Elm Avenue",
+   "city": "Lowell",
+   "state": "MA",
+   "postal_code": "01852",
+   "phone_home": "555-308-7370",
+   "marital": "M",
+   "language": "en",
+   "portrait": "shoulder-length light brown hair"
+  },
+  "emergency_contact": {
+   "name": "Kevin Casebook",
+   "relationship": "Spouse",
+   "phone": "555-548-6781"
+  },
+  "insurance": "Aetna"
+ },
+ "pyelo-kaerogenes-ivpo-01": {
+  "demographics": {
+   "race": [
+    "2028-9"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "228 Park Avenue",
+   "city": "Somerville",
+   "state": "MA",
+   "postal_code": "02143",
+   "phone_home": "555-485-7360",
+   "marital": "M",
+   "language": "en",
+   "portrait": "shoulder-length black hair, Filipino"
+  },
+  "emergency_contact": {
+   "name": "Kevin Casebook",
+   "relationship": "Spouse",
+   "phone": "555-576-3418"
+  },
+  "insurance": "UnitedHealthcare"
+ },
+ "pyelo-matched-negative-01": {
+  "demographics": {
+   "race": [
+    "2054-5"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "653 School Street",
+   "city": "Quincy",
+   "state": "MA",
+   "postal_code": "02169",
+   "phone_home": "555-578-4807",
+   "marital": "S",
+   "language": "en",
+   "portrait": "short natural hair"
+  },
+  "emergency_contact": {
+   "name": "Maria Casebook",
+   "relationship": "Daughter",
+   "phone": "555-209-7012"
+  },
+  "insurance": "Tufts Health Plan"
+ },
+ "uti-esbl-mismatch-01": {
+  "demographics": {
+   "race": [
+    "2028-9"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "298 Chestnut Street",
+   "city": "Somerville",
+   "state": "MA",
+   "postal_code": "02143",
+   "phone_home": "555-386-3841",
+   "marital": "W",
+   "language": "en",
+   "portrait": "gray hair in a bun, South Asian"
+  },
+  "emergency_contact": {
+   "name": "Grace Casebook",
+   "relationship": "Daughter",
+   "phone": "555-769-0694"
+  },
+  "insurance": "Medicare"
+ }
+}
