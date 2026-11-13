@@ -22,8 +22,8 @@ images:
     # commit d2cc459, clinical-images run 296; signature and SBOM attestation verified by CI 2026-11-10
     digest: sha256:b7e7d84ca6eec6477f4f45286ba13cfd2f192c3b0c27a09064351c153bdf16c6
   - name: git.lan/mike/locumview-clinical-agent
-    # commit a2b81d9, clinical-images (Gitea run 598); signature and SBOM attestation verified by CI 2026-11-12
-    digest: sha256:4571e788cd5b359db8366d6cf56c10a11c95f73672098849936b0c5e3e59e870
+    # commit 326d822, clinical-images (Gitea run 610); signature and SBOM attestation verified by CI 2026-11-12
+    digest: sha256:fe6659e3a6a3e8f0c82ce8d9cf348b921a194455596a2bb6001a89ab203c7e41
 
 # Site values (not secret, but site-specific): read from site.env by the replacements below and never applied.
 configMapGenerator:
