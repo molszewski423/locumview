@@ -9,8 +9,9 @@ the Gitea RPM registry. A public Fedora COPR mirror may follow once the packages
 | `locumview-branding` | The LocumView logo under the distribution logo's names, in an override directory first in `XDG_DATA_DIRS` (no package's files are changed); the login logo; the wallpapers in light and dark, listed in Settings |
 | `locumview-tour` | The LocumView Tour, its autostart at first sign-in, and the guest account's reopen-on-connect service |
 | `locumview-ehr-launcher` | The EHR launcher (Chrome app mode), its local start page and `/etc/locumview/ehr.conf` |
+| `locumview-desktop-cert` | ADR 0019's desktop client certificate: a TPM-held key per user, renewed from the IdM sub-CA with the host keytab; its timer, the sign-in hook and `/etc/locumview/desktop-cert.conf` (off until a deployment sets it) |
 
-All four come from one spec, `locumview-desktop.spec`, built from the same files `packaging/install-desktop.sh` and
+All five come from one spec, `locumview-desktop.spec`, built from the same files `packaging/install-desktop.sh` and
 the image use, so nothing moved. Dconf defaults, the organization's layout, the STIG and third-party pieces
 (Papirus, Tiling Assistant, Blur my Shell) stay with the image for now.
 

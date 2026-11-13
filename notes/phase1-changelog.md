@@ -2322,3 +2322,34 @@ Agent: Claude Code
   88:D7:FC:23:...:79:28), for Traefik's TLS option in step 4. Next: step 3, the desktop RPM.
 
 Agent: Claude Code
+
+## 145. ADR 0019 step 3 written: the desktop certificate RPM, Chrome's certificate policy and the EHR icon (2026-11-12)
+
+- **`locumview-desktop-cert` RPM** (fifth package of `locumview-desktop.spec`): `/usr/libexec/locumview/desktop-cert`,
+  the spike's B3 helper made permanent. At a user's sign-in (`user-runtime-dir@.service` drop-in; a failure never
+  blocks the sign-in, and it never waits for a lock) the user gets read and write access to `/dev/tpmrm0`, and a
+  background unit creates their tpm2-pkcs11 token if missing (ECDSA P-256 key generated in the TPM, empty user PIN,
+  random SO PIN not kept) and renews the host certificate when fewer than 48 hours remain: CSR signed by the TPM key,
+  `ipa cert-request` with the host keytab from `locumview-desktop-clients`, the issued key checked against the CSR,
+  added to the token, and only then the older certificates for that key (by the key's own CKA_ID on the token, never
+  an IdM search) removed. TPM access goes at the user's last sign-out. A timer (2 minutes after boot, then every 6
+  hours) renews every user's certificate when due, re-grants TPM access to signed-in users, and logs an error and
+  fails the unit when a certificate is within 24 hours of expiry unrenewed. Every renewal step checks its own result.
+  Off until `/etc/locumview/desktop-cert.conf` names a sub-CA and profile; the reference deployment sets them.
+- **Image:** `tpm2-pkcs11` and `tpm2-pkcs11-tools` (EL10 AppStream 1.9.0), the new RPM, the timer enabled, the
+  reference `desktop-cert.conf`, and `AutoSelectCertificateForUrls` for `emr.` and `clinical.corp.locumview.com`
+  filtered on issuer CN `LocumView desktop clients` in the reference Chrome policy. Harmless before step 4: the
+  servers do not ask for a client certificate yet.
+- **EHR launcher icon (owner direction):** OpenEMR's own menu logo, taken at build time from the same pinned OpenEMR
+  8.4.1 image the clinical image builds on (a build stage, not committed), placed unchanged on a white tile by
+  `image/desktop/scripts/ehr-icon.py` (the logo is black, colored by OpenEMR's CSS, and would vanish on the dark
+  dock), with a NOTICE crediting OpenEMR (GPL-3.0). The launcher copy in the override directory points at it; the
+  RPM's generic launcher keeps its default icon for other deployments. OpenEMR's brand page sets no terms for
+  third-party use; the logo identifies the EHR the launcher opens.
+- **Verification:** shellcheck; `build-rpms.sh` in the pinned CentOS Stream 10 builder built all five packages; the
+  new package's files and dependencies listed, and every dependency resolves in EL10 (tpm2-pkcs11 1.9.0,
+  tpm2-pkcs11-tools 1.9.0, ipa-client 4.13); `test-resolve-version.py` passes with the fifth package; the icon
+  rendered from OpenEMR 8.4.1's logo. Not yet run: the image build (CI on merge), a `:testing` desktop, and step 5's
+  tests (including the TPM lockout check from the build plan).
+
+Agent: Claude Code

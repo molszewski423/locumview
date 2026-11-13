@@ -63,6 +63,26 @@ Opens the organization's EHR (EHR_URL in /etc/locumview/ehr.conf) in Google Chro
 set, a local page explains how to set one. Chrome's managed policies, which allow only the EHR's sites, come with
 the LocumView image.
 
+%package -n locumview-desktop-cert
+Summary:        LocumView desktop client certificate: a TPM-held key per user, renewed from IdM (ADR 0019)
+Requires:       tpm2-pkcs11
+Requires:       tpm2-pkcs11-tools
+Requires:       tpm2-tools
+Requires:       nss-tools
+Requires:       ipa-client
+Requires:       krb5-workstation
+Requires:       openssl
+Requires:       acl
+Requires:       util-linux
+Requires:       python3
+Requires:       systemd
+
+%description -n locumview-desktop-cert
+Gives each desktop user a tpm2-pkcs11 token with a key generated in the desktop's TPM and an empty PIN, and keeps a
+short-lived TLS client certificate for the desktop host on it, issued by the deployment's IdM sub-CA with the
+host's keytab. Chrome presents it to the EHR without a prompt. Off until /etc/locumview/desktop-cert.conf names the
+sub-CA and profile.
+
 %prep
 %autosetup -n locumview-%{version}
 
@@ -151,6 +171,15 @@ install -D -m 0755 $F/usr/libexec/locumview/ehr-browser %{buildroot}%{_libexecdi
 install -D -m 0644 $F/usr/share/applications/locumview-ehr.desktop %{buildroot}%{_datadir}/applications/locumview-ehr.desktop
 install -D -m 0644 $F/etc/locumview/ehr.conf %{buildroot}%{_sysconfdir}/locumview/ehr.conf
 install -D -m 0644 $F/usr/share/locumview/ehr/index.html %{buildroot}%{_datadir}/locumview/ehr/index.html
+# Desktop client certificate (ADR 0019)
+install -D -m 0755 $F/usr/libexec/locumview/desktop-cert %{buildroot}%{_libexecdir}/locumview/desktop-cert
+install -D -m 0644 $F/etc/locumview/desktop-cert.conf %{buildroot}%{_sysconfdir}/locumview/desktop-cert.conf
+S=$F/usr/lib/systemd/system
+for u in locumview-desktop-cert@.service locumview-desktop-cert.service locumview-desktop-cert.timer; do
+  install -D -m 0644 $S/$u %{buildroot}%{_unitdir}/$u
+done
+install -D -m 0644 $S/user-runtime-dir@.service.d/50-locumview-desktop-cert.conf \
+  %{buildroot}%{_unitdir}/user-runtime-dir@.service.d/50-locumview-desktop-cert.conf
 
 %check
 desktop-file-validate %{buildroot}%{_datadir}/applications/org.locumview.Tour.desktop
@@ -199,6 +228,18 @@ fi
 %config(noreplace) %{_sysconfdir}/locumview/ehr.conf
 %dir %{_datadir}/locumview
 %{_datadir}/locumview/ehr/
+
+%files -n locumview-desktop-cert
+%license LICENSE
+%dir %{_libexecdir}/locumview
+%{_libexecdir}/locumview/desktop-cert
+%dir %{_sysconfdir}/locumview
+%config(noreplace) %{_sysconfdir}/locumview/desktop-cert.conf
+%{_unitdir}/locumview-desktop-cert@.service
+%{_unitdir}/locumview-desktop-cert.service
+%{_unitdir}/locumview-desktop-cert.timer
+%dir %{_unitdir}/user-runtime-dir@.service.d
+%{_unitdir}/user-runtime-dir@.service.d/50-locumview-desktop-cert.conf
 
 %changelog
 * Wed Oct 21 2026 Michael Olszewski <hello@locumview.com> - 0.1.0-1

@@ -1,0 +1,12 @@
+# ADR 0019 build decision 2 (2026-11-12): certificates last 3 days; try every 6 hours and soon after boot, renewing
+# once less than 2 days remain.
+[Unit]
+Description=LocumView desktop client certificates every 6 hours
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=6h
+RandomizedDelaySec=10min
+
+[Install]
+WantedBy=timers.target

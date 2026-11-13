@@ -1,0 +1,9 @@
+# ADR 0019: create the desktop user's TPM token if missing and renew their client certificate (started at sign-in).
+[Unit]
+Description=LocumView desktop client certificate for UID %i
+Wants=network-online.target
+After=network-online.target sssd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/locumview/desktop-cert renew %i
