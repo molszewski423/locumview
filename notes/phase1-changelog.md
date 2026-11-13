@@ -2577,3 +2577,16 @@ Agent: Claude Code
   checked the same way. The build-sign-publish path runs in CI only (it needs the signing secrets).
 
 Agent: Claude Code
+
+## 159. CI checks: a too-long comment line in rpms.yml (2026-11-13)
+
+- **Found:** after #157, checks still failed (runs 409 to 412), now at pre-commit's ansible-lint: `yaml[line-length]`,
+  166 > 160 characters, `.gitea/workflows/rpms.yml` line 7, the secrets comment lengthened in #156. The agent had run
+  pre-commit only on changed files, where ansible-lint does not look at the workflows.
+- **Fix:** the comment split over two lines.
+- **Verification:** `pre-commit run --all-files` passes (ansible-lint reproduces the failure on main and passes with the
+  fix); the CI's gitleaks image over the whole history: no leaks.
+- **Practice from here:** before pushing, the agent runs `pre-commit run --all-files` and the whole-history gitleaks
+  scan, as CI does.
+
+Agent: Claude Code
