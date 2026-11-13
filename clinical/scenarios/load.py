@@ -72,23 +72,29 @@ echo "ok\n";
 
 
 PHOTO_PHP = r"""<?php
-// Stores a JPEG (base64 on stdin) as the patient's photograph, with OpenEMR's own Document class, unless the patient
-// already has one: the category the patient summary shows (global patient_photo_category_name).
+// Stores a JPEG (base64 on stdin) as the patient's photograph with OpenEMR's own Document class, in the category the
+// patient summary shows (global patient_photo_category_name). The file name carries the image's hash: the same image
+// is stored once; a changed image replaces the patient's earlier photographs (marked deleted, OpenEMR's own flag).
 $_GET['site'] = 'default';
 $ignoreAuth = true;
 require_once '/var/www/localhost/htdocs/openemr/interface/globals.php';
 require_once $GLOBALS['fileroot'] . '/library/classes/Document.class.php';
 $pid = (int)$argv[1];
+$name = $argv[2];
 $category = sqlQuery("SELECT id FROM categories WHERE name = ?", [$GLOBALS['patient_photo_category_name']])['id'] ?? 0;
 if (!$category) { echo "error: no photograph category\n"; exit(1); }
-$have = sqlQuery("SELECT COUNT(*) AS n FROM documents d JOIN categories_to_documents c ON c.document_id = d.id " .
-                 "WHERE d.foreign_id = ? AND c.category_id = ? AND d.deleted = 0", [$pid, $category])['n'];
-if ($have) { echo "present\n"; exit(0); }
+$photos = "FROM documents d JOIN categories_to_documents c ON c.document_id = d.id " .
+          "WHERE d.foreign_id = ? AND c.category_id = ? AND d.deleted = 0";
+if (sqlQuery("SELECT COUNT(*) AS n $photos AND d.name = ?", [$pid, $category, $name])['n']) { echo "present\n"; exit(0); }
 $data = base64_decode(stream_get_contents(STDIN), true);
 if ($data === false || strlen($data) < 1000) { echo "error: no image\n"; exit(1); }
 $document = new Document();
-$error = $document->createDocument($pid, $category, $argv[2], 'image/jpeg', $data);
-echo $error ? "error: $error\n" : "ok\n";
+$error = $document->createDocument($pid, $category, $name, 'image/jpeg', $data);
+if ($error) { echo "error: $error\n"; exit(1); }
+sqlStatement("UPDATE documents d JOIN categories_to_documents c ON c.document_id = d.id SET d.deleted = 1 " .
+             "WHERE d.foreign_id = ? AND c.category_id = ? AND d.deleted = 0 AND d.id <> ?",
+             [$pid, $category, $document->get_id()]);
+echo "ok\n";
 """
 PHOTOS = HERE.parent / "photos"
 
@@ -101,33 +107,85 @@ def list_option(list_id, code):
     return rows[0][0] if rows else ""
 
 
-def chart_extras(pid, number, demographics=None, immunizations=(), name=None):
-    """Fills what a chart shows beyond the case data, idempotently, also for a patient loaded earlier: demographics
-    (overwritten), immunizations (each added once, by vaccine and date) and the photograph (once)."""
-    if name:   # Synthea's numbered names on patients loaded before the owner's decision of 2026-11-12
-        sql(f"UPDATE patient_data SET fname = {quote(name[0])}, lname = {quote(name[1])} WHERE pid = {int(pid)};")
-    if demographics:
-        d = demographics
+SMOKING = {"Never smoked tobacco": ("nevertobacco", "4"), "Ex-smoker": ("quittobacco", "3"),
+           "Smokes tobacco daily": ("currenttobacco", "1"), "Current every day smoker": ("currenttobacco", "1"),
+           "Never smoker": ("nevertobacco", "4"), "Former smoker": ("quittobacco", "3")}
+# OpenEMR's insurance type codes (claim filing): Medicare Part B, Medicaid, Blue Cross Blue Shield, else commercial.
+INSURANCE_TYPE = {"Medicare": 2, "Dual Eligible": 2, "Medicaid": 3, "Blue Cross Blue Shield": 6}
+
+
+def puuid_of(pid):
+    h = sql(f"SELECT LOWER(HEX(uuid)) FROM patient_data WHERE pid = {int(pid)};")[0][0]
+    return f"{h[:8]}-{h[8:12]}-{h[12:16]}-{h[16:20]}-{h[20:]}"
+
+
+def chart_extras(pid, number, record):
+    """Fills what a chart shows beyond the case data, idempotently, also for a patient loaded earlier. record holds any
+    of: name (given, family), demographics, emergency_contact, smoking, insurance, last_visit, immunizations.
+    Overwritten every run: name, demographics, emergency contact, smoking status. Added once: the insurer's record and
+    the patient's primary policy, the last visit (by date) with its vital signs, each immunization (by vaccine and
+    date), and the photograph (per image)."""
+    pid = int(pid)
+    if record.get("name"):   # Synthea's numbered names on patients loaded before the owner's decision of 2026-11-12
+        given, family = record["name"]
+        sql(f"UPDATE patient_data SET fname = {quote(given)}, lname = {quote(family)} WHERE pid = {pid};")
+    if d := record.get("demographics"):
         fields = {"street": d.get("street", ""), "city": d.get("city", ""), "state": d.get("state", ""),
                   "postal_code": d.get("postal_code", ""), "country_code": "USA", "phone_home": d.get("phone_home", ""),
                   "race": "|".join(filter(None, (list_option("race", r) for r in d.get("race", [])))),
                   "ethnicity": "|".join(filter(None, (list_option("ethnicity", e) for e in d.get("ethnicity", [])))),
                   "status": list_option("marital", d.get("marital", "")),
                   "language": list_option("language", d.get("language", ""))}
+        if c := record.get("emergency_contact"):
+            fields["contact_relationship"] = f"{c['name']} ({c['relationship'].lower()})"
+            fields["phone_contact"] = c["phone"]
         sql("UPDATE patient_data SET " + ", ".join(f"{k} = {quote(v)}" for k, v in fields.items())
-            + f" WHERE pid = {int(pid)};")
-    for v in immunizations:
+            + f" WHERE pid = {pid};")
+    if record.get("smoking") in SMOKING:
+        kind, option = SMOKING[record["smoking"]]
+        tobacco = quote(f"|{kind}||{option}|0")
+        if sql(f"SELECT id FROM history_data WHERE pid = {pid} LIMIT 1;"):
+            sql(f"UPDATE history_data SET tobacco = {tobacco} WHERE pid = {pid};")
+        else:
+            sql(f"INSERT INTO history_data (pid, date, tobacco) VALUES ({pid}, NOW(), {tobacco});")
+    if insurer := record.get("insurance"):
+        sql(f"INSERT INTO insurance_companies (id, name, ins_type_code, inactive, date_created, last_updated) "
+            f"SELECT next.id, {quote(insurer)}, {INSURANCE_TYPE.get(insurer, 16)}, 0, NOW(), NOW() "
+            f"FROM (SELECT COALESCE(MAX(id), 0) + 1 AS id FROM insurance_companies) next "
+            f"WHERE NOT EXISTS (SELECT 1 FROM insurance_companies WHERE name = {quote(insurer)});")
+        company = sql(f"SELECT id FROM insurance_companies WHERE name = {quote(insurer)} LIMIT 1;")[0][0]
+        if not sql(f"SELECT id FROM insurance_data WHERE pid = {pid} AND type = 'primary' LIMIT 1;"):
+            row = sql(f"SELECT fname, lname, DOB, sex, street, postal_code, city, state FROM patient_data WHERE pid = {pid};")[0]
+            policy = "LV" + number.replace("-", "")   # a made-up policy number, the same every run
+            sql(f"INSERT INTO insurance_data (type, provider, plan_name, policy_number, subscriber_fname, subscriber_lname, "
+                f"subscriber_relationship, subscriber_DOB, subscriber_sex, subscriber_street, subscriber_postal_code, "
+                f"subscriber_city, subscriber_state, subscriber_country, date, pid, accept_assignment, policy_type) VALUES "
+                f"('primary', {quote(str(company))}, {quote(insurer)}, {quote(policy)}, {quote(row[0])}, {quote(row[1])}, "
+                f"'self', {quote(row[2])}, {quote(row[3])}, {quote(row[4])}, {quote(row[5])}, {quote(row[6])}, "
+                f"{quote(row[7])}, 'USA', '2026-01-01', {pid}, 'TRUE', '');")
+    if visit := record.get("last_visit"):
+        day = utc(visit["start"])
+        if not sql(f"SELECT encounter FROM form_encounter WHERE pid = {pid} AND date = {quote(day)} LIMIT 1;"):
+            puuid = puuid_of(pid)
+            encounter = ok(f"{number}: visit", *target.api("POST", f"api/patient/{puuid}/encounter", {
+                "date": day, "reason": visit["reason"], "class_code": "AMB", "pc_catid": "5"}))["data"]["encounter"]
+            if visit.get("vitals"):
+                ok(f"{number}: vital signs", *target.api("POST", f"api/patient/{pid}/encounter/{encounter}/vital",
+                                                         {"date": day, **{k: str(v) for k, v in visit["vitals"].items()}}))
+    for v in record.get("immunizations", []):
         sql(f"INSERT INTO immunizations (patient_id, administered_date, cvx_code, note, create_date, update_date, "
             f"created_by, updated_by, added_erroneously, completion_status, information_source) "
-            f"SELECT {int(pid)}, {quote(v['date'] + ' 00:00:00')}, {quote(v['cvx'])}, {quote(v['title'])}, NOW(), NOW(), "
+            f"SELECT {pid}, {quote(v['date'] + ' 00:00:00')}, {quote(v['cvx'])}, {quote(v['title'])}, NOW(), NOW(), "
             f"1, 1, 0, 'Completed', 'hist_inf_src_unspecified' FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM immunizations "
-            f"WHERE patient_id = {int(pid)} AND cvx_code = {quote(v['cvx'])} "
+            f"WHERE patient_id = {pid} AND cvx_code = {quote(v['cvx'])} "
             f"AND administered_date = {quote(v['date'] + ' 00:00:00')});")
     photo = PHOTOS / f"{number}.jpg"
     if photo.exists():
         import base64
-        done = target.php(target.install("photo.php", PHOTO_PHP), str(int(pid)), f"{number}.jpg",
-                          stdin=base64.b64encode(photo.read_bytes()).decode())
+        import hashlib
+        data = photo.read_bytes()
+        done = target.php(target.install("photo.php", PHOTO_PHP), str(pid),
+                          f"{number}-{hashlib.sha256(data).hexdigest()[:8]}.jpg", stdin=base64.b64encode(data).decode())
         last = (done.stdout.strip().splitlines() or [""])[-1]
         if done.returncode or last not in ("ok", "present"):
             raise SystemExit(f"{number}: photograph not stored: {last} {done.stderr[-300:]}")
@@ -333,8 +391,7 @@ def load_background():
     added = 0
     for p in people:
         if existing := sql(f"SELECT pid FROM patient_data WHERE pubpid = {quote(p['number'])};"):
-            chart_extras(existing[0][0], p["number"], p.get("demographics"), p.get("immunizations", []),
-                         (p["given"], p["family"]))
+            chart_extras(existing[0][0], p["number"], {**p, "name": (p["given"], p["family"])})
             continue
         status, body = target.api("POST", "fhir/Patient", {
             "resourceType": "Patient",
@@ -350,7 +407,7 @@ def load_background():
         for x in p["allergies"]:
             ok(f"{p['number']}: allergy", *target.api("POST", f"api/patient/{puuid}/allergy", allergy_body(x)))
         pid = ok("patient lookup", *target.api("GET", f"api/patient/{puuid}"))["data"]["pid"]
-        chart_extras(pid, p["number"], p.get("demographics"), p.get("immunizations", []))
+        chart_extras(pid, p["number"], p)
         added += 1
     print(f"background: {added} loaded, {len(people) - added} already present (demographics, immunizations and "
           f"photographs brought up to date)")

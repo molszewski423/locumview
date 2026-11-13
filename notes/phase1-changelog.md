@@ -2387,3 +2387,27 @@ Agent: Claude Code
   as a draft for the owner's clinical review, then their photographs.
 
 Agent: Claude Code
+
+## 149. Background patients: insurance, emergency contact, smoking status, last visit; Jamal Grant's race (2026-11-12)
+
+- **Owner review of #148 in the app:** Jamal Grant's chart showed the photograph, address and immunizations, but
+  no emergency contact, insurance or vital signs, and a past-due tobacco assessment. The owner also asked that his
+  race and photograph match his name.
+- **Converter:** adds the payer of the most recent claim (none when uninsured), the most recent visit with vital
+  signs (weight, height, blood pressure, pulse, respiratory rate, and temperature when recorded; US units), and an
+  emergency contact made up per patient. `overrides.json` holds owner adjustments on top of Synthea's output (SYN-001:
+  race Black or African American); `background.json` regenerated, still reproducible.
+- **Loader:** sets the emergency contact and phone, the smoking status (OpenEMR's tobacco field: never, former or
+  current, with the SNOMED CT coded list option), adds each insurer once and the patient's primary policy (subscriber
+  self, a made-up policy number), and the last visit as an ambulatory encounter with its vital signs, once by date. A
+  photograph whose image changed replaces the earlier one (OpenEMR's deleted flag); the cluster's photographs, stored
+  under the old names, are replaced once on the next run. A failing SQL statement now reports the database's message.
+- **Photograph:** SYN-001 regenerated as an 87-year-old Black man; reviewed.
+- **Verification:** a fresh local OpenEMR loaded twice: 20 visits with vital signs, 19 policies (one patient
+  uninsured) with 9 insurers, 20 smoking statuses, 84 immunizations, 20 photographs, nothing duplicated; the
+  replacement path checked by renaming one stored photograph (old one marked deleted, new one stored); SYN-001's FHIR
+  read-back (Patient, 14 Conditions, the Encounter, 18 Observations) gives one vital-signs row and no finding. Found
+  and fixed on the way: the insert-if-missing for insurers returned a row even when the insurer existed (an aggregate
+  always does). Local OpenEMR destroyed.
+
+Agent: Claude Code

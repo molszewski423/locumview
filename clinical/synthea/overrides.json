@@ -1,0 +1,4 @@
+{
+  "_note": "Owner adjustments applied by convert.py on top of Synthea's output, so background.json stays reproducible from the pinned Synthea run. Each entry replaces fields of one patient's demographics, by patient number.",
+  "SYN-001": {"demographics": {"race": ["2054-5"]}, "why": "Owner request, 2026-11-12: race and photograph to match the patient's name"}
+}
