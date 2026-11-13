@@ -6,7 +6,7 @@
 #   REDHAT_REGISTRY_USER / REDHAT_REGISTRY_PASSWORD   pull the RHEL bootc base image
 #   RHSM_ORG / RHSM_ACTIVATION_KEY                    dnf during the build (build secret, never in a layer)
 #   REGISTRY_TOKEN                                    push to git.lan (Gitea token, package scope only)
-#   COSIGN_PRIVATE_KEY / COSIGN_PASSWORD              sign (public key: image/desktop/signing/cosign.pub)
+#   COSIGN_PRIVATE_KEY_B64 / COSIGN_PASSWORD              sign (public key: image/desktop/signing/cosign.pub)
 # Signatures and attestations use cosign's classic format (sha256-<digest>.sig and .att tags): RHEL's
 # containers/image, which bootc uses, does not read cosign 3's new bundle format. Signing is offline (no public
 # transparency log): verify with
@@ -114,20 +114,28 @@ jobs:
 
       - name: Sign
         env:
-          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PRIVATE_KEY_B64: ${{ secrets.COSIGN_PRIVATE_KEY_B64 }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
           set -euo pipefail
+          # The key is a one-line base64 secret, which the runner masks in its log; a multi-line PEM key in a step
+          # environment was printed in full (changelog #155). Decoded into a private tmpfs file, removed on exit.
+          COSIGN_KEY=$(umask 077; mktemp -p /dev/shm cosign.XXXXXX); trap 'rm -f "$COSIGN_KEY"' EXIT
+          printf '%s' "$COSIGN_PRIVATE_KEY_B64" | base64 -d > "$COSIGN_KEY"
           export DOCKER_CONFIG="$JOB/docker"
-          cosign sign --key env://COSIGN_PRIVATE_KEY --new-bundle-format=false --use-signing-config=false --tlog-upload=false -y \
+          cosign sign --key "$COSIGN_KEY" --new-bundle-format=false --use-signing-config=false --tlog-upload=false -y \
             -a "git.commit=$GITHUB_SHA" -a "ci.run=$GITHUB_RUN_NUMBER" "$IMAGE@$DIGEST"
 
       - name: SBOM
         env:
-          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PRIVATE_KEY_B64: ${{ secrets.COSIGN_PRIVATE_KEY_B64 }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
           set -euo pipefail
+          # The key is a one-line base64 secret, which the runner masks in its log; a multi-line PEM key in a step
+          # environment was printed in full (changelog #155). Decoded into a private tmpfs file, removed on exit.
+          COSIGN_KEY=$(umask 077; mktemp -p /dev/shm cosign.XXXXXX); trap 'rm -f "$COSIGN_KEY"' EXIT
+          printf '%s' "$COSIGN_PRIVATE_KEY_B64" | base64 -d > "$COSIGN_KEY"
           export DOCKER_CONFIG="$JOB/docker"
           # syft unpacks the image into TMPDIR, which is RAM (tmpfs) for the runner service, and without a Go memory
           # limit grew past 9.6 GiB on node2 next to the clinical workloads, until the API server stopped answering
@@ -149,17 +157,21 @@ jobs:
           json.dump(d, open(sys.argv[2], "w"), separators=(",", ":"))
           print(len(d["packages"]), "packages in the SBOM")
           PY
-          cosign attest --key env://COSIGN_PRIVATE_KEY --new-bundle-format=false --use-signing-config=false --tlog-upload=false -y \
+          cosign attest --key "$COSIGN_KEY" --new-bundle-format=false --use-signing-config=false --tlog-upload=false -y \
             --type spdxjson --predicate "$JOB/sbom.spdx.json" "$IMAGE@$DIGEST"
 
       - name: Attest the scan
         env:
-          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PRIVATE_KEY_B64: ${{ secrets.COSIGN_PRIVATE_KEY_B64 }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
           set -euo pipefail
+          # The key is a one-line base64 secret, which the runner masks in its log; a multi-line PEM key in a step
+          # environment was printed in full (changelog #155). Decoded into a private tmpfs file, removed on exit.
+          COSIGN_KEY=$(umask 077; mktemp -p /dev/shm cosign.XXXXXX); trap 'rm -f "$COSIGN_KEY"' EXIT
+          printf '%s' "$COSIGN_PRIVATE_KEY_B64" | base64 -d > "$COSIGN_KEY"
           export DOCKER_CONFIG="$JOB/docker"
-          cosign attest --key env://COSIGN_PRIVATE_KEY --new-bundle-format=false --use-signing-config=false --tlog-upload=false -y \
+          cosign attest --key "$COSIGN_KEY" --new-bundle-format=false --use-signing-config=false --tlog-upload=false -y \
             --type "$SCAN_TYPE" --predicate "$JOB/scan/summary.json" "$IMAGE@$DIGEST"
 
       - name: Verify
