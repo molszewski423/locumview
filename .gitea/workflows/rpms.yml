@@ -4,7 +4,8 @@
 # digest, signing with the LocumView RPM signing key, publishing to the Gitea RPM registry (el10). Each commit gives
 # a new release (1.<commit time>git<commit>); publishing a release that is already there is not an error.
 # Credentials come from Actions secrets (each also kept in SOPS, packaging/rpm/signing/rpm-signing.sops.yaml):
-#   RPM_SIGNING_KEY_B64 / RPM_SIGNING_PASSPHRASE   sign (the key as one-line base64, which the runner masks) (public key: packaging/rpm/signing/RPM-GPG-KEY-locumview)
+#   RPM_SIGNING_KEY_B64 / RPM_SIGNING_PASSPHRASE   sign (the key as one-line base64, which the runner masks;
+#                                              public key: packaging/rpm/signing/RPM-GPG-KEY-locumview)
 #   REGISTRY_TOKEN                             upload to the registry (Gitea token, package scope only)
 name: rpms
 "on":
