@@ -2244,7 +2244,7 @@ Agent: Claude Code
   disease B20; diabetes E08-E13; cancer C00-C96 except C44; immunodeficiency D81-D84 (not D80, antibody defects).
   The rule names the criterion and the problem in the summary (never as data), cites IDSA 2004 only for age, ESCMID
   2016 for both, and WHO 2025 above 60 or for a group WHO lists.
-- **Cases (26; clinical review pending):** meningitis-transplant-gap-01 (finding), meningitis-diabetes-gap-01
+- **Cases (26; owner approved 2026-11-12, with the code lists above):** meningitis-transplant-gap-01 (finding), meningitis-diabetes-gap-01
   (finding), meningitis-steroid-covered-negative-01 (negative control). FHIR fixtures recorded from a disposable local
   OpenEMR (destroyed afterwards). Boundary tests cover each group, the excluded codes and the combined age and risk
   criteria.
