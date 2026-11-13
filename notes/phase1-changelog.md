@@ -2306,3 +2306,19 @@ Agent: Claude Code
 - **Verification:** `bash -n` and shellcheck; pre-commit.
 
 Agent: Claude Code
+
+## 144. ADR 0019 step 2 Done: the IdM sub-CA for desktop client certificates (2026-11-12)
+
+- **Owner run:** a fresh IdM backup first (full, 22:12, encrypted off-host copy kept), then
+  `scripts/clinical/idm-desktop-subca.sh up` from operator-laptop with an admin ticket on idm01. It created the sub-CA
+  `locumview-desktop-clients`, imported the profile `locumviewDesktopClient` from `caIPAserviceCert` with exactly the
+  eight intended changes (ID, name, description, validity 3 days for both default and constraint, client auth only,
+  EC P-256/P-384 keys), and the CA ACL limiting both to the host group `locumview-desktops`.
+- **Verified read-only** (`status`, `openssl x509`): sub-CA subject `CN=LocumView desktop clients,O=CORP.LOCUMVIEW.COM`,
+  issued by IdM's CA, `CA:TRUE`, certificate signing; the ACL is enabled with only that CA, profile and host group.
+- **Sub-CA lifetime (decision 3):** the certificate ends 2046-10-05, the end of IdM's own CA: IdM gave it the longest
+  lifetime the parent allows, as expected. The rotation runbook is written with step 4.
+- **Committed:** the sub-CA's public certificate, `k8s/clinical/desktop-client-ca.pem` (SHA-256 fingerprint
+  88:D7:FC:23:...:79:28), for Traefik's TLS option in step 4. Next: step 3, the desktop RPM.
+
+Agent: Claude Code
