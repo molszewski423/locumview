@@ -2260,3 +2260,21 @@ Agent: Claude Code
 - **Deploy:** the owner's script from #118; the diff should show only the agent Deployment, and its scenario step loads the three Listeria cases from #140. Then check LV-meningitis-transplant-gap-01 (one finding: missing Listeria coverage, criterion "Listeria risk factor on the problem list") and LV-meningitis-alcohol-negative-01 (still no finding).
 
 Agent: Claude Code
+
+## 142. #141 deployed; SMART launch without OpenEMR's second sign-in and scope screen (2026-11-12)
+
+- **Deploy of #141 (owner):** the agent runs knowledge base 0.8.0. LV-meningitis-transplant-gap-01 showed exactly
+  its finding (missing Listeria coverage, criterion "Listeria risk factor on the problem list (organ or stem cell
+  transplant, long-term immunosuppressive therapy)", ESCMID 2016 and WHO 2025 cited, IDSA 2004 not), with an accurate
+  explanation; the new patient opened on the first launch. LV-meningitis-alcohol-negative-01 still shows no finding.
+- **Found (owner):** every launch from a chart asked for OpenEMR's sign-in again and for the scope authorization
+  (ADR 0019 context, item 4). OpenEMR 8.4.1 can skip both for an EHR launch when the user is already signed in to
+  OpenEMR: the global `oauth_ehr_launch_authorization_flow_skip` (on by default; on in the cluster) plus the client's
+  `skip_ehr_launch_authorization_flow` (off for LocumView Clinical). With both, the launch checks the core OpenEMR
+  session; signed in, the app gets its registered read-only scopes without the scope screen; otherwise the normal
+  sign-in follows (`AuthorizationController::shouldSkipAuthorizationFlow`, `processAuthorizeFlowForLaunch`).
+- **Change (owner approved):** `register-gateway.sh` sets the client flag at registration, so a rebuilt namespace keeps
+  it; `k8s/clinical/README.md` says so. The per-launch review of scopes goes away; access to OpenEMR is unchanged.
+- **Live (owner):** the flag is set once under Administration > System > API Clients > LocumView Clinical.
+
+Agent: Claude Code

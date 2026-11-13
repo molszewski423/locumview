@@ -25,7 +25,9 @@ OpenEMR 8.4.1 with LocumView's fix (`clinical/images/openemr/`), MariaDB, and th
    pinned in `kustomization.yaml`; only when it reports all verified, `kubectl apply -k k8s/clinical`.
    The gateway waits for its Secret (step 5); OpenEMR installs itself on first start (a few minutes).
 4. When `kubectl -n clinical get pods` shows OpenEMR ready: `scripts/clinical/register-gateway.sh` configures OpenEMR's
-   API and public address and registers the gateway; it writes `clinical-gateway.sops.yaml`. Commit it.
+   API and public address and registers the gateway; it writes `clinical-gateway.sops.yaml`. Commit it. It also
+   enables the client's "Skip EHR Launch Authorization Flow", so a launch from a chart opens the app without OpenEMR's
+   second sign-in and scope screen when the user is already signed in to OpenEMR (owner decision, 2026-11-12).
 5. `sops -d k8s/clinical/secrets/clinical-gateway.sops.yaml | kubectl apply -f -`, then
    `kubectl -n clinical rollout restart deployment/gateway`.
 
