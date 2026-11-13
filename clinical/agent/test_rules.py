@@ -225,6 +225,46 @@ class RuleBoundaryTests(unittest.TestCase):
         finally:
             KB.products.pop("TEST-AMPICILLIN")
 
+    def test_listeria_rule_fires_under_50_with_a_risk_factor_and_names_it(self):
+        (f,) = evaluate(from_case(case("meningitis-transplant-gap-01"), KB), KB, {"stewardship"})
+        self.assertIn("(Criterion: Listeria risk factor on the problem list (organ or stem cell transplant, long-term "
+                      "immunosuppressive therapy), ESCMID 2016; WHO 2025, organ or stem cell transplant, long-term "
+                      "immunosuppressive therapy, cited as supporting evidence.)", f.summary)
+        self.assertEqual(set(f.refs), {"escmid-meningitis-2016", "who-meningitis-2025"})   # IDSA 2004: age only
+        self.assertIn("Problem: Kidney transplant status", f.evidence)
+        self.assertFalse(any("riterion" in e for e in f.evidence))
+
+    def test_listeria_rule_is_silent_without_the_risk_factor_under_50(self):
+        c = case("meningitis-transplant-gap-01")
+        c["problems"] = c["problems"][:1]
+        self.assertEqual(keys(c), [])
+
+    def test_listeria_rule_ignores_tissue_transplants_skin_cancer_and_who_only_factors(self):
+        # Corneal, skin and bone grafts do not need immunosuppression; non-melanoma skin cancer (C44) is not the
+        # cancer ESCMID means; pregnancy, end-stage kidney disease, cirrhosis and alcohol use disorder are WHO-only
+        # (owner decision 2026-11-12).
+        for code in ("Z94.7", "Z94.5", "Z94.6", "C44.01", "O26.891", "Z33.1", "N18.6", "K74.60", "F10.20", "D80.2"):
+            c = case("meningitis-transplant-gap-01")
+            c["problems"] = c["problems"][:1] + [{"title": "x", "diagnosis": "ICD10:" + code, "begdate": "2020-01-01"}]
+            with self.subTest(code=code):
+                self.assertEqual(keys(c), [])
+
+    def test_listeria_rule_reads_each_risk_group(self):
+        for code in ("Z94.4", "Z94.84", "Z79.52", "Z79.69", "D84.821", "B20", "E10.9", "C91.10", "C50.911", "D83.9"):
+            c = case("meningitis-transplant-gap-01")
+            c["problems"] = c["problems"][:1] + [{"title": "x", "diagnosis": "ICD10:" + code, "begdate": "2020-01-01"}]
+            with self.subTest(code=code):
+                self.assertEqual(keys(c), [("stewardship", "missing-empiric-coverage", "Ampicillin")])
+
+    def test_listeria_criteria_combine_age_and_risk_factor(self):
+        c = case("meningitis-diabetes-gap-01")
+        c["patient"]["birth_date"] = "1960-07-09"   # 66
+        (f,) = evaluate(from_case(c, KB), KB, {"stewardship"})
+        self.assertIn("(Criterion: age over 50, IDSA 2004 and ESCMID 2016; Listeria risk factor on the problem list "
+                      "(diabetes), ESCMID 2016; WHO 2025, age over 60, diabetes, cited as supporting evidence.)",
+                      f.summary)
+        self.assertEqual(set(f.refs), {"idsa-meningitis-2004", "escmid-meningitis-2016", "who-meningitis-2025"})
+
     def test_double_anaerobe_rule_is_silent_without_the_second_agent(self):
         c = case("ciai-double-anaerobe-01")
         c["prescriptions"] = [p for p in c["prescriptions"] if p["rxnorm"] != "1659149"]

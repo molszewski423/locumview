@@ -93,7 +93,8 @@
       "pmid": "15494903",
       "doi": "10.1086/425368",
       "metadata_checked": "2026-10-25",
-      "content_check": "owner"
+      "content_check": "owner",
+      "note": "Table 4 (empiric therapy by age and predisposing condition) has no immunocompromised row, so the Listeria rule cites it for the age criterion only. Per OpenEvidence 2026-11-12; the table is an image and was not read here."
     },
     "escmid-meningitis-2016": {
       "authors": "van de Beek D, Cabellos C, Dzupova O, et al.",
@@ -103,7 +104,7 @@
       "doi": "10.1016/j.cmi.2016.01.007",
       "metadata_checked": "2026-10-25",
       "content_check": "owner",
-      "note": "WHO 2025 (who-meningitis-2025) is newer; IDSA 2004 and ESCMID 2016 remain the current society guidelines."
+      "note": "WHO 2025 (who-meningitis-2025) is newer; IDSA 2004 and ESCMID 2016 remain the current society guidelines. Table 4.1 pairs cefotaxime or ceftriaxone with amoxicillin for adults over 50 and for adults with Listeria risk factors (footnote: diabetes mellitus, immunosuppressive drugs, cancer, other immunocompromising conditions); per OpenEvidence 2026-11-12, the publisher page refused automated access and the table was not read here."
     },
     "who-meningitis-2025": {
       "authors": "World Health Organization",

@@ -1,0 +1,184 @@
+{
+  "schema": "locumview-case/1",
+  "id": "meningitis-steroid-covered-negative-01",
+  "version": "0.1.1",
+  "title": "Suspected bacterial meningitis at 45 on long-term prednisone, ampicillin already ordered",
+  "kind": "negative-control",
+  "modules": [
+    "stewardship"
+  ],
+  "provenance": {
+    "source": "synthetic",
+    "author": "Claude Code (draft for owner review), Listeria risk-factor rule (owner decision 2026-11-12)",
+    "created": "2026-11-12",
+    "clinical_review": {
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-12",
+      "notes": "Owner approved the Listeria risk-factor cases as drafted (after the OpenEvidence review of the rule's evidence)."
+    }
+  },
+  "story": "A 45-year-old woman with pulmonary sarcoidosis on prednisone 20 mg a day for six months presents with fever, severe headache, neck stiffness and new confusion. Lumbar puncture shows a neutrophilic pleocytosis with low glucose and high protein. Empiric vancomycin, ceftriaxone 2 g every 12 hours, ampicillin 2 g every 4 hours and dexamethasone are started; CSF and blood cultures are pending.",
+  "patient": {
+    "family": "Casebook",
+    "given": "Lena",
+    "birth_date": "1981-05-30",
+    "sex": "female"
+  },
+  "encounter": {
+    "class_code": "IMP",
+    "start": "2026-10-24T21:15:00-04:00",
+    "reason": "Fever, headache, neck stiffness, confusion"
+  },
+  "problems": [
+    {
+      "title": "Suspected acute bacterial meningitis",
+      "diagnosis": "ICD10:G00.9",
+      "begdate": "2026-10-24"
+    },
+    {
+      "title": "Sarcoidosis of lung",
+      "diagnosis": "ICD10:D86.0",
+      "begdate": "2025-11-20"
+    },
+    {
+      "title": "Long term (current) use of systemic steroids",
+      "diagnosis": "ICD10:Z79.52",
+      "begdate": "2026-04-20"
+    }
+  ],
+  "prescriptions": [
+    {
+      "drug": "vancomycin 1000 MG Injection",
+      "rxnorm": "1807513",
+      "start": "2026-10-24",
+      "route": "IV",
+      "instructions": "Loading dose then 15 to 20 mg/kg IV every 8 to 12 hours, pharmacy to dose"
+    },
+    {
+      "drug": "ceftriaxone 2000 MG Injection",
+      "rxnorm": "1665046",
+      "start": "2026-10-24",
+      "route": "IV",
+      "instructions": "2 g IV every 12 hours"
+    },
+    {
+      "drug": "ampicillin 2000 MG Injection",
+      "rxnorm": "1721476",
+      "start": "2026-10-24",
+      "route": "IV",
+      "instructions": "2 g IV every 4 hours"
+    },
+    {
+      "drug": "dexamethasone phosphate 10 MG/ML Injectable Solution",
+      "rxnorm": "309696",
+      "start": "2026-10-24",
+      "route": "IV",
+      "instructions": "10 mg IV every 6 hours, first dose with or before the first antibiotic dose"
+    }
+  ],
+  "vitals": [
+    {
+      "taken": "2026-10-24T21:25:00-04:00",
+      "temperature_f": 102.9,
+      "pulse": 112,
+      "bps": 138,
+      "bpd": 82,
+      "respiration": 20,
+      "oxygen_saturation": 96
+    }
+  ],
+  "labs": [
+    {
+      "order_code": "LV-BMP",
+      "order_text": "Basic labs",
+      "collected": "2026-10-24T21:40:00-04:00",
+      "resulted": "2026-10-24T22:30:00-04:00",
+      "results": [
+        {
+          "loinc": "2160-0",
+          "text": "Creatinine [Mass/volume] in Serum or Plasma",
+          "value": "0.9",
+          "units": "mg/dL",
+          "range": "0.5-1.0",
+          "flag": "N"
+        },
+        {
+          "loinc": "6690-2",
+          "text": "Leukocytes [#/volume] in Blood by Automated count",
+          "value": "17.6",
+          "units": "10*3/uL",
+          "range": "4.0-11.0",
+          "flag": "H"
+        }
+      ]
+    },
+    {
+      "order_code": "LV-CSF",
+      "order_text": "CSF cell count, glucose and protein",
+      "collected": "2026-10-24T22:20:00-04:00",
+      "resulted": "2026-10-24T23:35:00-04:00",
+      "results": [
+        {
+          "loinc": "806-0",
+          "text": "Leukocytes [#/volume] in Cerebrospinal Fluid by Manual count",
+          "value": "1450",
+          "units": "/uL",
+          "range": "0-5",
+          "flag": "H"
+        },
+        {
+          "loinc": "2342-4",
+          "text": "Glucose [Mass/volume] in Cerebrospinal Fluid",
+          "value": "28",
+          "units": "mg/dL",
+          "range": "40-70",
+          "flag": "L"
+        },
+        {
+          "loinc": "2880-3",
+          "text": "Protein [Mass/volume] in Cerebrospinal Fluid",
+          "value": "210",
+          "units": "mg/dL",
+          "range": "15-45",
+          "flag": "H"
+        }
+      ]
+    }
+  ],
+  "cultures": [
+    {
+      "order_code": "606-4",
+      "order_text": "Bacteria identified in Cerebrospinal Fluid by Culture",
+      "specimen": {
+        "snomed": "258450006",
+        "text": "Cerebrospinal fluid specimen"
+      },
+      "collected": "2026-10-24T22:20:00-04:00",
+      "status": "pending"
+    },
+    {
+      "order_code": "600-7",
+      "order_text": "Bacteria identified in Blood by Culture",
+      "specimen": {
+        "snomed": "119297000",
+        "text": "Blood specimen"
+      },
+      "collected": "2026-10-24T21:40:00-04:00",
+      "status": "pending"
+    }
+  ],
+  "expected_findings": [],
+  "reference_answer": "No intervention: the empiric regimen covers Listeria, which long-term corticosteroids make more likely. Some reviews prefer cefepime or meropenem in immunocompromised hosts; the rules do not flag ceftriaxone. Narrow therapy when cultures return.",
+  "rationale": "Long-term systemic steroids are a Listeria risk factor (ESCMID 2016: immunosuppressive drugs; WHO 2025: immunosuppressive therapy), and ampicillin is already ordered, so the rule must stay silent. No meningitis guideline sets a steroid dose threshold; the rule reads the long-term steroid problem code.",
+  "citations": [
+    {
+      "ref": "escmid-meningitis-2016",
+      "supports": "Empiric amoxicillin or ampicillin for Listeria, added to cefotaxime or ceftriaxone, in adults over 50 and in adults 18 to 50 with Listeria risk factors (Table 4.1 footnote: diabetes mellitus, immunosuppressive drugs, cancer, other immunocompromising conditions)."
+    },
+    {
+      "ref": "who-meningitis-2025",
+      "supports": "Add ampicillin or amoxicillin to the initial empiric regimen with any Listeria risk factor, including immunosuppressive therapy; checked against the WHO document, 2026-11-12."
+    }
+  ]
+}

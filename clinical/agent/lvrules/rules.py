@@ -28,14 +28,16 @@ class Finding:
 
 
 def _finding(kb: Knowledge, rule: str, type_: str, agent: str, summary: str, evidence: list[str],
-             extra_refs: tuple[str, ...] = (), variant: str = "") -> Finding:
+             extra_refs: tuple[str, ...] = (), variant: str = "", refs: tuple[str, ...] | None = None) -> Finding:
+    """refs, when given, replaces the rule's references (a subset of them, for a criterion only some support)."""
     spec = kb.rules[rule]
+    assert refs is None or set(refs) <= set(spec["refs"]), (rule, refs)
     # A reviewed reason the model restates instead of writing its own (owner decision, 2026-11-12).
     why = kb.why.get(f"{rule}/{variant}" if variant else rule)
     if why:
         evidence = evidence + [f"Why it matters: {why['text']}"]
     return Finding(rule, spec["module"], type_, kb.display(agent), summary, tuple(evidence),
-                   tuple(spec["refs"]) + extra_refs)
+                   (tuple(spec["refs"]) if refs is None else refs) + extra_refs)
 
 
 def _recent_fever(s: Snapshot, kb: Knowledge) -> bool:
@@ -117,27 +119,47 @@ def mssa_vancomycin(s: Snapshot, kb: Knowledge) -> list[Finding]:
 
 
 def meningitis_listeria(s: Snapshot, kb: Knowledge) -> list[Finding]:
-    """Empiric therapy for bacterial meningitis at or above the age threshold without Listeria coverage."""
+    """Empiric therapy for bacterial meningitis without Listeria coverage, at or above the age threshold or with a
+    Listeria risk factor on the problem list (knowledge listeria_risk_factors)."""
     if not any("bacterial-meningitis" in kb.condition_of(p.icd10) for p in s.problems):
         return []
     active = s.active_antimicrobials()
     age = s.age_on(s.as_of.date())
-    if not active or age < kb.thresholds["listeria_age"]:
+    risks = {}   # group -> the first chart problem in it
+    for p in s.problems:
+        for group in kb.listeria_risks(p.icd10):
+            risks.setdefault(group, p)
+    by_age = age >= kb.thresholds["listeria_age"]
+    if not active or not (by_age or risks):
         return []
     if any(kb.has(p.agent, "covers_listeria") for p in active):
         return []
-    # WHO 2025 sets its Listeria age risk at over 60 (IDSA 2004, ESCMID 2016: over 50), so it is cited only above 60.
-    who = ("who-meningitis-2025",) if age > kb.thresholds["listeria_age_who"] else ()
+    groups = kb.listeria_risk_factors
+    # IDSA 2004 gives ampicillin by age only (its Table 4 has no immunocompromised row); ESCMID 2016 adds the risk
+    # factors. WHO 2025 sets its age risk at over 60 and lists most of the groups; it is cited as supporting evidence.
+    criteria = []
+    if by_age:
+        criteria.append(f"age over {kb.thresholds['listeria_age']}, IDSA 2004 and ESCMID 2016")
+    if risks:
+        criteria.append("Listeria risk factor on the problem list (" + ", ".join(groups[g]["display"] for g in risks)
+                        + "), ESCMID 2016")
+    who_reasons = []
+    if age > kb.thresholds["listeria_age_who"]:
+        who_reasons.append(f"age over {kb.thresholds['listeria_age_who']}")
+    who_reasons += [groups[g]["display"] for g in risks if groups[g]["who"]]
+    refs = ("idsa-meningitis-2004",) if by_age else ()
+    refs += ("escmid-meningitis-2016",)
+    who = ("who-meningitis-2025",) if who_reasons else ()
     # The criterion is in the summary, not the data: given it as data, gemma4:26b wrote that the patient "does not
     # meet" it (2026-11-12), an inversion the guard cannot catch.
     return [_finding(kb, "meningitis-listeria", "missing-empiric-coverage", "ampicillin",
                      f"Empiric therapy for suspected bacterial meningitis at age {age} lacks Listeria coverage: "
                      "cephalosporins and vancomycin do not cover Listeria monocytogenes; add ampicillin. "
-                     f"(Criterion: age over {kb.thresholds['listeria_age']}, IDSA 2004 and ESCMID 2016"
-                     + (f"; WHO 2025, age over {kb.thresholds['listeria_age_who']}, cited as supporting evidence."
-                        if who else ".") + ")",
-                     [f"Age {age}", "Problem: suspected bacterial meningitis",
-                      "Active: " + ", ".join(kb.display(p.agent) for p in active)], who)]
+                     "(Criterion: " + "; ".join(criteria)
+                     + (f"; WHO 2025, {', '.join(who_reasons)}, cited as supporting evidence." if who else ".") + ")",
+                     [f"Age {age}", "Problem: suspected bacterial meningitis"]
+                     + [f"Problem: {p.title}" for p in dict.fromkeys(risks.values())]
+                     + ["Active: " + ", ".join(kb.display(p.agent) for p in active)], who, refs=refs)]
 
 
 def double_anaerobic_coverage(s: Snapshot, kb: Knowledge) -> list[Finding]:

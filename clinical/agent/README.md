@@ -71,7 +71,7 @@ after the findings, so a slow or missing model never holds the findings back.
 | `bug-drug-mismatch` | stewardship, bug-drug-mismatch | An active antimicrobial tests R against a final isolate | clsi-m100, idsa-shea-asp-2016 |
 | `ampc-third-generation-cephalosporin` | stewardship, suboptimal-agent | A third-generation cephalosporin for a blood isolate with an inducible AmpC | idsa-amr-gn-2024 |
 | `mssa-vancomycin` | stewardship, de-escalation | Vancomycin for oxacillin-susceptible *S. aureus* in blood, with no anti-staphylococcal beta-lactam active | idsa-crbsi-2009 |
-| `meningitis-listeria` | stewardship, missing-empiric-coverage | Empiric therapy for bacterial meningitis (ICD-10 G00) at age 50 or over without a Listeria-active agent | idsa-meningitis-2004, escmid-meningitis-2016 |
+| `meningitis-listeria` | stewardship, missing-empiric-coverage | Empiric therapy for bacterial meningitis (ICD-10 G00) without a Listeria-active agent, at age 50 or over (IDSA 2004, ESCMID 2016) or with a Listeria risk factor on the problem list (ESCMID 2016) | idsa-meningitis-2004 (age only), escmid-meningitis-2016; who-meningitis-2025 as supporting evidence |
 | `double-anaerobic-coverage` | stewardship, redundant-coverage | An anaerobe-only agent (metronidazole) beside another agent that covers anaerobes | idsa-ciai-2010 |
 | `duration-review` | stewardship, duration-review | An active course with no stop date past the review point for cellulitis or pneumonia | idsa-shea-asp-2016 and the condition's guideline |
 | `iv-to-po-switch` | iv-to-po, iv-to-po-switch | An IV antimicrobial, a stable patient (newest vitals within limits, no fever for 24 hours) and an oral option the data supports | idsa-shea-asp-2016 and the guideline of each charted condition (pneumonia: ats-idsa-cap-2019; pyelonephritis: idsa-cuti-2025) |
@@ -81,12 +81,19 @@ trimethoprim-sulfamethoxazole); otherwise an oral agent every final isolate test
 urinary surrogate counts only for urine isolates, and nitrofurantoin is never offered as a step-down. IV to PO is
 not offered for meningitis or *S. aureus* bacteremia.
 
-## Known limits (version 0.7.0)
+## Known limits (version 0.8.0)
 
 - **Oral intake is not charted** in a structured form, in the cases or in OpenEMR. Owner decision, 2026-11-09: the
   IV to PO rule does not read it, and the finding asks the pharmacist to confirm intake before switching.
-- **Immunocompromise is not checked** by the Listeria rule: age is its only risk criterion until an owner-reviewed
-  list of conditions exists.
+- **Listeria risk factors are read from problem codes only** (knowledge `listeria_risk_factors`, owner decision
+  2026-11-12): organ or stem cell transplant, long-term immunosuppressive therapy including systemic steroids, HIV
+  disease, diabetes, cancer (not non-melanoma skin cancer) and immunodeficiency, the groups ESCMID 2016 names. The
+  rule sees no doses (no meningitis guideline sets a steroid threshold), CD4 counts or cancer activity, and does not
+  read a problem's end date. WHO-only factors (pregnancy, end-stage kidney disease, cirrhosis, alcohol use disorder)
+  are not triggers.
+- **The cephalosporin backbone is not judged.** IDSA 2004, ESCMID 2016, WHO 2025 and NICE 2024 keep ceftriaxone or
+  cefotaxime with ampicillin for immunocompromised adults; cefepime or meropenem appears only in review tables, so
+  the rules do not flag ceftriaxone (owner decision, 2026-11-12).
 - **Problems are matched by ICD-10 code.** Stock OpenEMR 8.4.1 returns problem-list conditions as text only;
   `clinical/spike/patches/0002-problem-list-condition-codes.diff` fixes that, and the OpenEMR image carries it.
   Without it the meningitis and duration rules stay silent (tested).
@@ -95,10 +102,10 @@ not offered for meningitis or *S. aureus* bacteremia.
   A dosage timing `boundsPeriod`, when an EHR sends one, is used instead.
 - **Severity and source control are not judged.** IDSA 2026 allows completing an empirically started ceftriaxone course for a moderate-risk AmpC organism in a non-severe infection with clinical improvement and source control, but does not define non-severe. The AmpC and IV to PO findings state that condition and leave the judgment to the pharmacist (owner decision, 2026-11-12).
 - **Pneumonia severity is not judged.** The duration review for pneumonia follows ATS 2025 (fewer than 5 days, at least 3, once stable in nonsevere CAP; 5 or more in severe CAP): it fires from day 5 without a stop date and states both, leaving severity to the pharmacist (owner decision, 2026-11-12). It does not check the groups the duration trials excluded (S. aureus, P. aeruginosa, empyema, necrotizing pneumonia), which reviews say need longer courses; ATS 2025's own text on them is not yet read.
-- **Listeria age threshold.** The rule fires above 50 (IDSA 2004, ESCMID 2016) and cites WHO 2025 only above 60, its own threshold. WHO 2025's other risk factors (pregnancy, transplantation, malignancy, diabetes and others) are not checked yet.
+- **Listeria age threshold.** The rule fires above 50 (IDSA 2004, ESCMID 2016) and cites WHO 2025 above 60, its own threshold, or for a risk factor WHO also lists. IDSA 2004 is cited only for the age criterion: its empiric table has no immunocompromised row.
 - **Oral cephalosporins in urinary infection.** CLSI's cefazolin urinary surrogate is for uncomplicated UTI only, and no condition in the knowledge base is an uncomplicated UTI yet, so it is never offered. For pyelonephritis the IV to PO rule offers an oral third-generation cephalosporin only when the patient is on ceftriaxone, the isolate is ceftriaxone susceptible and it is not a moderate-risk AmpC organism (IDSA 2025 cUTI, IDSA 2026).
-- **Reasons are fixed lines, not model output.** Each finding's data ends with a reviewed "Why it matters" line from the knowledge base (`why`), which the model restates; `try_explanations.py` reports whether each explanation keeps the line's key term. Criteria the model must not compare (such as the Listeria age criterion) go in the summary, not the data: given as data, the model once wrote that a 67-year-old "does not meet" an over-50 criterion.
+- **Reasons are fixed lines, not model output.** Each finding's data ends with a reviewed "Why it matters" line from the knowledge base (`why`), which the model restates; `try_explanations.py` reports whether each explanation keeps the line's key term. Criteria the model must not compare (such as the Listeria criteria) go in the summary, not the data: given as data, the model once wrote that a 67-year-old "does not meet" an over-50 criterion.
 - **Fever, not severity, gates the AmpC exception.** With a temperature of 100.4 F or more in the last 24 hours (the IV to PO threshold and window), the bacteremia finding says the empiric-course exception does not apply yet; without fever it states the exception, since IDSA 2026 does not exclude bacteremia.
 - **Organisms are matched by SNOMED CT code.** A culture reported by name only matches no organism rule. Klebsiella aerogenes (62592009) is one concept that also carries its former name, Enterobacter aerogenes.
-- The knowledge base holds what the 23 cases need and the closest related agents. An agent, organism or test it does
+- The knowledge base holds what the 26 cases need and the closest related agents. An agent, organism or test it does
   not know is ignored, never guessed.

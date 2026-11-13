@@ -2214,3 +2214,41 @@ Agent: Claude Code
 - **Deploy:** no image changes; the owner's deploy script runs the loader (scenario step), which now includes the step.
 
 Agent: Claude Code
+
+## 139. Phase 9 lite M6: #137 deployed and #138 run on the cluster (2026-11-12)
+
+- **Deploy of #137 (owner):** the agent runs the pinned image (knowledge base 0.7.0). LV-bsi-citrobacter-ampc-01 showed both expected findings (suboptimal agent with the exception wording; IV to PO with ciprofloxacin and TMP-SMX) once its FHIR ids were set (see #138).
+- **#138 on the cluster (owner):** after the merge, `scripts/clinical/load-scenarios.sh` skipped the 20 background patients and all 23 cases as already loaded, then printed "FHIR ids assigned to records that had none".
+- **App check (owner screenshot):** LV-bsi-kaerogenes-cefepime-negative-01 (cefepime 2 g every 8 hours, cefepime MIC 4 SDD) opened without an error and showed "No findings for this patient", decided by knowledge base 0.7.0, as expected for this negative control. This confirms the patient opens and the result is correct after the step; it does not reproduce the race itself, which #138 verified locally.
+- **Open:** the Listeria risk-factor rule (immunocompromise, WHO 2025 list) awaits the owner's design choice, then primary sources and an OpenEvidence packet.
+
+Agent: Claude Code
+
+## 140. Phase 9 lite M6: Listeria risk factors other than age (knowledge base 0.8.0) (2026-11-12)
+
+- **Gap:** the Listeria rule fired only at age 50 or over, so a 40-year-old transplant recipient on vancomycin and
+  ceftriaxone got no finding (README known limit; OpenEvidence called it safety-relevant).
+- **Evidence:** WHO 2025's risk-factor list was checked against the WHO document earlier (citations.json). An
+  OpenEvidence packet run by the owner reported that IDSA 2004 Table 4 has no immunocompromised row; ESCMID 2016
+  Table 4.1 adds amoxicillin for adults with Listeria risk factors (footnote: diabetes, immunosuppressive drugs,
+  cancer, other immunocompromising conditions) and keeps cefotaxime or ceftriaxone; the cefepime or meropenem backbone
+  appears only in review tables. These table contents are secondary (images or refused pages); the seven key
+  references were confirmed in PubMed by DOI, and Sigfrid et al. 2019 (BMC Med, PMC6729038) was read: guidelines extend
+  Listeria coverage to adults with chronic immunosuppressing conditions.
+- **Owner decisions (2026-11-12):** a backbone finding was first chosen, then dropped on this evidence (ceftriaxone is
+  not flagged); the trigger is the ESCMID groups; pregnancy, end-stage kidney disease, cirrhosis and alcohol use
+  disorder (WHO only) are not triggers, so meningitis-alcohol-negative-01 stays silent; any long-term systemic steroid
+  code counts (no guideline sets a dose).
+- **Change:** knowledge `listeria_risk_factors` (ICD-10-CM prefixes, checked in the NLM code table): transplant
+  Z94.0-Z94.4 and Z94.81-Z94.84 (not skin, bone or cornea); immunosuppressive therapy Z79.52, Z79.6, D84.821; HIV
+  disease B20; diabetes E08-E13; cancer C00-C96 except C44; immunodeficiency D81-D84 (not D80, antibody defects).
+  The rule names the criterion and the problem in the summary (never as data), cites IDSA 2004 only for age, ESCMID
+  2016 for both, and WHO 2025 above 60 or for a group WHO lists.
+- **Cases (26; owner approved 2026-11-12, with the code lists above):** meningitis-transplant-gap-01 (finding), meningitis-diabetes-gap-01
+  (finding), meningitis-steroid-covered-negative-01 (negative control). FHIR fixtures recorded from a disposable local
+  OpenEMR (destroyed afterwards). Boundary tests cover each group, the excluded codes and the combined age and risk
+  criteria.
+- **Verification:** `test_rules.py` 49 tests pass; gemma4:26b (explain-v2) explained the three Listeria findings
+  without a withheld explanation, each keeping its why line.
+
+Agent: Claude Code
