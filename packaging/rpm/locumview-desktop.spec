@@ -176,9 +176,11 @@ install -D -m 0644 $F/usr/share/locumview/ehr/index.html %{buildroot}%{_datadir}
 # Desktop client certificate (ADR 0019)
 install -D -m 0755 $F/usr/libexec/locumview/desktop-cert %{buildroot}%{_libexecdir}/locumview/desktop-cert
 install -D -m 0755 $F/usr/libexec/locumview/grd-credentials-to-tpm %{buildroot}%{_libexecdir}/locumview/grd-credentials-to-tpm
+install -D -m 0755 $F/usr/libexec/locumview/tpm-harden %{buildroot}%{_libexecdir}/locumview/tpm-harden
 install -D -m 0644 $F/etc/locumview/desktop-cert.conf %{buildroot}%{_sysconfdir}/locumview/desktop-cert.conf
 S=$F/usr/lib/systemd/system
-for u in locumview-desktop-cert@.service locumview-desktop-cert.service locumview-desktop-cert.timer; do
+for u in locumview-desktop-cert@.service locumview-desktop-cert.service locumview-desktop-cert.timer \
+    locumview-tpm-harden.service; do
   install -D -m 0644 $S/$u %{buildroot}%{_unitdir}/$u
 done
 install -D -m 0644 $S/user-runtime-dir@.service.d/50-locumview-desktop-cert.conf \
@@ -237,11 +239,13 @@ fi
 %dir %{_libexecdir}/locumview
 %{_libexecdir}/locumview/desktop-cert
 %{_libexecdir}/locumview/grd-credentials-to-tpm
+%{_libexecdir}/locumview/tpm-harden
 %dir %{_sysconfdir}/locumview
 %config(noreplace) %{_sysconfdir}/locumview/desktop-cert.conf
 %{_unitdir}/locumview-desktop-cert@.service
 %{_unitdir}/locumview-desktop-cert.service
 %{_unitdir}/locumview-desktop-cert.timer
+%{_unitdir}/locumview-tpm-harden.service
 %dir %{_unitdir}/user-runtime-dir@.service.d
 %{_unitdir}/user-runtime-dir@.service.d/50-locumview-desktop-cert.conf
 

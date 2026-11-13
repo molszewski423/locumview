@@ -1,0 +1,14 @@
+# ADR 0019 (changelog #162): TPM clear disabled and a root-only lockout password, so a desktop user with TPM access
+# cannot clear the TPM; and an alert when an owner or endorsement password was set.
+[Unit]
+Description=LocumView: TPM hardening (no clear; lockout password) and check
+After=locumview-provision.service
+ConditionPathExists=/dev/tpmrm0
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/locumview/tpm-harden harden
+
+[Install]
+WantedBy=multi-user.target

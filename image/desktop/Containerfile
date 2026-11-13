@@ -117,7 +117,7 @@ RUN --mount=type=bind,target=/src \
         /usr/libexec/locumview/remote-access/; \
     install -D -m 0644 /src/image/desktop/signing/cosign.pub /usr/share/locumview/signing/cosign.pub; \
     systemctl enable locumview-flatpaks.service locumview-provision.service locumview-dns-v4-only.service \
-        locumview-desktop-cert.timer; \
+        locumview-desktop-cert.timer locumview-tpm-harden.service; \
     dconf update
 
 # 3b. Initramfs with clevis, so the LUKS volume unlocks with the vTPM at boot (the base image's initramfs has
