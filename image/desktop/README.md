@@ -51,7 +51,7 @@ cosign verify-attestation --key image/desktop/signing/cosign.pub --insecure-igno
 
 **Promotion.** Desktops follow `:stable`, which only the promote workflow (`.gitea/workflows/promote.yml`, run by hand) moves: it verifies the signature, the SBOM and a passing scan on the digest, then points `:stable` at the same manifest, byte for byte (`scripts/registry-tag.py`), and prints the previous `:stable` digest for a rollback. A build reaches desktops only after someone has tried `:testing` and promoted it.
 
-The private key and its password are Actions secrets, with a SOPS backup in `signing/cosign.sops.yaml`.
+The private key (as one-line base64, `COSIGN_PRIVATE_KEY_B64`, so the runner masks it in logs) and its password are Actions secrets, with a SOPS backup in `signing/cosign.sops.yaml`.
 
 ## Default apps
 

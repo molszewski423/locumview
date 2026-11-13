@@ -2514,3 +2514,21 @@ Agent: Claude Code
   `locumview-desktop-cert` contains `/usr/libexec/locumview/grd-credentials-to-tpm`.
 
 Agent: Claude Code
+
+## 155. CI: the image signing key no longer appears in run logs (2026-11-13)
+
+- **Found (owner screenshot of image run 665):** the runner prints each step's environment in its log and masks
+  secrets line by line; the multi-line `COSIGN_PRIVATE_KEY` (cosign's encrypted PEM key) was not recognized and
+  appeared in full in every signing step (Sign, SBOM, Attest the scan) of `image.yml` and `clinical-images.yml`,
+  in all runs since signing began. Its password (`COSIGN_PASSWORD`, one line) was masked, so the key could not be
+  used from the log alone. The repository and its run logs are private.
+- **Fix:** the key is now a one-line base64 secret, `COSIGN_PRIVATE_KEY_B64` (masked), decoded inside each signing
+  step into a private file in `/dev/shm` (mode 600, removed on exit) that cosign reads with `--key`.
+- **Owner steps:** create `COSIGN_PRIVATE_KEY_B64` from the SOPS backup before this is merged; after the next
+  signed run passes, delete the old `COSIGN_PRIVATE_KEY` secret.
+- **Open (owner decision, 2026-11-13):** rotate the signing key (staged: desktops must trust the new public key
+  before images are signed with it), planned for a later session; optionally delete the old run logs.
+- **Verification:** both workflows parse; the decode tried with a throwaway cosign key: identical bytes, mode 600,
+  file removed afterwards, the base64 value has no line breaks.
+
+Agent: Claude Code

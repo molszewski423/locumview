@@ -3,7 +3,7 @@
 # SBOM attestations in cosign's classic format, signed offline with the project key; verify with
 #   cosign verify --key image/desktop/signing/cosign.pub --insecure-ignore-tlog git.lan/mike/<image>@<digest>
 # Each build is pushed as :<commit> and :testing. A deployment pins a digest in k8s/clinical/kustomization.yaml.
-# Secrets (Actions): REGISTRY_TOKEN (Gitea token, package scope), COSIGN_PRIVATE_KEY / COSIGN_PASSWORD.
+# Secrets (Actions): REGISTRY_TOKEN (Gitea token, package scope), COSIGN_PRIVATE_KEY_B64 / COSIGN_PASSWORD.
 name: clinical-images
 "on":
   push:
@@ -76,20 +76,28 @@ jobs:
 
       - name: Sign
         env:
-          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PRIVATE_KEY_B64: ${{ secrets.COSIGN_PRIVATE_KEY_B64 }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
           set -euo pipefail
+          # The key is a one-line base64 secret, which the runner masks in its log; a multi-line PEM key in a step
+          # environment was printed in full (changelog #155). Decoded into a private tmpfs file, removed on exit.
+          COSIGN_KEY=$(umask 077; mktemp -p /dev/shm cosign.XXXXXX); trap 'rm -f "$COSIGN_KEY"' EXIT
+          printf '%s' "$COSIGN_PRIVATE_KEY_B64" | base64 -d > "$COSIGN_KEY"
           export DOCKER_CONFIG="$JOB/docker"
-          cosign sign --key env://COSIGN_PRIVATE_KEY --new-bundle-format=false --use-signing-config=false --tlog-upload=false -y \
+          cosign sign --key "$COSIGN_KEY" --new-bundle-format=false --use-signing-config=false --tlog-upload=false -y \
             -a "git.commit=$GITHUB_SHA" -a "ci.run=$GITHUB_RUN_NUMBER" "$IMAGE@$DIGEST"
 
       - name: SBOM
         env:
-          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PRIVATE_KEY_B64: ${{ secrets.COSIGN_PRIVATE_KEY_B64 }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
           set -euo pipefail
+          # The key is a one-line base64 secret, which the runner masks in its log; a multi-line PEM key in a step
+          # environment was printed in full (changelog #155). Decoded into a private tmpfs file, removed on exit.
+          COSIGN_KEY=$(umask 077; mktemp -p /dev/shm cosign.XXXXXX); trap 'rm -f "$COSIGN_KEY"' EXIT
+          printf '%s' "$COSIGN_PRIVATE_KEY_B64" | base64 -d > "$COSIGN_KEY"
           export DOCKER_CONFIG="$JOB/docker"
           syft scan "registry:$IMAGE@$DIGEST" -q -o "spdx-json=$JOB/sbom-full.spdx.json"
           # Packages only, as for the desktop image (image.yml): packages and their relationships are what
@@ -105,7 +113,7 @@ jobs:
           json.dump(d, open(sys.argv[2], "w"), separators=(",", ":"))
           print(len(d["packages"]), "packages in the SBOM")
           PY
-          cosign attest --key env://COSIGN_PRIVATE_KEY --new-bundle-format=false --use-signing-config=false --tlog-upload=false -y \
+          cosign attest --key "$COSIGN_KEY" --new-bundle-format=false --use-signing-config=false --tlog-upload=false -y \
             --type spdxjson --predicate "$JOB/sbom.spdx.json" "$IMAGE@$DIGEST"
 
       - name: Verify
