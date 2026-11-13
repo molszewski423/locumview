@@ -52,19 +52,31 @@ for o in objs:
 ' || true
 }
 
+has_key() {  # has_key <store>: the token holds this helper's private key
+  objects "$1" | awk -v k="$KEY" '$2=="CKO_PRIVATE_KEY" && $4==k {found=1} END {exit !found}'
+}
+
 ensure_token() {  # ensure_token <user>: store, token (empty user PIN) and TPM key, owned by the user
-  local u=$1 store; store=$(store_of "$u")
-  if [ -f "$store/tpm2_pkcs11.sqlite3" ]; then return 0; fi
-  install -d -m 0700 -o "$u" -g "$(id -gn "$u")" "$store"
-  quiet tpm2_ptool init --path="$store" >/dev/null
+  local u=$1 store new pid; store=$(store_of "$u"); new="$store.new"
+  if [ -f "$store/tpm2_pkcs11.sqlite3" ] && has_key "$store"; then return 0; fi
+  # The TPM PKCS#11 library creates an empty store database when any program in the user's session loads it through
+  # p11-kit, and can do so before this runs (changelog #164); tpm2_ptool did not set up a token in such a database. So
+  # the token is always built in a folder of its own, which the library never opens, checked, and only then put in
+  # place. A store without this helper's key holds nothing to keep.
+  rm -rf "$new"; install -d -m 0700 "$new"
+  pid=$(tpm2_ptool init --path="$new" 2>/dev/null | sed -n 's/^[ -]*id: *\([0-9][0-9]*\)$/\1/p' | head -n 1)
+  [ -n "$pid" ] || { rm -rf "$new"; fail "$u: could not create a TPM primary object"; return 1; }
   # The SO PIN is random and not kept: it only resets a user PIN, and this PIN is empty by design. A broken token is
   # replaced by deleting the store; the next run creates a new key and certificate.
   local so up; so=$(openssl rand -hex 16); up=$(openssl rand -hex 16)
-  quiet tpm2_ptool addtoken --path="$store" --pid=1 --label="$TOKEN" --sopin="$so" --userpin="$up" >/dev/null
-  quiet tpm2_ptool changepin --path="$store" --label="$TOKEN" --user=user --old="$up" --new="" >/dev/null
+  quiet tpm2_ptool addtoken --path="$new" --pid="$pid" --label="$TOKEN" --sopin="$so" --userpin="$up" >/dev/null
+  quiet tpm2_ptool changepin --path="$new" --label="$TOKEN" --user=user --old="$up" --new="" >/dev/null
   unset so up
-  quiet tpm2_ptool addkey --path="$store" --label="$TOKEN" --userpin="" --algorithm=ecc256 --key-label="$KEY" >/dev/null
+  quiet tpm2_ptool addkey --path="$new" --label="$TOKEN" --userpin="" --algorithm=ecc256 --key-label="$KEY" >/dev/null
+  has_key "$new" || { rm -rf "$new"; fail "$u: the TPM key could not be created"; return 1; }
+  rm -rf "$store"; mv "$new" "$store"
   chown -R "$u:$(id -gn "$u")" "$store"
+  has_key "$store" || { fail "$u: the token did not survive the move into $store"; return 1; }
   log "token and TPM key created for $u"
 }
 

@@ -2714,5 +2714,32 @@ Agent: Claude Code
   commit, `kubectl apply -k k8s/clinical` (the sso Ingress and middleware annotations return).
 - **Verification so far:** `kubectl kustomize` renders the TLSOption, the Secret (`ca.crt`), both Ingresses with the
   option and no sso Ingress; shellcheck; pre-commit on all files; the whole-history gitleaks scan.
+## 164. Desktop certificate: a user's token could be left without its key (race with the PKCS#11 library) (2026-11-13)
+
+- **Found on lv-demo01** (image `sha256:1cb7cbad…`, promoted to `:stable` by the owner and applied with `bootc
+  upgrade` and a reboot): the TPM hardening service hardened it at boot; the demo user's always-on session got its
+  token, its certificate (valid 3 days) and its Remote Desktop credentials moved into the TPM. But the owner's own
+  login there failed: "no private key 'desktop' on token". The TPM PKCS#11 library creates an empty store database when
+  any program in a new session loads it through p11-kit, and that happened before the helper ran; `ensure_token`
+  treated an existing database as a finished token and skipped creating the token and key. The timer then raised its
+  ALERT for that user, as designed. (On lv-test17 the helper happened to run first.)
+- **First fix, not enough:** deciding by the key and completing the existing store passed against swtpm, but on
+  lv-demo01 (owner run by hand) it still failed: read-only as root, the library-made store held no primary object and
+  no token after the attempt; tpm2_ptool did not set up a token in a database the library had created.
+- **Fix:** `ensure_token` keeps a store only if it holds the helper's key; otherwise it builds the token in a folder of
+  its own (`~/.tpm2_pkcs11.new`, which the library never opens: it uses `~/.tpm2_pkcs11`), checks the key there, then
+  replaces the store with it and checks again. This is the setup path that always worked on a fresh folder (the demo
+  user, lv-test17), made independent of the race.
+- **Verified** in an EL10 container against swtpm 0.9.0 behind tpm2-abrmd 3.0 (a resource manager, as `/dev/tpmrm0` is
+  on the desktops; without one the software TPM runs out of object slots inside a single `tpm2_ptool` call): a fresh
+  user; the race (a store the library created first) replaced by a working one owned by the user; a second run
+  changes nothing. The PKCS#11 library in that container does not use the resource manager, so the read-back through
+  PKCS#11 is left to a real desktop.
+
+- **Verified on lv-demo01 (owner ran the fixed helper by hand as root; agent read-only):** "token and TPM key created
+  for molszewski", a certificate from the sub-CA valid 3 days; the token lists private key, public key and certificate
+  (EC P-256) through PKCS#11 (`p11tool`, the path Chrome uses); no `.new` folder left; no failed units after
+  `reset-failed`. lv-demo01's demo user and the owner, and lv-test17's owner, now hold desktop certificates: the
+  cut-over (#163) can go ahead once this reaches the next image.
 
 Agent: Claude Code
