@@ -104,6 +104,53 @@ sqlStatement("UPDATE documents d JOIN categories_to_documents c ON c.document_id
 sqlStatement($unlink, [$pid, $category]);
 echo "ok\n";
 """
+BRANDING_PHP = r"""<?php
+// LocumView's login page branding (changelog #167), with OpenEMR's own settings and logo folders only: the LocumView
+// wordmark (SVG, base64 on stdin; fixed dark colors: OpenEMR's login page has no dark mode) as the primary login logo,
+// OpenEMR's own colored logo as the secondary one, a tagline.
+$_GET['site'] = 'default';
+$ignoreAuth = true;
+require_once '/var/www/localhost/htdocs/openemr/interface/globals.php';
+$data = base64_decode(stream_get_contents(STDIN), true);
+if ($data === false || strpos($data, '<svg') === false) { echo "error: no logo\n"; exit(1); }
+$base = $GLOBALS['OE_SITE_DIR'] . '/images/logos/core/login';
+// The image ships these folders read-only for their owner, the web server user this runs as: make them writable
+// for the owner, and check every write (a failed write must not report success).
+foreach (['primary', 'secondary'] as $d) {
+    if (!is_dir("$base/$d") && !mkdir("$base/$d", 0755, true)) { echo "error: cannot create $base/$d\n"; exit(1); }
+    if (!is_writable("$base/$d") && !chmod("$base/$d", 0755)) { echo "error: cannot make $base/$d writable\n"; exit(1); }
+    foreach (glob("$base/$d/logo.*") ?: [] as $old) {
+        if (!unlink($old)) { echo "error: cannot remove $old\n"; exit(1); }
+    }
+}
+if (file_put_contents("$base/primary/logo.svg", $data) === false
+    || !copy($GLOBALS['fileroot'] . '/public/images/logos/core/login/primary/logo.png', "$base/secondary/logo.png")) {
+    echo "error: cannot write the login logos\n"; exit(1);
+}
+$settings = [
+    'login_tagline_text' => 'LocumView reference EHR · synthetic patients only',
+    'show_tagline_on_login' => '1', 'show_primary_logo' => '1', 'extra_logo_login' => '1',
+    'secondary_logo_position' => 'second', 'logo_position' => 'flex-column',
+    'primary_logo_width' => 'w-75', 'secondary_logo_width' => 'w-25',
+    'display_acknowledgements_on_login' => '1', 'openemr_name' => 'LocumView · OpenEMR',
+];
+foreach ($settings as $name => $value) {
+    sqlStatement("REPLACE INTO globals (gl_name, gl_index, gl_value) VALUES (?, 0, ?)", [$name, $value]);
+}
+echo "ok\n";
+"""
+
+
+def branding():
+    import base64
+    logo = (HERE / "branding" / "locumview-login-logo.svg").read_bytes()
+    done = target.php(target.install("branding.php", BRANDING_PHP), stdin=base64.b64encode(logo).decode())
+    last = (done.stdout.strip().splitlines() or [""])[-1]
+    if done.returncode or last != "ok":
+        raise SystemExit(f"login page branding not applied: {last} {done.stderr[-300:]}")
+    print("login page branding applied")
+
+
 PHOTOS = HERE.parent / "photos"
 
 
@@ -489,6 +536,7 @@ def main(argv):
     target = targets.Target(name)
     # Result flags for S, I, R and SDD (list configuration, idempotent).
     sql((SPIKE / "susceptibility-flags.sql").read_text())
+    branding()
     with target.session(fhir.SCOPES):
         if "--no-background" not in argv:
             load_background()

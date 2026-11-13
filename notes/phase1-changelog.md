@@ -2792,3 +2792,28 @@ Agent: Claude Code
   3 days; nothing to revoke.
 
 Agent: Claude Code
+
+## 167. OpenEMR login page branded for LocumView; the clinical app already follows the system's light or dark mode (2026-11-13)
+
+- **Owner request:** brand the EHR's login page for LocumView, and make the clinical app and the EHR follow the user's
+  light or dark appearance, ideally from GNOME's setting.
+- **Clinical app:** nothing to build. Its stylesheet already has light and dark palettes on `prefers-color-scheme`,
+  which Chrome takes from GNOME; it shows dark because the desktops are in dark mode.
+- **OpenEMR login page (stock OpenEMR settings and logo folders only, no code change):** the scenario loader now
+  applies, on every run, the LocumView wordmark (`clinical/scenarios/branding/locumview-login-logo.svg`, from the
+  desktop's login logo, in fixed dark colors) as the primary login logo and OpenEMR's own colored logo as the
+  secondary one, in the site folder (`sites/default/images/logos/core/login/`, on the persistent volume; the image ships
+  it read-only for its owner, so the step makes it writable for the owner and checks every write), and the settings:
+  tagline "LocumView reference EHR · synthetic patients only", logos stacked, the acknowledgements and licensing link
+  kept, application title "LocumView · OpenEMR".
+- **Found:** the first version reported success although the logo write had failed (unchecked writes, read-only
+  folder); fixed. OpenEMR's login page has no dark mode, so a logo that switched to white in dark mode vanished; the
+  logo now keeps dark colors.
+- **Planned (owner agreed):** an OpenEMR patch adding an "Automatic" theme that loads OpenEMR's light and dark styles by
+  `prefers-color-scheme`, so the EHR follows GNOME too; it needs an OpenEMR image and testing across its pages. Until
+  then each user can choose light or dark in OpenEMR's own settings.
+- **Verification:** a fresh local OpenEMR: the step reports success, the login page serves both logos from the site
+  folder (SVG 200 `image/svg+xml`), the tagline, the title and the acknowledgements link; a headless Chromium screenshot
+  checked by eye, in light and in dark mode. Local OpenEMR destroyed.
+
+Agent: Claude Code
