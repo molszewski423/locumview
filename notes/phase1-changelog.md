@@ -2736,4 +2736,10 @@ Agent: Claude Code
   changes nothing. The PKCS#11 library in that container does not use the resource manager, so the read-back through
   PKCS#11 is left to a real desktop.
 
+- **Verified on lv-demo01 (owner ran the fixed helper by hand as root; agent read-only):** "token and TPM key created
+  for molszewski", a certificate from the sub-CA valid 3 days; the token lists private key, public key and certificate
+  (EC P-256) through PKCS#11 (`p11tool`, the path Chrome uses); no `.new` folder left; no failed units after
+  `reset-failed`. lv-demo01's demo user and the owner, and lv-test17's owner, now hold desktop certificates: the
+  cut-over (#163) can go ahead once this reaches the next image.
+
 Agent: Claude Code
