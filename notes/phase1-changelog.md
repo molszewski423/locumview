@@ -2653,3 +2653,30 @@ Agent: Claude Code
   the cut-over). Also open: the October node3 test desktop lv-test18 is still running on operator-laptop.
 
 Agent: Claude Code
+
+## 162. ADR 0019 TPM check: hierarchy passwords; TPM hardening at boot; lv-test18 destroyed (2026-11-13)
+
+- **TPM lockout check (build plan, read-only on lv-test17):** dictionary-attack settings as provisioning sets them
+  (32 tries, a failure expires after 300 s, lockout recovery 300 s; counter 0, not in lockout). Found: the owner,
+  endorsement and lockout passwords are all empty and `disableClear` is 0. Before ADR 0019 only root could reach the
+  TPM; now every signed-in desktop user can, and could clear the TPM (lockout hierarchy) or set an owner password.
+  Either makes clevis fail to unseal the disk key at the next boot (recovery: the LUKS recovery passphrase in SOPS).
+  No key can be read or copied this way: it is a denial of service against that desktop by a signed-in user.
+- **Fix (owner approved):** `tpm-harden` (in the `locumview-desktop-cert` RPM) with `locumview-tpm-harden.service`
+  (after first-boot provisioning, every boot, idempotent): sets `disableClear` with the lockout hierarchy, then a
+  random 64-hex-character lockout password kept root-only in `/etc/locumview/tpm-lockout.auth` (passed with `file:`,
+  never as an argument). The owner password cannot be set (clevis and tpm2-pkcs11 create their primary keys under the
+  owner hierarchy without one), so `tpm-harden check`, also run by the 6-hourly certificate timer, raises an ALERT and
+  fails when an owner or endorsement password was set or the hardening is missing. tpm2-tools 5.7 (EL10) syntax checked:
+  `tpm2_clearcontrol` clears the bit unless given `s`; `file:` passwords are read as text.
+- **To verify on lv-test17 (owner run):** the platform hierarchy is not usable from the OS (firmware randomizes its
+  password; otherwise it could clear the TPM regardless); harden by hand; reboot; the disk unlocks by itself and the
+  certificate still works.
+- **Found on the way (again):** an edit placed a file-list line in the spec's `%install` section (as in #154); a build
+  from the commit caught it, together with the missing `%files` line. RPMs now build from the commit with all files.
+- **lv-test18 destroyed (owner):** the October node3 test desktop, from `terraform/node3` in a separate operator
+  checkout (default workspace, only lv-test18): plan reviewed (0 to add, 0 to change, 10 to destroy), applied; VM,
+  disks, IdM host, DNS record, Guacamole connection and Red Hat registration removed; the plan file deleted. Its
+  October twin lv-test19 is in that directory's `node1-twin` workspace and is not running.
+
+Agent: Claude Code
