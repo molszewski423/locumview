@@ -2436,7 +2436,8 @@ Agent: Claude Code
 - **Works:** the system booted (disk unlocked, LocumView login on the console); at the owner's sign-in the helper
   created his tpm2-pkcs11 token and obtained a certificate: subject `CN=lv-test17.corp.locumview.com`, issuer
   `CN=LocumView desktop clients`, valid to 2026-11-16 (3 days); the dock shows the EHR launcher with OpenEMR's blue
-  logo; the EHR still asks for Keycloak with TOTP, as expected until step 4.
+  logo; the EHR still asks for Keycloak with TOTP, as expected until step 4, then opens OpenEMR (patient list of 46:
+  the 20 background patients with their new data, the 26 cases still without contact details).
 - **Broke:** Guacamole could not connect. GNOME Remote Desktop (headless) started but refused every session:
   "Couldn't initialize session: Credentials are not set". It keeps its RDP credentials in the TPM when it can reach
   one and falls back to a file only when it cannot (GNOME commit "ctl: Use GKeyFile as fallback for TPM", 2022).
