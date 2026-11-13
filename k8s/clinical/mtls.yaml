@@ -1,0 +1,13 @@
+# ADR 0019 step 4 (changelog #163): the two clinical names answer only to LocumView desktops. Traefik requires a TLS
+# client certificate from the IdM sub-CA locumview-desktop-clients (its public certificate: desktop-client-ca.pem,
+# made into the Secret desktop-client-ca by kustomization.yaml) at the handshake; anything else is refused before HTTP.
+# The desktops' certificates come from the locumview-desktop-cert RPM; Chrome presents them without a prompt.
+apiVersion: traefik.io/v1alpha1
+kind: TLSOption
+metadata: {name: desktop-mtls, namespace: clinical}
+spec:
+  minVersion: VersionTLS12
+  sniStrict: true
+  clientAuth:
+    secretNames: [desktop-client-ca]   # pragma: allowlist secret
+    clientAuthType: RequireAndVerifyClientCert

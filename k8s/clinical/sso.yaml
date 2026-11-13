@@ -1,3 +1,6 @@
+# ADR 0019 step 4a (changelog #163): no route uses oauth2-proxy any more; its /lv-sso Ingress is gone (it shared the
+# clinical host names, which now carry the desktop mTLS option). The rest stays until step 4b removes it, so the
+# cut-over can be undone by reverting one commit.
 # Keycloak in front of the clinical names (M3 step 4): oauth2-proxy answers Traefik's ForwardAuth for every request to
 # emr. and clinical.corp.locumview.com. Without a session it sends the browser to Keycloak (password and TOTP, ADR 0005);
 # only members of locumview-clinical get through. OpenEMR's own login and the SMART launch carry on behind it; the
@@ -90,25 +93,3 @@ spec:
     # Traefik drops the auth server's cookies unless they are listed: without this, a session refreshed with Keycloak
     # never reaches the browser and every request refreshes again. Sessions over 4 KB are split into _0, _1, ...
     addAuthCookiesToResponse: [_lv_clinical_sso, _lv_clinical_sso_0, _lv_clinical_sso_1, _lv_clinical_sso_2]
----
-# oauth2-proxy's own paths (start, callback, sign-out) on both names, not behind the middleware.
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: sso
-  namespace: clinical
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.tls: "true"
-spec:
-  ingressClassName: traefik
-  tls:
-    - {hosts: [emr.corp.locumview.com], secretName: clinical-tls-emr}             # pragma: allowlist secret
-    - {hosts: [clinical.corp.locumview.com], secretName: clinical-tls-clinical}   # pragma: allowlist secret
-  rules:
-    - host: emr.corp.locumview.com
-      http:
-        paths: [{path: /lv-sso, pathType: Prefix, backend: {service: {name: oauth2-proxy, port: {number: 4180}}}}]
-    - host: clinical.corp.locumview.com
-      http:
-        paths: [{path: /lv-sso, pathType: Prefix, backend: {service: {name: oauth2-proxy, port: {number: 4180}}}}]

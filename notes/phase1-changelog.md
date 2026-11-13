@@ -2688,3 +2688,31 @@ Agent: Claude Code
   October twin lv-test19 is in that directory's `node1-twin` workspace and is not running.
 
 Agent: Claude Code
+
+## 163. ADR 0019 step 4a prepared: desktops-only mTLS on the clinical names; a false record in #144 corrected (2026-11-13)
+
+- **Correction to #144:** it says the sub-CA's public certificate was committed as `k8s/clinical/desktop-client-ca.pem`.
+  It was not: `.gitignore` ignores `*.pem`, `git add` skipped it without a word, and the agent's work folder holding it
+  was removed later. Fetched again read-only from IdM (`ipa ca-show --certificate-out`): its SHA-256 fingerprint is
+  the one #144 records (88:D7:FC:23...79:28). Now committed, with a `.gitignore` exception. Nothing secret was involved.
+- **Step 4a (cluster manifests, not applied):** `k8s/clinical/mtls.yaml`, a Traefik `TLSOption` `desktop-mtls`
+  (TLS 1.2 or newer, `sniStrict`, `RequireAndVerifyClientCert` against the Secret `desktop-client-ca`, which the
+  kustomization makes from that certificate); both clinical Ingresses use it (`router.tls.options`) instead of the
+  `sso` middleware. oauth2-proxy's `/lv-sso` Ingress is removed: it shared the two host names, and Traefik refuses
+  different TLS options for one name (421). oauth2-proxy's Deployment, Service, Middleware, Secret, Keycloak client and
+  network policy stay, unused, until step 4b, so the cut-over can be undone by reverting one commit. The gateway is
+  unaffected: it reaches OpenEMR only at `EHR_INTERNAL_URL` (discovery, token, FHIR). Nothing else in the repository
+  or the owner's deploy script uses the two names from outside a desktop.
+- **Checks:** `scripts/clinical/mtls-checks.sh` from a machine that is not a desktop: per name, no client certificate
+  and a certificate from another CA must be refused at the handshake, and a different TLS name with the clinical Host
+  must get 421. Baseline today (before the cut-over): all six fail with Keycloak's 302, as they should.
+- **Cut-over order (owner approves each access change):** (1) the image of #104's merge (TPM hardening) built and
+  verified, promoted to `:stable`, and lv-demo01 rebooted onto it, so the demo desktop has its certificate before the
+  names start requiring one (otherwise it loses the EHR until then); (2) `kubectl apply -k k8s/clinical`, then
+  `kubectl -n clinical delete ingress sso` (apply does not prune it); (3) the checks script, all PASS; (4) in
+  lv-test17 and lv-demo01: the EHR opens with OpenEMR's login only, and a SMART launch works. Rollback: revert this
+  commit, `kubectl apply -k k8s/clinical` (the sso Ingress and middleware annotations return).
+- **Verification so far:** `kubectl kustomize` renders the TLSOption, the Secret (`ca.crt`), both Ingresses with the
+  option and no sso Ingress; shellcheck; pre-commit on all files; the whole-history gitleaks scan.
+
+Agent: Claude Code
