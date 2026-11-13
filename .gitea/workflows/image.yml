@@ -7,6 +7,7 @@
 #   RHSM_ORG / RHSM_ACTIVATION_KEY                    dnf during the build (build secret, never in a layer)
 #   REGISTRY_TOKEN                                    push to git.lan (Gitea token, package scope only)
 #   COSIGN_PRIVATE_KEY_B64 / COSIGN_PASSWORD              sign (public key: image/desktop/signing/cosign.pub)
+#   RPM_SIGNING_KEY_B64 / RPM_SIGNING_PASSPHRASE          only when this run must build its own RPMs (rpms.yml)
 # Signatures and attestations use cosign's classic format (sha256-<digest>.sig and .att tags): RHEL's
 # containers/image, which bootc uses, does not read cosign 3's new bundle format. Signing is offline (no public
 # transparency log): verify with
@@ -76,6 +77,38 @@ jobs:
           read -r SOURCE VERSION RELEASE EVR < <(python3 packaging/rpm/resolve-version.py "$GITHUB_SHA" --check-inputs --format tsv)
           echo "RPM source: $SOURCE; required version-release: $EVR"
           echo "LOCUMVIEW_RPM_EVR=$EVR" >> "$GITHUB_ENV"
+          echo "LOCUMVIEW_RPM_SOURCE=$SOURCE" >> "$GITHUB_ENV"
+
+      # A push that changes both the packages and the image starts this run and the rpms run together, on the one
+      # runner, in no fixed order; the build then failed at step 1c when the RPMs were not published yet (changelog
+      # #158). Waiting for the rpms run would hold the only runner. So: if the required version is not in the registry
+      # yet, build, sign and publish it here with the same scripts rpms.yml uses; publishing is idempotent, so
+      # whichever run comes second finds the packages there.
+      - name: RPMs for this image
+        env:
+          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+          RPM_SIGNING_KEY_B64: ${{ secrets.RPM_SIGNING_KEY_B64 }}
+          RPM_SIGNING_PASSPHRASE: ${{ secrets.RPM_SIGNING_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          cd src
+          url="https://git.lan/api/packages/${GITHUB_REPOSITORY_OWNER}/rpm/el10/package/locumview-desktop-cert/${LOCUMVIEW_RPM_EVR}/noarch"
+          if [ "$(curl -s -o /dev/null -w '%{http_code}' "$url")" = 200 ]; then
+            echo "RPMs $LOCUMVIEW_RPM_EVR already published"; exit 0
+          fi
+          echo "RPMs $LOCUMVIEW_RPM_EVR not published yet: building them from $LOCUMVIEW_RPM_SOURCE here"
+          packaging/rpm/build-rpms.sh "$JOB/rpms" "$LOCUMVIEW_RPM_SOURCE"
+          FPR=$(gpg --batch --with-colons --show-keys packaging/rpm/signing/RPM-GPG-KEY-locumview | awk -F: '/^fpr/{print $10; exit}')
+          python3 -I - "$FPR" <<'PY' | packaging/rpm/sign-rpms.sh "$JOB/rpms"
+          import base64, json, os, sys
+          json.dump({"rpm_signing_fingerprint": sys.argv[1],
+                     "rpm_signing_passphrase": os.environ["RPM_SIGNING_PASSPHRASE"],
+                     "rpm_signing_private_key": base64.b64decode(os.environ["RPM_SIGNING_KEY_B64"]).decode()},
+                    sys.stdout)
+          PY
+          REGISTRY_USER="${GITHUB_REPOSITORY_OWNER}" packaging/rpm/publish-rpms.sh "$JOB/rpms"
+          rm -rf "$JOB/rpms"
+          [ "$(curl -s -o /dev/null -w '%{http_code}' "$url")" = 200 ] || { echo "RPMs still not in the registry" >&2; exit 1; }
 
       - name: Build
         env:
