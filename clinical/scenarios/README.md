@@ -23,6 +23,13 @@ afterwards it deletes the client and restores the grant. Read a case back with
 Loading is idempotent: each case's patient has the patient number `LV-<case id>`, and a case already present is
 skipped. No manual chart entry, ever.
 
+What no rule reads lives in `charts.json`, per case: demographics, emergency contact, insurance, the portrait text, and
+`history` (past history with ICD-10-CM codes, home medications with RxNorm codes as OpenEMR's patient-reported
+medication list, allergies, tobacco and alcohol, social history, immunizations with CVX codes; owner approved
+2026-11-13). The loader applies it to new and already loaded cases, once per item; FHIR shows the home medications as
+MedicationRequest with intent `plan` (prescriptions: `order`). `--no-chart-details` loads the case data alone, for
+recording fixtures.
+
 ## Case format `locumview-case/1`
 
 One JSON file per case in `cases/`, named after its `id`. `check_cases.py` enforces the rules below and rejects

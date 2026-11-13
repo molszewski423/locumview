@@ -1,5 +1,5 @@
 {
- "_note": "Chart details for the scenario cases that no rule reads (owner request, 2026-11-12): demographics, emergency contact and insurance, made up and consistent with each case's age and sex; plus the portrait description for clinical/photos/portraits.py. Clinical history (past history, home medications, social history, immunizations) is added only after the owner's clinical review. The loader applies this to new and already loaded cases.",
+ "_note": "Chart details for the scenario cases that no rule reads (owner request, 2026-11-12): demographics, emergency contact and insurance, made up and consistent with each case's age and sex; plus the portrait description for clinical/photos/portraits.py. history: past history, home medications (patient-reported list), allergies, social history and immunizations, owner approved 2026-11-13 after an OpenEvidence review. The loader applies this to new and already loaded cases.",
  "bsi-citrobacter-ampc-01": {
   "demographics": {
    "race": [
@@ -22,7 +22,44 @@
    "relationship": "Spouse",
    "phone": "555-267-4035"
   },
-  "insurance": "Medicaid"
+  "insurance": "Medicaid",
+  "history": {
+   "problems": [
+    {
+     "title": "Essential hypertension",
+     "icd10": "I10"
+    },
+    {
+     "title": "Personal history of urinary calculi",
+     "icd10": "Z87.442"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "amlodipine 5 MG Oral Tablet",
+     "rxnorm": "197361",
+     "dose": "5 mg daily"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "2 to 3 beers a week",
+   "social": "married, lives with wife; electrician",
+   "immunizations": [
+    {
+     "cvx": "140",
+     "date": "2025-10-14"
+    },
+    {
+     "cvx": "115",
+     "date": "2019-06-03"
+    }
+   ],
+   "why": "Kidney stone 2019 passed spontaneously. Amlodipine rather than an ACE inhibitor: TMP-SMX is an oral option in this case (hyperkalemia)."
+  }
  },
  "bsi-ecoli-esbl-mismatch-01": {
   "demographics": {
@@ -46,7 +83,70 @@
    "relationship": "Daughter",
    "phone": "555-808-1213"
   },
-  "insurance": "Medicare"
+  "insurance": "Medicare",
+  "history": {
+   "problems": [
+    {
+     "title": "Essential hypertension",
+     "icd10": "I10"
+    },
+    {
+     "title": "Hyperlipidemia",
+     "icd10": "E78.5"
+    },
+    {
+     "title": "Personal history of urinary tract infections",
+     "icd10": "Z87.440"
+    },
+    {
+     "title": "Atrophic vaginitis",
+     "icd10": "N95.2"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "amlodipine 10 MG Oral Tablet",
+     "rxnorm": "308135",
+     "dose": "10 mg daily"
+    },
+    {
+     "drug": "atorvastatin 20 MG Oral Tablet",
+     "rxnorm": "617310",
+     "dose": "20 mg daily"
+    },
+    {
+     "drug": "estradiol 0.1 MG/ML Vaginal Cream",
+     "rxnorm": "310169",
+     "dose": "1 g vaginally twice weekly"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "no alcohol",
+   "social": "widowed, lives alone, independent; retired teacher",
+   "immunizations": [
+    {
+     "cvx": "197",
+     "date": "2025-10-02"
+    },
+    {
+     "cvx": "216",
+     "date": "2024-11-20"
+    },
+    {
+     "cvx": "187",
+     "date": "2021-05-11"
+    },
+    {
+     "cvx": "115",
+     "date": "2018-03-09"
+    }
+   ],
+   "why": "Three cystitis episodes in the past year treated as outpatient (explains the resistant isolate)."
+  }
  },
  "bsi-enterobacter-ampc-01": {
   "demographics": {
@@ -70,7 +170,62 @@
    "relationship": "Spouse",
    "phone": "555-735-8821"
   },
-  "insurance": "Medicare"
+  "insurance": "Medicare",
+  "history": {
+   "problems": [
+    {
+     "title": "Type 2 diabetes mellitus with diabetic autonomic neuropathy",
+     "icd10": "E11.43"
+    },
+    {
+     "title": "Essential hypertension",
+     "icd10": "I10"
+    },
+    {
+     "title": "Chronic kidney disease, stage 2",
+     "icd10": "N18.2"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "metformin hydrochloride 500 MG Oral Tablet",
+     "rxnorm": "861007",
+     "dose": "1000 mg twice daily"
+    },
+    {
+     "drug": "insulin glargine 100 UNT/ML Injectable Solution",
+     "rxnorm": "311041",
+     "dose": "20 units at bedtime"
+    },
+    {
+     "drug": "amlodipine 5 MG Oral Tablet",
+     "rxnorm": "197361",
+     "dose": "5 mg daily"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "former",
+    "note": "Former smoker, quit 2010 (20 pack-years)"
+   },
+   "alcohol": "no alcohol",
+   "social": "married; retired truck driver; chronic indwelling Foley changed monthly by home health",
+   "immunizations": [
+    {
+     "cvx": "197",
+     "date": "2025-10-20"
+    },
+    {
+     "cvx": "216",
+     "date": "2024-12-01"
+    },
+    {
+     "cvx": "115",
+     "date": "2016-08-15"
+    }
+   ],
+   "why": "Neurogenic bladder (N31.9, already in the case) from diabetic cystopathy explains the chronic catheter. Diabetes is not a Listeria trigger here (no meningitis)."
+  }
  },
  "bsi-kaerogenes-cefepime-negative-01": {
   "demographics": {
@@ -94,7 +249,67 @@
    "relationship": "Spouse",
    "phone": "555-326-2415"
   },
-  "insurance": "Medicare"
+  "insurance": "Medicare",
+  "history": {
+   "problems": [
+    {
+     "title": "Benign prostatic hyperplasia with lower urinary tract symptoms",
+     "icd10": "N40.1"
+    },
+    {
+     "title": "Hyperlipidemia",
+     "icd10": "E78.5"
+    },
+    {
+     "title": "Gout",
+     "icd10": "M10.9"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "tamsulosin hydrochloride 0.4 MG Oral Capsule",
+     "rxnorm": "863669",
+     "dose": "0.4 mg daily"
+    },
+    {
+     "drug": "finasteride 5 MG Oral Tablet",
+     "rxnorm": "310346",
+     "dose": "5 mg daily"
+    },
+    {
+     "drug": "atorvastatin 40 MG Oral Tablet",
+     "rxnorm": "617311",
+     "dose": "40 mg daily"
+    },
+    {
+     "drug": "allopurinol 100 MG Oral Tablet",
+     "rxnorm": "197319",
+     "dose": "100 mg daily"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "occasional wine",
+   "social": "married; retired postal worker",
+   "immunizations": [
+    {
+     "cvx": "197",
+     "date": "2025-09-30"
+    },
+    {
+     "cvx": "216",
+     "date": "2025-01-15"
+    },
+    {
+     "cvx": "187",
+     "date": "2022-02-07"
+    }
+   ],
+   "why": "BPH supports a urinary source; renal ultrasound in the story checks for obstruction."
+  }
  },
  "bsi-mssa-cefazolin-negative-01": {
   "demographics": {
@@ -118,7 +333,53 @@
    "relationship": "Son",
    "phone": "555-851-6115"
   },
-  "insurance": "Medicaid"
+  "insurance": "Medicaid",
+  "history": {
+   "problems": [
+    {
+     "title": "Crohn's disease of small intestine without complications",
+     "icd10": "K50.00"
+    },
+    {
+     "title": "Iron deficiency anemia",
+     "icd10": "D50.9"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "loperamide hydrochloride 2 MG Oral Capsule",
+     "rxnorm": "978006",
+     "dose": "4 mg four times daily"
+    },
+    {
+     "drug": "pantoprazole 40 MG Delayed Release Oral Tablet",
+     "rxnorm": "314200",
+     "dose": "40 mg daily"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "no alcohol",
+   "social": "single, lives with his sister; disability since 2021",
+   "immunizations": [
+    {
+     "cvx": "140",
+     "date": "2025-10-08"
+    },
+    {
+     "cvx": "216",
+     "date": "2024-10-22"
+    },
+    {
+     "cvx": "115",
+     "date": "2020-01-13"
+    }
+   ],
+   "why": "Home parenteral nutrition 5 nights a week, with IV iron in the nutrition. Crohn's in remission off biologics (no immunosuppressant). The case's short bowel problem is recoded K91.2 to K90.829 (K91.2 is postsurgical malabsorption)."
+  }
  },
  "bsi-mssa-vancomycin-01": {
   "demographics": {
@@ -142,7 +403,57 @@
    "relationship": "Spouse",
    "phone": "555-352-0995"
   },
-  "insurance": "UnitedHealthcare"
+  "insurance": "UnitedHealthcare",
+  "history": {
+   "problems": [
+    {
+     "title": "Personal history of septic arthritis of native right knee (group B streptococcus), no arthroplasty",
+     "icd10": "Z87.39"
+    },
+    {
+     "title": "Osteoarthritis of knee",
+     "icd10": "M17.9"
+    },
+    {
+     "title": "Hypothyroidism",
+     "icd10": "E03.9"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "levothyroxine sodium 0.075 MG Oral Tablet",
+     "rxnorm": "966222",
+     "dose": "75 mcg daily"
+    },
+    {
+     "drug": "acetaminophen 500 MG Oral Tablet",
+     "rxnorm": "198440",
+     "dose": "1000 mg every 8 hours as needed"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "no alcohol",
+   "social": "married; part-time bookkeeper",
+   "immunizations": [
+    {
+     "cvx": "150",
+     "date": "2025-10-05"
+    },
+    {
+     "cvx": "216",
+     "date": "2025-02-10"
+    },
+    {
+     "cvx": "187",
+     "date": "2023-03-20"
+    }
+   ],
+   "why": "Answers 'PICC for home antibiotics': 4 weeks of IV cefazolin for group B streptococcal septic arthritis of the native right knee ended 2026-10-17, 5 days before admission, with no reaction; the knee is quiescent and inflammatory markers had normalized. A streptococcus, not S. aureus, so the new MSSA bacteremia is not a relapse. Past course only, no active order."
+  }
  },
  "cap-duration-01": {
   "demographics": {
@@ -166,7 +477,45 @@
    "relationship": "Spouse",
    "phone": "555-492-8798"
   },
-  "insurance": "Cigna Health"
+  "insurance": "Cigna Health",
+  "history": {
+   "problems": [
+    {
+     "title": "Essential hypertension",
+     "icd10": "I10"
+    },
+    {
+     "title": "Obesity",
+     "icd10": "E66.9"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "losartan potassium 50 MG Oral Tablet",
+     "rxnorm": "979492",
+     "dose": "50 mg daily"
+    }
+   ],
+   "allergies": [
+    {
+     "title": "Codeine",
+     "reaction": "Nausea and vomiting"
+    }
+   ],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "social alcohol",
+   "social": "married; office manager",
+   "immunizations": [
+    {
+     "cvx": "150",
+     "date": "2025-10-11"
+    }
+   ],
+   "why": "No QT-prolonging home drugs and no calcium/iron/antacids (levofloxacin chelation)."
+  }
  },
  "cap-febrile-iv-negative-01": {
   "demographics": {
@@ -190,7 +539,49 @@
    "relationship": "Son",
    "phone": "555-148-5281"
   },
-  "insurance": "Medicaid"
+  "insurance": "Medicaid",
+  "history": {
+   "problems": [
+    {
+     "title": "Hypothyroidism",
+     "icd10": "E03.9"
+    },
+    {
+     "title": "Gastro-esophageal reflux disease without esophagitis",
+     "icd10": "K21.9"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "levothyroxine sodium 0.1 MG Oral Tablet",
+     "rxnorm": "892246",
+     "dose": "100 mcg daily"
+    },
+    {
+     "drug": "famotidine 20 MG Oral Tablet",
+     "rxnorm": "310273",
+     "dose": "20 mg twice daily"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "former",
+    "note": "Former smoker, quit 2005 (10 pack-years)"
+   },
+   "alcohol": "no alcohol",
+   "social": "divorced, lives alone; hairdresser",
+   "immunizations": [
+    {
+     "cvx": "150",
+     "date": "2025-10-18"
+    },
+    {
+     "cvx": "216",
+     "date": "2025-03-04"
+    }
+   ],
+   "why": "No lung disease on purpose: the story says no Pseudomonas risk factors. Famotidine rather than a PPI or antacid with levofloxacin."
+  }
  },
  "cap-levofloxacin-ivpo-01": {
   "demographics": {
@@ -214,7 +605,44 @@
    "relationship": "Spouse",
    "phone": "555-635-4580"
   },
-  "insurance": "Cigna Health"
+  "insurance": "Cigna Health",
+  "history": {
+   "problems": [
+    {
+     "title": "Hyperlipidemia",
+     "icd10": "E78.5"
+    },
+    {
+     "title": "Benign prostatic hyperplasia without lower urinary tract symptoms",
+     "icd10": "N40.0"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "rosuvastatin calcium 10 MG Oral Tablet",
+     "rxnorm": "859747",
+     "dose": "10 mg daily"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "former",
+    "note": "Former smoker, quit 2015 (15 pack-years)"
+   },
+   "alcohol": "1 to 2 drinks a week",
+   "social": "married; accountant",
+   "immunizations": [
+    {
+     "cvx": "140",
+     "date": "2025-10-27"
+    },
+    {
+     "cvx": "216",
+     "date": "2025-01-08"
+    }
+   ],
+   "why": "No sulfonylurea (fluoroquinolone dysglycemia) or QT drugs."
+  }
  },
  "cellulitis-duration-01": {
   "demographics": {
@@ -238,7 +666,52 @@
    "relationship": "Spouse",
    "phone": "555-336-1807"
   },
-  "insurance": "Cigna Health"
+  "insurance": "Cigna Health",
+  "history": {
+   "problems": [
+    {
+     "title": "Essential hypertension",
+     "icd10": "I10"
+    },
+    {
+     "title": "Obesity",
+     "icd10": "E66.9"
+    },
+    {
+     "title": "Chronic venous insufficiency",
+     "icd10": "I87.2"
+    },
+    {
+     "title": "Prediabetes",
+     "icd10": "R73.03"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "hydrochlorothiazide 25 MG Oral Tablet",
+     "rxnorm": "310798",
+     "dose": "25 mg daily"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "no alcohol",
+   "social": "married, two teenage children; school cafeteria manager",
+   "immunizations": [
+    {
+     "cvx": "150",
+     "date": "2025-10-03"
+    },
+    {
+     "cvx": "115",
+     "date": "2021-07-19"
+    }
+   ],
+   "why": "Venous insufficiency and obesity are the cellulitis risk factors. Prediabetes, not diabetes."
+  }
  },
  "cellulitis-stop-date-negative-01": {
   "demographics": {
@@ -262,7 +735,25 @@
    "relationship": "Spouse",
    "phone": "555-248-2220"
   },
-  "insurance": "Medicaid"
+  "insurance": "Medicaid",
+  "history": {
+   "problems": [],
+   "home_medications": [],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "4 to 6 beers a week",
+   "social": "married; construction worker; cut on forearm at work 3 days before onset",
+   "immunizations": [
+    {
+     "cvx": "115",
+     "date": "2026-10-29"
+    }
+   ],
+   "why": "Tdap given in the emergency department for the work wound (the date is in the case's window)."
+  }
  },
  "ciai-double-anaerobe-01": {
   "demographics": {
@@ -286,7 +777,30 @@
    "relationship": "Son",
    "phone": "555-799-1938"
   },
-  "insurance": "Aetna"
+  "insurance": "Aetna",
+  "history": {
+   "problems": [],
+   "home_medications": [],
+   "allergies": [
+    {
+     "title": "Seasonal allergens",
+     "reaction": "Rhinitis"
+    }
+   ],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "social alcohol",
+   "social": "single; software developer; runs",
+   "immunizations": [
+    {
+     "cvx": "150",
+     "date": "2025-11-01"
+    }
+   ],
+   "why": "Previously healthy."
+  }
  },
  "ciai-piptazo-alone-negative-01": {
   "demographics": {
@@ -310,7 +824,45 @@
    "relationship": "Spouse",
    "phone": "555-122-4850"
   },
-  "insurance": "UnitedHealthcare"
+  "insurance": "UnitedHealthcare",
+  "history": {
+   "problems": [
+    {
+     "title": "Migraine without aura",
+     "icd10": "G43.009"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "norethindrone 0.35 MG Oral Tablet",
+     "rxnorm": "198042",
+     "dose": "0.35 mg daily"
+    },
+    {
+     "drug": "sumatriptan 50 MG Oral Tablet",
+     "rxnorm": "313161",
+     "dose": "50 mg as needed for migraine"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "social alcohol",
+   "social": "married; nurse",
+   "immunizations": [
+    {
+     "cvx": "150",
+     "date": "2025-10-10"
+    },
+    {
+     "cvx": "115",
+     "date": "2023-02-01"
+    }
+   ],
+   "why": "Progestin-only pill (migraine without aura; no estrogen issue either way)."
+  }
  },
  "cystitis-enterobacter-negative-01": {
   "demographics": {
@@ -334,7 +886,68 @@
    "relationship": "Son",
    "phone": "555-558-8695"
   },
-  "insurance": "Medicare"
+  "insurance": "Medicare",
+  "history": {
+   "problems": [
+    {
+     "title": "Personal history of healed osteoporotic fracture (left wrist, 2021)",
+     "icd10": "Z87.310"
+    },
+    {
+     "title": "Essential hypertension",
+     "icd10": "I10"
+    },
+    {
+     "title": "Mild cognitive impairment",
+     "icd10": "G31.84"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "alendronic acid 70 MG Oral Tablet",
+     "rxnorm": "904431",
+     "dose": "70 mg weekly",
+     "comment": "held while NPO"
+    },
+    {
+     "drug": "amlodipine 5 MG Oral Tablet",
+     "rxnorm": "197361",
+     "dose": "5 mg daily"
+    },
+    {
+     "drug": "cholecalciferol 0.025 MG Oral Tablet",
+     "rxnorm": "199362",
+     "dose": "1000 units daily"
+    }
+   ],
+   "allergies": [
+    {
+     "title": "Morphine",
+     "reaction": "Delirium"
+    }
+   ],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "no alcohol",
+   "social": "widowed, lives with daughter; fell at home",
+   "immunizations": [
+    {
+     "cvx": "197",
+     "date": "2025-10-15"
+    },
+    {
+     "cvx": "216",
+     "date": "2024-09-12"
+    },
+    {
+     "cvx": "187",
+     "date": "2020-11-02"
+    }
+   ],
+   "why": "Osteoporosis on alendronate after a 2021 wrist fracture explains the hip fracture after a ground-level fall."
+  }
  },
  "meningitis-alcohol-negative-01": {
   "demographics": {
@@ -358,7 +971,46 @@
    "relationship": "Daughter",
    "phone": "555-390-6845"
   },
-  "insurance": "Harvard Pilgrim"
+  "insurance": "Harvard Pilgrim",
+  "history": {
+   "problems": [
+    {
+     "title": "Tobacco use disorder",
+     "icd10": "F17.210"
+    },
+    {
+     "title": "Alcoholic gastritis",
+     "icd10": "K29.20"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "thiamine 100 MG Oral Tablet",
+     "rxnorm": "313323",
+     "dose": "100 mg daily"
+    },
+    {
+     "drug": "folic acid 1 MG Oral Tablet",
+     "rxnorm": "310410",
+     "dose": "1 mg daily"
+    },
+    {
+     "drug": "naltrexone hydrochloride 50 MG Oral Tablet",
+     "rxnorm": "1483744",
+     "dose": "50 mg daily",
+     "comment": "not taking"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "current",
+    "note": "Current smoker, 1 pack a day"
+   },
+   "alcohol": "alcohol daily (about 10 drinks), no withdrawal seizures",
+   "social": "divorced, lives alone; unemployed",
+   "immunizations": [],
+   "why": "No cirrhosis on purpose (story). No immunizations on record."
+  }
  },
  "meningitis-ampicillin-covered-negative-01": {
   "demographics": {
@@ -382,7 +1034,53 @@
    "relationship": "Spouse",
    "phone": "555-974-8623"
   },
-  "insurance": "Medicare"
+  "insurance": "Medicare",
+  "history": {
+   "problems": [
+    {
+     "title": "Essential hypertension",
+     "icd10": "I10"
+    },
+    {
+     "title": "Osteoarthritis of hip",
+     "icd10": "M16.9"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "lisinopril 10 MG Oral Tablet",
+     "rxnorm": "314076",
+     "dose": "10 mg daily"
+    },
+    {
+     "drug": "acetaminophen 500 MG Oral Tablet",
+     "rxnorm": "198440",
+     "dose": "1000 mg every 8 hours as needed"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "no alcohol",
+   "social": "married; retired librarian",
+   "immunizations": [
+    {
+     "cvx": "197",
+     "date": "2025-10-06"
+    },
+    {
+     "cvx": "216",
+     "date": "2024-10-30"
+    },
+    {
+     "cvx": "187",
+     "date": "2022-04-18"
+    }
+   ],
+   "why": "Not immunocompromised: no diabetes or cancer (each would be a Listeria trigger)."
+  }
  },
  "meningitis-diabetes-gap-01": {
   "demographics": {
@@ -406,7 +1104,54 @@
    "relationship": "Spouse",
    "phone": "555-308-2397"
   },
-  "insurance": "Medicaid"
+  "insurance": "Medicaid",
+  "history": {
+   "problems": [
+    {
+     "title": "Essential hypertension",
+     "icd10": "I10"
+    },
+    {
+     "title": "Hyperlipidemia",
+     "icd10": "E78.5"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "metformin hydrochloride 1000 MG Oral Tablet",
+     "rxnorm": "861004",
+     "dose": "1000 mg twice daily"
+    },
+    {
+     "drug": "lisinopril 20 MG Oral Tablet",
+     "rxnorm": "314077",
+     "dose": "20 mg daily"
+    },
+    {
+     "drug": "atorvastatin 20 MG Oral Tablet",
+     "rxnorm": "617310",
+     "dose": "20 mg daily"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "social alcohol",
+   "social": "married, three children; restaurant owner",
+   "immunizations": [
+    {
+     "cvx": "150",
+     "date": "2025-10-21"
+    },
+    {
+     "cvx": "216",
+     "date": "2025-04-02"
+    }
+   ],
+   "why": "E11.9 stays the only Listeria trigger. PCV20 because of diabetes (ACIP: adults 19 to 49 with a risk condition)."
+  }
  },
  "meningitis-listeria-gap-01": {
   "demographics": {
@@ -430,7 +1175,53 @@
    "relationship": "Son",
    "phone": "555-816-7321"
   },
-  "insurance": "Medicare"
+  "insurance": "Medicare",
+  "history": {
+   "problems": [
+    {
+     "title": "Essential hypertension",
+     "icd10": "I10"
+    },
+    {
+     "title": "Hyperlipidemia",
+     "icd10": "E78.5"
+    },
+    {
+     "title": "Osteopenia",
+     "icd10": "M85.80"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "amlodipine 5 MG Oral Tablet",
+     "rxnorm": "197361",
+     "dose": "5 mg daily"
+    },
+    {
+     "drug": "atorvastatin 10 MG Oral Tablet",
+     "rxnorm": "617312",
+     "dose": "10 mg daily"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "no alcohol",
+   "social": "widowed, lives alone; retired nurse's aide",
+   "immunizations": [
+    {
+     "cvx": "197",
+     "date": "2025-10-09"
+    },
+    {
+     "cvx": "216",
+     "date": "2024-12-12"
+    }
+   ],
+   "why": "Age is her only Listeria criterion: the finding's tested criterion text must not change."
+  }
  },
  "meningitis-steroid-covered-negative-01": {
   "demographics": {
@@ -454,7 +1245,45 @@
    "relationship": "Spouse",
    "phone": "555-698-6938"
   },
-  "insurance": "Tufts Health Plan"
+  "insurance": "Tufts Health Plan",
+  "history": {
+   "problems": [
+    {
+     "title": "Vitamin D deficiency",
+     "icd10": "E55.9"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "prednisone 20 MG Oral Tablet",
+     "rxnorm": "312615",
+     "dose": "20 mg daily"
+    },
+    {
+     "drug": "calcium carbonate 600 MG / cholecalciferol 0.01 MG Oral Tablet",
+     "rxnorm": "668292",
+     "dose": "1 tablet twice daily"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "no alcohol",
+   "social": "married; graphic designer",
+   "immunizations": [
+    {
+     "cvx": "150",
+     "date": "2025-10-12"
+    },
+    {
+     "cvx": "216",
+     "date": "2025-05-20"
+    }
+   ],
+   "why": "No PJP prophylaxis: prednisone alone without a second immunosuppressant has no consensus indication (guideline-concordant omission; TMP-SMX would also confound a Listeria case). Calcium and vitamin D: normal calcium, low 25-OH vitamin D."
+  }
  },
  "meningitis-transplant-gap-01": {
   "demographics": {
@@ -478,7 +1307,68 @@
    "relationship": "Spouse",
    "phone": "555-620-3147"
   },
-  "insurance": "UnitedHealthcare"
+  "insurance": "UnitedHealthcare",
+  "history": {
+   "problems": [
+    {
+     "title": "IgA nephropathy, cause of end-stage kidney disease before transplant",
+     "icd10": "N02.B9"
+    },
+    {
+     "title": "Essential hypertension",
+     "icd10": "I10"
+    },
+    {
+     "title": "Long term (current) use of systemic steroids",
+     "icd10": "Z79.52"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "tacrolimus 1 MG Oral Capsule",
+     "rxnorm": "198377",
+     "dose": "3 mg twice daily (trough goal 5 to 8)"
+    },
+    {
+     "drug": "mycophenolate mofetil 500 MG Oral Tablet",
+     "rxnorm": "200060",
+     "dose": "1000 mg twice daily"
+    },
+    {
+     "drug": "prednisone 5 MG Oral Tablet",
+     "rxnorm": "312617",
+     "dose": "5 mg daily"
+    },
+    {
+     "drug": "prednisone 5 MG Oral Tablet",
+     "rxnorm": "312617",
+     "dose": "5 mg daily"
+    },
+    {
+     "drug": "amlodipine 5 MG Oral Tablet",
+     "rxnorm": "197361",
+     "dose": "5 mg daily"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "no alcohol",
+   "social": "married, one child; teacher; contraception: levonorgestrel IUD (mycophenolate)",
+   "immunizations": [
+    {
+     "cvx": "150",
+     "date": "2025-10-01"
+    },
+    {
+     "cvx": "216",
+     "date": "2023-08-15"
+    }
+   ],
+   "why": "Triple maintenance: tacrolimus, mycophenolate, prednisone 5 mg. No PJP prophylaxis 3 years out. No live vaccines."
+  }
  },
  "meningitis-young-negative-01": {
   "demographics": {
@@ -502,7 +1392,25 @@
    "relationship": "Father",
    "phone": "555-990-5139"
   },
-  "insurance": "UnitedHealthcare"
+  "insurance": "UnitedHealthcare",
+  "history": {
+   "problems": [],
+   "home_medications": [],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "social alcohol",
+   "social": "single; graduate student",
+   "immunizations": [
+    {
+     "cvx": "150",
+     "date": "2025-10-25"
+    }
+   ],
+   "why": "Previously healthy (story)."
+  }
  },
  "pyelo-enterobacter-ambiguous-01": {
   "demographics": {
@@ -526,7 +1434,49 @@
    "relationship": "Daughter",
    "phone": "555-546-2251"
   },
-  "insurance": "Medicaid"
+  "insurance": "Medicaid",
+  "history": {
+   "problems": [
+    {
+     "title": "Hyperlipidemia",
+     "icd10": "E78.5"
+    },
+    {
+     "title": "Gastro-esophageal reflux disease without esophagitis",
+     "icd10": "K21.9"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "simvastatin 20 MG Oral Tablet",
+     "rxnorm": "312961",
+     "dose": "20 mg at bedtime"
+    },
+    {
+     "drug": "omeprazole 20 MG Delayed Release Oral Capsule",
+     "rxnorm": "198051",
+     "dose": "20 mg daily"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "no alcohol",
+   "social": "divorced, lives with her adult son; home health aide",
+   "immunizations": [
+    {
+     "cvx": "150",
+     "date": "2025-10-16"
+    },
+    {
+     "cvx": "216",
+     "date": "2025-06-11"
+    }
+   ],
+   "why": "No warfarin or ACE inhibitor: TMP-SMX and ciprofloxacin are the oral options."
+  }
  },
  "pyelo-ivpo-ambiguous-01": {
   "demographics": {
@@ -550,7 +1500,36 @@
    "relationship": "Spouse",
    "phone": "555-548-6781"
   },
-  "insurance": "Aetna"
+  "insurance": "Aetna",
+  "history": {
+   "problems": [
+    {
+     "title": "Hypothyroidism",
+     "icd10": "E03.9"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "levothyroxine sodium 0.05 MG Oral Tablet",
+     "rxnorm": "966221",
+     "dose": "50 mcg daily"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "social alcohol",
+   "social": "married; real estate agent",
+   "immunizations": [
+    {
+     "cvx": "150",
+     "date": "2025-10-22"
+    }
+   ],
+   "why": ""
+  }
  },
  "pyelo-kaerogenes-ivpo-01": {
   "demographics": {
@@ -574,7 +1553,31 @@
    "relationship": "Spouse",
    "phone": "555-576-3418"
   },
-  "insurance": "UnitedHealthcare"
+  "insurance": "UnitedHealthcare",
+  "history": {
+   "problems": [],
+   "home_medications": [
+    {
+     "drug": "ethinyl estradiol 0.035 MG / norgestimate 0.25 MG Oral Tablet",
+     "rxnorm": "240128",
+     "dose": "1 tablet daily"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "social alcohol",
+   "social": "married, two children; pharmacy technician",
+   "immunizations": [
+    {
+     "cvx": "150",
+     "date": "2025-10-07"
+    }
+   ],
+   "why": "No tizanidine or QT drugs (ciprofloxacin is the reference answer)."
+  }
  },
  "pyelo-matched-negative-01": {
   "demographics": {
@@ -598,7 +1601,45 @@
    "relationship": "Daughter",
    "phone": "555-209-7012"
   },
-  "insurance": "Tufts Health Plan"
+  "insurance": "Tufts Health Plan",
+  "history": {
+   "problems": [
+    {
+     "title": "Mild persistent asthma",
+     "icd10": "J45.30"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "fluticasone propionate 0.11 MG/ACTUAT Metered Dose Inhaler",
+     "rxnorm": "895999",
+     "dose": "2 puffs twice daily"
+    },
+    {
+     "drug": "albuterol 0.09 MG/ACTUAT Metered Dose Inhaler",
+     "rxnorm": "2123072",
+     "dose": "2 puffs every 4 hours as needed"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "no alcohol",
+   "social": "single; dental hygienist",
+   "immunizations": [
+    {
+     "cvx": "150",
+     "date": "2025-10-19"
+    },
+    {
+     "cvx": "216",
+     "date": "2024-11-05"
+    }
+   ],
+   "why": "PCV20 for asthma (ACIP risk condition)."
+  }
  },
  "uti-esbl-mismatch-01": {
   "demographics": {
@@ -622,6 +1663,56 @@
    "relationship": "Daughter",
    "phone": "555-769-0694"
   },
-  "insurance": "Medicare"
+  "insurance": "Medicare",
+  "history": {
+   "problems": [
+    {
+     "title": "Essential hypertension",
+     "icd10": "I10"
+    },
+    {
+     "title": "Osteoarthritis of knee",
+     "icd10": "M17.9"
+    },
+    {
+     "title": "Personal history of urinary tract infections",
+     "icd10": "Z87.440"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "metoprolol succinate 50 MG Extended Release Oral Tablet",
+     "rxnorm": "866436",
+     "dose": "50 mg daily"
+    },
+    {
+     "drug": "acetaminophen 500 MG Oral Tablet",
+     "rxnorm": "198440",
+     "dose": "1000 mg every 8 hours as needed"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "no alcohol",
+   "social": "widowed, lives with her son's family; retired seamstress",
+   "immunizations": [
+    {
+     "cvx": "197",
+     "date": "2025-10-13"
+    },
+    {
+     "cvx": "216",
+     "date": "2025-01-21"
+    },
+    {
+     "cvx": "187",
+     "date": "2021-09-14"
+    }
+   ],
+   "why": "No valproate (carbapenems lower its levels): a carbapenem is the reference answer."
+  }
  }
 }

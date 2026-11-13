@@ -2590,3 +2590,39 @@ Agent: Claude Code
   scan, as CI does.
 
 Agent: Claude Code
+
+## 160. Case charts: clinical history for the 26 cases; Hal's short bowel code (2026-11-13)
+
+- **Draft and review:** past history, home medications, allergies, social history and immunizations for every case,
+  drafted to fit each story (`~/locumview-evidence/2026-11-13-case-charts/`, outside the repository). The owner ran it
+  through OpenEvidence and approved its assessment, with edits: Lena keeps no PJP prophylaxis (prednisone alone, no
+  second immunosuppressant: no consensus indication; TMP-SMX would also confound a Listeria case); Iris's PICC
+  backstory names a group B streptococcal septic arthritis of the native knee, completed IV cefazolin 5 days before
+  admission, knee quiescent (not an S. aureus relapse); Hal's iron is IV in his parenteral nutrition; Rosa gets
+  prednisone 5 mg maintenance (Z79.52, same Listeria group), IgA nephropathy as N02.B9 (not N02.8), and contraception
+  documented; Fern's alendronate indication is a healed osteoporotic wrist fracture (Z87.310, not M81.0 "without
+  current fracture" beside her hip fracture); Lia's hydrochlorothiazide gets hypertension; status notes ("held while
+  NPO", "not taking") are comments, not doses; drug names without RxNorm package prefixes. Ned's negative label rests
+  on the owner's #140 decision (alcohol use disorder is not a trigger). The OpenEvidence review is secondary evidence.
+- **Avoided on purpose:** Listeria risk codes in the meningitis cases beyond each case's own; any code under the four
+  condition prefixes; interactions with each case's antibiotics (no ACE inhibitor where TMP-SMX is offered, no QT
+  drugs or chelating antacids with levofloxacin, no valproate with a carbapenem answer).
+- **Codes:** every ICD-10-CM code checked in NLM's table; every RxNorm SCD looked up in RxNav; CVX codes as installed in
+  the clinical OpenEMR.
+- **Case change:** `bsi-mssa-cefazolin-negative-01` 0.1.x: its short bowel problem recoded K91.2 (postsurgical
+  malabsorption) to K90.829 (short bowel syndrome); the loader corrects the code on patients loaded before. Fixture
+  re-recorded: the code changed, and OpenEMR no longer returned its calculated "mean of last 5" blood pressure panel
+  for this patient (only the per-encounter mean is computed now, even on a second read); the adapter does not read
+  that panel and every test passes.
+- **Loader:** `charts.json` `history` per case, once per item: problems (API), home medications as the patient-reported
+  medication list (this endpoint takes the numeric pid and a full timestamp and drops comments, which are then set
+  directly), allergies, tobacco and alcohol in OpenEMR's lifestyle format, social note, immunizations. `ok()` now treats
+  an HTTP 200 whose body is only field-validation errors as a failure: OpenEMR answered the first medication attempts
+  that way, and they were silently lost. `--no-chart-details` loads case data alone, for fixtures.
+- **Verification:** automated: all 26 cases with the history added give exactly their expected findings and identical
+  summaries; on a fresh local OpenEMR, four cases loaded twice (new and already loaded patients): every item once,
+  comments set, Hal's code corrected, no duplicates; FHIR read-backs of three cases: home medications as
+  MedicationRequest intent `plan` (prescriptions `order`), findings exactly as expected (Rosa's Listeria finding
+  included). `pre-commit run --all-files` and the whole-history gitleaks scan pass. Local OpenEMR destroyed.
+
+Agent: Claude Code

@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "bsi-mssa-cefazolin-negative-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "MSSA catheter-related bacteremia already on cefazolin",
   "kind": "negative-control",
   "modules": [
@@ -16,7 +16,7 @@
       "status": "approved",
       "by": "owner",
       "date": "2026-10-25",
-      "notes": "Owner clinical review: cases look good."
+      "notes": "Owner clinical review: cases look good. 2026-11-13: short bowel problem recoded K91.2 to K90.829 (owner approved, OpenEvidence review)."
     }
   },
   "story": "A 58-year-old man receiving home parenteral nutrition through a tunneled catheter is admitted with fever and rigors. Blood cultures grow methicillin-susceptible Staphylococcus aureus; empiric vancomycin was changed to cefazolin 2 g IV every 8 hours on day 2 and the catheter removed. On day 3 he is still febrile; repeat blood cultures are pending.",
@@ -39,7 +39,7 @@
     },
     {
       "title": "Short bowel syndrome on parenteral nutrition",
-      "diagnosis": "ICD10:K91.2",
+      "diagnosis": "ICD10:K90.829",
       "begdate": "2021-03-15"
     }
   ],
