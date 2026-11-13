@@ -2548,3 +2548,15 @@ Agent: Claude Code
 - **Verification:** the workflow parses and its Python block compiles.
 
 Agent: Claude Code
+
+## 157. CI checks: a gitleaks false positive on changelog #155 (2026-11-13)
+
+- **Found:** every checks run since #155 (runs 399 to 406) failed at "gitleaks (whole history)": its
+  generic-api-key rule matched the sentence in #155 that names the new one-line cosign secret, a name and not a
+  value. Locally, pre-commit's gitleaks scans only the changed files, so the agent's checks passed.
+- **Fix:** `.gitleaksignore` (new) lists that one fingerprint (commit, file, rule, line), with the reason; the history
+  cannot be rewritten (public mirrors). Checked by hand: the matched text is the secret's name.
+- **Verification:** the CI's pinned gitleaks image over the whole history: "no leaks found".
+- **Lesson:** run the whole-history gitleaks scan locally before pushing changes that discuss secrets.
+
+Agent: Claude Code

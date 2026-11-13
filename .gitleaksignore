@@ -1,0 +1,3 @@
+# gitleaks findings checked by hand and found not to be secrets (one fingerprint per line: commit:file:rule:line).
+# Changelog #155 names the Actions secret COSIGN_PRIVATE_KEY_B64; the generic-api-key rule matched the name, not a value (changelog #157).
+f788e6d7cf622d64f3f58f101716d6b29d6223ba:notes/phase1-changelog.md:generic-api-key:2525
