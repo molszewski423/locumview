@@ -2341,9 +2341,9 @@ Agent: Claude Code
   filtered on issuer CN `LocumView desktop clients` in the reference Chrome policy. Harmless before step 4: the
   servers do not ask for a client certificate yet.
 - **EHR launcher icon (owner direction):** OpenEMR's own menu logo, taken at build time from the same pinned OpenEMR
-  8.4.1 image the clinical image builds on (a build stage, not committed), placed unchanged on a white tile by
-  `image/desktop/scripts/ehr-icon.py` (the logo is black, colored by OpenEMR's CSS, and would vanish on the dark
-  dock), with a NOTICE crediting OpenEMR (GPL-3.0). The launcher copy in the override directory points at it; the
+  8.4.1 image the clinical image builds on (a build stage, not committed), in OpenEMR's own blue: the logo file has no
+  color of its own (OpenEMR's CSS sets it), so `image/desktop/scripts/ehr-icon.py` gives it #2c9cd4, the fill 24 of
+  OpenEMR 8.4.1's theme stylesheets use for it (owner's choice of the blue logo), with a NOTICE crediting OpenEMR (GPL-3.0). The launcher copy in the override directory points at it; the
   RPM's generic launcher keeps its default icon for other deployments. OpenEMR's brand page sets no terms for
   third-party use; the logo identifies the EHR the launcher opens.
 - **Verification:** shellcheck; `build-rpms.sh` in the pinned CentOS Stream 10 builder built all five packages; the
