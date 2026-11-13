@@ -2252,3 +2252,11 @@ Agent: Claude Code
   without a withheld explanation, each keeping its why line.
 
 Agent: Claude Code
+
+## 141. Pin the agent image with #140 (2026-11-12)
+
+- **Done:** `kustomization.yaml` pins the agent image that the clinical-images run for merge commit 326d822 (#140; Gitea run 610) built and signed: knowledge base 0.8.0. OpenEMR and the gateway stay at their pinned images.
+- **Verification:** digest transcribed from that run's Verify step for `locumview-clinical-agent`; `scripts/clinical/verify-images.sh` verified the signature and SBOM attestation of all three pinned images.
+- **Deploy:** the owner's script from #118; the diff should show only the agent Deployment, and its scenario step loads the three Listeria cases from #140. Then check LV-meningitis-transplant-gap-01 (one finding: missing Listeria coverage, criterion "Listeria risk factor on the problem list") and LV-meningitis-alcohol-negative-01 (still no finding).
+
+Agent: Claude Code
