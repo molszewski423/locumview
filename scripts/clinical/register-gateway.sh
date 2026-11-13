@@ -14,11 +14,12 @@ NAME="LocumView Clinical"
 # shellcheck disable=SC2016  # $MARIADB_ROOT_PASSWORD expands inside the pod, never here
 sql() { kubectl exec -i -n clinical mariadb-0 -c mariadb -- sh -c 'MYSQL_PWD="$MARIADB_ROOT_PASSWORD" exec mariadb -uroot --batch openemr'; }
 
-# OpenEMR's API on, its public address for OAuth, and the S/I/R/SDD result flags. The password grant stays off.
+# OpenEMR's API on, its public address for OAuth, the S/I/R/SDD result flags and the pharmacist provider types. The
+# password grant stays off.
 {
   printf "UPDATE globals SET gl_value = '1' WHERE gl_name IN ('rest_api', 'rest_fhir_api');\n"
   printf "UPDATE globals SET gl_value = '%s' WHERE gl_name = 'site_addr_oath';\n" "$EMR"
-  cat clinical/spike/susceptibility-flags.sql
+  cat clinical/spike/susceptibility-flags.sql clinical/spike/provider-types.sql
 } | sql
 echo "OpenEMR API configured for $EMR"
 

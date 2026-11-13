@@ -2275,6 +2275,14 @@ Agent: Claude Code
   sign-in follows (`AuthorizationController::shouldSkipAuthorizationFlow`, `processAuthorizeFlowForLaunch`).
 - **Change (owner approved):** `register-gateway.sh` sets the client flag at registration, so a rebuilt namespace keeps
   it; `k8s/clinical/README.md` says so. The per-launch review of scopes goes away; access to OpenEMR is unchanged.
-- **Live (owner):** the flag is set once under Administration > System > API Clients > LocumView Clinical.
+- **Live:** the flag was set in the clinical OpenEMR with the owner's approval (read back: `is_enabled` 1,
+  `skip_ehr_launch_authorization_flow` 1); launch test from a chart pending.
+- **Named administrator (owner request):** the owner created an OpenEMR account for himself in Administrators
+  (Admin > Users), with his own password typed in the form; `admin` stays as the break-glass account whose password
+  the loader uses from the `clinical-db` Secret. Provider, calendar and provider type were set afterwards in the
+  database (read back). OpenEMR's Provider Type list gains Pharmacist (SNOMED CT 46255001) and Clinical pharmacist
+  (734293001), added live and in `clinical/spike/provider-types.sql`, which `register-gateway.sh` now applies.
+- **Lesson:** the Guacamole clipboard box appends to its text, so a pasted password can arrive with old text in front
+  (four "Incorrect password" audit events); empty the box first, or do admin steps in a local browser.
 
 Agent: Claude Code
