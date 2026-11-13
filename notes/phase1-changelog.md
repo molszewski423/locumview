@@ -2455,3 +2455,22 @@ Agent: Claude Code
   plan, and Chrome reaching a test mTLS endpoint. Promotion of this image is not proposed until then.
 
 Agent: Claude Code
+
+## 152. Case patients: photographs and the chart details no rule reads (2026-11-13)
+
+- **Owner request:** photographs and details for every patient in OpenEMR; the 26 case patients had neither.
+- **`clinical/scenarios/charts.json`** (new; the reviewed case files are unchanged): per case, made up and consistent
+  with its age and sex: race and ethnicity, address in a Massachusetts town (as the background patients), 555 phone,
+  marital status, language, an emergency contact (spouse when married; otherwise a parent under 40 or a grown
+  child), insurance (Medicare at 65 or over, otherwise Medicaid or a commercial plan), and a portrait description.
+  Clinical history (past history, home medications, social history, immunizations) is not included: it follows the
+  owner's clinical review.
+- **Photographs:** 26 portraits from `portraits.py` (RealVisXL V5.0, locally), reviewed by eye on a contact sheet.
+- **Loader:** applies a case's chart details and photograph when the case is loaded and on every later run (the
+  same idempotent pass as the background patients, #148 to #150).
+- **Verification:** a fresh local OpenEMR with two cases, loaded twice: address, phone, race, ethnicity, marital
+  status, language, emergency contact, insurance and one photograph each, nothing duplicated; the FHIR read-back of
+  LV-bsi-citrobacter-ampc-01 still gives exactly its two expected findings; agent tests, case checker and its tests
+  pass. Local OpenEMR destroyed.
+
+Agent: Claude Code
