@@ -2779,3 +2779,16 @@ Agent: Claude Code
   Cancel works) and slows the first start.
 
 Agent: Claude Code
+
+## 166. ROADMAP.md: ADR 0019 cut over, M6 progress; lv-demo01 tokens rebuilt (2026-11-13)
+
+- **ROADMAP.md:** the Phase 9 lite row now records ADR 0019 accepted and cut over (desktops only, one MFA sign-in, M3
+  closing with step 4b) and M6 so far (26 approved cases, knowledge base 0.8.0, SMART launch without a second EHR
+  sign-in, fuller synthetic charts with AI-generated portraits); ADR 0019's reference says Accepted. The public site's
+  status comes from this file.
+- **lv-demo01 tokens rebuilt (owner run):** both users' token folders removed and recreated with the fixed helper
+  (#164), new keys and certificates (valid 3 days), because a diagnostic run in #165 had printed the old tokens'
+  internal auth values; the demo user's Chrome stopped so it loads the new token. The old certificates expire within
+  3 days; nothing to revoke.
+
+Agent: Claude Code
