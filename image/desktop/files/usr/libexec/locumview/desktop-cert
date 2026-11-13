@@ -7,8 +7,9 @@
 # /etc/locumview/desktop-cert.conf, with the host's own keytab: no new credential exists. Renewal is this helper, not
 # certmonger, which cannot save to a token with an empty PIN (ADR 0019 spike B3).
 #
-#   desktop-cert login <uid>    from user-runtime-dir@<uid>.service: TPM access for the user, then renew in the background
-#                               (never waits for the lock, so it cannot hold up a sign-in)
+#   desktop-cert login <uid>    from user-runtime-dir@<uid>.service: TPM access for the user, the user's Remote Desktop
+#                               credentials into the TPM backend, then renew in the background (never waits for the
+#                               lock, so it cannot hold up a sign-in)
 #   desktop-cert logout <uid>   the user's TPM access is removed when their last session ends
 #   desktop-cert renew <uid>    create the token if missing; renew when the certificate expires within RENEW_BEFORE_HOURS
 #   desktop-cert all            the timer: renew every user with a token; alert when one expires within ALERT_BEFORE_HOURS
@@ -126,6 +127,10 @@ login)
   enabled || exit 0
   u=$(user_of "$arg") || exit 0
   tpm_access add "$u"
+  # With TPM access, GNOME Remote Desktop switches its credentials to the TPM backend: put the user's existing RDP
+  # credentials there before the user's session starts it (changelog #151, #153). Bounded, and never blocks sign-in.
+  timeout 30 runuser -u "$u" -- env HOME="$(home_of "$u")" /usr/libexec/locumview/grd-credentials-to-tpm \
+    2>&1 | logger -t locumview-desktop-cert || true
   systemctl start --no-block "locumview-desktop-cert@$arg.service"
   ;;
 logout)

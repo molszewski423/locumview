@@ -2474,3 +2474,26 @@ Agent: Claude Code
   pass. Local OpenEMR destroyed.
 
 Agent: Claude Code
+
+## 153. ADR 0019 step 3 fix: Remote Desktop's RDP credentials move into the TPM at sign-in (2026-11-13)
+
+- **Fix for #151:** `grd-credentials-to-tpm` (new, in the `locumview-desktop-cert` RPM), run as the user by the
+  sign-in hook right after it grants TPM access and before the user's session starts Remote Desktop: when the file
+  backend (`~/.local/share/gnome-remote-desktop/credentials.ini`) holds RDP credentials and the backend `grdctl` now
+  uses (the TPM) does not, it writes them there, as provisioning does (a pty, fed by bash builtins; never as
+  arguments, never printed or logged). The file stays as the fallback. Bounded to 30 seconds; never blocks sign-in.
+  The RPM now requires `python3-gobject` (to read the file's GVariant) and `gnome-remote-desktop`.
+- **Tried on lv-test17 (owner run; it handles a desktop credential):** after a reboot through the hypervisor
+  (`virsh reboot`), the image's hook gave the user TPM access at boot (checked read-only: user ACL on `/dev/tpmrm0`);
+  the owner ran the script by hand as the user: "RDP credentials now in the backend Remote Desktop uses"; Remote
+  Desktop restarted ("RDP server started", no credentials error) and Guacamole went straight into the desktop.
+  The credentials now live in the TPM on lv-test17, so later reboots of the current image work too.
+- **Found on the way:** three wrong sudo passwords locked the owner's local account on lv-test17 (STIG faillock:
+  `deny = 3`, `unlock_time = 0`, so until an administrator resets it). SSH with keys and Guacamole are unaffected;
+  sudo and the console login wait for `faillock --user molszewski --reset` by the break-glass `lvadmin` (owner run,
+  console). IdM's own lockout counter also saw those attempts.
+- **Verification:** shellcheck of both scripts; the live run above.
+- **Next:** the next image carries the fix (merge, CI, pin to lv-test17's next switch); the TPM lockout check from
+  the build plan; Chrome presenting the certificate to a test mTLS endpoint; then step 4.
+
+Agent: Claude Code
