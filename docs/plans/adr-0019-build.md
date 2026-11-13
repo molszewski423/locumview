@@ -2,7 +2,7 @@
 
 Written 2026-11-12. Decision: [ADR 0019](../adr/0019-ehr-reachable-only-from-desktops.md). The spike is done and
 fully undone (changelog #96, #98). M3 closes when this build passes its tests (owner decision, 2026-10-27).
-Status: In progress. Step 2 Done (#144); step 3 Built and working on a fresh desktop (#161); next: the TPM lockout check, then step 4.
+Status: In progress. Steps 2 and 3 Done (#144, #161, #162); step 4a prepared, not applied (#163).
 
 ## Why now
 
