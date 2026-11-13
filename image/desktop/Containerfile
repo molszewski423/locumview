@@ -141,15 +141,15 @@ RUN --mount=type=bind,target=/src \
     install -m 0644 /src/image/desktop/reference/desktop-cert.conf /etc/locumview/desktop-cert.conf; \
     grep -qx 'SUBCA=locumview-desktop-clients' /etc/locumview/desktop-cert.conf; \
     grep -qx 'EHR_URL=https://emr.corp.locumview.com/' /etc/locumview/ehr.conf
-# 3d. The EHR launcher shows the EHR's own icon (owner direction, 2026-11-12): OpenEMR's menu logo, unchanged, on a
-#     white tile (image/desktop/scripts/ehr-icon.py), through a launcher copy in the override directory that comes
+# 3d. The EHR launcher shows the EHR's own icon (owner direction, 2026-11-12): OpenEMR's menu logo in the blue of
+#     OpenEMR's standard themes, #2c9cd4 (image/desktop/scripts/ehr-icon.py), through a launcher copy in the override directory that comes
 #     first in XDG_DATA_DIRS (no package file changes). OpenEMR is GPL-3.0 software of the OpenEMR project; its name
 #     and logo identify the EHR this launcher opens. A deployment with another EHR uses that EHR's logo here.
 COPY --from=ehr-logo /var/www/localhost/htdocs/openemr/public/images/logos/core/menu/primary/logo.svg /tmp/ehr-logo.svg
 RUN --mount=type=bind,target=/src \
     set -euo pipefail; \
     install -d -m 0755 /usr/share/locumview/ehr-icon; \
-    python3 -I /src/image/desktop/scripts/ehr-icon.py /tmp/ehr-logo.svg /usr/share/locumview/ehr-icon/ehr.svg; \
+    python3 -I /src/image/desktop/scripts/ehr-icon.py /tmp/ehr-logo.svg /usr/share/locumview/ehr-icon/ehr.svg '#2c9cd4'; \
     printf '%s\n' 'The EHR launcher icon is the OpenEMR logo (https://www.open-emr.org), from OpenEMR 8.4.1' \
         '(public/images/logos/core/menu/primary/logo.svg), GPL-3.0. It identifies the EHR the launcher opens.' \
         > /usr/share/locumview/ehr-icon/NOTICE; \
