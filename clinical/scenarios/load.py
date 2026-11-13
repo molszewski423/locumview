@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Load the Phase 9 lite scenario library into OpenEMR (plan M2), with one command and idempotently.
 
-    load.py [--target spike|cluster] [--reset] [--no-background] [case.json ...]     default: every case in cases/
+    load.py [--target spike|cluster] [--reset] [--no-background] [--no-chart-details] [case.json ...]
+                                                                       default: every case in cases/
 
 --target is the local spike (the default) or the clinical namespace (k8s/clinical, kubectl; owner run
 scripts/clinical/load-scenarios.sh, after register-gateway.sh). Both are reached the same way, from inside their
@@ -114,7 +115,8 @@ def list_option(list_id, code):
     return rows[0][0] if rows else ""
 
 
-SMOKING = {"Never smoked tobacco": ("nevertobacco", "4"), "Ex-smoker": ("quittobacco", "3"),
+SMOKING = {"never": ("nevertobacco", "4"), "former": ("quittobacco", "3"), "current": ("currenttobacco", "1"),
+           "Never smoked tobacco": ("nevertobacco", "4"), "Ex-smoker": ("quittobacco", "3"),
            "Smokes tobacco daily": ("currenttobacco", "1"), "Current every day smoker": ("currenttobacco", "1"),
            "Never smoker": ("nevertobacco", "4"), "Former smoker": ("quittobacco", "3")}
 # OpenEMR's insurance type codes (claim filing): Medicare Part B, Medicaid, Blue Cross Blue Shield, else commercial.
@@ -148,13 +150,46 @@ def chart_extras(pid, number, record):
             fields["phone_contact"] = c["phone"]
         sql("UPDATE patient_data SET " + ", ".join(f"{k} = {quote(v)}" for k, v in fields.items())
             + f" WHERE pid = {pid};")
-    if record.get("smoking") in SMOKING:
-        kind, option = SMOKING[record["smoking"]]
-        tobacco = quote(f"|{kind}||{option}|0")
+    history = record.get("history") or {}
+    smoking = (history.get("tobacco") or {}).get("status") or record.get("smoking")
+    if smoking in SMOKING:
+        kind, option = SMOKING[smoking]
+        note = (history.get("tobacco") or {}).get("note", "").replace("|", " ")
+        fields = {"tobacco": f"{note}|{kind}||{option}|0"}
+        if "alcohol" in history:   # OpenEMR's lifestyle field: note|<status><field>|date
+            drinks = history["alcohol"].replace("|", " ")
+            fields["alcohol"] = f"{drinks}|{'never' if drinks.lower().startswith('no alcohol') else 'current'}alcohol|"
+        if history.get("social"):
+            fields["additional_history"] = history["social"]
         if sql(f"SELECT id FROM history_data WHERE pid = {pid} LIMIT 1;"):
-            sql(f"UPDATE history_data SET tobacco = {tobacco} WHERE pid = {pid};")
+            sql("UPDATE history_data SET " + ", ".join(f"{k} = {quote(v)}" for k, v in fields.items())
+                + f" WHERE pid = {pid};")
         else:
-            sql(f"INSERT INTO history_data (pid, date, tobacco) VALUES ({pid}, NOW(), {tobacco});")
+            sql(f"INSERT INTO history_data (pid, date, {', '.join(fields)}) VALUES ({pid}, NOW(), "
+                + ", ".join(quote(v) for v in fields.values()) + ");")
+    if history:
+        puuid = puuid_of(pid)
+        def missing(kind, title):
+            return not sql(f"SELECT id FROM lists WHERE pid = {pid} AND type = {quote(kind)} AND title = {quote(title)} "
+                           f"LIMIT 1;")
+        for x in history.get("problems", []):
+            if missing("medical_problem", x["title"]):
+                ok(f"{number}: past history", *target.api("POST", f"api/patient/{puuid}/medical_problem", {
+                    "title": x["title"], "begdate": "2020-01-01", "diagnosis": f"ICD10:{x['icd10']}"}))
+        # Patient-reported home medications: OpenEMR's medication list, not prescriptions (no ordering clinician).
+        for x in history.get("home_medications", []):
+            title = f"{x['drug']} ({x['dose']})"
+            if missing("medication", title):
+                # This endpoint takes the numeric pid and a full timestamp, and ignores comments (set below).
+                made = ok(f"{number}: home medication", *target.api("POST", f"api/patient/{pid}/medication", {
+                    "title": title, "begdate": "2026-01-01 00:00:00", "diagnosis": f"RXCUI:{x['rxnorm']}"}))
+                if not isinstance(made, dict) or not made.get("id"):
+                    raise SystemExit(f"{number}: home medication not created: {made}")
+                if x.get("comment"):
+                    sql(f"UPDATE lists SET comments = {quote(x['comment'])} WHERE id = {int(made['id'])};")
+        for x in history.get("allergies", []):
+            if missing("allergy", x["title"]):
+                ok(f"{number}: allergy", *target.api("POST", f"api/patient/{puuid}/allergy", allergy_body(x)))
     if insurer := record.get("insurance"):
         sql(f"INSERT INTO insurance_companies (id, name, ins_type_code, inactive, date_created, last_updated) "
             f"SELECT next.id, {quote(insurer)}, {INSURANCE_TYPE.get(insurer, 16)}, 0, NOW(), NOW() "
@@ -179,10 +214,11 @@ def chart_extras(pid, number, record):
             if visit.get("vitals"):
                 ok(f"{number}: vital signs", *target.api("POST", f"api/patient/{pid}/encounter/{encounter}/vital",
                                                          {"date": day, **{k: str(v) for k, v in visit["vitals"].items()}}))
-    for v in record.get("immunizations", []):
+    for v in record.get("immunizations", []) + [
+            {**i, "title": ""} for i in (record.get("history") or {}).get("immunizations", [])]:
         sql(f"INSERT INTO immunizations (patient_id, administered_date, cvx_code, note, create_date, update_date, "
             f"created_by, updated_by, added_erroneously, completion_status, information_source) "
-            f"SELECT {pid}, {quote(v['date'] + ' 00:00:00')}, {quote(v['cvx'])}, {quote(v['title'])}, NOW(), NOW(), "
+            f"SELECT {pid}, {quote(v['date'] + ' 00:00:00')}, {quote(v['cvx'])}, {quote(v.get('title', ''))}, NOW(), NOW(), "
             f"1, 1, 0, 'Completed', 'hist_inf_src_unspecified' FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM immunizations "
             f"WHERE patient_id = {pid} AND cvx_code = {quote(v['cvx'])} "
             f"AND administered_date = {quote(v['date'] + ' 00:00:00')});")
@@ -228,7 +264,11 @@ def hl7(value):
 
 
 def ok(step, status, body):
-    if status not in (200, 201):
+    # OpenEMR's standard API answers some validation failures with HTTP 200 and a body of field errors
+    # ({"begdate": {"DateTime::INVALID_VALUE": ...}}): treat a body whose values are all such dicts as a failure.
+    invalid = (isinstance(body, dict) and body and all(isinstance(v, dict) and any("::" in k for k in v)
+                                                       for v in body.values()))
+    if status not in (200, 201) or invalid:
         raise SystemExit(f"{step}: HTTP {status}: {json.dumps(body)[:600] if not isinstance(body, str) else body[:600]}")
     return body
 
@@ -330,12 +370,15 @@ def message(case, pid, encounter, orders):
     return "\r".join(segments) + "\r"
 
 
-CHARTS = json.loads((HERE / "charts.json").read_text())
+CHARTS = {} if "--no-chart-details" in sys.argv else json.loads((HERE / "charts.json").read_text())
 
 
 def load(case):
     number = f"LV-{case['id']}"
     if existing := sql(f"SELECT pid FROM patient_data WHERE pubpid = {quote(number)};"):
+        for x in case.get("problems", []):
+            sql(f"UPDATE lists SET diagnosis = {quote(x['diagnosis'])} WHERE pid = {int(existing[0][0])} "
+                f"AND type = 'medical_problem' AND title = {quote(x['title'])} AND diagnosis <> {quote(x['diagnosis'])};")
         chart_extras(existing[0][0], number, CHARTS.get(case["id"], {}))
         # A case loaded before the start-date fix (changelog #112) gets it now; the update is a no-op otherwise.
         sql(f"UPDATE prescriptions SET date_added = start_date WHERE patient_id = {int(existing[0][0])} "

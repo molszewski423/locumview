@@ -23,7 +23,7 @@
   "code": {
    "coding": [
     {
-     "code": "K91.2",
+     "code": "K90.829",
      "display": "",
      "system": "http://hl7.org/fhir/sid/icd-10"
     }
@@ -1647,7 +1647,7 @@
    },
    {
     "display": "Head Occipital-frontal circumference",
-    "reference": "Observation/<Observation#45>",
+    "reference": "Observation/<Observation#44>",
     "type": "Observation"
    },
    {
@@ -1737,7 +1737,7 @@
    },
    {
     "display": "Head Occipital-frontal circumference",
-    "reference": "Observation/<Observation#46>",
+    "reference": "Observation/<Observation#45>",
     "type": "Observation"
    },
    {
@@ -2127,74 +2127,6 @@
   }
  },
  {
-  "category": [
-   {
-    "coding": [
-     {
-      "code": "vital-signs",
-      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
-     }
-    ]
-   }
-  ],
-  "code": {
-   "coding": [
-    {
-     "code": "96607-7",
-     "display": "Blood pressure panel mean systolic and mean diastolic",
-     "system": "http://loinc.org"
-    }
-   ]
-  },
-  "component": [
-   {
-    "code": {
-     "coding": [
-      {
-       "code": "96608-5",
-       "display": "Systolic blood pressure mean",
-       "system": "http://loinc.org"
-      }
-     ]
-    },
-    "valueQuantity": {
-     "code": "mm[Hg]",
-     "system": "http://unitsofmeasure.org",
-     "unit": "mm[Hg]",
-     "value": 108
-    }
-   },
-   {
-    "code": {
-     "coding": [
-      {
-       "code": "96609-3",
-       "display": "Diastolic blood pressure mean",
-       "system": "http://loinc.org"
-      }
-     ]
-    },
-    "valueQuantity": {
-     "code": "mm[Hg]",
-     "system": "http://unitsofmeasure.org",
-     "unit": "mm[Hg]",
-     "value": 65
-    }
-   }
-  ],
-  "effectivePeriod": {
-   "end": "2026-10-23T12:00:00+00:00",
-   "start": "2026-10-21T20:10:00+00:00"
-  },
-  "id": "<Observation#44>",
-  "resourceType": "Observation",
-  "status": "final",
-  "subject": {
-   "reference": "Patient/<Patient#1>",
-   "type": "Patient"
-  }
- },
- {
   "active": true,
   "birthDate": "1968-08-04",
   "communication": [
@@ -2399,7 +2331,7 @@
      }
     ]
    },
-   "value": "LV5"
+   "value": "LV3"
   },
   "collection": {
    "collectedDateTime": "2026-10-23T11:00:00+00:00"
@@ -2408,7 +2340,7 @@
   "identifier": [
    {
     "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
-    "value": "LV5-1"
+    "value": "LV3-1"
    }
   ],
   "resourceType": "Specimen",
@@ -2437,7 +2369,7 @@
      }
     ]
    },
-   "value": "LV4"
+   "value": "LV2"
   },
   "collection": {
    "collectedDateTime": "2026-10-21T20:30:00+00:00"
@@ -2446,7 +2378,7 @@
   "identifier": [
    {
     "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
-    "value": "LV4-1"
+    "value": "LV2-1"
    }
   ],
   "resourceType": "Specimen",
@@ -2475,7 +2407,7 @@
      }
     ]
    },
-   "value": "LV4"
+   "value": "LV2"
   },
   "collection": {
    "collectedDateTime": "2026-10-21T20:30:00+00:00"
@@ -2484,7 +2416,7 @@
   "identifier": [
    {
     "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
-    "value": "LV4-1"
+    "value": "LV2-1"
    }
   ],
   "resourceType": "Specimen",
