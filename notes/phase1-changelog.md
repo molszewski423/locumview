@@ -2532,3 +2532,19 @@ Agent: Claude Code
   file removed afterwards, the base64 value has no line breaks.
 
 Agent: Claude Code
+
+## 156. CI: the RPM signing key no longer appears in run logs; #155 confirmed (2026-11-13)
+
+- **#155 confirmed (owner):** image run 671 signed through `COSIGN_PRIVATE_KEY_B64`; the SBOM step's environment
+  shows `COSIGN_PRIVATE_KEY_B64: ***` and `COSIGN_PASSWORD: ***`; the agent verified the image's signature and its
+  scan attestation (pass), digest `sha256:0608c1f8…b0f208aa`. The old `COSIGN_PRIVATE_KEY` secret is deleted.
+- **Found the same way:** `rpms.yml`'s Sign step put the multi-line GPG private key `RPM_SIGNING_KEY` (passphrase
+  protected; the passphrase is a masked one-line secret) in its environment, so every rpms run printed it in full.
+- **Fix:** `RPM_SIGNING_KEY_B64` (one-line base64, masked), decoded inside the step's Python into the JSON that
+  `sign-rpms.sh` reads on stdin, as before. The other Actions secrets are one-line values and stay masked.
+- **Owner steps:** create `RPM_SIGNING_KEY_B64` from `packaging/rpm/signing/rpm-signing.sops.yaml` before merging;
+  after the next rpms run signs and publishes, delete the old `RPM_SIGNING_KEY`. Key rotation for both signing keys is
+  an owner decision for a later session.
+- **Verification:** the workflow parses and its Python block compiles.
+
+Agent: Claude Code
