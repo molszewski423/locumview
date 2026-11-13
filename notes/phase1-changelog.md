@@ -2260,3 +2260,49 @@ Agent: Claude Code
 - **Deploy:** the owner's script from #118; the diff should show only the agent Deployment, and its scenario step loads the three Listeria cases from #140. Then check LV-meningitis-transplant-gap-01 (one finding: missing Listeria coverage, criterion "Listeria risk factor on the problem list") and LV-meningitis-alcohol-negative-01 (still no finding).
 
 Agent: Claude Code
+
+## 142. #141 deployed; SMART launch without OpenEMR's second sign-in and scope screen (2026-11-12)
+
+- **Deploy of #141 (owner):** the agent runs knowledge base 0.8.0. LV-meningitis-transplant-gap-01 showed exactly
+  its finding (missing Listeria coverage, criterion "Listeria risk factor on the problem list (organ or stem cell
+  transplant, long-term immunosuppressive therapy)", ESCMID 2016 and WHO 2025 cited, IDSA 2004 not), with an accurate
+  explanation; the new patient opened on the first launch. LV-meningitis-alcohol-negative-01 still shows no finding.
+- **Found (owner):** every launch from a chart asked for OpenEMR's sign-in again and for the scope authorization
+  (ADR 0019 context, item 4). OpenEMR 8.4.1 can skip both for an EHR launch when the user is already signed in to
+  OpenEMR: the global `oauth_ehr_launch_authorization_flow_skip` (on by default; on in the cluster) plus the client's
+  `skip_ehr_launch_authorization_flow` (off for LocumView Clinical). With both, the launch checks the core OpenEMR
+  session; signed in, the app gets its registered read-only scopes without the scope screen; otherwise the normal
+  sign-in follows (`AuthorizationController::shouldSkipAuthorizationFlow`, `processAuthorizeFlowForLaunch`).
+- **Change (owner approved):** `register-gateway.sh` sets the client flag at registration, so a rebuilt namespace keeps
+  it; `k8s/clinical/README.md` says so. The per-launch review of scopes goes away; access to OpenEMR is unchanged.
+- **Live:** the flag was set in the clinical OpenEMR with the owner's approval (read back: `is_enabled` 1,
+  `skip_ehr_launch_authorization_flow` 1). Verified by the owner on lv-test17, signed in to OpenEMR as his named
+  account: launching from LV-bsi-kaerogenes-cefepime-negative-01 opened the app directly (no second sign-in, no scope
+  screen) with the expected result (no findings, knowledge base 0.8.0).
+- **Named administrator (owner request):** the owner created an OpenEMR account for himself in Administrators
+  (Admin > Users), with his own password typed in the form; `admin` stays as the break-glass account whose password
+  the loader uses from the `clinical-db` Secret. Provider, calendar and provider type were set afterwards in the
+  database (read back). OpenEMR's Provider Type list gains Pharmacist (SNOMED CT 46255001) and Clinical pharmacist
+  (734293001), added live and in `clinical/spike/provider-types.sql`, which `register-gateway.sh` now applies.
+- **Lesson:** the Guacamole clipboard box appends to its text, so a pasted password can arrive with old text in front
+  (four "Incorrect password" audit events); empty the box first, or do admin steps in a local browser.
+
+Agent: Claude Code
+
+## 143. ADR 0019 build plan and the IdM sub-CA script (step 2) (2026-11-12)
+
+- **Why:** the owner asked why the desktop asks for Keycloak and TOTP again before the EHR; ADR 0019 removes that
+  second prompt, and M3 closes when it is built. The owner agreed to build it next, then return to M6.
+- **Plan:** `docs/plans/adr-0019-build.md`: the owner decisions needed first (accept the ADR; client certificate
+  validity, recommended 3 days with renewal every 6 hours under 2 days left; the sub-CA lifetime, recommended to
+  accept IdM's fixed lifetime with a rotation runbook, since `ipa ca-add` takes no validity option; the EHR
+  launcher's icon, per site, OpenEMR's on the reference desktops, taken at build time after reading OpenEMR's brand
+  page), then steps 2 to 5.
+- **Step 2 script:** `scripts/clinical/idm-desktop-subca.sh` (owner run), derived from the spike's: sub-CA
+  `locumview-desktop-clients`, profile `locumviewDesktopClient` (EC, client auth only, validity from the owner's
+  decision), CA ACL for `locumview-desktops`; `up` creates only what is missing, `status` reads; no destructive mode
+  (changelog #98). It writes the sub-CA's public certificate to `k8s/clinical/desktop-client-ca.pem`. Not run yet.
+- **Owner decisions (2026-11-12):** all four approved as recommended; ADR 0019 is Accepted.
+- **Verification:** `bash -n` and shellcheck; pre-commit.
+
+Agent: Claude Code

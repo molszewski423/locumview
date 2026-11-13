@@ -14,11 +14,12 @@ NAME="LocumView Clinical"
 # shellcheck disable=SC2016  # $MARIADB_ROOT_PASSWORD expands inside the pod, never here
 sql() { kubectl exec -i -n clinical mariadb-0 -c mariadb -- sh -c 'MYSQL_PWD="$MARIADB_ROOT_PASSWORD" exec mariadb -uroot --batch openemr'; }
 
-# OpenEMR's API on, its public address for OAuth, and the S/I/R/SDD result flags. The password grant stays off.
+# OpenEMR's API on, its public address for OAuth, the S/I/R/SDD result flags and the pharmacist provider types. The
+# password grant stays off.
 {
   printf "UPDATE globals SET gl_value = '1' WHERE gl_name IN ('rest_api', 'rest_fhir_api');\n"
   printf "UPDATE globals SET gl_value = '%s' WHERE gl_name = 'site_addr_oath';\n" "$EMR"
-  cat clinical/spike/susceptibility-flags.sql
+  cat clinical/spike/susceptibility-flags.sql clinical/spike/provider-types.sql
 } | sql
 echo "OpenEMR API configured for $EMR"
 
@@ -41,6 +42,9 @@ print(f"  client-id: {json.dumps(c['client_id'])}\n  client-secret: {json.dumps(
 PY
 grep -q 'ENC\[' "$out.tmp" || { echo "encryption check failed" >&2; rm -f "$out.tmp"; exit 1; }
 mv "$out.tmp" "$out"
-# Approving the client, as an administrator would under Administration > System > API Clients.
-printf "UPDATE oauth_clients SET is_enabled = 1 WHERE client_name = '%s';\nSELECT client_name, is_enabled, is_confidential FROM oauth_clients WHERE client_name = '%s';\n" "$NAME" "$NAME" | sql
+# Approving the client, as an administrator would under Administration > System > API Clients, and letting a launch
+# from the chart skip OpenEMR's second sign-in and scope screen when the user is already signed in to OpenEMR ("Skip
+# EHR Launch Authorization Flow"; the global oauth_ehr_launch_authorization_flow_skip is on by default). The app still
+# gets only its registered read-only scopes. Owner decision, 2026-11-12.
+printf "UPDATE oauth_clients SET is_enabled = 1, skip_ehr_launch_authorization_flow = 1 WHERE client_name = '%s';\nSELECT client_name, is_enabled, is_confidential, skip_ehr_launch_authorization_flow FROM oauth_clients WHERE client_name = '%s';\n" "$NAME" "$NAME" | sql
 echo "wrote $out (encrypted; values never shown). Commit it, then apply: sops -d $out | kubectl apply -f -"
