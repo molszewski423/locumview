@@ -74,7 +74,8 @@ echo "ok\n";
 PHOTO_PHP = r"""<?php
 // Stores a JPEG (base64 on stdin) as the patient's photograph with OpenEMR's own Document class, in the category the
 // patient summary shows (global patient_photo_category_name). The file name carries the image's hash: the same image
-// is stored once; a changed image replaces the patient's earlier photographs (marked deleted, OpenEMR's own flag).
+// is stored once; a changed image replaces the patient's earlier photographs (marked deleted, OpenEMR's own flag,
+// and taken out of the category).
 $_GET['site'] = 'default';
 $ignoreAuth = true;
 require_once '/var/www/localhost/htdocs/openemr/interface/globals.php';
@@ -85,6 +86,11 @@ $category = sqlQuery("SELECT id FROM categories WHERE name = ?", [$GLOBALS['pati
 if (!$category) { echo "error: no photograph category\n"; exit(1); }
 $photos = "FROM documents d JOIN categories_to_documents c ON c.document_id = d.id " .
           "WHERE d.foreign_id = ? AND c.category_id = ? AND d.deleted = 0";
+// A replaced photograph also leaves the category: OpenEMR's header picks the first photograph in it without checking
+// the deleted flag (docs/upstream/openemr-8.4.1.md item 14). Also cleans up photographs replaced before this fix.
+$unlink = "DELETE c FROM categories_to_documents c JOIN documents d ON d.id = c.document_id " .
+          "WHERE d.foreign_id = ? AND c.category_id = ? AND d.deleted = 1";
+sqlStatement($unlink, [$pid, $category]);
 if (sqlQuery("SELECT COUNT(*) AS n $photos AND d.name = ?", [$pid, $category, $name])['n']) { echo "present\n"; exit(0); }
 $data = base64_decode(stream_get_contents(STDIN), true);
 if ($data === false || strlen($data) < 1000) { echo "error: no image\n"; exit(1); }
@@ -94,6 +100,7 @@ if ($error) { echo "error: $error\n"; exit(1); }
 sqlStatement("UPDATE documents d JOIN categories_to_documents c ON c.document_id = d.id SET d.deleted = 1 " .
              "WHERE d.foreign_id = ? AND c.category_id = ? AND d.deleted = 0 AND d.id <> ?",
              [$pid, $category, $document->get_id()]);
+sqlStatement($unlink, [$pid, $category]);
 echo "ok\n";
 """
 PHOTOS = HERE.parent / "photos"

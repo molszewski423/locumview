@@ -2411,3 +2411,17 @@ Agent: Claude Code
   always does). Local OpenEMR destroyed.
 
 Agent: Claude Code
+
+## 150. Patient photograph: the header showed the replaced photograph (2026-11-12)
+
+- **Found (owner, in the app):** after #149's load, Jamal Grant's chart header still showed his old photograph,
+  although the loader had marked it deleted. OpenEMR's header (`PatientService::getPatientPictureDocumentId()`) takes
+  the first document in the photograph category without checking `documents.deleted`; the dashboard's photograph list
+  does check it. Recorded as `docs/upstream/openemr-8.4.1.md` item 14.
+- **Fix:** the loader also takes a replaced photograph out of the category, and on every run unlinks any deleted
+  photograph still in it, which cleans up the 20 the cluster replaced in #149.
+- **Verification:** fresh local OpenEMR; SYN-001's stored photograph renamed to the old naming, loader run again: the
+  old one marked deleted and out of the category, and the header's own query now returns only the new photograph.
+  Local OpenEMR destroyed.
+
+Agent: Claude Code
