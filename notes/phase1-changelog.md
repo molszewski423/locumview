@@ -2743,3 +2743,31 @@ Agent: Claude Code
   cut-over (#163) can go ahead once this reaches the next image.
 
 Agent: Claude Code
+
+## 165. ADR 0019 step 4 applied; the demo user may reach the EHR through its egress fence (2026-11-13)
+
+- **Cut-over (owner, from operator-laptop's main checkout):** `kubectl apply -k k8s/clinical` (Secret
+  `desktop-client-ca` and TLSOption `desktop-mtls` created, both clinical Ingresses switched to it), then
+  `kubectl -n clinical delete ingress sso`. The apply also reported `statefulset.apps/mariadb configured`: checked,
+  still one revision, pod not restarted (running 17 days), ready (a field the apply manages, not a change).
+- **Checks:** `scripts/clinical/mtls-checks.sh` from operator-laptop (not a desktop): 6 of 6 PASS: no client certificate
+  "certificate required", a certificate from another CA "unknown ca", the bypass attempt 421, for both names. In
+  lv-test17 (owner): the EHR launcher opens OpenEMR's login directly, no Keycloak and no MFA prompt.
+- **Found on lv-demo01:** the demo session's EHR window kept loading. Traced (strace as the demo user): the TPM key
+  and certificate work (TPM device, token and certificate opened within 0.1 s); the process then waited in
+  `connect()` until killed. The demo account has an egress fence by uid (`packaging/remote-access/demo-user-root.sh`,
+  #22, #61: internet yes; private, cluster and VPN ranges no), and the EHR names resolve to the cluster's LAN address,
+  so the guest never reached the EHR, before or after the cut-over. Several earlier diagnostic runs were invalid
+  (`sudo -u demo` kept the owner's HOME) and one printed the tokens' internal auth values (`tpm2_ptool verify`); both
+  tokens on lv-demo01 are to be rebuilt.
+- **Owner decision:** demo users may reach the EHR; now a narrow opening (option 1), later a dedicated cluster address
+  for the two clinical names so the opening covers only them (option 3, Planned).
+- **Change:** `demo-egress-ehr` and `locumview-demo-ehr.service` (image files, enabled; after the fence, restarted with
+  it): resolve the EHR's names (`EHR_HOSTS` in `/etc/locumview/ehr.conf`, or the host of `EHR_URL`) at each start and
+  allow the demo user TCP 443 to exactly those IPv4 addresses (a named set and one prepended rule, tagged); every other
+  private address stays dropped. Residual risk until option 3: other sites Traefik serves on that address are
+  reachable by the guest at the network level, each behind its own login; Chrome's allowlist still limits the browser.
+- **Verification:** shellcheck; in an EL10 container with a copy of the fence: the rule lands before the drops, for the
+  demo uid, port 443, the set holding the resolved address; a second run changes nothing; an unresolvable name exits 1.
+
+Agent: Claude Code

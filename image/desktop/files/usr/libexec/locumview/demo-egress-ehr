@@ -1,0 +1,37 @@
+#!/bin/bash
+# The demo (guest) user's egress fence (packaging/remote-access/demo-user-root.sh, table inet locumview_demo) drops
+# all private ranges, including the cluster the EHR is served from. Owner decision 2026-11-13 (changelog #165): demo
+# users may reach the EHR. This opens exactly the EHR's addresses, TCP 443 only, for the demo user; everything else
+# on the LAN stays blocked. The names come from /etc/locumview/ehr.conf: EHR_HOSTS, or the host of EHR_URL; or from
+# the arguments. They are resolved at each start, so a later dedicated address for the clinical names narrows this
+# rule by itself. Runs as root (locumview-demo-ehr.service, after the fence).
+#   demo-egress-ehr [host ...]
+set -euo pipefail
+FAMILY=inet TABLE=locumview_demo SET=ehr4 TAG=locumview-demo-ehr DEMO=demo
+nft list table "$FAMILY" "$TABLE" >/dev/null 2>&1 || { echo "no demo egress fence on this desktop"; exit 0; }
+hosts=("$@")
+if [ ${#hosts[@]} -eq 0 ]; then
+  EHR_URL='' EHR_HOSTS=''
+  # shellcheck source=/dev/null
+  [ -r /etc/locumview/ehr.conf ] && . /etc/locumview/ehr.conf
+  read -r -a hosts <<< "${EHR_HOSTS:-$(printf '%s' "$EHR_URL" | sed -n 's|^https://\([^/:]*\).*|\1|p')}"
+fi
+[ ${#hosts[@]} -gt 0 ] || { echo "no EHR host configured"; exit 0; }
+addrs=()
+for h in "${hosts[@]}"; do
+  for _ in $(seq 30); do   # name service may not be up yet at boot
+    mapfile -t a < <(getent ahostsv4 "$h" | awk '{print $1}' | sort -u)
+    [ ${#a[@]} -gt 0 ] && break; sleep 2
+  done
+  [ ${#a[@]} -gt 0 ] || { echo "cannot resolve $h" >&2; exit 1; }
+  addrs+=("${a[@]}")
+done
+mapfile -t addrs < <(printf '%s\n' "${addrs[@]}" | sort -u)
+nft add set "$FAMILY" "$TABLE" $SET '{ type ipv4_addr; }'
+nft flush set "$FAMILY" "$TABLE" $SET
+nft add element "$FAMILY" "$TABLE" $SET "{ $(IFS=,; echo "${addrs[*]}") }"
+if ! nft list chain "$FAMILY" "$TABLE" output | grep -q "comment \"$TAG\""; then
+  # Prepended: an accept for the demo user to these addresses on 443 only, before the fence's drops.
+  nft insert rule "$FAMILY" "$TABLE" output meta skuid "$DEMO" ip daddr @$SET tcp dport 443 accept comment "\"$TAG\""
+fi
+echo "demo user may reach ${hosts[*]} (TCP 443 only)"
