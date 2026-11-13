@@ -2770,4 +2770,12 @@ Agent: Claude Code
 - **Verification:** shellcheck; in an EL10 container with a copy of the fence: the rule lands before the drops, for the
   demo uid, port 443, the set holding the resolved address; a second run changes nothing; an unresolvable name exits 1.
 
+- **Verified on lv-demo01 (owner, by hand until the next image):** the script with both names: "demo user may reach
+  emr.corp.locumview.com clinical.corp.locumview.com (TCP 443 only)"; as the demo user a TCP connection to the EHR
+  now succeeds; the rule is first in the chain (demo uid, port 443, set holding the one cluster address). The demo
+  session's Chrome still held the earlier dropped connections; after the owner stopped it (`pkill -u demo` on Chrome),
+  the EHR launcher opened OpenEMR's login. Still open: GNOME's login keyring asks to be unlocked twice when Chrome
+  starts in the demo session (its always-on session starts without a password; Chrome's own storage asks for it;
+  Cancel works) and slows the first start.
+
 Agent: Claude Code
