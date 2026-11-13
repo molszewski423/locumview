@@ -2626,3 +2626,30 @@ Agent: Claude Code
   included). `pre-commit run --all-files` and the whole-history gitleaks scan pass. Local OpenEMR destroyed.
 
 Agent: Claude Code
+
+## 161. ADR 0019 step 3 works on a fresh lv-test17; the old one was rebuilt (2026-11-13)
+
+- **Why a rebuild:** the old lv-test17 kept the owner's local account locked (#153; faillock `unlock_time = 0`), and
+  its break-glass `lvadmin` refused the password from lv-test17's own secrets file over SSH (two attempts; the cause is
+  not visible to a desktop user and was not pursued). Its IdM account was fine (`ipa user-status`: not disabled, failed
+  logins 0; the last failure was the third sudo attempt at 05:38:05Z). The owner chose a rebuild of the disposable
+  canary over more attempts.
+- **Owner runs:** a fresh IdM backup (11:10, encrypted off-host copy kept), then from the operational OpenTofu
+  checkout on operator-laptop a plan targeted at `module.desktop["lv-test17"]` replacing the enrollment password, the
+  IdM host and its host-group membership (the agent added it after the first plan: re-creating the host drops it from
+  `locumview-desktops`, which the sub-CA's CA ACL needs), disk, seed, VM and RHSM record. Reviewed: 10 to add, 0 to
+  change, 10 to destroy, all lv-test17, nothing for lv-demo01 (whose state has drifted, so no full apply). Applied;
+  the plan file was deleted. Then `bootc switch --enforce-container-sigpolicy` to the image of run 671
+  (`sha256:0608c1f8…`, commit bfdbf89) and a reboot.
+- **Verified (read-only, and the owner in the desktop):** booted `0608c1f8…`; Guacamole went straight into the desktop
+  with the sign-in hook's TPM access in place, so Remote Desktop runs from TPM-held credentials, moved there by
+  `grd-credentials-to-tpm` (#153) without any manual step; the certificate issued at sign-in is for
+  `CN=lv-test17.corp.locumview.com` from `CN=LocumView desktop clients`, valid 3 days; the renewal timer is scheduled;
+  the EHR launcher shows OpenEMR's logo and still asks for Keycloak with TOTP, as expected until step 4. Failed units:
+  `rpc-gssd` only (also on the old lv-test17; NFS, unused). On first boot `locumview-dns-v4-only` failed once while
+  names resolved; it did not fail after the reboot; to be looked at.
+- **Next:** the TPM lockout check from the build plan (a desktop user must not be able to lock out the disk-unlock
+  objects), then step 4: Traefik's TLS option on the two clinical routers and oauth2-proxy's removal (owner approves
+  the cut-over). Also open: the October node3 test desktop lv-test18 is still running on operator-laptop.
+
+Agent: Claude Code
