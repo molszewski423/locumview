@@ -17,6 +17,7 @@ class Knowledge:
         self.specimens = data["specimens"]
         self.conditions = data["conditions"]
         self.thresholds = data["thresholds"]
+        self.listeria_risk_factors = {k: v for k, v in data["listeria_risk_factors"].items() if not k.startswith("_")}
         self.rules = data["rules"]
         self.why = {k: v for k, v in data.get("why", {}).items() if not k.startswith("_")}
 
@@ -41,3 +42,10 @@ class Knowledge:
             return []
         return [name for name, c in self.conditions.items()
                 if any(icd10.startswith(prefix) for prefix in c["icd10_prefixes"])]
+
+    def listeria_risks(self, icd10: str | None) -> list[str]:
+        """The Listeria risk-factor groups a problem code falls in (knowledge listeria_risk_factors)."""
+        if not icd10:
+            return []
+        return [name for name, g in self.listeria_risk_factors.items()
+                if any(icd10.startswith(prefix) for prefix in g["icd10_prefixes"])]
