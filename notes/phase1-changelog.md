@@ -2302,6 +2302,7 @@ Agent: Claude Code
   `locumview-desktop-clients`, profile `locumviewDesktopClient` (EC, client auth only, validity from the owner's
   decision), CA ACL for `locumview-desktops`; `up` creates only what is missing, `status` reads; no destructive mode
   (changelog #98). It writes the sub-CA's public certificate to `k8s/clinical/desktop-client-ca.pem`. Not run yet.
+- **Owner decisions (2026-11-12):** all four approved as recommended; ADR 0019 is Accepted.
 - **Verification:** `bash -n` and shellcheck; pre-commit.
 
 Agent: Claude Code

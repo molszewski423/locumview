@@ -1,6 +1,6 @@
 # ADR 0019: The EHR is reachable only from LocumView desktops, with one MFA sign-in
 
-Status: Proposed (revised 2026-10-27 after the spike: the design works on the platform; nothing is built)
+Status: Accepted (owner, 2026-11-12; revised 2026-10-27 after the spike). Build in progress: docs/plans/adr-0019-build.md
 Date: 2026-10-26; revised 2026-10-27 (changelog #96, owner decision on renewal)
 
 ## Context

@@ -10,7 +10,7 @@ Every EHR session asks for Keycloak and TOTP twice: once before Guacamole, then 
 (oauth2-proxy in front of OpenEMR). After changelog #142, OpenEMR's own sign-in is the only other prompt, and the
 SMART launch no longer adds one. This build removes the second Keycloak prompt.
 
-## Owner decisions needed before step 2
+## Owner decisions (approved 2026-11-12, as recommended)
 
 1. **Accept ADR 0019** (status Proposed to Accepted). The spike confirmed the design; nothing in it changed since.
 2. **Client certificate validity. Recommendation: 3 days**, with the helper trying to renew every 6 hours and at
