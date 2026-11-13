@@ -175,7 +175,6 @@ install -D -m 0644 $F/etc/locumview/ehr.conf %{buildroot}%{_sysconfdir}/locumvie
 install -D -m 0644 $F/usr/share/locumview/ehr/index.html %{buildroot}%{_datadir}/locumview/ehr/index.html
 # Desktop client certificate (ADR 0019)
 install -D -m 0755 $F/usr/libexec/locumview/desktop-cert %{buildroot}%{_libexecdir}/locumview/desktop-cert
-%{_libexecdir}/locumview/grd-credentials-to-tpm
 install -D -m 0755 $F/usr/libexec/locumview/grd-credentials-to-tpm %{buildroot}%{_libexecdir}/locumview/grd-credentials-to-tpm
 install -D -m 0644 $F/etc/locumview/desktop-cert.conf %{buildroot}%{_sysconfdir}/locumview/desktop-cert.conf
 S=$F/usr/lib/systemd/system

@@ -2502,3 +2502,15 @@ Agent: Claude Code
   the build plan; Chrome presenting the certificate to a test mTLS endpoint; then step 4.
 
 Agent: Claude Code
+
+## 154. RPM build fix: a stray file-list line in the spec's install section (2026-11-13)
+
+- **Found:** rpms run 392 (merge of #153) failed in `%install`: the edit that added `grd-credentials-to-tpm` to the
+  `locumview-desktop-cert` file list also matched the install line for `desktop-cert`, so a bare
+  `%{_libexecdir}/locumview/grd-credentials-to-tpm` landed in `%install` and ran as a command (not found). Image run
+  391 failed as a result. The agent had not rebuilt the RPMs after that edit.
+- **Fix:** the stray line removed; the script is installed once and listed once.
+- **Verification:** `build-rpms.sh` in the pinned CentOS Stream 10 builder builds all five packages from this commit;
+  `locumview-desktop-cert` contains `/usr/libexec/locumview/grd-credentials-to-tpm`.
+
+Agent: Claude Code
