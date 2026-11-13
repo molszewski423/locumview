@@ -2560,3 +2560,20 @@ Agent: Claude Code
 - **Lesson:** run the whole-history gitleaks scan locally before pushing changes that discuss secrets.
 
 Agent: Claude Code
+
+## 158. CI: an image build no longer races its RPMs (2026-11-13)
+
+- **Found:** a push that changes both the packages and the image starts `image.yml` and `rpms.yml` together on the
+  one runner (`image-builder`), in no fixed order; when the image ran first it failed at Containerfile step 1c after
+  about 12 minutes, because the RPM version it pins was not published yet (runs 368, 372, 391, 665). The image job
+  cannot wait for the rpms job: it would hold the only runner.
+- **Fix:** a step "RPMs for this image" after the version is resolved: if the registry already has the pinned version
+  (an unauthenticated request for `locumview-desktop-cert`'s package URL answers 200), nothing happens; otherwise the
+  job builds that version from the resolved source commit, signs and publishes it with the same scripts and secrets
+  as `rpms.yml`, and checks the registry again. Publishing is idempotent, so whichever run comes second finds the
+  packages there.
+- **Verification:** the workflow parses; the step passes shellcheck and its Python block compiles; the registry URL
+  answers 200 for a published version and 404 for one that is not; for the current main the resolved version is
+  checked the same way. The build-sign-publish path runs in CI only (it needs the signing secrets).
+
+Agent: Claude Code
