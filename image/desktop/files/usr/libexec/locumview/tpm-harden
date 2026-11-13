@@ -35,8 +35,9 @@ harden() {
   [ "$(flag disableClear)" = 1 ] || tpm2_clearcontrol -C l s   # "s": set (the tool clears by default)
   install -d -m 0755 /etc/locumview
   umask 077
-  # 64 hex characters (tpm2-tools reads a file: password as text); file: keeps it out of every process's arguments.
-  head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n' > "$AUTH.new"; chmod 0400 "$AUTH.new"
+  # 32 hex characters (128 bits): tpm2-tools reads a file: password as text, and refuses one longer than a SHA-256
+  # digest (64 characters failed on lv-test17, #162); file: keeps it out of every process's arguments.
+  head -c 16 /dev/urandom | od -An -tx1 | tr -d ' \n' > "$AUTH.new"; chmod 0400 "$AUTH.new"
   tpm2_changeauth -c lockout "file:$AUTH.new"
   mv -f "$AUTH.new" "$AUTH"
   log "TPM hardened: clear disabled, lockout password set (root-only $AUTH)"

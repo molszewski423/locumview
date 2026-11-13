@@ -2664,11 +2664,17 @@ Agent: Claude Code
   No key can be read or copied this way: it is a denial of service against that desktop by a signed-in user.
 - **Fix (owner approved):** `tpm-harden` (in the `locumview-desktop-cert` RPM) with `locumview-tpm-harden.service`
   (after first-boot provisioning, every boot, idempotent): sets `disableClear` with the lockout hierarchy, then a
-  random 64-hex-character lockout password kept root-only in `/etc/locumview/tpm-lockout.auth` (passed with `file:`,
+  random 32-hex-character (128-bit) lockout password kept root-only in `/etc/locumview/tpm-lockout.auth` (passed with `file:`,
   never as an argument). The owner password cannot be set (clevis and tpm2-pkcs11 create their primary keys under the
   owner hierarchy without one), so `tpm-harden check`, also run by the 6-hourly certificate timer, raises an ALERT and
   fails when an owner or endorsement password was set or the hardening is missing. tpm2-tools 5.7 (EL10) syntax checked:
-  `tpm2_clearcontrol` clears the bit unless given `s`; `file:` passwords are read as text.
+  `tpm2_clearcontrol` clears the bit unless given `s`; `file:` passwords are read as text and may not exceed a
+  SHA-256 digest: the first owner run on lv-test17 set `disableClear` but its 64-character password failed ("get
+  password"); against swtpm 0.9.0 with tpm2-tools 5.7, 64 characters fail and 32 work. The fixed script, tested there:
+  hardens once and is a no-op the second time; the stored password is 32 characters, root-only, and usable; a clear is
+  refused; an owner password raises the alert.
+- **Platform hierarchy (owner, on lv-test17):** `tpm2_clearcontrol -C p s` as the desktop user: "authorization
+  failure without DA implications": the firmware has given it a password, so it cannot clear the TPM.
 - **To verify on lv-test17 (owner run):** the platform hierarchy is not usable from the OS (firmware randomizes its
   password; otherwise it could clear the TPM regardless); harden by hand; reboot; the disk unlocks by itself and the
   certificate still works.
