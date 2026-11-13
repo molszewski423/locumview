@@ -27,7 +27,7 @@ RUN --mount=type=secret,id=rhsm --mount=type=bind,target=/src \
         gnome-shell-extension-dash-to-dock gnome-shell-extension-dash-to-panel \
         gnome-remote-desktop flatpak librsvg2-tools unzip \
         firewalld nftables cockpit ipa-client \
-        clevis clevis-luks clevis-dracut clevis-systemd tpm2-tools cloud-init \
+        clevis clevis-luks clevis-dracut clevis-systemd tpm2-tools tpm2-pkcs11 tpm2-pkcs11-tools cloud-init \
         openscap-scanner openscap-utils scap-security-guide; \
     rhsm_off; \
     systemctl set-default graphical.target
@@ -77,16 +77,18 @@ RUN --mount=type=secret,id=lanca --mount=type=bind,target=/src \
         "locumview-shell-extensions-${LOCUMVIEW_RPM_EVR}.noarch" \
         "locumview-branding-${LOCUMVIEW_RPM_EVR}.noarch" \
         "locumview-tour-${LOCUMVIEW_RPM_EVR}.noarch" \
-        "locumview-ehr-launcher-${LOCUMVIEW_RPM_EVR}.noarch"; then \
+        "locumview-ehr-launcher-${LOCUMVIEW_RPM_EVR}.noarch" \
+        "locumview-desktop-cert-${LOCUMVIEW_RPM_EVR}.noarch"; then \
         echo "Required LocumView RPMs ${LOCUMVIEW_RPM_EVR} could not be installed. Check the RPM publication job and repository, then rerun this image build; no newer-version fallback is allowed." >&2; \
         exit 1; \
     fi; \
-    for package in locumview-shell-extensions locumview-branding locumview-tour locumview-ehr-launcher; do \
+    for package in locumview-shell-extensions locumview-branding locumview-tour locumview-ehr-launcher \
+        locumview-desktop-cert; do \
         test "$(rpm -q --qf '%{VERSION}-%{RELEASE}' "$package")" = "$LOCUMVIEW_RPM_EVR"; \
     done; \
     rm -f /etc/yum.repos.d/locumview.repo /etc/pki/ca-trust/source/anchors/locumview-registry-build.crt; \
     update-ca-trust; \
-    rpm -q locumview-shell-extensions locumview-branding locumview-tour locumview-ehr-launcher
+    rpm -q locumview-shell-extensions locumview-branding locumview-tour locumview-ehr-launcher locumview-desktop-cert
 
 # 2. The rest of the LocumView desktop: third-party extensions, Papirus, the hidden GNOME Tour entry, system dconf
 #    defaults and the organization layout (mac, locked). Same script as the hand-built desktop, in image mode
@@ -106,12 +108,13 @@ RUN --mount=type=bind,target=/src \
 RUN --mount=type=bind,target=/src \
     set -euo pipefail; \
     bash /src/image/desktop/scripts/install-files.sh /src/image/desktop/files; \
-    rpm -V locumview-ehr-launcher locumview-branding; \
+    rpm -V locumview-ehr-launcher locumview-branding locumview-desktop-cert; \
     install -d -m 0755 /usr/libexec/locumview/remote-access; \
     install -m 0755 /src/packaging/remote-access/user-mode-user.sh /src/packaging/remote-access/demo-user-root.sh \
         /usr/libexec/locumview/remote-access/; \
     install -D -m 0644 /src/image/desktop/signing/cosign.pub /usr/share/locumview/signing/cosign.pub; \
-    systemctl enable locumview-flatpaks.service locumview-provision.service locumview-dns-v4-only.service; \
+    systemctl enable locumview-flatpaks.service locumview-provision.service locumview-dns-v4-only.service \
+        locumview-desktop-cert.timer; \
     dconf update
 
 # 3b. Initramfs with clevis, so the LUKS volume unlocks with the vTPM at boot (the base image's initramfs has
@@ -125,11 +128,15 @@ RUN set -euo pipefail; \
 #     Chrome allows only it, the clinical app and Keycloak's sign-in pages (the root of that host, Guacamole, stays
 #     blocked). After step 3's rpm -V, because ehr.conf is the locumview-ehr-launcher RPM's %config file; the RPM keeps
 #     its generic default for other deployments (ADR 0016). Desktops trust the certificates through IdM enrollment.
+#     ADR 0019: desktop client certificates from the IdM sub-CA (desktop-cert.conf, the locumview-desktop-cert RPM's
+#     %config file), which Chrome presents to the two clinical names without a prompt (AutoSelectCertificateForUrls).
 RUN --mount=type=bind,target=/src \
     set -euo pipefail; \
     install -m 0644 /src/image/desktop/reference/ehr.conf /etc/locumview/ehr.conf; \
     install -m 0644 /src/image/desktop/reference/50-locumview-ehr-sites.json \
         /etc/opt/chrome/policies/managed/50-locumview-ehr-sites.json; \
+    install -m 0644 /src/image/desktop/reference/desktop-cert.conf /etc/locumview/desktop-cert.conf; \
+    grep -qx 'SUBCA=locumview-desktop-clients' /etc/locumview/desktop-cert.conf; \
     grep -qx 'EHR_URL=https://emr.corp.locumview.com/' /etc/locumview/ehr.conf
 
 # 4. DISA STIG with GUI, LocumView image profile (hardening/stig/README.md), applied at build time by oscap-im.

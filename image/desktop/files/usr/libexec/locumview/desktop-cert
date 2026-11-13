@@ -1,0 +1,161 @@
+#!/bin/bash
+# LocumView desktop client certificate (ADR 0019, docs/plans/adr-0019-build.md step 3). Runs as root, from systemd.
+#
+# Each desktop user gets a tpm2-pkcs11 token in ~/.tpm2_pkcs11 with an ECDSA P-256 key generated in the desktop's TPM
+# (it cannot leave this machine) and an empty user PIN, so Chrome presents the certificate without a prompt. The
+# certificate is issued to the HOST (it proves "a LocumView desktop", not who is signed in) by the IdM sub-CA in
+# /etc/locumview/desktop-cert.conf, with the host's own keytab: no new credential exists. Renewal is this helper, not
+# certmonger, which cannot save to a token with an empty PIN (ADR 0019 spike B3).
+#
+#   desktop-cert login <uid>    from user-runtime-dir@<uid>.service: TPM access for the user, then renew in the background
+#                               (never waits for the lock, so it cannot hold up a sign-in)
+#   desktop-cert logout <uid>   the user's TPM access is removed when their last session ends
+#   desktop-cert renew <uid>    create the token if missing; renew when the certificate expires within RENEW_BEFORE_HOURS
+#   desktop-cert all            the timer: renew every user with a token; alert when one expires within ALERT_BEFORE_HOURS
+#
+# Nothing is revoked or deleted in IdM. On the token, only certificates for this helper's own key are replaced.
+set -euo pipefail
+umask 077
+CONF=/etc/locumview/desktop-cert.conf
+SUBCA='' PROFILE='' RENEW_BEFORE_HOURS=48 ALERT_BEFORE_HOURS=24 MIN_UID=1000
+TOKEN=locumview-desktop KEY=desktop
+# shellcheck source=/dev/null
+[ -r "$CONF" ] && . "$CONF"
+export TPM2_PKCS11_BACKEND=esysdb TPM2_PKCS11_TCTI=device:/dev/tpmrm0
+log() { logger -t locumview-desktop-cert -p "user.${2:-info}" -- "$1"; echo "$1"; }
+die() { log "$1" err; exit 1; }
+enabled() { [ -n "$SUBCA" ] && [ -n "$PROFILE" ] && [ -s /etc/krb5.keytab ] && [ -e /dev/tpmrm0 ]; }
+
+user_of() {  # user_of <uid>: the account name, only for ordinary users with a home directory
+  local u; u=$(getent passwd "$1" | cut -d: -f1) || return 1
+  [ -n "$u" ] && [ "$1" -ge "$MIN_UID" ] && [ -d "$(home_of "$u")" ] && echo "$u"
+}
+home_of() { getent passwd "$1" | cut -d: -f6; }
+store_of() { echo "$(home_of "$1")/.tpm2_pkcs11"; }
+quiet() { "$@" 2>&1 | grep -v -i -e fapi -e 'tpm2-pkcs11/blob' || true; }   # tpm2_ptool's harmless FAPI noise
+
+# The key's object id on the token (tpm2_ptool listobjects: "- id: N" blocks with CKA_CLASS and CKA_LABEL).
+objects() {
+  tpm2_ptool listobjects --path="$1" --label="$TOKEN" 2>/dev/null | python3 -I -c '
+import re, sys
+objs, cur, want = [], None, False
+for l in sys.stdin:
+    if l.startswith("- "): cur = {}; objs.append(cur)
+    if cur is None: continue
+    if want: cur["ckaid"] = l.strip(" -\x27\n"); want = False; continue
+    m = re.match(r"\s*-?\s*(CKA_CLASS|CKA_LABEL|id): (.*)", l)
+    if m: cur[m.group(1)] = m.group(2).strip()
+    if re.match(r"\s*CKA_ID:\s*$", l): want = True
+for o in objs:
+    print(o.get("id", "?"), o.get("CKA_CLASS", "?"), o.get("ckaid", "-"), o.get("CKA_LABEL", ""))
+' || true
+}
+
+ensure_token() {  # ensure_token <user>: store, token (empty user PIN) and TPM key, owned by the user
+  local u=$1 store; store=$(store_of "$u")
+  if [ -f "$store/tpm2_pkcs11.sqlite3" ]; then return 0; fi
+  install -d -m 0700 -o "$u" -g "$(id -gn "$u")" "$store"
+  quiet tpm2_ptool init --path="$store" >/dev/null
+  # The SO PIN is random and not kept: it only resets a user PIN, and this PIN is empty by design. A broken token is
+  # replaced by deleting the store; the next run creates a new key and certificate.
+  local so up; so=$(openssl rand -hex 16); up=$(openssl rand -hex 16)
+  quiet tpm2_ptool addtoken --path="$store" --pid=1 --label="$TOKEN" --sopin="$so" --userpin="$up" >/dev/null
+  quiet tpm2_ptool changepin --path="$store" --label="$TOKEN" --user=user --old="$up" --new="" >/dev/null
+  unset so up
+  quiet tpm2_ptool addkey --path="$store" --label="$TOKEN" --userpin="" --algorithm=ecc256 --key-label="$KEY" >/dev/null
+  chown -R "$u:$(id -gn "$u")" "$store"
+  log "token and TPM key created for $u"
+}
+
+hours_left() {  # hours_left <pem>: whole hours until the certificate expires (negative when expired)
+  local end; end=$(openssl x509 -in "$1" -noout -enddate | cut -d= -f2)
+  echo $(( ($(date -d "$end" +%s) - $(date +%s)) / 3600 ))
+}
+
+fail() { log "$1" err; return 1; }
+
+# renew <user>. Every step checks its own result: callers use "renew || ...", where errexit does not apply.
+renew() {
+  local u=$1 store pem kid tmp k_csr k_crt before after oid
+  store=$(store_of "$u"); pem=$store/locumview-desktop.pem
+  ensure_token "$u" || fail "$u: could not create the token" || return 1
+  if [ -s "$pem" ] && [ "$(hours_left "$pem")" -gt "$RENEW_BEFORE_HOURS" ]; then return 0; fi
+  kid=$(objects "$store" | awk -v k="$KEY" '$2=="CKO_PRIVATE_KEY" && $4==k {print $3; exit}')
+  [ -n "$kid" ] || { fail "$u: no private key '$KEY' on token '$TOKEN' in $store"; return 1; }
+  tmp=$(mktemp -d)
+  # shellcheck disable=SC2064  # $tmp expands now, on purpose
+  trap "rm -rf '$tmp'; kdestroy -c 'FILE:$tmp/cc' >/dev/null 2>&1 || true" RETURN
+  export TPM2_PKCS11_STORE=$store KRB5CCNAME=FILE:$tmp/cc
+  # 1. A CSR signed by the TPM key, through a throwaway NSS database (the token's PIN is empty).
+  if ! { mkdir "$tmp/nss" && certutil -N -d "sql:$tmp/nss" --empty-password >/dev/null 2>&1; }; then
+    fail "$u: could not create a scratch NSS database"; return 1
+  fi
+  : > "$tmp/pin"
+  quiet certutil -R -d "sql:$tmp/nss" -h "$TOKEN" -k "$kid" -s "CN=$(hostname -f)" -f "$tmp/pin" -a \
+    -o "$tmp/req.csr" </dev/null >/dev/null
+  grep -q 'CERTIFICATE REQUEST' "$tmp/req.csr" 2>/dev/null || { fail "$u: the TPM key did not sign a request"; return 1; }
+  sed -i 's/NEW CERTIFICATE REQUEST/CERTIFICATE REQUEST/' "$tmp/req.csr"
+  k_csr=$(openssl req -in "$tmp/req.csr" -noout -pubkey | openssl pkey -pubin -outform DER | sha256sum | cut -c1-16)
+  # 2. The certificate, with the host's identity.
+  kinit -k -t /etc/krb5.keytab "host/$(hostname -f)" || { fail "$u: kinit with the host keytab failed"; return 1; }
+  ipa cert-request "$tmp/req.csr" --principal="host/$(hostname -f)" --ca="$SUBCA" --profile-id="$PROFILE" \
+    --certificate-out="$tmp/cert.pem" >/dev/null || { fail "$u: IdM did not issue a certificate"; return 1; }
+  # 3. It must be for the TPM key, or nothing changes on the token.
+  k_crt=$(openssl x509 -in "$tmp/cert.pem" -noout -pubkey | openssl pkey -pubin -outform DER | sha256sum | cut -c1-16)
+  [ "$k_crt" = "$k_csr" ] || { fail "$u: issued certificate key $k_crt is not the TPM key $k_csr; token unchanged"; return 1; }
+  # 4. Onto the token; only once the new one is there do the older certificates for this key (found by the key's
+  #    own CKA_ID on this token, never by a search in IdM) go.
+  before=$(objects "$store" | awk -v id="$kid" '$2=="CKO_CERTIFICATE" && $3==id {print $1}')
+  quiet tpm2_ptool addcert --path="$store" --label="$TOKEN" --key-label="$KEY" "$tmp/cert.pem" >/dev/null
+  after=$(objects "$store" | awk -v id="$kid" '$2=="CKO_CERTIFICATE" && $3==id {print $1}')
+  [ "$(echo "$after" | wc -w)" -gt "$(echo "$before" | wc -w)" ] || { fail "$u: the certificate was not added to the token"; return 1; }
+  for oid in $before; do quiet tpm2_ptool objdel --path="$store" "$oid" >/dev/null; done
+  install -m 0644 -o "$u" -g "$(id -gn "$u")" "$tmp/cert.pem" "$pem"
+  chown "$u:$(id -gn "$u")" "$store"/tpm2_pkcs11.sqlite3*
+  log "$u: certificate $(openssl x509 -in "$pem" -noout -serial | cut -d= -f2) valid until $(openssl x509 -in "$pem" -noout -enddate | cut -d= -f2)"
+}
+
+tpm_access() {  # tpm_access <add|remove> <user>
+  if [ "$1" = add ]; then setfacl -m "u:$2:rw" /dev/tpmrm0; else setfacl -x "u:$2" /dev/tpmrm0 2>/dev/null || true; fi
+}
+
+lock() { exec 9>/run/locumview-desktop-cert.lock; flock -w 300 9 || die "another run holds the lock"; }
+cmd=${1:-}; arg=${2:-}
+case "$cmd" in
+login)
+  enabled || exit 0
+  u=$(user_of "$arg") || exit 0
+  tpm_access add "$u"
+  systemctl start --no-block "locumview-desktop-cert@$arg.service"
+  ;;
+logout)
+  u=$(user_of "$arg") || exit 0
+  tpm_access remove "$u"
+  ;;
+renew)
+  enabled || { echo "desktop certificates are not configured ($CONF) or this host is not enrolled"; exit 0; }
+  lock
+  u=$(user_of "$arg") || die "uid $arg is not a desktop user"
+  renew "$u" || exit 1
+  ;;
+all)
+  enabled || exit 0
+  lock
+  rc=0
+  for uid in $(loginctl list-users --no-legend 2>/dev/null | awk '{print $1}'); do   # access lost to a udev event
+    if u=$(user_of "$uid"); then tpm_access add "$u"; fi
+  done
+  for store in /home/*/.tpm2_pkcs11; do
+    [ -f "$store/tpm2_pkcs11.sqlite3" ] || continue
+    u=$(stat -c %U "$store")
+    [ "$(readlink -f "$(home_of "$u")/.tpm2_pkcs11")" = "$(readlink -f "$store")" ] || continue   # the owner's own
+    renew "$u" || rc=1
+    pem=$store/locumview-desktop.pem
+    if [ ! -s "$pem" ] || [ "$(hours_left "$pem")" -le "$ALERT_BEFORE_HOURS" ]; then
+      log "ALERT $u: the desktop certificate expires within $ALERT_BEFORE_HOURS hours and could not be renewed" err; rc=1
+    fi
+  done
+  exit $rc
+  ;;
+*) echo "usage: $0 login|logout|renew <uid> | all" >&2; exit 2 ;;
+esac

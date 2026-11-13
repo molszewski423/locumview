@@ -1,5 +1,8 @@
 {
-  "URLBlocklist": ["*", "javascript://*"],
+  "URLBlocklist": [
+    "*",
+    "javascript://*"
+  ],
   "URLAllowlist": [
     "file:///usr/share/locumview/ehr/*",
     "chrome://policy",
@@ -7,5 +10,9 @@
     "https://clinical.corp.locumview.com",
     "https://login.locumview.com/realms/locumview",
     "https://login.locumview.com/resources"
+  ],
+  "AutoSelectCertificateForUrls": [
+    "{\"pattern\":\"https://emr.corp.locumview.com\",\"filter\":{\"ISSUER\":{\"CN\":\"LocumView desktop clients\"}}}",
+    "{\"pattern\":\"https://clinical.corp.locumview.com\",\"filter\":{\"ISSUER\":{\"CN\":\"LocumView desktop clients\"}}}"
   ]
 }

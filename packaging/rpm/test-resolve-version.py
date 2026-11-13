@@ -131,7 +131,7 @@ rpm() { if [ "${2:-}" = --qf ]; then printf '%s' "$LOCUMVIEW_RPM_EVR"; fi; retur
         packages = [arg for arg in arguments if arg.startswith("locumview-")]
         self.assertEqual(packages, [f"{name}-0.1.0-1.test.el10.noarch" for name in
                          ("locumview-shell-extensions", "locumview-branding", "locumview-tour",
-                          "locumview-ehr-launcher")])
+                          "locumview-ehr-launcher", "locumview-desktop-cert")])
 
     def test_missing_publication_fails_without_retrying_latest(self):
         result, arguments = self.run_image_install(1)
