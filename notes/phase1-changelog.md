@@ -2945,3 +2945,20 @@ Agent: Claude Code
   (`/usr/libexec/locumview/ehr-browser --start-maximized`).
 
 Agent: Claude Code
+
+## 173. RPM publish: a good signature could fail the check (SIGPIPE under pipefail) (2026-11-15)
+
+- **Found:** rpms run 465 and image run 464 (#172), and image run 452 (#168), failed at publishing: each RPM was
+  "signed and verified" by `sign-rpms.sh`, then `publish-rpms.sh` reported the first one "not signed with the LocumView
+  key". Both steps derive the expected key ID the same way from the same committed key on the same host. The check
+  piped `rpm -K -v` into `grep -qi` inside `bash -o pipefail`: grep -q stops at the first match, rpm can then die of
+  SIGPIPE while writing its remaining lines, and pipefail turns the pipeline into a failure. That happens only now
+  and then, which is why rpms run 453 passed with the same code. `sign-rpms.sh` had the same pattern in its check
+  that the committed public key matches.
+- **Changed:** both checks let grep read all of the output (`grep ... >/dev/null` instead of `grep -q`).
+- **Verification:** RPMs signed with a throwaway key in the CentOS Stream 10 build container (the pinned digest): the
+  old check failed 2 of 300 runs on correctly signed RPMs; the new one failed 0 of 1000 and still rejects a wrong key
+  ID. The repository's shellcheck hook passes on both scripts (plain `shellcheck` shows only the existing SC1091
+  note that it does not follow `builder.env`). The next push to main reruns rpms and image (#168 and #172 ship there).
+
+Agent: Claude Code

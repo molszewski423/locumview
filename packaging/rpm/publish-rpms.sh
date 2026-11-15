@@ -18,7 +18,9 @@ podman run --rm --network none -v "$(realpath "$DIR"):/rpms:ro,Z" \
   "quay.io/centos/centos@sha256:$CENTOS_STREAM10_DIGEST" bash -euo pipefail -c '
   rpm --import /pub.asc
   for f in /rpms/*.rpm; do
-    rpm -K -v "$f" | grep -qi "Signature, key ID '"${FPR: -8}"': OK" || { echo "not signed with the LocumView key: $f"; exit 1; }
+    # grep reads all of rpm'"'"'s output (no -q): with -q it stops at the match, rpm can then die of SIGPIPE, and pipefail
+    # turns a good signature into a failure (changelog #173).
+    rpm -K -v "$f" | grep -i "Signature, key ID '"${FPR: -8}"': OK" >/dev/null || { echo "not signed with the LocumView key: $f"; exit 1; }
   done'
 for f in "$DIR"/*.rpm; do
   code=$(curl -sS -o /dev/null -w '%{http_code}' -u "$REGISTRY_USER:$REGISTRY_TOKEN" --upload-file "$f" "$URL/upload")

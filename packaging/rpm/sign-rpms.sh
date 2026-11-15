@@ -25,7 +25,8 @@ open(\"/keys/fpr\", \"w\").write(d[\"rpm_signing_fingerprint\"])"
   gpg --batch --quiet --pinentry-mode loopback --passphrase-file /keys/pass --import /keys/key.asc 2>/dev/null
   rm -f /keys/key.asc
   # The committed public key must be the key that signs.
-  gpg --batch --with-colons --show-keys /pub.asc | grep -q "^fpr:::::::::$FPR:" || { echo "public key does not match"; exit 1; }
+  # No grep -q after a pipe under pipefail: the writer can die of SIGPIPE after the match (changelog #173).
+  gpg --batch --with-colons --show-keys /pub.asc | grep "^fpr:::::::::$FPR:" >/dev/null || { echo "public key does not match"; exit 1; }
   rpmsign --addsign --define "_gpg_name $FPR" \
     --define "_gpg_sign_cmd_extra_args --pinentry-mode loopback --passphrase-file /keys/pass" /rpms/*.rpm >/dev/null
   rpm --import /pub.asc
