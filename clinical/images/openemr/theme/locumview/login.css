@@ -1,0 +1,166 @@
+/* LocumView's OpenEMR login page (changelog #169), loaded by the "Automatic" theme (style_automatic.css).
+   Every rule is scoped to the login page (a body holding OpenEMR's #login_form), so no other page changes.
+   Colors: the LocumView brand kit (packaging/branding/web/COLORS-AND-USAGE.md). Background: the desktop's "pulse"
+   wallpaper, light or dark with the system's appearance; the form sits on a card to the left of the trace. */
+
+body:has(#login_form) {
+  --lv-bg: #E9EEF3;
+  --lv-card: rgba(255, 255, 255, 0.88);
+  --lv-card-border: rgba(15, 118, 110, 0.18);
+  --lv-text: #1D2230;
+  --lv-muted: #5B6672;
+  --lv-accent: #0F766E;
+  --lv-accent-hover: #0B5F59;
+  --lv-on-accent: #FFFFFF;
+  --lv-input: #FFFFFF;
+  --lv-input-border: #C9D2DB;
+  --lv-wallpaper: url("pulse-light.svg");
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  background: var(--lv-bg) var(--lv-wallpaper) center / cover no-repeat fixed;
+  color: var(--lv-text);
+}
+
+@media (prefers-color-scheme: dark) {
+  body:has(#login_form) {
+    --lv-bg: #0E141C;
+    --lv-card: rgba(21, 29, 40, 0.86);
+    --lv-card-border: rgba(94, 234, 212, 0.16);
+    --lv-text: #E6EDF3;
+    --lv-muted: #8A949E;
+    --lv-accent: #5EEAD4;
+    --lv-accent-hover: #8FF3E3;
+    --lv-on-accent: #0E141C;
+    --lv-input: #0E141C;
+    --lv-input-border: #2A3646;
+    --lv-wallpaper: url("pulse-dark.svg");
+  }
+
+  /* The wordmark in white and bright teal; OpenEMR's logo in white. */
+  body:has(#login_form) img[src*="/login/primary/"] {
+    content: url("login-logo-dark.svg");
+  }
+
+  body:has(#login_form) img[src*="/login/secondary/"] {
+    filter: brightness(0) invert(1);
+    opacity: 0.75;
+  }
+}
+
+/* The card: OpenEMR's layout container (vertical band, the layout the loader selects). */
+body:has(#login_form) .vertical-band {
+  height: auto !important;
+  width: min(440px, calc(100vw - 32px));
+  max-width: 440px;
+  margin: 0 0 0 max(16px, 7vw) !important;
+  padding: 40px 40px 28px !important;
+  background: var(--lv-card) !important;
+  border: 1px solid var(--lv-card-border);
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+@media (max-width: 900px) {
+  body:has(#login_form) .vertical-band {
+    margin: 0 auto !important;
+  }
+}
+
+/* Logos: the wordmark first, "openEMR" small below it, less space under them. */
+body:has(#login_form) .vertical-band > div > .mb-5 {
+  margin-bottom: 1.25rem !important;
+  gap: 10px;
+}
+
+body:has(#login_form) img[src*="/login/primary/"] {
+  width: 100%;
+  max-width: 260px;
+}
+
+body:has(#login_form) img[src*="/login/secondary/"] {
+  max-width: 96px;
+}
+
+body:has(#login_form) .lead {
+  font-size: 0.9rem;
+  color: var(--lv-muted);
+  margin-bottom: 1.75rem;
+}
+
+/* Labels above their fields. */
+body:has(#login_form) #login_form .form-group.row {
+  flex-direction: column;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+body:has(#login_form) #login_form .form-group.row > label,
+body:has(#login_form) #login_form .form-group.row > .col {
+  flex: 0 0 100%;
+  max-width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+body:has(#login_form) #login_form .form-group.row > label {
+  padding-top: 0;
+  padding-bottom: 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--lv-muted);
+}
+
+body:has(#login_form) #login_form .form-control,
+body:has(#login_form) #login_form .input-group-text {
+  height: 44px;
+  background-color: var(--lv-input);
+  border-color: var(--lv-input-border);
+  color: var(--lv-text);
+}
+
+body:has(#login_form) #login_form .form-control {
+  border-radius: 8px;
+}
+
+body:has(#login_form) #login_form .input-group > .form-control {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+body:has(#login_form) #login_form .input-group-text {
+  border-radius: 0 8px 8px 0;
+  color: var(--lv-muted);
+}
+
+body:has(#login_form) #login_form .form-control:focus {
+  border-color: var(--lv-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--lv-accent) 25%, transparent);
+}
+
+body:has(#login_form) #login-button {
+  height: 46px;
+  margin-top: 0.5rem;
+  border: 0;
+  border-radius: 8px;
+  font-weight: 600;
+  background: var(--lv-accent);
+  color: var(--lv-on-accent);
+}
+
+body:has(#login_form) #login-button:hover,
+body:has(#login_form) #login-button:focus {
+  background: var(--lv-accent-hover);
+}
+
+body:has(#login_form) .vertical-band p.small {
+  margin: 1.25rem 0 0;
+}
+
+body:has(#login_form) .vertical-band p.small a {
+  color: var(--lv-muted);
+}

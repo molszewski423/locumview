@@ -23,6 +23,11 @@ ARG ROUTES=apis/routes/_rest_routes_fhir_r4_us_core_3_1_0.inc.php
 COPY --from=patcher --chown=apache:apache --chmod=400 /w/${AUTH} /var/www/localhost/htdocs/openemr/${AUTH}
 COPY --from=patcher --chown=apache:apache --chmod=400 /w/${PROBLEMS} /var/www/localhost/htdocs/openemr/${PROBLEMS}
 COPY --from=patcher --chown=apache:apache --chmod=400 /w/${ROUTES} /var/www/localhost/htdocs/openemr/${ROUTES}
+# LocumView's "Automatic" theme and login page (changelog #169): files added beside OpenEMR's own themes, no OpenEMR
+# file changed. OpenEMR lists every public/themes/style_*.css as a theme; the scenario loader selects this one.
+COPY --chown=apache:apache clinical/images/openemr/theme/ /var/www/localhost/htdocs/openemr/public/themes/
+RUN cd /var/www/localhost/htdocs/openemr/public/themes \
+ && chmod 0400 ./*style_automatic.css locumview/* && chmod 0500 locumview
 LABEL org.opencontainers.image.title="LocumView OpenEMR" \
-      org.opencontainers.image.description="OpenEMR 8.4.1 with LocumView's SMART launch, problem-list code and specimen permission fixes" \
+      org.opencontainers.image.description="OpenEMR 8.4.1 with LocumView's SMART launch, problem-list code and specimen permission fixes, and an automatic light or dark theme with LocumView's login page" \
       org.opencontainers.image.base.name="docker.io/openemr/openemr:8.4.1"
