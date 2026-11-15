@@ -2907,3 +2907,19 @@ Agent: Claude Code
     pinned host key, and the apply on the cluster (all owner steps).
 
 Agent: Claude Code
+
+## 171. Pin the OpenEMR image with the Automatic theme (#169) and the VNC tunnel image (#170) (2026-11-14)
+
+- **Done:** `k8s/clinical/kustomization.yaml` pins the OpenEMR image that clinical-images built and signed from merge
+  commit df6204c (Gitea run 742): patches 0001 to 0003 and the Automatic theme with LocumView's login page.
+  `k8s/locumview/vnc-tunnel.yaml` replaces its placeholder with the tunnel image from the same run. The agent and
+  gateway stay at their pinned images: that run rebuilt them only because the workflow changed, not their sources.
+- **Changed:** `scripts/clinical/verify-images.sh` also verifies the project's own images pinned in
+  `k8s/locumview/*.yaml` (now the tunnel), so both pins are checked before any apply.
+- **Verification:** digests transcribed from the run's Verify steps (screenshots from the owner); both are 64
+  hexadecimal characters. A transcription error fails `verify-images.sh` (signature and SBOM attestation) before the
+  apply. Shellcheck passes on the script.
+- **Deploy (owner):** OpenEMR: verify, `kubectl apply -k k8s/clinical`, then `load-scenarios.sh` so the loader selects
+  the theme. The tunnel waits for the Catalyst desktop's steps (#170).
+
+Agent: Claude Code

@@ -40,8 +40,9 @@ spec:
         seccompProfile: {type: RuntimeDefault}
       containers:
         - name: ssh
-          # Built and signed by clinical-images.yml (k8s/locumview/vnc-tunnel/Containerfile); pinned after the first build.
-          image: git.lan/mike/locumview-vnc-tunnel@sha256:0000000000000000000000000000000000000000000000000000000000000000
+          # Built and signed by clinical-images.yml (k8s/locumview/vnc-tunnel/Containerfile): commit df6204c, Gitea run 742;
+          # signature and SBOM attestation verified by CI 2026-11-14. Verify again before applying (changelog #171).
+          image: git.lan/mike/locumview-vnc-tunnel@sha256:e66861fe1ecf6051635eecf1bcb63d8ce6159de5561e11f2c8623da4291ea3da
           args:
             - -N
             - -T
