@@ -140,6 +140,16 @@ $settings = [
     'language_menu_showall' => '0',
 ];
 sqlStatement("DELETE FROM globals WHERE gl_name = 'language_menu_other'");
+// Changelog #172: every account follows the Automatic theme (a theme saved on an account overrides the site's), and
+// OpenEMR opens on the Patient Finder, then the Message Inbox (stock list "Default Open Tabs"; the first active entry
+// is shown; the Calendar tab is turned off). Both take effect at the next login.
+sqlStatement("DELETE FROM user_settings WHERE setting_label = 'global:css_header'");
+foreach (['fin' => [10, 1], 'msg' => [20, 1], 'cal' => [30, 0], 'pat' => [40, 0], 'flb' => [50, 0]] as $id => [$seq, $on]) {
+    sqlStatement("UPDATE list_options SET seq = ?, activity = ? WHERE list_id = 'default_open_tabs' AND option_id = ?",
+                 [$seq, $on, $id]);
+}
+$first = sqlQuery("SELECT option_id FROM list_options WHERE list_id = 'default_open_tabs' AND activity = 1 ORDER BY seq LIMIT 1");
+if (($first['option_id'] ?? '') !== 'fin') { echo "error: Patient Finder is not the first open tab\n"; exit(1); }
 foreach ($settings as $name => $value) {
     sqlStatement("REPLACE INTO globals (gl_name, gl_index, gl_value) VALUES (?, 0, ?)", [$name, $value]);
 }
