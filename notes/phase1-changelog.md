@@ -2958,6 +2958,7 @@ Agent: Claude Code
 - **Changed:** both checks let grep read all of the output (`grep ... >/dev/null` instead of `grep -q`).
 - **Verification:** RPMs signed with a throwaway key in the CentOS Stream 10 build container (the pinned digest): the
   old check failed 2 of 300 runs on correctly signed RPMs; the new one failed 0 of 1000 and still rejects a wrong key
-  ID. `shellcheck -x` passes on both scripts. The next push to main reruns rpms and image (#168 and #172 ship there).
+  ID. The repository's shellcheck hook passes on both scripts (plain `shellcheck` shows only the existing SC1091
+  note that it does not follow `builder.env`). The next push to main reruns rpms and image (#168 and #172 ship there).
 
 Agent: Claude Code
