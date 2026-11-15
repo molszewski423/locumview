@@ -1,0 +1,5 @@
+/* LocumView (changelog #169): OpenEMR's "Automatic" theme. It loads OpenEMR's own rtl_compact_style_light.css or
+   rtl_compact_style_dark.css by the browser's prefers-color-scheme, which Chrome takes from GNOME's appearance setting.
+   OpenEMR lists every public/themes/style_*.css as a theme, so this file is the whole theme. */
+@import url("rtl_compact_style_light.css") not all and (prefers-color-scheme: dark);
+@import url("rtl_compact_style_dark.css") (prefers-color-scheme: dark);

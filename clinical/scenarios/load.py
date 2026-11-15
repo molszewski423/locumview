@@ -107,7 +107,10 @@ echo "ok\n";
 BRANDING_PHP = r"""<?php
 // LocumView's login page branding (changelog #167), with OpenEMR's own settings and logo folders only: the LocumView
 // wordmark (SVG, base64 on stdin; fixed dark colors: OpenEMR's login page has no dark mode) as the primary login logo,
-// OpenEMR's own colored logo as the secondary one, a tagline.
+// OpenEMR's own colored logo as the secondary one, a tagline. Changelog #169: the "Automatic" theme in LocumView's
+// OpenEMR image (light or dark with the system's appearance, and the LocumView login card), the vertical band layout
+// that theme styles, and no language menu on the login page (English only). An older image without the theme falls
+// back to OpenEMR's light theme by itself.
 $_GET['site'] = 'default';
 $ignoreAuth = true;
 require_once '/var/www/localhost/htdocs/openemr/interface/globals.php';
@@ -133,7 +136,10 @@ $settings = [
     'secondary_logo_position' => 'second', 'logo_position' => 'flex-column',
     'primary_logo_width' => 'w-75', 'secondary_logo_width' => 'w-25',
     'display_acknowledgements_on_login' => '1', 'openemr_name' => 'LocumView · OpenEMR',
+    'css_header' => 'style_automatic.css', 'login_page_layout' => 'login/layouts/vertical_band.html.twig',
+    'language_menu_showall' => '0',
 ];
+sqlStatement("DELETE FROM globals WHERE gl_name = 'language_menu_other'");
 foreach ($settings as $name => $value) {
     sqlStatement("REPLACE INTO globals (gl_name, gl_index, gl_value) VALUES (?, 0, ?)", [$name, $value]);
 }

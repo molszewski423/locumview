@@ -2833,3 +2833,27 @@ Agent: Claude Code
   keyring prompt, quick start, EHR login page reached, in the owner's and the demo session).
 
 Agent: Claude Code
+
+## 169. OpenEMR: an "Automatic" light or dark theme and a LocumView login page (2026-11-14)
+
+- **Owner request (#167 follow-up):** a better login page with a graphical background, and OpenEMR following the
+  user's light or dark appearance, ideally from GNOME's setting.
+- **Done, with no OpenEMR file changed:** OpenEMR lists every `public/themes/style_*.css` as a theme, so the OpenEMR
+  image adds `style_automatic.css` (and its compact and right-to-left variants), which imports OpenEMR's own light or
+  dark stylesheet by `prefers-color-scheme`; Chrome takes that from GNOME. The same theme imports
+  `locumview/login.css`, scoped to the login page (a body holding `#login_form`): the desktop's "pulse" wallpaper
+  (an ECG trace ending in the LocumView L) in its light or dark version, the form on a card to the left of the trace,
+  labels above the fields, LocumView teal for the button, and in dark mode a white wordmark and a white OpenEMR logo.
+  Files: `clinical/images/openemr/theme/`, copied in by the Containerfile with the upstream owner and mode.
+- **Loader:** the branding step also sets the theme (`css_header`), the vertical band layout the login card styles,
+  and no language menu on the login page (`language_menu_showall` off, `language_menu_other` cleared: English only).
+  On an OpenEMR image without the theme, OpenEMR falls back to its light theme by itself.
+- **Limits:** a user who picked a theme in OpenEMR's own settings keeps it; choosing "Automatic" there follows the
+  system again. OpenEMR's tab bar keeps its own stylesheet, as it does with OpenEMR's Dark theme.
+- **Verification:** a fresh local OpenEMR with the theme files: the loader's branding step reports success and sets
+  the three settings; headless Chromium screenshots of the login page in light and dark mode (checked by eye, the
+  owner shown both), the failed-login message in both, and the main screen after login, light and dark. `podman
+  build` of the OpenEMR image: the theme files are in place, apache-owned, read-only, as OpenEMR's own themes. Not
+  yet: the image built and signed by CI, pinned and deployed, and the loader run on the cluster.
+
+Agent: Claude Code
