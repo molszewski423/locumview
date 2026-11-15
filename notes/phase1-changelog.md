@@ -2857,3 +2857,53 @@ Agent: Claude Code
   yet: the image built and signed by CI, pinned and deployed, and the loader run on the cluster.
 
 Agent: Claude Code
+
+## 170. A VNC tunnel for the owner's Catalyst desktop (prepared, not applied) (2026-11-14)
+
+- **Owner request:** a Guacamole connection to the owner's persistent Catalyst desktop, the guest that runs the agents
+  (Catalyst ADR 0007). That ADR opens its browser desktop only after an encrypted tunnel, because WayVNC crosses the
+  LAN in the clear (#105) and that desktop holds the agents' credentials. Catalyst's side exists (its #238, docs
+  `vdi-guest.md`, "SSH tunnel"): with a gateway key set, WayVNC listens on the desktop's loopback only, port 5900 stays
+  closed, and the gateway logs in as `vnc-tunnel`, an account with no shell or password that may only forward to
+  `127.0.0.1:5900`, with the gateway pinning the desktop's host key. Owner approved this plan (2026-11-14).
+- **Added (LocumView's side):**
+  - `k8s/locumview/vnc-tunnel.yaml`: its own pod, an OpenSSH client that holds
+    `-L 0.0.0.0:15902:127.0.0.1:5900 vnc-tunnel@<desktop>` open with a pinned host key (`HostKeyAlias=catalyst-vdi3`,
+    `StrictHostKeyChecking=yes`, `BatchMode`, keepalives; if the link drops, ssh exits and the container restarts), and
+    a Service `vnc-tunnel:15902`. Non-root, read-only root file system, no capabilities.
+  - A separate pod rather than a container beside guacd: a missing key or a failing link would otherwise make guacd's
+    pod not ready and take down every desktop connection. guacd to the tunnel pod stays inside the cluster, whose
+    traffic between nodes is encrypted (#49).
+  - `networkpolicy.yaml`: guacd may reach only the tunnel pod's 15902 for this desktop (no rule to the desktop itself);
+    the tunnel pod accepts only guacd and may open SSH only, to the desktop's exact address (site value
+    `CATALYST_VDI3_CIDR`, which also fills in the tunnel's target through `kustomization.yaml` replacements).
+  - `vnc-tunnel/Containerfile`: Alpine pinned by digest with `openssh-client-default` pinned by version, built, signed
+    and attested by `clinical-images.yml` as `locumview-vnc-tunnel`. The Deployment carries a placeholder digest until
+    the first build is pinned.
+  - `vnc-tunnel/new-key.sh`: makes the tunnel's ed25519 key on a per-user tmpfs, encrypts it straight into
+    `secrets/vnc-tunnel.sops.yaml` (Secret `vnc-tunnel-key`) and prints only the public key.
+  - `vnc-tunnel/known_hosts.example`: the desktop's host key goes in the git-ignored `vnc-tunnel/known_hosts`, checked
+    against the fingerprint read on the desktop itself.
+  - `guacamole/upsert-vnc-connection.sh`: `VNC_PORT` (default 5900) and grantees as user groups or `user:<name>`, so
+    the connection can be granted to the owner's account alone (not `catalyst-users`). A rerun now also revokes direct
+    user grants that are not listed.
+- **Limits:** VNC is in the clear inside the tunnel pod and between guacd and that pod (on one node, or encrypted
+  between nodes). The VNC password stays as a second check. If the desktop's host restarts, the desktop waits for its
+  disk passphrase (Catalyst ADR 0007).
+- **Verification:**
+  - The tunnel image built locally and, against a disposable OpenSSH server set up like Catalyst's account (`restrict`,
+    `permitopen="127.0.0.1:5900"`, `PermitOpen`, `ForceCommand /sbin/nologin`) with a stand-in VNC server: another
+    container received `RFB 003.008` through the tunnel's 15902, with the key root-owned, mode 0440, group 1000 as the
+    pod mounts it. A wrong pinned host key was refused ("Host key verification failed"), a forward to another port got
+    nothing, and stopping the server made the tunnel exit (255) for a restart.
+  - `kubectl kustomize` with example site values renders the address into the tunnel's target and both network rules,
+    guacd keeps its one container, and kubeconform passes all 36 resources.
+  - `upsert-vnc-connection.sh` against a temporary Postgres with Guacamole 1.6.0's schema: a group connection on 5900,
+    an owner-only connection on 15902, a removed grant revoked on rerun, a bad port refused; the password shows as
+    `(set)` only.
+  - `new-key.sh` in a throwaway worktree: the Secret file is SOPS-encrypted (the repository's check passes), holds no
+    plain-text key, the tmpfs copy is gone, and a second run refuses to overwrite. That test key was discarded.
+  - Not yet: the image built by CI and pinned, the desktop's address reserved, the Catalyst apply on the desktop, the
+    pinned host key, and the apply on the cluster (all owner steps).
+
+Agent: Claude Code

@@ -1,0 +1,12 @@
+# The VNC tunnel beside guacd (changelog #170): OpenSSH's client only, so guacd reaches a Catalyst desktop's WayVNC
+# through SSH (Catalyst docs/vdi-guest.md, "SSH tunnel") instead of in the clear across the LAN. Built, signed and
+# attested by .gitea/workflows/clinical-images.yml from the repository root:
+#   podman build -f k8s/locumview/vnc-tunnel/Containerfile .
+# Base pinned by digest, package pinned by version; runs as an unprivileged user with ssh as the entrypoint.
+FROM docker.io/library/alpine@sha256:49340b346798875b5592e5d420241f2f9cfba5f47e62ebb1446a1b34734e898f
+RUN apk add --no-cache openssh-client-default=10.0_p1-r11 \
+ && adduser -D -H -u 1000 -s /sbin/nologin tunnel
+USER 1000:1000
+ENTRYPOINT ["/usr/bin/ssh"]
+LABEL org.opencontainers.image.title="LocumView VNC tunnel" \
+      org.opencontainers.image.description="OpenSSH client that carries guacd's VNC to a Catalyst desktop over SSH"

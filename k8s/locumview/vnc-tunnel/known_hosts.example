@@ -1,0 +1,6 @@
+# Copy to known_hosts (git-ignored) with the Catalyst desktop's SSH host key, checked on the desktop itself:
+#   ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub     (on the desktop: compare this fingerprint)
+#   ssh-keyscan -t ed25519 <desktop address> | sed 's/^[^ ]*/catalyst-vdi3/' > k8s/locumview/vnc-tunnel/known_hosts
+#   ssh-keygen -lf k8s/locumview/vnc-tunnel/known_hosts   (must print the same fingerprint)
+# The tunnel names the host "catalyst-vdi3" (HostKeyAlias), so the entry does not depend on the address.
+catalyst-vdi3 ssh-ed25519 <the desktop's host public key>

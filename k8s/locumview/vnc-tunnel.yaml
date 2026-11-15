@@ -1,0 +1,89 @@
+# vnc-tunnel (changelog #170): carries Guacamole's VNC to the owner's Catalyst desktop over SSH, so VNC never crosses
+# the LAN in the clear (Catalyst docs/vdi-guest.md, "SSH tunnel"; Catalyst ADR 0007). An OpenSSH client logs in as
+# Catalyst's restricted account vnc-tunnel, which may only forward to the desktop's own 127.0.0.1:5900, and listens on
+# port 15902 in this pod; only guacd may connect to it (networkpolicy.yaml). The Guacamole connection points at
+# vnc-tunnel:15902. Its own pod, apart from guacd, so a missing key or a failing link affects this desktop only.
+# Key: Secret vnc-tunnel-key (secrets/vnc-tunnel.sops.yaml, made by vnc-tunnel/new-key.sh). The desktop's host key is
+# pinned (vnc-tunnel/known_hosts, git-ignored, checked on the desktop). If the link drops, ssh exits and restarts.
+apiVersion: v1
+kind: Service
+metadata:
+  name: vnc-tunnel
+  namespace: locumview
+  labels: {app.kubernetes.io/name: vnc-tunnel, app.kubernetes.io/part-of: locumview}
+spec:
+  selector: {app.kubernetes.io/name: vnc-tunnel}
+  ports: [{name: vnc, port: 15902, targetPort: vnc}]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vnc-tunnel
+  namespace: locumview
+  labels: {app.kubernetes.io/name: vnc-tunnel, app.kubernetes.io/part-of: locumview}
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app.kubernetes.io/name: vnc-tunnel}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/name: vnc-tunnel, app.kubernetes.io/part-of: locumview}
+    spec:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000   # the key: root-owned and group-readable, so ssh (uid 1000) reads it and accepts its mode
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: ssh
+          # Built and signed by clinical-images.yml (k8s/locumview/vnc-tunnel/Containerfile); pinned after the first build.
+          image: git.lan/mike/locumview-vnc-tunnel@sha256:0000000000000000000000000000000000000000000000000000000000000000
+          args:
+            - -N
+            - -T
+            - -F
+            - /dev/null
+            - -i
+            - /keys/id_ed25519
+            - -o
+            - IdentitiesOnly=yes
+            - -o
+            - BatchMode=yes
+            - -o
+            - StrictHostKeyChecking=yes
+            - -o
+            - UserKnownHostsFile=/known/known_hosts
+            - -o
+            - HostKeyAlias=catalyst-vdi3
+            - -o
+            - ExitOnForwardFailure=yes
+            - -o
+            - ServerAliveInterval=15
+            - -o
+            - ServerAliveCountMax=3
+            - -o
+            - ConnectTimeout=10
+            - -L
+            - 0.0.0.0:15902:127.0.0.1:5900
+            - vnc-tunnel@CATALYST_VDI3_ADDRESS   # args[26]: kustomization.yaml replacements
+          ports: [{name: vnc, containerPort: 15902}]
+          readinessProbe:
+            tcpSocket: {port: vnc}
+            periodSeconds: 10
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          volumeMounts:
+            - {name: key, mountPath: /keys, readOnly: true}
+            - {name: known-hosts, mountPath: /known, readOnly: true}
+          resources: {requests: {cpu: 5m, memory: 8Mi}, limits: {memory: 64Mi}}
+      volumes:
+        - name: key
+          secret: {secretName: vnc-tunnel-key, defaultMode: 0440}   # pragma: allowlist secret (the Secret's name, not a value)
+        - name: known-hosts
+          configMap: {name: vnc-tunnel-known-hosts}
