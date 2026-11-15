@@ -2817,3 +2817,19 @@ Agent: Claude Code
   checked by eye, in light and in dark mode. Local OpenEMR destroyed.
 
 Agent: Claude Code
+
+## 168. EHR browser without the GNOME keyring (2026-11-14)
+
+- **Found (owner, on the demo desktop):** opening the EHR showed two GNOME keyring unlock prompts and a slow start.
+  Chrome keeps the key that encrypts its local profile data in the login keyring; the demo's always-on session starts
+  without a password, so the keyring stays locked and Chrome waits on it at every start.
+- **Changed (owner approved):** the EHR launcher (`ehr-browser`, RPM `locumview-ehr-launcher`) starts Chrome with
+  `--password-store=basic`, so Chrome does not use the keyring, for every account.
+- **Trade-off:** small. The managed policies already turn Chrome's password manager off and keep cookies to the session
+  (`PasswordManagerEnabled` false, `DefaultCookiesSetting` 4). What the keyring key protected is the remaining local
+  profile data, which is now protected by the home directory's permissions and the disk encryption bound to the TPM.
+  Data an earlier start encrypted with the keyring key becomes unreadable to Chrome; it holds nothing kept on purpose.
+- **Verification:** shellcheck and the hooks pass; the RPM builds. On a desktop: Planned, with the next image (no
+  keyring prompt, quick start, EHR login page reached, in the owner's and the demo session).
+
+Agent: Claude Code
