@@ -87,6 +87,9 @@ spec:
       ports: [{protocol: TCP, port: 22}]
     - to: [{ipBlock: {cidr: CATALYST_VDI2_CIDR}}]  # egress[3]: kustomization.yaml replacements
       ports: [{protocol: TCP, port: 22}]
+    # The owner's Catalyst desktop through the vnc-tunnel pod only (changelog #170): no rule reaches that desktop itself.
+    - to: [{podSelector: {matchLabels: {app.kubernetes.io/name: vnc-tunnel}}}]
+      ports: [{protocol: TCP, port: 15902}]
 ---
 # Keycloak: serves Guacamole's server-side JWKS fetch (browsers reach it via port-forward now, the tunnel later).
 apiVersion: networking.k8s.io/v1
@@ -157,3 +160,18 @@ spec:
   ingress:
     - from: [{podSelector: {matchLabels: {app.kubernetes.io/name: cloudflared}}}]
       ports: [{protocol: TCP, port: 8080}]
+---
+# vnc-tunnel (changelog #170): accepts VNC from guacd only; may open SSH to the owner's Catalyst desktop only, by exact
+# address (site value CATALYST_VDI3_CIDR). The desktop's WayVNC listens on its own loopback, reached through SSH.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: vnc-tunnel, namespace: locumview}
+spec:
+  podSelector: {matchLabels: {app.kubernetes.io/name: vnc-tunnel}}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from: [{podSelector: {matchLabels: {app.kubernetes.io/name: guacd}}}]
+      ports: [{protocol: TCP, port: 15902}]
+  egress:
+    - to: [{ipBlock: {cidr: CATALYST_VDI3_CIDR}}]   # egress[0]: kustomization.yaml replacements
+      ports: [{protocol: TCP, port: 22}]

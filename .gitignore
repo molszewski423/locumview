@@ -39,6 +39,7 @@ __pycache__/
 
 # Site-specific values (addresses, host names); see site.env.example files
 site.env
+k8s/locumview/vnc-tunnel/known_hosts
 
 # STIG run logs and scan results (contain host addresses)
 locumview-stig-*.log

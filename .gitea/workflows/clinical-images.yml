@@ -1,5 +1,6 @@
 # Build, push, sign and attest the Phase 9 lite clinical images (k8s/clinical/): OpenEMR with LocumView's fixes, and
-# the clinical app with its gateway, and the agent service (rules). The same runner, key and formats as the desktop image (image.yml): signatures and
+# the clinical app with its gateway, and the agent service (rules); also the access layer's VNC tunnel (changelog #170).
+# The same runner, key and formats as the desktop image (image.yml): signatures and
 # SBOM attestations in cosign's classic format, signed offline with the project key; verify with
 #   cosign verify --key image/desktop/signing/cosign.pub --insecure-ignore-tlog git.lan/mike/<image>@<digest>
 # Each build is pushed as :<commit> and :testing. A deployment pins a digest in k8s/clinical/kustomization.yaml.
@@ -14,6 +15,7 @@ name: clinical-images
       - clinical/spike/patches/**
       - clinical/agent/**
       - clinical/scenarios/citations.json
+      - k8s/locumview/vnc-tunnel/Containerfile
       - .gitea/workflows/clinical-images.yml
   workflow_dispatch:
 
@@ -28,6 +30,8 @@ jobs:
           - {name: locumview-openemr, containerfile: clinical/images/openemr/Containerfile}
           - {name: locumview-clinical-gateway, containerfile: clinical/images/gateway/Containerfile}
           - {name: locumview-clinical-agent, containerfile: clinical/images/agent/Containerfile}
+          # The access layer's VNC tunnel to the owner's Catalyst desktop (k8s/locumview/vnc-tunnel.yaml, changelog #170).
+          - {name: locumview-vnc-tunnel, containerfile: k8s/locumview/vnc-tunnel/Containerfile}
     concurrency:
       group: clinical-image-${{ matrix.name }}
       cancel-in-progress: false
