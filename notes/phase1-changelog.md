@@ -2923,3 +2923,25 @@ Agent: Claude Code
   the theme. The tunnel waits for the Catalyst desktop's steps (#170).
 
 Agent: Claude Code
+
+## 172. OpenEMR opens on the Patient Finder; every account follows the Automatic theme; the EHR window starts maximized (2026-11-14)
+
+- **Owner feedback (after #171 on lv-test17):** the login page follows GNOME's light and dark, but OpenEMR itself
+  stayed light after login; the window cut the page off at the side; OpenEMR should open on the patient finder, not
+  the calendar.
+- **Found:** each account had a theme saved on it (`user_settings` `global:css_header`: two light, one dark), which
+  overrides the site's Automatic theme. In OpenEMR 8.4.1 the tabs that open at login come from the stock list "Default
+  Open Tabs" (the first active entry is shown), not from a setting. Chrome reopens its last window size.
+- **Changed:**
+  - Loader branding step (`clinical/scenarios/load.py`): removes theme choices saved on accounts, so every account
+    follows Automatic (an account can still choose a theme; the next loader run clears it), and sets the open tabs:
+    Patient Finder first, Message Inbox second, Calendar, Patient Search / Add and Flow Board off. It checks that the
+    Patient Finder comes first. Both take effect at the next login.
+  - EHR launcher (`ehr-browser`): `--start-maximized`; ships with the next desktop image, with #168.
+- **Verification:** a fresh local OpenEMR with a saved light theme on its account: the branding step reports success
+  twice (idempotent), leaves no saved theme and the list in that order; a headless Chromium login opens the tabs
+  "Patient Finder" (shown) and "Message Center". Local OpenEMR destroyed. The launcher flag is not yet tested on a
+  desktop: it can be tried before the image, since the launcher passes extra arguments to Chrome
+  (`/usr/libexec/locumview/ehr-browser --start-maximized`).
+
+Agent: Claude Code

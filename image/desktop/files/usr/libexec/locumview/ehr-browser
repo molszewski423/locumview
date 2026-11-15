@@ -6,7 +6,8 @@
 # always-on session) has a locked keyring, and Chrome waited on it with two unlock prompts at every start. The policies
 # turn the password manager off and keep cookies to the session, so the keyring protected little; the profile stays
 # under the user's home directory on the TPM-bound encrypted disk.
+# --start-maximized (#172): OpenEMR's menu and pages need the full width; Chrome otherwise reopens its last window size.
 EHR_URL=file:///usr/share/locumview/ehr/index.html
 # shellcheck source=/dev/null
 [ -r /etc/locumview/ehr.conf ] && . /etc/locumview/ehr.conf
-exec /usr/bin/google-chrome-stable --app="$EHR_URL" --class=locumview-ehr --no-first-run --no-default-browser-check --password-store=basic "$@"
+exec /usr/bin/google-chrome-stable --app="$EHR_URL" --class=locumview-ehr --no-first-run --no-default-browser-check --password-store=basic --start-maximized "$@"
