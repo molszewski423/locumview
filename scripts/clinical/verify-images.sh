@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Owner run (operator-laptop), before kubectl apply -k k8s/clinical: verify every image pinned in
-# k8s/clinical/kustomization.yaml against the project's public key, the same checks clinical-images.yml runs after a
+# k8s/clinical/kustomization.yaml, and the project's own images pinned in k8s/locumview/*.yaml, against the project's public key, the same checks clinical-images.yml runs after a
 # build: the signature and the SPDX SBOM attestation. Exits non-zero if any image fails or none is found. Needs cosign
 # and read access to the registry; uses only the public key.
 #   scripts/clinical/verify-images.sh
@@ -14,6 +14,8 @@ mapfile -t refs < <(awk '
   in_images && $1 == "-" && $2 == "name:" {name = $3}
   in_images && $1 == "digest:" {print name "@" $2}
 ' k8s/clinical/kustomization.yaml)
+# The project's own images in the access layer, pinned in their manifests (the VNC tunnel, changelog #171).
+mapfile -t -O "${#refs[@]}" refs < <(grep -ho 'git\.lan/mike/locumview-[a-z0-9-]*@sha256:[0-9a-f]\{64\}' k8s/locumview/*.yaml | sort -u)
 [[ ${#refs[@]} -gt 0 ]] || { echo "no images found in k8s/clinical/kustomization.yaml" >&2; exit 1; }
 failed=0
 for ref in "${refs[@]}"; do
