@@ -3028,3 +3028,19 @@ Agent: Claude Code
   start, until the desktop allows it.
 
 Agent: Claude Code
+
+## 177. Sound on the owner's Catalyst desktop works (owner runs, 2026-11-16)
+
+- **Applied (owner runs):** #176 on the cluster (the tunnel pod's second forward, Service port, NetworkPolicies);
+  Catalyst #273 on the desktop with `devalpine_vdi_audio: true` (`failed=0`), the session's PipeWire restarted; the
+  connection rerun with `VNC_AUDIO_SERVER=tcp:vnc-tunnel:14713`. On the desktop: the default sink is
+  `catalyst-vdi-output` and pipewire-pulse listens on `127.0.0.1:4713` only.
+- **Found:** no sound at first. guacd logged "PulseAudio connection failed" and the tunnel pod "channel 3: open
+  failed: administratively prohibited": the pod had logged in before the desktop's apply, and sshd fixes a key's
+  `permitopen` options at login. Restarting the pod (`kubectl -n locumview rollout restart deploy/vnc-tunnel`) made it
+  log in again with the new options. Rule: after the desktop changes what the tunnel key may forward, restart the
+  tunnel pod.
+- **Verified (owner):** a video in Chromium on the desktop is heard in the browser through Guacamole. No microphone,
+  as designed.
+
+Agent: Claude Code
