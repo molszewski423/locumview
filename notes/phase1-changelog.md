@@ -3527,3 +3527,15 @@ Agent: Claude Code
   load added none, and her FHIR read-back matched the recorded fixture (codes, start dates, status).
 
 Agent: Claude Code
+
+## 203. The agent and gateway images with O3 pinned (2026-11-16)
+
+- **Images:** clinical-images run 885 for the merge of #201 and #202 (commit 9e85e6c); its Verify step checked each
+  signature and SBOM attestation. Agent `sha256:0ebe7b01…` (pulled: knowledge base 0.11.0, `missing_bowel_regimen`);
+  gateway `sha256:f71e2fc9…` (pulled: the "Opioid without a bowel regimen" label).
+- **Deploy (owner run):** `scripts/clinical/verify-images.sh`; `kubectl diff -k k8s/clinical` (the agent's and the
+  gateway's images); `kubectl apply -k k8s/clinical`; rollout status for agent and gateway; then
+  `scripts/clinical/load-scenarios.sh` (Mira and Cyrus Casebook with photographs; the senna orders added to Yara and
+  Bram Casebook) and a new baseline straight away.
+
+Agent: Claude Code

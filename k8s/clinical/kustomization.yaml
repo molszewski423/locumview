@@ -22,13 +22,13 @@ images:
     # with the menu buttons' hover fix (#195); signature and SBOM attestation verified by CI 2026-11-16
     digest: sha256:24537d4d40b7074ce58bc1a1d63a4e933294129a5d78a7d92f2366d50777f6cc
   - name: git.lan/mike/locumview-clinical-gateway
-    # commit 64ae70d, clinical-images (Gitea run 873): the app's Opioid Stewardship tab and labels (#198); signature
-    # and SBOM attestation verified by CI 2026-11-16
-    digest: sha256:0f362f73570c533a59ae0ac10b610120b5aa827ae095cdd511ca411322a97eb1
+    # commit 9e85e6c, clinical-images (Gitea run 885): the app's bowel regimen label (#201); signature and SBOM attestation
+    # verified by CI 2026-11-16
+    digest: sha256:f71e2fc922333f715d06c9f03d53ea9c216a798c674b8a7a8e3e7ed6108152eb
   - name: git.lan/mike/locumview-clinical-agent
-    # commit 64ae70d, clinical-images (Gitea run 873): knowledge base 0.10.0, the opioid stewardship rule and orders only
-    # (#198), the explanation memory (#193); signature and SBOM attestation verified by CI 2026-11-16
-    digest: sha256:aa5bc93c3262277a311be34b8ccd5ea2a07c267a2a2865e382dc50ece49bb820
+    # commit 9e85e6c, clinical-images (Gitea run 885): knowledge base 0.11.0 and the bowel regimen rule (#201); signature
+    # and SBOM attestation verified by CI 2026-11-16
+    digest: sha256:0ebe7b0126478b60c2a5863f0627658949480a28e3730e550b02ec50de3cec9e
 
 # Site values (not secret, but site-specific): read from site.env by the replacements below and never applied.
 configMapGenerator:
