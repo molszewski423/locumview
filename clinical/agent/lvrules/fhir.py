@@ -72,6 +72,8 @@ def from_fhir(resources: list[dict], kb: Knowledge, local_tz: str) -> Snapshot:
 
     prescriptions = []
     for m in by_type.get("MedicationRequest", []):
+        if m.get("intent", "order") != "order":
+            continue    # the home medication list (intent plan): the rules read inpatient orders only (#198)
         dosage = (m.get("dosageInstruction") or [{}])[0]
         bounds = ((dosage.get("timing") or {}).get("repeat") or {}).get("boundsPeriod") or {}
         start = bounds.get("start") or m.get("authoredOn")

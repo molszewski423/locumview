@@ -53,6 +53,11 @@ class ServiceTests(unittest.TestCase):
         self.assertEqual(self.post({"resources": fixture("cap-levofloxacin-ivpo-01"), "modules": ["triage"]}).status_code,
                          422)
 
+    def test_opioid_module_returns_the_benzodiazepine_finding(self):
+        reply = self.post({"resources": fixture("opioid-lorazepam-postop-01"), "modules": ["opioid"]})
+        (f,) = reply.json()["findings"]
+        self.assertEqual((f["module"], f["type"], f["drug"]), ("opioid", "opioid-benzodiazepine", "Lorazepam"))
+
     def test_ade_module_returns_the_duplicate_anticoagulation_finding(self):
         reply = self.post({"resources": fixture("anticoag-apixaban-heparin-duplicate-01"), "modules": ["ade"]})
         (f,) = reply.json()["findings"]
@@ -85,7 +90,7 @@ class ServiceTests(unittest.TestCase):
             create_app(Knowledge.load(), CITATIONS, "Mars/Olympus_Mons")
 
     def test_health_reports_the_knowledge_version(self):
-        self.assertEqual(self.client.get("/healthz").json(), {"status": "ok", "knowledge_version": "0.9.0"})
+        self.assertEqual(self.client.get("/healthz").json(), {"status": "ok", "knowledge_version": "0.10.0"})
 
     def test_no_api_documentation_is_served(self):
         for path in ("/docs", "/redoc", "/openapi.json"):

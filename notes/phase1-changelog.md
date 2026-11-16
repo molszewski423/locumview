@@ -3391,3 +3391,65 @@ Agent: Claude Code
 - **Deploy:** CI builds the OpenEMR image on merge; a follow-up pins it.
 
 Agent: Claude Code
+
+## 196. Opioid stewardship module: plan (2026-11-16)
+
+- **Owner request (2026-11-16):** an opioid stewardship tab in LocumView Clinical. Plan in
+  `docs/plans/opioid-stewardship.md`: seven candidate rules (O1 opioid with a benzodiazepine, O2 no naloxone with risk
+  factors, O3 no bowel regimen, O4 high daily MME, O5 extended-release opioid in an opioid-naive patient, O6 therapeutic
+  duplication, O7 renally cleared opioids), their data needs and the primary sources to read; nothing built.
+- **Found while planning:** OpenEMR's FHIR prescriptions read back with the route only; it returns a dose and a
+  frequency only for orders with a structured size, unit and interval, which the loader does not send, and it
+  truncates the dose to a whole number (`intval`). Dose-based rules wait for a loader change and an OpenEMR patch,
+  checked on the spike first. Home medications and orders both reach FHIR as `MedicationRequest` (intent `plan` and
+  `order`), which is why the app lists Thea Casebook's apixaban twice.
+- **Checked:** the CDC 2022 opioid guideline's PubMed metadata (PMID 36327391, MMWR Recomm Rep 2022;71(3):1-95). Its
+  content, the FDA safety communications and the labels are still to read.
+- **Owner decisions needed:** listed at the end of the plan (scope, O1's second drug class, O3 on consensus, O4's
+  counting and thresholds, O1 first).
+
+Agent: Claude Code
+
+## 197. The OpenEMR image with the menu hover fix pinned (2026-11-16)
+
+- **Image:** clinical-images run 867 for the merge of #195 (commit 944a310),
+  `sha256:24537d4d40b7074ce58bc1a1d63a4e933294129a5d78a7d92f2366d50777f6cc`; its Verify step checked the signature and
+  the SBOM attestation. Pulled by digest: asset version 8202, `menu.css?v=8202` in the theme, the section hover cleared.
+- **Deploy (owner run):** `scripts/clinical/verify-images.sh`; `kubectl diff -k k8s/clinical` (only OpenEMR's image);
+  `kubectl apply -k k8s/clinical` and `kubectl -n clinical rollout status deploy/openemr`; sign the desktops' EHR out and
+  in. This branch also carries #196 (the opioid plan), so the changelog stays in order.
+
+Agent: Claude Code
+
+## 198. Opioid stewardship's first rule: an opioid with a benzodiazepine or gabapentinoid (prepared, review pending) (2026-11-16)
+
+- **Owner decisions (2026-11-16):** inpatient orders only; O1 covers benzodiazepines and gabapentinoids; O1 first. The
+  plan (#196) records them.
+- **Orders only:** the FHIR adapter now skips `MedicationRequest` with intent `plan`, OpenEMR's home medication list
+  (in the live chart these start 2026-01-01 and were read as active prescriptions by every rule). The case files never
+  held home medications, so the tests and the runtime now agree. A test adds a home lorazepam to a fixture: silent as
+  `plan`, a finding as `order`.
+- **Rule `opioid-cns-depressant` (module `opioid`, shown as Opioid Stewardship):** an active opioid order with an active
+  benzodiazepine or gabapentinoid order; one finding per sedative, named after it, of type `opioid-benzodiazepine` or
+  `opioid-gabapentinoid`, each with its own references and reviewed reason. Knowledge base 0.10.0: oxycodone,
+  hydromorphone, morphine, lorazepam, alprazolam, diazepam, gabapentin and pregabalin with a `class`; RxNorm products
+  checked in RxNav 2026-11-16 (all active SCDs).
+- **Sources (read 2026-11-16 on DailyMed, `content_check: pending`):** Roxicodone boxed warning and 5.3 (opioids with
+  benzodiazepines or other CNS depressants, gabapentinoids named, may cause profound sedation, respiratory depression,
+  coma and death; reserve for inadequate alternatives); Ativan boxed warning and Warnings (lowest effective dosages,
+  minimum durations, monitoring); Neurontin 5.8 and Lyrica 5.4 (respiratory depression with CNS depressants,
+  particularly opioids; monitor, consider a low starting dose).
+- **Cases (pending review), with photographs:** `opioid-lorazepam-postop-01`, a 62-year-old woman after ankle fracture
+  fixation on as-needed oxycodone and hydromorphone, given lorazepam for insomnia on the first night (finding:
+  Lorazepam); `opioid-gabapentin-preop-negative-01`, a 70-year-old man after knee replacement whose single preoperative
+  gabapentin dose has ended, on oxycodone alone (no finding). ICD-10-CM checked in NLM Clinical Tables. Portraits made
+  with `portraits.py` and reviewed by eye; the first portrait of the woman looked older than 62 and was regenerated
+  with a lighter hair description.
+- **App and service:** an Opioid Stewardship tab, the two type labels; the service accepts `opioid`.
+- **Verified:** `check_cases.py` 30 cases ok; `test_rules.py` 62 tests (FHIR fixtures for both cases from the spike,
+  six boundary tests); agent service, explain and rule tests 94 OK in the CI requirements; the app's 16 tests and build
+  in the CI's Node image; the real gemma4:26b explained the finding (guard passed, "respiratory" kept).
+- **Owner review needed:** both cases and reference answers; the two reviewed reasons; naming the sedative rather than
+  the opioid; treating the class wording of the lorazepam label as standing for alprazolam and diazepam.
+
+Agent: Claude Code

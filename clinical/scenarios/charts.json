@@ -1834,5 +1834,99 @@
    "immunizations": [],
    "why": "Port placed in June for chemotherapy; apixaban since the September femoral vein thrombosis."
   }
+ },
+ "opioid-lorazepam-postop-01": {
+  "demographics": {
+   "race": [
+    "2054-5"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "77 Maple Terrace",
+   "city": "Holyoke",
+   "state": "MA",
+   "postal_code": "01040",
+   "phone_home": "555-733-4182",
+   "marital": "D",
+   "language": "en",
+   "portrait": "shoulder-length curly black hair with a few gray strands, smooth skin"
+  },
+  "emergency_contact": {
+   "name": "Imani Casebook",
+   "relationship": "Daughter",
+   "phone": "555-733-9054"
+  },
+  "insurance": "Commercial",
+  "history": {
+   "problems": [
+    {
+     "title": "Essential hypertension",
+     "icd10": "I10"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "lisinopril 10 MG Oral Tablet",
+     "rxnorm": "314076",
+     "dose": "10 mg daily"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "1 glass of wine a week",
+   "social": "divorced, lives alone in a second-floor apartment; school bus dispatcher",
+   "immunizations": [],
+   "why": "No home sedatives or opioids: the lorazepam is new in hospital, for insomnia on the first night after surgery."
+  }
+ },
+ "opioid-gabapentin-preop-negative-01": {
+  "demographics": {
+   "race": [
+    "2106-3"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "12 Quarry Road",
+   "city": "Westfield",
+   "state": "MA",
+   "postal_code": "01085",
+   "phone_home": "555-562-3307",
+   "marital": "M",
+   "language": "en",
+   "portrait": "thinning gray hair, clean-shaven, wire-rimmed glasses"
+  },
+  "emergency_contact": {
+   "name": "Helen Casebook",
+   "relationship": "Spouse",
+   "phone": "555-562-8841"
+  },
+  "insurance": "Medicare",
+  "history": {
+   "problems": [
+    {
+     "title": "Primary osteoarthritis of right knee",
+     "icd10": "M17.11"
+    },
+    {
+     "title": "Gastro-esophageal reflux disease",
+     "icd10": "K21.9"
+    }
+   ],
+   "home_medications": [],
+   "allergies": [],
+   "tobacco": {
+    "status": "former",
+    "note": "Quit 1990"
+   },
+   "alcohol": "2 beers on weekends",
+   "social": "married, lives with wife in a single-story house; retired postal carrier",
+   "immunizations": [],
+   "why": "Opioid-naive before surgery; gabapentin was a single enhanced recovery dose, not a home medication."
+  }
  }
 }

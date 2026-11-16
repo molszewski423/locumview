@@ -41,6 +41,8 @@ export const TYPE_LABELS: Record<string, string> = {
   "redundant-coverage": "Redundant coverage",
   "duration-review": "Duration review",
   "duplicate-anticoagulation": "Duplicate anticoagulation",
+  "opioid-benzodiazepine": "Opioid with a benzodiazepine",
+  "opioid-gabapentinoid": "Opioid with a gabapentinoid",
 };
 
 export interface Explanation {

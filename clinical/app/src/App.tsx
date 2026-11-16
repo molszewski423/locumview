@@ -11,6 +11,7 @@ const MODULES = [
   { id: "stewardship", name: "Antimicrobial Stewardship" },
   { id: "iv-to-po", name: "IV to PO" },
   { id: "ade", name: "ADE Monitoring" },
+  { id: "opioid", name: "Opioid Stewardship" },
 ] as const;
 type View = "home" | "patient" | (typeof MODULES)[number]["id"];
 

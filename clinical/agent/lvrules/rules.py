@@ -1,4 +1,4 @@
-"""Deterministic rules for the stewardship, IV to PO and ADE monitoring modules (ADR 0017: rules decide, the model only explains).
+"""Deterministic rules for the stewardship, IV to PO, ADE monitoring and opioid stewardship modules (ADR 0017: rules decide, the model only explains).
 
 Each rule reads a Snapshot and the knowledge base and returns findings. A finding carries the data it rests on
 (evidence) and the references in clinical/scenarios/citations.json it cites, so the explanation step can only restate
@@ -324,8 +324,37 @@ def duplicate_anticoagulation(s: Snapshot, kb: Knowledge) -> list[Finding]:
                      [f"Active: {p.text}, started {p.start}" for p in active])]
 
 
+def opioid_cns_depressant(s: Snapshot, kb: Knowledge) -> list[Finding]:
+    """An active opioid order with an active benzodiazepine or gabapentinoid order (opioid stewardship, #198). One
+    finding per sedative, named after it: in opioid stewardship it is the drug to question."""
+    active = s.active_ade()
+    opioids = sorted({kb.display(p.ade_agent).lower() for p in active if kb.drug_class(p.ade_agent) == "opioid"})
+    if not opioids:
+        return []
+    out = []
+    for p in sorted(active, key=lambda p: p.ade_agent or ""):
+        cls = kb.drug_class(p.ade_agent)
+        if cls not in ("benzodiazepine", "gabapentinoid") or any(f.drug == kb.display(p.ade_agent) for f in out):
+            continue
+        with_ = " and ".join(opioids)
+        if cls == "benzodiazepine":
+            summary = (f"{kb.display(p.ade_agent)} is active with {with_}: an opioid with a benzodiazepine. Confirm both "
+                       f"are needed; if so, use the lowest effective doses and watch for sedation and respiratory depression.")
+            refs = ("fda-oxycodone-label", "fda-lorazepam-label")
+        else:
+            summary = (f"{kb.display(p.ade_agent)} is active with {with_}: an opioid with a gabapentinoid. Watch for "
+                       f"sedation and respiratory depression, and start the gabapentinoid at a low dose.")
+            refs = ("fda-oxycodone-label", "fda-gabapentin-label", "fda-pregabalin-label")
+        evidence = [f"Active: {q.text}, started {q.start}" for q in active
+                    if q is p or kb.drug_class(q.ade_agent) == "opioid"]
+        out.append(_finding(kb, "opioid-cns-depressant", f"opioid-{cls}", p.ade_agent, summary, evidence,
+                            variant=cls, refs=refs))
+    return out
+
+
 RULES = (bug_drug_mismatch, ampc_third_generation_cephalosporin, mssa_vancomycin, meningitis_listeria,
-         double_anaerobic_coverage, duration_review, iv_to_po_switch, duplicate_anticoagulation)
+         double_anaerobic_coverage, duration_review, iv_to_po_switch, duplicate_anticoagulation,
+         opioid_cns_depressant)
 
 
 def evaluate(s: Snapshot, kb: Knowledge, modules: set[str] | None = None) -> list[Finding]:

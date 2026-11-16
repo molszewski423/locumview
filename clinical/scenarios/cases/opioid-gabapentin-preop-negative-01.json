@@ -1,0 +1,119 @@
+{
+  "schema": "locumview-case/1",
+  "id": "opioid-gabapentin-preop-negative-01",
+  "version": "0.1.0",
+  "title": "Oxycodone after knee replacement; a single preoperative gabapentin dose is not a combination",
+  "kind": "negative-control",
+  "modules": [
+    "opioid"
+  ],
+  "provenance": {
+    "source": "synthetic",
+    "author": "Claude Code (draft for owner review)",
+    "created": "2026-11-16",
+    "clinical_review": {
+      "status": "pending"
+    }
+  },
+  "story": "A 70-year-old man has an elective right total knee arthroplasty. As part of the enhanced recovery pathway he receives one dose of gabapentin 300 mg on the evening before surgery, with no further gabapentin ordered. After surgery he has oxycodone 5 mg by mouth every 4 hours as needed and scheduled acetaminophen. On the first postoperative morning only the oxycodone and acetaminophen are active.",
+  "patient": {
+    "family": "Casebook",
+    "given": "Bram",
+    "birth_date": "1956-02-08",
+    "sex": "male"
+  },
+  "encounter": {
+    "class_code": "IMP",
+    "start": "2026-11-13T18:00:00-05:00",
+    "reason": "Elective right knee replacement"
+  },
+  "problems": [
+    {
+      "title": "Primary osteoarthritis of right knee",
+      "diagnosis": "ICD10:M17.11",
+      "begdate": "2021-08-19"
+    },
+    {
+      "title": "Presence of right artificial knee joint",
+      "diagnosis": "ICD10:Z96.651",
+      "begdate": "2026-11-14"
+    },
+    {
+      "title": "Gastro-esophageal reflux disease",
+      "diagnosis": "ICD10:K21.9",
+      "begdate": "2015-03-02"
+    }
+  ],
+  "allergies": [],
+  "prescriptions": [
+    {
+      "drug": "gabapentin 300 MG Oral Capsule",
+      "rxnorm": "310431",
+      "start": "2026-11-13",
+      "end": "2026-11-14",
+      "route": "PO",
+      "instructions": "300 mg by mouth once, the evening before surgery (enhanced recovery pathway)"
+    },
+    {
+      "drug": "oxycodone hydrochloride 5 MG Oral Tablet",
+      "rxnorm": "1049621",
+      "start": "2026-11-14",
+      "route": "PO",
+      "instructions": "5 mg by mouth every 4 hours as needed for pain"
+    },
+    {
+      "drug": "acetaminophen 500 MG Oral Tablet",
+      "rxnorm": "198440",
+      "start": "2026-11-14",
+      "route": "PO",
+      "instructions": "1,000 mg by mouth every 8 hours"
+    }
+  ],
+  "vitals": [
+    {
+      "taken": "2026-11-13T18:10:00-05:00",
+      "temperature_f": 98.0,
+      "pulse": 70,
+      "bps": 138,
+      "bpd": 80,
+      "respiration": 14,
+      "oxygen_saturation": 98
+    },
+    {
+      "taken": "2026-11-15T07:00:00-05:00",
+      "temperature_f": 98.9,
+      "pulse": 82,
+      "bps": 128,
+      "bpd": 74,
+      "respiration": 16,
+      "oxygen_saturation": 96
+    }
+  ],
+  "labs": [
+    {
+      "order_code": "LV-BMP",
+      "order_text": "Basic labs",
+      "collected": "2026-11-15T05:30:00-05:00",
+      "resulted": "2026-11-15T06:30:00-05:00",
+      "results": [
+        {
+          "loinc": "2160-0",
+          "text": "Creatinine [Mass/volume] in Serum or Plasma",
+          "value": "0.9",
+          "units": "mg/dL",
+          "range": "0.5-1.1",
+          "flag": "N"
+        }
+      ]
+    }
+  ],
+  "expected_findings": [],
+  "reference_answer": "No change for this rule: the single preoperative gabapentin dose has ended, so oxycodone is the only CNS depressant now ordered. Continue multimodal analgesia and the usual postoperative monitoring.",
+  "rationale": "A near miss for the opioid with a sedative rule: gabapentin is on the chart, but as one preoperative dose that ended before the newest charted day. The rule reads orders active on that day and must stay silent.",
+  "citations": [
+    {
+      "ref": "fda-gabapentin-label",
+      "supports": "5.8: the risk is from gabapentin coadministered with opioids; a dose that has ended is not coadministration. Read in the label, owner review pending."
+    }
+  ]
+}
