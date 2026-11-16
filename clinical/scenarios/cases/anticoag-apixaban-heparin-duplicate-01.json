@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "anticoag-apixaban-heparin-duplicate-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Apixaban continued and heparin prophylaxis added: two anticoagulants",
   "kind": "finding",
   "modules": [
@@ -12,7 +12,10 @@
     "author": "Claude Code (draft for owner review)",
     "created": "2026-11-16",
     "clinical_review": {
-      "status": "pending"
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-16",
+      "notes": "Owner approved 2026-11-16 the four review points of changelog #187 as presented: the case and its reference answer, the reviewed reason, a 300 unit lock flush as not systemic, and naming the parenteral drug on a same-day start. The basis is the Eliquis label text quoted in #187 (2.5, 5.2, 7.3), read by Claude Code on DailyMed; the owner did not report reading the label."
     }
   },
   "story": "A 74-year-old woman with permanent atrial fibrillation on apixaban 5 mg twice daily is admitted with an exacerbation of heart failure. Her home apixaban is continued, and the admission order set also adds heparin 5,000 units subcutaneously every 8 hours for VTE prophylaxis. Both are active the next morning. Weight 72 kg, creatinine 1.0 mg/dL, platelets and hemoglobin stable.",
@@ -143,7 +146,7 @@
   "citations": [
     {
       "ref": "fda-apixaban-label",
-      "supports": "Concomitant heparin increases bleeding risk on apixaban (5.2, 7.3); switching stops one anticoagulant and starts the other at the next dose, without overlap (2.5). Content read in the label, owner review pending."
+      "supports": "Concomitant heparin increases bleeding risk on apixaban (5.2, 7.3); switching stops one anticoagulant and starts the other at the next dose, without overlap (2.5). Content read in the label by Claude Code; owner approved 2026-11-16 (#189)."
     }
   ]
 }

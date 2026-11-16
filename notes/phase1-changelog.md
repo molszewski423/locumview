@@ -3273,3 +3273,16 @@ Agent: Claude Code
   `scripts/clinical/load-scenarios.sh` and a new baseline (#186).
 
 Agent: Claude Code
+
+## 189. Duplicate anticoagulation cases: owner approved (2026-11-16)
+
+- **Owner decision (2026-11-16):** "I agree with the clinical part, approve", on the four review points of #187: the
+  case and its reference answer, the reviewed "why it matters" line, a 300 unit heparin lock flush as not systemic,
+  and naming the parenteral drug on a same-day start.
+- **Basis, as recorded:** the Eliquis label text quoted in #187 (2.5, 5.2, 7.3), read by Claude Code on DailyMed. The
+  owner approved the content as presented and did not report reading the label; the citation's `content_check` is
+  `owner` on that basis.
+- **Changed:** both cases' `clinical_review` approved (version 0.1.1), the citation note and each case's `supports`
+  line. `check_cases.py --require-approved` no longer lists them. No rule, knowledge or fixture change.
+
+Agent: Claude Code
