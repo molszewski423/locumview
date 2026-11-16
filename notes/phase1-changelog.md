@@ -3177,3 +3177,24 @@ Agent: Claude Code
   EHR out and in.
 
 Agent: Claude Code
+
+## 184. The demo desktop's EHR opened slowly: the egress fence now rejects instead of dropping (2026-11-16)
+
+- **Found (owner report):** on the demo desktop the EHR took 20 to 30 s from the dock icon to OpenEMR's login page.
+  OpenEMR answers that page in about 0.1 s (timed inside its pod), and the owner's own desktops open it quickly. The
+  DISA STIG Chrome policy turns on online revocation checks (`EnableOnlineRevocationChecks`), and the EHR
+  certificate's OCSP and CRL addresses are IdM's CA name, which resolves to a LAN address. The demo user's egress
+  fence (`packaging/remote-access/demo-user-root.sh`) drops every private range, so Chrome waited for those checks
+  to time out before it showed the page.
+- **Change:** the fence's two blocking rules `reject with icmpx type admin-prohibited` instead of `drop`. The demo
+  user reaches nothing new: the same ranges are blocked, but a blocked connection fails at once, and Chrome's
+  revocation check, which soft-fails, moves on. Revocation is therefore not checked for the demo user, as before;
+  allowing the demo user to reach the CA's OCSP and CRL on port 80 would make the checks real, and is a separate
+  access decision.
+- **Checked:** `nft -c` accepts the table; loaded in a throwaway container, a connection as `demo` to a blocked LAN
+  address took 10.0 s (the test's connect timeout) with `drop` and 0.00006 s with `reject`.
+- **Apply (owner run on the existing demo desktop, root):** the fence file lives in `/etc`, so the image is not
+  involved; the command edits it in place (keeping a dated copy), checks it, and restarts the fence and then the EHR
+  rule, which the fence's reload removes. New demo desktops get the change from this script.
+
+Agent: Claude Code
