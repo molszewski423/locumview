@@ -27,9 +27,9 @@ images:
     # SBOM attestation verified by CI 2026-11-16
     digest: sha256:764c0310d779e8be21f7fcd2d64f835aab8e195db4cd91f0cc1709b96279c3eb
   - name: git.lan/mike/locumview-clinical-agent
-    # commit 145bd5b, clinical-images (Gitea run 840): knowledge base 0.9.0 and the ADE module's duplicate
-    # anticoagulation rule (#187); signature and SBOM attestation verified by CI 2026-11-16
-    digest: sha256:38ebf229a966a9ff23aefb9022559b41d538ba7bfd0ae44203277b9119731c9e
+    # commit 1cc3b50, clinical-images (Gitea run 860): explanations kept in memory (#193), with the ADE rule (#187);
+    # signature and SBOM attestation verified by CI 2026-11-16
+    digest: sha256:48327a8799260e0b05b526378c90a03dc75142062200b773c39dbc306ef6d898
 
 # Site values (not secret, but site-specific): read from site.env by the replacements below and never applied.
 configMapGenerator:

@@ -3360,3 +3360,15 @@ Agent: Claude Code
 - **Deploy:** CI builds the agent image on merge; a follow-up pins it.
 
 Agent: Claude Code
+
+## 194. The agent image with the explanation memory pinned (2026-11-16)
+
+- **Image:** clinical-images run 860 for the merge of #193 (commit 1cc3b50), agent
+  `sha256:48327a8799260e0b05b526378c90a03dc75142062200b773c39dbc306ef6d898`; its Verify step checked the signature and
+  the SBOM attestation. Pulled by digest: the memory in `explain.py` and the service's check before contacting the
+  model server.
+- **Deploy (owner run), together with #192's OpenEMR image:** `scripts/clinical/verify-images.sh`;
+  `kubectl diff -k k8s/clinical` (OpenEMR's and the agent's images); `kubectl apply -k k8s/clinical`;
+  `kubectl -n clinical rollout status deploy/openemr` and `deploy/agent`; then sign the desktops' EHR out and in.
+
+Agent: Claude Code
