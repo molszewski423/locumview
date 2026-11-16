@@ -3,6 +3,8 @@
 # Catalyst's restricted account vnc-tunnel, which may only forward to the desktop's own 127.0.0.1:5900, and listens on
 # port 15902 in this pod; only guacd may connect to it (networkpolicy.yaml). The Guacamole connection points at
 # vnc-tunnel:15902. Its own pod, apart from guacd, so a missing key or a failing link affects this desktop only.
+# Sound (changelog #176): a second forward, port 14713 to the desktop's loopback PulseAudio 127.0.0.1:4713, which the
+# desktop's restricted account allows only with Catalyst's devalpine_vdi_audio; guacd reads it as tcp:vnc-tunnel:14713.
 # Key: Secret vnc-tunnel-key (secrets/vnc-tunnel.sops.yaml, made by vnc-tunnel/new-key.sh). The desktop's host key is
 # pinned (vnc-tunnel/known_hosts, git-ignored, checked on the desktop). If the link drops, ssh exits and restarts.
 apiVersion: v1
@@ -13,7 +15,9 @@ metadata:
   labels: {app.kubernetes.io/name: vnc-tunnel, app.kubernetes.io/part-of: locumview}
 spec:
   selector: {app.kubernetes.io/name: vnc-tunnel}
-  ports: [{name: vnc, port: 15902, targetPort: vnc}]
+  ports:
+    - {name: vnc, port: 15902, targetPort: vnc}
+    - {name: audio, port: 14713, targetPort: audio}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -70,8 +74,12 @@ spec:
             - ConnectTimeout=10
             - -L
             - 0.0.0.0:15902:127.0.0.1:5900
-            - vnc-tunnel@CATALYST_VDI3_ADDRESS   # args[26]: kustomization.yaml replacements
-          ports: [{name: vnc, containerPort: 15902}]
+            - -L
+            - 0.0.0.0:14713:127.0.0.1:4713
+            - vnc-tunnel@CATALYST_VDI3_ADDRESS   # args[28]: kustomization.yaml replacements
+          ports:
+            - {name: vnc, containerPort: 15902}
+            - {name: audio, containerPort: 14713}
           readinessProbe:
             tcpSocket: {port: vnc}
             periodSeconds: 10

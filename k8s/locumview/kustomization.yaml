@@ -64,7 +64,7 @@ replacements:
   - source: {kind: ConfigMap, name: site-values, fieldPath: data.CATALYST_VDI3_CIDR, options: {delimiter: "/", index: 0}}
     targets:
       - select: {kind: Deployment, name: vnc-tunnel}
-        fieldPaths: ["spec.template.spec.containers.[name=ssh].args.26"]
+        fieldPaths: ["spec.template.spec.containers.[name=ssh].args.28"]
         options: {delimiter: "@", index: 1}
   - source: {kind: ConfigMap, name: site-values, fieldPath: data.IDM_CIDR}
     targets: [{select: {kind: NetworkPolicy, name: keycloak}, fieldPaths: [spec.egress.2.to.0.ipBlock.cidr]}]

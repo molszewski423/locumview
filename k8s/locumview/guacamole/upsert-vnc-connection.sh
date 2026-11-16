@@ -4,13 +4,16 @@
 # The desktop's WayVNC password comes on stdin and never appears in arguments or output. The username is the fixed one
 # the desktop's role writes. Permissions: READ for each grantee (others are revoked); a grantee is a Guacamole user
 # group, or user:<name> for one user. VNC_PORT (default 5900) sets the port: 15902 with host vnc-tunnel is the
-# tunnel to the owner's Catalyst desktop (changelog #170).
+# tunnel to the owner's Catalyst desktop (changelog #170). VNC_AUDIO_SERVER, if set, turns sound on and names the
+# desktop's PulseAudio server as guacd reaches it: tcp:vnc-tunnel:14713 through that tunnel (changelog #176).
 # See changelog #105 for what this login does and does not protect, and #106 for `cursor`.
 set -euo pipefail
 NAME=${1:?connection name}; HOST=${2:?desktop address or name}; shift 2
 [ $# -ge 1 ] || { echo "give at least one grantee"; exit 1; }
 PORT=${VNC_PORT:-5900}
 [[ $PORT =~ ^[0-9]{1,5}$ ]] || { echo "bad VNC_PORT: $PORT"; exit 1; }
+AUDIO=${VNC_AUDIO_SERVER:-}
+[[ -z $AUDIO || $AUDIO =~ ^tcp:[a-z0-9.-]+:[0-9]{1,5}$ ]] || { echo "bad VNC_AUDIO_SERVER: $AUDIO"; exit 1; }
 IFS= read -r PASSWORD || [ -n "$PASSWORD" ] || { echo "give the VNC password on stdin"; exit 1; }
 q() { printf "%s" "$1" | sed "s/'/''/g"; }   # SQL literal escaping for \set values
 # Grantees as (type, name) pairs for SQL: user groups by default, user:<name> for a single user.
@@ -21,7 +24,7 @@ for g in "$@"; do
 done
 grantees=${grantees%,}
 {
-  printf "\\\\set name '%s'\n\\\\set host '%s'\n\\\\set port '%s'\n\\\\set password '%s'\n" "$(q "$NAME")" "$(q "$HOST")" "$PORT" "$(q "$PASSWORD")"
+  printf "\\\\set name '%s'\n\\\\set host '%s'\n\\\\set port '%s'\n\\\\set password '%s'\n\\\\set audio '%s'\n" "$(q "$NAME")" "$(q "$HOST")" "$PORT" "$(q "$PASSWORD")" "$AUDIO"
   cat <<SQL
 BEGIN;
 INSERT INTO guacamole_connection (connection_name, protocol)
@@ -31,8 +34,8 @@ DELETE FROM guacamole_connection_parameter WHERE connection_id = (SELECT connect
 INSERT INTO guacamole_connection_parameter (connection_id, parameter_name, parameter_value)
 SELECT c.connection_id, p.n, p.v FROM guacamole_connection c,
   (VALUES ('hostname', :'host'), ('port', :'port'), ('color-depth', '24'), ('disable-copy', 'true'), ('cursor', 'local'),
-          ('username', 'vdi'), ('password', :'password')) p(n, v)
-WHERE c.connection_name = :'name' AND c.parent_id IS NULL;
+          ('username', 'vdi'), ('password', :'password'), ('enable-audio', 'true'), ('audio-servername', :'audio')) p(n, v)
+WHERE c.connection_name = :'name' AND c.parent_id IS NULL AND (p.n NOT IN ('enable-audio', 'audio-servername') OR :'audio' <> '');
 DELETE FROM guacamole_connection_permission cp USING guacamole_connection c, guacamole_entity e
 WHERE cp.connection_id = c.connection_id AND cp.entity_id = e.entity_id AND c.connection_name = :'name'
   AND (e.type::text, e.name) NOT IN ($grantees);
