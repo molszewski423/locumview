@@ -3273,3 +3273,19 @@ Agent: Claude Code
   `scripts/clinical/load-scenarios.sh` and a new baseline (#186).
 
 Agent: Claude Code
+
+## 188. The agent and gateway images with the ADE rule pinned (2026-11-16)
+
+- **Images:** clinical-images run 840 for the merge of #187 (commit 145bd5b); its Verify step checked each
+  signature and SBOM attestation. Agent `sha256:38ebf229…` (pulled: knowledge base 0.9.0, `duplicate_anticoagulation`
+  in `rules.py`, the service accepting `ade`); gateway `sha256:764c0310…` (pulled: the app's "Duplicate
+  anticoagulation" label, no "no rules yet" note; its bundle has the same hash as the local build). The run also
+  rebuilt OpenEMR and the tunnel image with no change to their sources; their pins stay.
+- **Deploy (owner run, operator-laptop, in order):** `scripts/clinical/verify-images.sh`; `kubectl diff -k k8s/clinical`
+  (only the agent's and the gateway's images change); `kubectl apply -k k8s/clinical`;
+  `kubectl -n clinical rollout status deploy/agent` and `deploy/gateway`; then `scripts/clinical/load-scenarios.sh`
+  (loads the two new cases) and a new baseline straight away (#186).
+- **Clinical review:** the two cases stay `pending` until the owner's review of #187's four points; the demo shows
+  them meanwhile, as it shows other pending cases.
+
+Agent: Claude Code
