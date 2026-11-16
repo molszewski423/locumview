@@ -40,6 +40,7 @@ export const TYPE_LABELS: Record<string, string> = {
   "iv-to-po-switch": "IV to PO switch",
   "redundant-coverage": "Redundant coverage",
   "duration-review": "Duration review",
+  "duplicate-anticoagulation": "Duplicate anticoagulation",
 };
 
 export interface Explanation {

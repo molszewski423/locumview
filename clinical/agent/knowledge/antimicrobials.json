@@ -1,6 +1,6 @@
 {
   "_note": "Knowledge base for the Phase 9 lite rules (plan M4). Versioned with the rules: raise version on every change. Every rule names the references in clinical/scenarios/citations.json it rests on. Codes: RxNorm (prescribed products), LOINC (susceptibility results), SNOMED CT (organisms, specimens), ICD-10-CM (problems). Group inducible-ampc holds IDSA 2026's moderate-risk AmpC organisms (Enterobacter cloacae complex, Klebsiella aerogenes, Citrobacter freundii, Hafnia alvei) by SNOMED CT code; 62592009 is one concept that also carries the former name Enterobacter aerogenes. IDSA's low-risk Serratia, Morganella and Providencia are deliberately not in it.",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "agents": {
     "amoxicillin": {"display": "Amoxicillin"},
     "ampicillin": {"display": "Ampicillin", "covers_listeria": true},
@@ -23,6 +23,18 @@
     "piperacillin-tazobactam": {"display": "Piperacillin-tazobactam", "anaerobic": true},
     "trimethoprim-sulfamethoxazole": {"display": "Trimethoprim-sulfamethoxazole", "oral_bioequivalent": true},
     "vancomycin": {"display": "Vancomycin"}
+  },
+  "ade_agents": {
+    "_note": "ADE monitoring (changelog #187): drugs the ADE rules read, kept apart from the antimicrobials so no stewardship or IV to PO rule ever sees them. systemic_anticoagulant marks a dose that anticoagulates the patient; a heparin lock flush does not.",
+    "apixaban": {"display": "Apixaban", "systemic_anticoagulant": true},
+    "heparin": {"display": "Heparin", "systemic_anticoagulant": true},
+    "heparin-flush": {"display": "Heparin lock flush", "systemic_anticoagulant": false}
+  },
+  "ade_products": {
+    "1364435": "apixaban",
+    "1364445": "apixaban",
+    "1798389": "heparin",
+    "1362062": "heparin-flush"
   },
   "products": {
     "1659149": "piperacillin-tazobactam",
@@ -106,7 +118,8 @@
     "meningitis-listeria": {"text": "Listeria monocytogenes is intrinsically resistant to cephalosporins and is not covered by vancomycin", "key": "Listeria"},
     "double-anaerobic-coverage": {"text": "the other agent already covers anaerobes, so the second anaerobic agent adds no coverage", "key": "anaerob"},
     "duration-review": {"text": "antibiotics continued past the recommended course add adverse effects and resistance pressure", "key": "adverse effects"},
-    "iv-to-po-switch": {"text": "switching a clinically stable patient to an effective oral agent avoids IV catheter complications and cost", "key": "catheter"}
+    "iv-to-po-switch": {"text": "switching a clinically stable patient to an effective oral agent avoids IV catheter complications and cost", "key": "catheter"},
+    "duplicate-anticoagulation": {"text": "two systemic anticoagulants at once raise the risk of serious bleeding; when one replaces the other, the label stops the first and starts the second at the time of the next dose", "key": "bleeding"}
   },
   "rules": {
     "bug-drug-mismatch": {"module": "stewardship", "refs": ["clsi-m100", "idsa-shea-asp-2016"]},
@@ -115,6 +128,7 @@
     "meningitis-listeria": {"module": "stewardship", "refs": ["idsa-meningitis-2004", "escmid-meningitis-2016"]},
     "double-anaerobic-coverage": {"module": "stewardship", "refs": ["idsa-ciai-2010"]},
     "duration-review": {"module": "stewardship", "refs": ["idsa-shea-asp-2016"]},
-    "iv-to-po-switch": {"module": "iv-to-po", "refs": ["idsa-shea-asp-2016"]}
+    "iv-to-po-switch": {"module": "iv-to-po", "refs": ["idsa-shea-asp-2016"]},
+    "duplicate-anticoagulation": {"module": "ade", "refs": ["fda-apixaban-label"]}
   }
 }

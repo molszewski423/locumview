@@ -12,6 +12,8 @@ class Knowledge:
         self.version = data["version"]
         self.agents = data["agents"]
         self.products = data["products"]
+        self.ade_agents = {k: v for k, v in data.get("ade_agents", {}).items() if not k.startswith("_")}
+        self.ade_products = data.get("ade_products", {})
         self.tests = data["susceptibility_tests"]
         self.organisms = data["organisms"]
         self.specimens = data["specimens"]
@@ -26,7 +28,10 @@ class Knowledge:
         return cls(json.loads(path.read_text()))
 
     def display(self, agent: str) -> str:
-        return self.agents[agent]["display"]
+        return (self.agents.get(agent) or self.ade_agents[agent])["display"]
+
+    def systemic_anticoagulant(self, ade_agent: str | None) -> bool:
+        return bool(self.ade_agents.get(ade_agent or "", {}).get("systemic_anticoagulant"))
 
     def has(self, agent: str, flag: str) -> bool:
         return bool(self.agents.get(agent, {}).get(flag))

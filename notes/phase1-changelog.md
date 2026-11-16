@@ -3233,3 +3233,43 @@ Agent: Claude Code
   again. The README's step 11 now says to save a baseline after every loader run.
 
 Agent: Claude Code
+
+## 187. ADE monitoring's first rule: duplicate anticoagulation (prepared, clinical review pending) (2026-11-16)
+
+- **Owner request (2026-11-16):** new scenarios for the clinical app, starting with ADE monitoring (renal dose
+  adjustment, suspected HIT, duplicate anticoagulation, daptomycin with a raised CK, linezolid with an SSRI, and, for
+  stewardship, daptomycin for pneumonia); duplicate anticoagulation first, end to end. The background patients'
+  enrichment and the other five follow.
+- **Rule `duplicate-anticoagulation` (module `ade`):** two different systemic anticoagulants active on the same day.
+  It names the one started last, the order to question, and on the same start date the parenteral one. A switch
+  without overlap (the first stopped on or before the second's start) and a heparin lock flush stay silent.
+  Knowledge base 0.9.0: `ade_agents` and `ade_products` hold the anticoagulants apart from the antimicrobials, and
+  prescriptions carry them in a separate `ade_agent` field, so no stewardship or IV to PO rule ever sees them.
+  RxNorm (checked in RxNav 2026-11-16, all active SCDs): apixaban 5 mg 1364445 and 2.5 mg 1364435 tablets; heparin
+  5,000 units/mL 1 mL syringe 1798389 (systemic); heparin 100 units/mL 3 mL syringe 1362062 (lock flush, not systemic).
+- **Source:** the Eliquis label on DailyMed (setid e9481622-7cc6-418a-acb6-c5450daae9b0, published 2026-11-12),
+  read 2026-11-16: 2.5 converting between ELIQUIS and other anticoagulants stops one and starts the other at the time
+  of the next dose; 5.2 and 7.3 concomitant heparin increases bleeding. Citation `fda-apixaban-label`,
+  `content_check: pending`.
+- **Cases (provenance pending):** `anticoag-apixaban-heparin-duplicate-01`, a 74-year-old woman with atrial
+  fibrillation whose home apixaban is continued while the admission order set adds heparin 5,000 units every 8 hours
+  (finding: Heparin); `anticoag-apixaban-flush-negative-01`, a 68-year-old man on apixaban whose port is flushed with
+  300 units of heparin (no finding). ICD-10-CM and LOINC codes checked in NLM Clinical Tables and tx.fhir.org. Chart
+  details in `charts.json`; no photographs yet (AI-generated portraits, made separately).
+- **App and service:** the agent service accepts the `ade` module; the app labels the type and no longer says ADE
+  monitoring has no rules. The explanation prompt still calls its input "a hospital's antimicrobial rules"; the real
+  model (gemma4:26b, prompt v2) explained the new finding correctly and kept the reviewed "bleeding" reason, so the
+  wording waits for the next prompt version and its evaluation.
+- **Verified:** `check_cases.py` (28 cases ok); `test_rules.py` 56 tests, including both new cases' FHIR fixtures,
+  recorded from the local spike with the loader (subcutaneous heparin reads back with route C38299), and seven
+  boundary tests (switch, one drug alone, the drug named, a stopped order, citation and reason, antimicrobial rules
+  never see anticoagulants, every ADE product known); agent service, explain and rule tests 84 OK in the CI
+  requirements; the app's tests (16) and build in the CI's pinned Node image.
+- **Owner review needed before approval:** the two cases' clinical content; the reviewed reason ("two systemic
+  anticoagulants at once raise the risk of serious bleeding; when one replaces the other, the label stops the first
+  and starts the second at the time of the next dose"); treating a 300 unit lock flush as not systemic (clinical
+  judgment, not in the label); and naming the parenteral drug on a same-day start.
+- **Deploy after review and merge:** CI builds the agent and app images; a follow-up pins them; then
+  `scripts/clinical/load-scenarios.sh` and a new baseline (#186).
+
+Agent: Claude Code

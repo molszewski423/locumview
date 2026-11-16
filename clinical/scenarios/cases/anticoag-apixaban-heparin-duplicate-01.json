@@ -1,0 +1,149 @@
+{
+  "schema": "locumview-case/1",
+  "id": "anticoag-apixaban-heparin-duplicate-01",
+  "version": "0.1.0",
+  "title": "Apixaban continued and heparin prophylaxis added: two anticoagulants",
+  "kind": "finding",
+  "modules": [
+    "ade"
+  ],
+  "provenance": {
+    "source": "synthetic",
+    "author": "Claude Code (draft for owner review)",
+    "created": "2026-11-16",
+    "clinical_review": {
+      "status": "pending"
+    }
+  },
+  "story": "A 74-year-old woman with permanent atrial fibrillation on apixaban 5 mg twice daily is admitted with an exacerbation of heart failure. Her home apixaban is continued, and the admission order set also adds heparin 5,000 units subcutaneously every 8 hours for VTE prophylaxis. Both are active the next morning. Weight 72 kg, creatinine 1.0 mg/dL, platelets and hemoglobin stable.",
+  "patient": {
+    "family": "Casebook",
+    "given": "Thea",
+    "birth_date": "1952-03-09",
+    "sex": "female"
+  },
+  "encounter": {
+    "class_code": "IMP",
+    "start": "2026-11-14T15:00:00-05:00",
+    "reason": "Shortness of breath, leg swelling"
+  },
+  "problems": [
+    {
+      "title": "Acute on chronic diastolic heart failure",
+      "diagnosis": "ICD10:I50.33",
+      "begdate": "2026-11-14"
+    },
+    {
+      "title": "Permanent atrial fibrillation",
+      "diagnosis": "ICD10:I48.21",
+      "begdate": "2021-05-02"
+    },
+    {
+      "title": "Essential hypertension",
+      "diagnosis": "ICD10:I10",
+      "begdate": "2012-09-20"
+    }
+  ],
+  "allergies": [],
+  "prescriptions": [
+    {
+      "drug": "apixaban 5 MG Oral Tablet",
+      "rxnorm": "1364445",
+      "start": "2026-11-14",
+      "route": "PO",
+      "instructions": "5 mg by mouth twice daily (home medication continued)"
+    },
+    {
+      "drug": "1 ML heparin sodium, porcine 5000 UNT/ML Prefilled Syringe",
+      "rxnorm": "1798389",
+      "start": "2026-11-14",
+      "route": "SC",
+      "instructions": "5,000 units subcutaneously every 8 hours (admission VTE prophylaxis order set)"
+    },
+    {
+      "drug": "4 ML furosemide 10 MG/ML Injection",
+      "rxnorm": "1719291",
+      "start": "2026-11-14",
+      "route": "IV",
+      "instructions": "40 mg IV twice daily"
+    }
+  ],
+  "vitals": [
+    {
+      "taken": "2026-11-14T15:20:00-05:00",
+      "temperature_f": 98.4,
+      "pulse": 96,
+      "bps": 148,
+      "bpd": 84,
+      "respiration": 22,
+      "oxygen_saturation": 92
+    },
+    {
+      "taken": "2026-11-15T08:00:00-05:00",
+      "temperature_f": 98.1,
+      "pulse": 84,
+      "bps": 136,
+      "bpd": 78,
+      "respiration": 18,
+      "oxygen_saturation": 95
+    }
+  ],
+  "labs": [
+    {
+      "order_code": "LV-BMP",
+      "order_text": "Basic labs",
+      "collected": "2026-11-15T05:30:00-05:00",
+      "resulted": "2026-11-15T06:30:00-05:00",
+      "results": [
+        {
+          "loinc": "2160-0",
+          "text": "Creatinine [Mass/volume] in Serum or Plasma",
+          "value": "1.0",
+          "units": "mg/dL",
+          "range": "0.5-1.0",
+          "flag": "N"
+        }
+      ]
+    },
+    {
+      "order_code": "LV-CBC",
+      "order_text": "Complete blood count",
+      "collected": "2026-11-15T05:30:00-05:00",
+      "resulted": "2026-11-15T06:15:00-05:00",
+      "results": [
+        {
+          "loinc": "777-3",
+          "text": "Platelets [#/volume] in Blood by Automated count",
+          "value": "228",
+          "units": "10*3/uL",
+          "range": "150-400",
+          "flag": "N"
+        },
+        {
+          "loinc": "718-7",
+          "text": "Hemoglobin [Mass/volume] in Blood",
+          "value": "12.1",
+          "units": "g/dL",
+          "range": "12.0-16.0",
+          "flag": "N"
+        }
+      ]
+    }
+  ],
+  "expected_findings": [
+    {
+      "module": "ade",
+      "type": "duplicate-anticoagulation",
+      "drug": "Heparin",
+      "summary": "Subcutaneous heparin 5,000 units every 8 hours was added while apixaban 5 mg twice daily continues: two systemic anticoagulants at once."
+    }
+  ],
+  "reference_answer": "Stop the subcutaneous heparin. Apixaban 5 mg twice daily already anticoagulates her, so she needs no added pharmacologic VTE prophylaxis, and the combination raises bleeding risk. The dose fits her (age 74, weight 72 kg, creatinine 1.0 mg/dL, so no criteria for 2.5 mg). If apixaban must be held, for a procedure for example, stop it and start the parenteral anticoagulant at the time of the next apixaban dose instead of overlapping them.",
+  "rationale": "The apixaban label lists heparin among the drugs whose concomitant use increases bleeding (5.2, 7.3), and its conversion guidance replaces one anticoagulant with the other at the next dose rather than overlapping them (2.5). The rule needs both products active on the same day and knows the 5,000 unit syringe as a systemic dose; it names heparin, the parenteral order added on the same day as the oral one.",
+  "citations": [
+    {
+      "ref": "fda-apixaban-label",
+      "supports": "Concomitant heparin increases bleeding risk on apixaban (5.2, 7.3); switching stops one anticoagulant and starts the other at the next dose, without overlap (2.5). Content read in the label, owner review pending."
+    }
+  ]
+}

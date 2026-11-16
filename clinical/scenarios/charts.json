@@ -1714,5 +1714,125 @@
    ],
    "why": "No valproate (carbapenems lower its levels): a carbapenem is the reference answer."
   }
+ },
+ "anticoag-apixaban-heparin-duplicate-01": {
+  "demographics": {
+   "race": [
+    "2106-3"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "41 Orchard Lane",
+   "city": "Northampton",
+   "state": "MA",
+   "postal_code": "01060",
+   "phone_home": "555-418-2291",
+   "marital": "W",
+   "language": "en",
+   "portrait": "short white hair, reading glasses"
+  },
+  "emergency_contact": {
+   "name": "Daniel Casebook",
+   "relationship": "Son",
+   "phone": "555-418-7730"
+  },
+  "insurance": "Medicare",
+  "history": {
+   "problems": [
+    {
+     "title": "Permanent atrial fibrillation",
+     "icd10": "I48.21"
+    },
+    {
+     "title": "Essential hypertension",
+     "icd10": "I10"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "apixaban 5 MG Oral Tablet",
+     "rxnorm": "1364445",
+     "dose": "5 mg twice daily"
+    },
+    {
+     "drug": "24 HR metoprolol succinate 50 MG Extended Release Oral Tablet",
+     "rxnorm": "866436",
+     "dose": "50 mg daily"
+    },
+    {
+     "drug": "furosemide 40 MG Oral Tablet",
+     "rxnorm": "313988",
+     "dose": "40 mg daily"
+    },
+    {
+     "drug": "lisinopril 10 MG Oral Tablet",
+     "rxnorm": "314076",
+     "dose": "10 mg daily"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "former",
+    "note": "Quit 1995"
+   },
+   "alcohol": "None",
+   "social": "widowed, lives alone; retired schoolteacher",
+   "immunizations": [],
+   "why": "On apixaban for atrial fibrillation since 2021, at the full dose (fewer than two of age 80 or more, weight 60 kg or less, creatinine 1.5 mg/dL or more)."
+  }
+ },
+ "anticoag-apixaban-flush-negative-01": {
+  "demographics": {
+   "race": [
+    "2106-3"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "9 Mill River Road",
+   "city": "Chicopee",
+   "state": "MA",
+   "postal_code": "01013",
+   "phone_home": "555-602-1148",
+   "marital": "M",
+   "language": "en",
+   "portrait": "bald, short gray beard"
+  },
+  "emergency_contact": {
+   "name": "Ruth Casebook",
+   "relationship": "Spouse",
+   "phone": "555-602-9917"
+  },
+  "insurance": "Commercial",
+  "history": {
+   "problems": [
+    {
+     "title": "Malignant neoplasm of sigmoid colon",
+     "icd10": "C18.7"
+    }
+   ],
+   "home_medications": [
+    {
+     "drug": "apixaban 5 MG Oral Tablet",
+     "rxnorm": "1364445",
+     "dose": "5 mg twice daily"
+    },
+    {
+     "drug": "ondansetron 4 MG Disintegrating Oral Tablet",
+     "rxnorm": "104894",
+     "dose": "4 mg every 8 hours as needed"
+    }
+   ],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "None since diagnosis",
+   "social": "married, lives with wife; retired machinist",
+   "immunizations": [],
+   "why": "Port placed in June for chemotherapy; apixaban since the September femoral vein thrombosis."
+  }
  }
 }

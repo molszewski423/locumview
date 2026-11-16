@@ -1,0 +1,142 @@
+{
+  "schema": "locumview-case/1",
+  "id": "anticoag-apixaban-flush-negative-01",
+  "version": "0.1.0",
+  "title": "Apixaban with a heparin lock flush for a port: not a duplicate",
+  "kind": "negative-control",
+  "modules": [
+    "ade"
+  ],
+  "provenance": {
+    "source": "synthetic",
+    "author": "Claude Code (draft for owner review)",
+    "created": "2026-11-16",
+    "clinical_review": {
+      "status": "pending"
+    }
+  },
+  "story": "A 68-year-old man with sigmoid colon cancer on chemotherapy through an implanted port, and on apixaban 5 mg twice daily for a left femoral vein thrombosis diagnosed in September, is admitted with dehydration after poor oral intake. Apixaban is continued. Nursing flushes the port with heparin 100 units/mL, 3 mL (300 units), after each access, per the port protocol. Weight 80 kg, creatinine 0.9 mg/dL.",
+  "patient": {
+    "family": "Casebook",
+    "given": "Quinn",
+    "birth_date": "1958-07-22",
+    "sex": "male"
+  },
+  "encounter": {
+    "class_code": "IMP",
+    "start": "2026-11-14T11:00:00-05:00",
+    "reason": "Poor oral intake, dizziness"
+  },
+  "problems": [
+    {
+      "title": "Dehydration",
+      "diagnosis": "ICD10:E86.0",
+      "begdate": "2026-11-14"
+    },
+    {
+      "title": "Malignant neoplasm of sigmoid colon",
+      "diagnosis": "ICD10:C18.7",
+      "begdate": "2026-06-10"
+    },
+    {
+      "title": "Acute thrombosis of left femoral vein",
+      "diagnosis": "ICD10:I82.412",
+      "begdate": "2026-09-18"
+    }
+  ],
+  "allergies": [],
+  "prescriptions": [
+    {
+      "drug": "apixaban 5 MG Oral Tablet",
+      "rxnorm": "1364445",
+      "start": "2026-11-14",
+      "route": "PO",
+      "instructions": "5 mg by mouth twice daily (home medication continued)"
+    },
+    {
+      "drug": "3 ML heparin sodium, porcine 100 UNT/ML Prefilled Syringe",
+      "rxnorm": "1362062",
+      "start": "2026-11-14",
+      "route": "IV",
+      "instructions": "300 units (3 mL) to flush the implanted port after each access, per protocol"
+    },
+    {
+      "drug": "ondansetron 4 MG Disintegrating Oral Tablet",
+      "rxnorm": "104894",
+      "start": "2026-11-14",
+      "route": "PO",
+      "instructions": "4 mg by mouth every 8 hours as needed for nausea"
+    }
+  ],
+  "vitals": [
+    {
+      "taken": "2026-11-14T11:15:00-05:00",
+      "temperature_f": 98.0,
+      "pulse": 104,
+      "bps": 102,
+      "bpd": 64,
+      "respiration": 18,
+      "oxygen_saturation": 97
+    },
+    {
+      "taken": "2026-11-15T08:00:00-05:00",
+      "temperature_f": 98.2,
+      "pulse": 86,
+      "bps": 118,
+      "bpd": 72,
+      "respiration": 16,
+      "oxygen_saturation": 98
+    }
+  ],
+  "labs": [
+    {
+      "order_code": "LV-BMP",
+      "order_text": "Basic labs",
+      "collected": "2026-11-15T05:30:00-05:00",
+      "resulted": "2026-11-15T06:30:00-05:00",
+      "results": [
+        {
+          "loinc": "2160-0",
+          "text": "Creatinine [Mass/volume] in Serum or Plasma",
+          "value": "0.9",
+          "units": "mg/dL",
+          "range": "0.5-1.0",
+          "flag": "N"
+        }
+      ]
+    },
+    {
+      "order_code": "LV-CBC",
+      "order_text": "Complete blood count",
+      "collected": "2026-11-15T05:30:00-05:00",
+      "resulted": "2026-11-15T06:15:00-05:00",
+      "results": [
+        {
+          "loinc": "777-3",
+          "text": "Platelets [#/volume] in Blood by Automated count",
+          "value": "245",
+          "units": "10*3/uL",
+          "range": "150-400",
+          "flag": "N"
+        },
+        {
+          "loinc": "718-7",
+          "text": "Hemoglobin [Mass/volume] in Blood",
+          "value": "11.0",
+          "units": "g/dL",
+          "range": "12.0-16.0",
+          "flag": "L"
+        }
+      ]
+    }
+  ],
+  "expected_findings": [],
+  "reference_answer": "No change. A heparin lock flush of 300 units keeps the port open and does not anticoagulate the patient; apixaban 5 mg twice daily continues for the femoral vein thrombosis.",
+  "rationale": "A near miss for the duplicate anticoagulation rule: heparin is on the medication list, but as a lock flush, which the knowledge base does not count as a systemic anticoagulant. The rule must stay silent; treating every heparin product as anticoagulation would flood the queue with flush orders.",
+  "citations": [
+    {
+      "ref": "fda-apixaban-label",
+      "supports": "Concomitant heparin increases bleeding risk on apixaban (5.2, 7.3); switching stops one anticoagulant and starts the other at the next dose, without overlap (2.5). Content read in the label, owner review pending."
+    }
+  ]
+}

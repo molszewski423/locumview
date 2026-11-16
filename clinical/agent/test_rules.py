@@ -336,6 +336,55 @@ class RuleBoundaryTests(unittest.TestCase):
         self.assertEqual(s.as_of.isoformat(), "2026-10-22T09:40:00-04:00")
 
 
+class DuplicateAnticoagulationTests(unittest.TestCase):
+    """ADE module, changelog #187: two systemic anticoagulants active on the same day."""
+    POSITIVE = "anticoag-apixaban-heparin-duplicate-01"
+    FINDING = ("ade", "duplicate-anticoagulation", "Heparin")
+
+    def rx(self, c, rxnorm):
+        (p,) = [p for p in c["prescriptions"] if p["rxnorm"] == rxnorm]
+        return p
+
+    def test_a_switch_without_overlap_is_silent(self):
+        c = case(self.POSITIVE)
+        self.rx(c, "1364445")["end"] = "2026-11-14"    # apixaban stopped the day heparin starts
+        self.assertEqual(keys(c), [])
+
+    def test_one_anticoagulant_alone_is_silent(self):
+        c = case(self.POSITIVE)
+        c["prescriptions"] = [p for p in c["prescriptions"] if p["rxnorm"] != "1798389"]
+        self.assertEqual(keys(c), [])
+
+    def test_the_drug_started_last_is_named(self):
+        c = case(self.POSITIVE)
+        self.rx(c, "1798389")["start"] = "2026-11-13"   # heparin first, apixaban added a day later
+        self.assertEqual(keys(c), [("ade", "duplicate-anticoagulation", "Apixaban")])
+
+    def test_a_stopped_heparin_order_is_silent(self):
+        c = case(self.POSITIVE)
+        self.rx(c, "1798389")["end"] = "2026-11-15"     # discontinued on the newest charted day
+        self.assertEqual(keys(c), [])
+
+    def test_finding_cites_the_label_and_carries_the_reviewed_reason(self):
+        (f,) = evaluate(from_case(case(self.POSITIVE), KB), KB, {"ade"})
+        self.assertEqual(f.key(), self.FINDING)
+        self.assertEqual(f.refs, ("fda-apixaban-label",))
+        self.assertTrue(any(e.startswith("Why it matters:") and "bleeding" in e for e in f.evidence))
+        self.assertEqual(sum(e.startswith("Active:") for e in f.evidence), 2)
+
+    def test_anticoagulants_never_reach_the_antimicrobial_rules(self):
+        s = from_case(case(self.POSITIVE), KB)
+        self.assertEqual(s.active_antimicrobials(), [])
+        self.assertEqual(sorted(p.ade_agent for p in s.active_ade()), ["apixaban", "heparin"])
+        self.assertEqual(keys(case(self.POSITIVE), {"stewardship", "iv-to-po"}), [])
+
+    def test_every_ade_product_names_a_known_ade_agent(self):
+        for rxnorm, agent in KB.ade_products.items():
+            with self.subTest(rxnorm=rxnorm):
+                self.assertIn(agent, KB.ade_agents)
+                self.assertNotIn(rxnorm, KB.products)
+
+
 class FhirAdapterTests(unittest.TestCase):
     """The same rules over OpenEMR's FHIR read-back of each case (fixtures/fhir, recorded with patches 0001 and 0002
     and the loader's start dates) give the same snapshot and the same findings as over the case file."""

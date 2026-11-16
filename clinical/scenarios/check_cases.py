@@ -15,9 +15,9 @@ import sys
 HERE = Path(__file__).resolve().parent
 SCHEMA = "locumview-case/1"
 KINDS = {"finding", "negative-control", "ambiguous"}
-MODULES = {"stewardship", "iv-to-po"}
+MODULES = {"stewardship", "iv-to-po", "ade"}
 FINDING_TYPES = {"bug-drug-mismatch", "suboptimal-agent", "missing-empiric-coverage", "de-escalation",
-                 "iv-to-po-switch", "redundant-coverage", "duration-review"}
+                 "iv-to-po-switch", "redundant-coverage", "duration-review", "duplicate-anticoagulation"}
 INTERPRETATIONS = {"S", "I", "R", "SDD", "NS"}
 TIME = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?(Z|[+-]\d{2}:\d{2})$")
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")

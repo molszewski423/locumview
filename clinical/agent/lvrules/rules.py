@@ -1,4 +1,4 @@
-"""Deterministic rules for the stewardship and IV to PO modules (ADR 0017: rules decide, the model only explains).
+"""Deterministic rules for the stewardship, IV to PO and ADE monitoring modules (ADR 0017: rules decide, the model only explains).
 
 Each rule reads a Snapshot and the knowledge base and returns findings. A finding carries the data it rests on
 (evidence) and the references in clinical/scenarios/citations.json it cites, so the explanation step can only restate
@@ -305,8 +305,27 @@ def iv_to_po_switch(s: Snapshot, kb: Knowledge) -> list[Finding]:
     return out
 
 
+def duplicate_anticoagulation(s: Snapshot, kb: Knowledge) -> list[Finding]:
+    """Two different systemic anticoagulants active on the same day (ADE). The finding names the one started last,
+    the order to question, and on the same start date the parenteral one (an inpatient order added to an oral
+    anticoagulant is the usual duplicate); a heparin lock flush is not a systemic anticoagulant. Switching without overlap (the
+    first stopped before or on the day the second starts) is not a finding."""
+    active = [p for p in s.active_ade() if kb.systemic_anticoagulant(p.ade_agent)]
+    if len({p.ade_agent for p in active}) < 2:
+        return []
+    active.sort(key=lambda p: (p.start, p.route != "PO", p.text))
+    latest = active[-1]
+    others = [p for p in active if p.ade_agent != latest.ade_agent]
+    names = " and ".join(sorted({kb.display(p.ade_agent).lower() for p in others}))
+    return [_finding(kb, "duplicate-anticoagulation", "duplicate-anticoagulation", latest.ade_agent,
+                     f"{kb.display(latest.ade_agent)} was started while {names} is active: two systemic "
+                     f"anticoagulants at once. Confirm whether both are intended; if one replaces the other, stop the "
+                     f"first and start the second at the time of its next dose.",
+                     [f"Active: {p.text}, started {p.start}" for p in active])]
+
+
 RULES = (bug_drug_mismatch, ampc_third_generation_cephalosporin, mssa_vancomycin, meningitis_listeria,
-         double_anaerobic_coverage, duration_review, iv_to_po_switch)
+         double_anaerobic_coverage, duration_review, iv_to_po_switch, duplicate_anticoagulation)
 
 
 def evaluate(s: Snapshot, kb: Knowledge, modules: set[str] | None = None) -> list[Finding]:
