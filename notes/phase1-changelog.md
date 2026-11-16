@@ -3391,3 +3391,21 @@ Agent: Claude Code
 - **Deploy:** CI builds the OpenEMR image on merge; a follow-up pins it.
 
 Agent: Claude Code
+
+## 196. Opioid stewardship module: plan (2026-11-16)
+
+- **Owner request (2026-11-16):** an opioid stewardship tab in LocumView Clinical. Plan in
+  `docs/plans/opioid-stewardship.md`: seven candidate rules (O1 opioid with a benzodiazepine, O2 no naloxone with risk
+  factors, O3 no bowel regimen, O4 high daily MME, O5 extended-release opioid in an opioid-naive patient, O6 therapeutic
+  duplication, O7 renally cleared opioids), their data needs and the primary sources to read; nothing built.
+- **Found while planning:** OpenEMR's FHIR prescriptions read back with the route only; it returns a dose and a
+  frequency only for orders with a structured size, unit and interval, which the loader does not send, and it
+  truncates the dose to a whole number (`intval`). Dose-based rules wait for a loader change and an OpenEMR patch,
+  checked on the spike first. Home medications and orders both reach FHIR as `MedicationRequest` (intent `plan` and
+  `order`), which is why the app lists Thea Casebook's apixaban twice.
+- **Checked:** the CDC 2022 opioid guideline's PubMed metadata (PMID 36327391, MMWR Recomm Rep 2022;71(3):1-95). Its
+  content, the FDA safety communications and the labels are still to read.
+- **Owner decisions needed:** listed at the end of the plan (scope, O1's second drug class, O3 on consensus, O4's
+  counting and thresholds, O1 first).
+
+Agent: Claude Code
