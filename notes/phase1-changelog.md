@@ -3332,3 +3332,22 @@ Agent: Claude Code
   the desktops' EHR out and in, #183).
 
 Agent: Claude Code
+
+## 193. Explanations kept in memory: a reload does not run the model again (2026-11-16)
+
+- **Owner request (2026-11-16):** reopening a patient whose findings were already explained should not draft the
+  explanations on the GPU again, unless the finding changed.
+- **Change (`clinical/agent/explain.py`, `service.py`):** the agent keeps each "ok" or "withheld" explanation in memory,
+  keyed by a hash of everything the answer and the guard's verdict depend on: the message the model sees (type,
+  module, drug, summary, the data the rule used, the reference titles), the evidence and summary, the pinned model
+  and digest, the prompt and the options. A changed finding (new data, a new knowledge base) or a changed model makes a
+  new key. "Unavailable" is not kept, so the model is tried again. When every finding is already in memory, the
+  service does not contact the model server at all. Each explanation in the reply carries `cached` (true or false).
+  The memory holds 2,000 explanations (oldest out first) and is lost when the agent restarts; the agent runs as one
+  replica.
+- **Verified:** agent tests 87 OK (a reload serves from memory with no model call and no server check; another
+  patient's findings are explained; an unavailable model is not kept); with the real gemma4:26b on the workstation,
+  Thea Casebook's finding took 25.8 s the first time (model load and generation) and 0.00 s the second.
+- **Deploy:** CI builds the agent image on merge; a follow-up pins it.
+
+Agent: Claude Code

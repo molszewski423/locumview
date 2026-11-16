@@ -93,6 +93,33 @@ class ServiceTests(unittest.TestCase):
 
 
 class ExplanationTests(unittest.TestCase):
+    def test_a_reload_serves_the_explanation_from_memory(self):
+        fake = FakeOllama(reply="Levofloxacin is given IV while the patient is stable.")
+        client = self.client(fake)
+        first = client.post("/v1/explanations", json={"resources": fixture("cap-levofloxacin-ivpo-01")}).json()
+        calls = len(fake.requests)
+        second = client.post("/v1/explanations", json={"resources": fixture("cap-levofloxacin-ivpo-01")}).json()
+        self.assertEqual(len(fake.requests), calls)              # no model call and no model-server check
+        (a,), (b,) = first["explanations"], second["explanations"]
+        self.assertEqual((a["cached"], b["cached"]), (False, True))
+        self.assertEqual(a["text"], b["text"])
+
+    def test_a_changed_finding_is_explained_again(self):
+        fake = FakeOllama(reply="Levofloxacin is given IV while the patient is stable.")
+        client = self.client(fake)
+        client.post("/v1/explanations", json={"resources": fixture("cap-levofloxacin-ivpo-01")})
+        chats = sum(u.endswith("/api/chat") for _, u, _ in fake.requests)
+        resources = fixture("pyelo-kaerogenes-ivpo-01")           # another patient: other findings, other data
+        client.post("/v1/explanations", json={"resources": resources})
+        self.assertGreater(sum(u.endswith("/api/chat") for _, u, _ in fake.requests), chats)
+
+    def test_an_unavailable_model_is_tried_again(self):
+        fake = FakeOllama(fail=True)
+        exp = explainer(fake)
+        finding = {"type": "t", "module": "m", "drug": "D", "summary": "s", "evidence": ["e"], "citations": []}
+        self.assertEqual(exp.explain(finding)["status"], "unavailable")
+        self.assertIsNone(exp.cached(finding))
+
     def client(self, fake):
         return TestClient(create_app(Knowledge.load(), CITATIONS, "America/New_York", explainer(fake) if fake else None))
 
