@@ -3198,3 +3198,14 @@ Agent: Claude Code
   rule, which the fence's reload removes. New demo desktops get the change from this script.
 
 Agent: Claude Code
+
+## 185. The OpenEMR image with patch 0005 pinned (2026-11-16)
+
+- **Image:** clinical-images run 826 for the merge of #183 (commit 5bf5e8b),
+  `sha256:372b5c4e3d8e8ce4447f52249164dc347b5ed99341c65d09b401d927a08515a5`; its Verify step checked the signature
+  and the SBOM attestation. Pulled by digest: patches 0004 and 0005 are in their files, mode 400, owner apache.
+- **Deploy (owner run):** `scripts/clinical/verify-images.sh`, `kubectl diff -k k8s/clinical` (only OpenEMR's image),
+  `kubectl apply -k k8s/clinical`, `kubectl -n clinical rollout status deploy/openemr`. Then sign the desktops' EHR
+  windows out and in (#183).
+
+Agent: Claude Code
