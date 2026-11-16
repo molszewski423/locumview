@@ -3097,3 +3097,49 @@ Agent: Claude Code
   The next steps of #178 are unchanged: save the baseline, then the lv-demo01 test.
 
 Agent: Claude Code
+
+## 180. The demo EHR tested on the demo desktop; what the test found (owner run, 2026-11-16)
+
+- **Baseline:** saved at 2026-11-16T14:52:38Z, 16,648,779 bytes, after #179's wait was applied (checked in the live
+  ConfigMap). The encrypted `openemr-demo.sops.yaml` was committed by the owner (both values `ENC[`, one recipient).
+- **Test (owner, on the demo desktop through the guest `demo` connection):** Keycloak sign-in as `demo`; OpenEMR
+  sign-in as `demo`; LV-cap-duration-01 opened and LocumView Clinical launched from the chart with its finding,
+  explanation, problems, medications and vitals, so the demo login has the reads the app needs. An edit as `demo`
+  (mobile phone `555-0123`, checked in `patient_data`), then `openemr-reset` by hand: the job succeeded ("reset to
+  the baseline saved at 2026-11-16T14:52:38Z"), the phone was blank again, `demo` still signed in with the same
+  password, and OpenEMR's `log` kept its rows (248,296, with entries after the reset).
+- **Found, fixed here:** the demo desktop is one session that stays open between visitors, and the EHR was still
+  signed in from an earlier test when the owner opened it. The rotation runbook now ends with signing the desktop out
+  of OpenEMR and closing the browser. The idle logout of the guest desktop (ROADMAP) would remove the need.
+- **Found, fixed here:** `wl-copy -o` (one paste) on the owner's GNOME desktop delivered nothing: the shell reads the
+  clipboard as soon as it changes. The runbook uses `wl-copy` and `wl-copy --clear`.
+- **Found, open:** OpenEMR's demographics form refuses to save a scenario patient: Birth Sex is required and empty,
+  and Sex shows Unassigned because the loader stores `female` where the form's list uses `Female`. Every `LV-`
+  patient is affected; the loader should write OpenEMR's list values and the birth sex.
+- **Found, open:** scenario dates are fixed, so findings drift with real time (LV-cap-duration-01 now reports day 27
+  of antibiotics, written as a day 6 case). A reset restores the same dates; the loader or the reset should shift
+  them relative to the day.
+
+Agent: Claude Code
+
+## 181. The SMART apps card first on the patient dashboard (OpenEMR patch 0004) (2026-11-16)
+
+- **Owner request (2026-11-16, made a priority):** the LocumView Clinical launch button higher on the patient
+  dashboard, above the medical problems and medications.
+- **Found:** stock OpenEMR attaches the "SMART Enabled Apps" card to `RenderEvent::EVENT_SECTION_LIST_RENDER_AFTER`,
+  the end of the dashboard's main column, under the issue cards, demographics and vitals. No event fires between the
+  patient header and the row of allergies, medical problems and medications (`EVENT_SECTION_LIST_RENDER_TOP` fires
+  above the patient header), and no setting moves the card.
+- **Change:** `clinical/spike/patches/0004-smart-apps-above-issue-cards.diff` to
+  `interface/patient_file/summary/demographics.php`: the card renders in its own full-width row at the start of the
+  main content, under the dashboard's own access check, and is no longer registered at the end. The OpenEMR image's
+  patch stage copies and patches the file (`clinical/images/openemr/Containerfile`); `docs/upstream/openemr-8.4.1.md`
+  records it as a LocumView change, not a defect.
+- **Verified locally:** `clinical/spike/run.sh up` applied patches 0001 to 0004 to stock 8.4.1; with one scenario
+  patient loaded and the spike's client given the `launch` scope, the signed-in dashboard HTML has "SMART Enabled
+  Apps" once, before Allergies, Medical Problems and Medications. `podman build` of the OpenEMR image applies the
+  patch at `--fuzz=0`; the patched file keeps mode 400, owner apache, and passes `php -l`.
+- **Next:** CI builds and signs the image on merge; a follow-up commit pins its digest; the owner verifies, applies and
+  checks the dashboard on a desktop.
+
+Agent: Claude Code
