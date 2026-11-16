@@ -3372,3 +3372,22 @@ Agent: Claude Code
   `kubectl -n clinical rollout status deploy/openemr` and `deploy/agent`; then sign the desktops' EHR out and in.
 
 Agent: Claude Code
+
+## 195. Menu buttons: the hover stays inside the button and follows the theme (2026-11-16)
+
+- **Deployed (owner run):** #192's OpenEMR image and #194's agent image (both verified, only those images in the diff).
+  The owner checked on the demo desktop: the menu as buttons, the photographs, the narrower dialog, and an explanation
+  served at once on the second launch.
+- **Found (owner, dark appearance):** hovering a dropdown button (Miscellaneous) showed a light cyan block that spread
+  past the button's border. Cause: OpenEMR's tab stylesheet `tabs_style_full.css` colors the whole section around a
+  dropdown button (`.menuSection:hover { background-color: #cce3f8 }`) in every theme, and the dark theme gives
+  dropdown entries a light hover (`.appMenu li:hover { background-color: #cbd8e7 !important }`).
+- **Change (`locumview/menu.css`):** the section's hover background is cleared; the button keeps its highlight while
+  the pointer is anywhere in its section, open dropdown included; dropdown entries hover in the theme's colors (light
+  `#E5EAF0`, dark `#223044`). The theme imports `menu.css?v=8202`, and patch 0007 raises OpenEMR's asset version to
+  8202, so browsers fetch the new stylesheets.
+- **Checked:** a headless render of the hovered state with OpenEMR's light and dark theme and tab stylesheets: the
+  highlight inside the button in both, dropdown entries in theme colors. The patches apply in a local image build.
+- **Deploy:** CI builds the OpenEMR image on merge; a follow-up pins it.
+
+Agent: Claude Code

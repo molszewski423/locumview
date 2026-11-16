@@ -8,6 +8,8 @@
   --lv-menu-text: #1D2230;
   --lv-menu-hover-bg: rgba(15, 118, 110, 0.10);
   --lv-menu-accent: #0F766E;
+  --lv-menu-item-hover-bg: #E5EAF0;
+  --lv-menu-item-hover-text: #1D2230;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -17,6 +19,8 @@
     --lv-menu-text: #E6EDF3;
     --lv-menu-hover-bg: rgba(94, 234, 212, 0.12);
     --lv-menu-accent: #5EEAD4;
+    --lv-menu-item-hover-bg: #223044;
+    --lv-menu-item-hover-text: #E6EDF3;
   }
 }
 
@@ -40,8 +44,15 @@
   transition: background-color 0.12s, border-color 0.12s, color 0.12s;
 }
 
+/* OpenEMR's tab stylesheet paints the whole section (button and the space around it) light blue on hover
+   (.menuSection:hover), in either theme; the highlight belongs to the button only (changelog #195). */
+#mainMenu .appMenu > div > .menuSection:hover {
+  background-color: transparent;
+}
+
+/* The button stays highlighted while the pointer is anywhere in its section, its open dropdown included. */
 #mainMenu .appMenu > div > .menuLabel:hover,
-#mainMenu .appMenu > div > .menuSection > .menuLabel:hover,
+#mainMenu .appMenu > div > .menuSection:hover > .menuLabel,
 #mainMenu .appMenu > div > .menuSection.show > .menuLabel {
   border-color: var(--lv-menu-accent);
   background: var(--lv-menu-hover-bg);
@@ -57,4 +68,15 @@
 #mainMenu .appMenu > div > .menuLabel.menuDisabled {
   opacity: 0.5;
   cursor: default;
+}
+
+/* Dropdown entries: OpenEMR's dark theme gives them a light hover (#cbd8e7, !important) and its tab stylesheet a dark
+   one; both follow the theme here instead. */
+#mainMenu .appMenu .menuEntries li:hover {
+  background-color: var(--lv-menu-item-hover-bg) !important;
+}
+
+#mainMenu .appMenu .menuEntries li .menuLabel:hover {
+  background-color: var(--lv-menu-item-hover-bg) !important;
+  color: var(--lv-menu-item-hover-text) !important;
 }
