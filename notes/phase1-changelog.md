@@ -3156,3 +3156,24 @@ Agent: Claude Code
   baseline are untouched (the dashboard file is in the image, not the database).
 
 Agent: Claude Code
+
+## 183. The SMART apps card always open (OpenEMR patch 0005) (2026-11-16)
+
+- **Applied (owner run):** #182's image, `sha256:601e39b5…`, after `verify-images.sh` (all verified) and a diff showing
+  only OpenEMR's image. On the demo desktop the "SMART Enabled Apps" card is first, above allergies, medical problems
+  and medications, but collapsed: stock OpenEMR starts it collapsed until a user expands it and keeps the choice per
+  user in `user_settings`, which the demo's nightly reset would restore to collapsed every day.
+- **Owner request:** open by default, so the launch button shows whenever a chart is opened.
+  `clinical/spike/patches/0005-smart-apps-card-always-open.diff` sets the card's `forceAlwaysOpen` (always open, no
+  collapse toggle) in `src/FHIR/SMART/SmartLaunchController.php`; the image's patch stage includes the file.
+- **Found during the apply:** the OpenEMR restart left the demo desktop's open EHR window on a login page that took no
+  input (its old page kept polling with the dead session, `400`s in OpenEMR's log), and closing it from the GNOME
+  overview did not help; logging the demo session out and in did. After an OpenEMR restart, open EHR windows need a
+  fresh session; the deploy notes say so.
+- **Verified locally:** patch 0005 applied at `--fuzz=0` to the spike's file; with no `smart` user setting, the
+  dashboard renders the card's body `collapse show`, with no collapse toggle, and the launch button before Allergies.
+  `podman build` of the OpenEMR image applies 0001 to 0005.
+- **Next:** CI builds the image on merge; a follow-up pins it; the owner applies it, then signs the demo desktop's
+  EHR out and in.
+
+Agent: Claude Code

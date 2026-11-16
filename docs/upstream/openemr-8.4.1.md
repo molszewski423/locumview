@@ -31,6 +31,11 @@ contribute fixes in parallel). Nothing here has been submitted.
   in its own full-width row at the start of the main content, under the same access check as the dashboard, and no
   longer registers it at the end. A candidate upstream improvement is a configurable position, or an event at that
   point; not offered.
+- **SMART apps card always open** (owner request, changelog #183):
+  `clinical/spike/patches/0005-smart-apps-card-always-open.diff`. Stock OpenEMR starts the card collapsed until a user
+  expands it, and keeps that choice per user in `user_settings`; the demo EHR's nightly reset restores the baseline,
+  so the demo user would find it collapsed again each morning. The patch sets the card's `forceAlwaysOpen`, as other
+  cards use it: always open, no collapse toggle, for every user.
 
 Evidence: M1 `docs/evidence/clinical/20261025-openemr-m1-spike/`, M2 changelog #75, M3
 `docs/evidence/clinical/20261025-m3-local-launch/`.
