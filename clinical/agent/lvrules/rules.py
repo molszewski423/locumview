@@ -352,9 +352,28 @@ def opioid_cns_depressant(s: Snapshot, kb: Knowledge) -> list[Finding]:
     return out
 
 
+def missing_bowel_regimen(s: Snapshot, kb: Knowledge) -> list[Finding]:
+    """An active opioid order with no stimulant or osmotic laxative order (opioid stewardship O3, #201). A stool softener
+    alone does not count; a problem of diarrhea keeps the rule silent (SHM 2018, statement 10). Names the opioid
+    started first."""
+    active = s.active_ade()
+    opioids = sorted((p for p in active if kb.drug_class(p.ade_agent) == "opioid"), key=lambda p: (p.start, p.text))
+    if not opioids or any(kb.has_ade_condition(x.icd10, "diarrhea") for x in s.problems):
+        return []
+    if any(kb.drug_class(p.ade_agent) in ("stimulant-laxative", "osmotic-laxative") for p in active):
+        return []
+    names = " and ".join(sorted({kb.display(p.ade_agent).lower() for p in opioids}))
+    softeners = [p for p in active if kb.drug_class(p.ade_agent) == "stool-softener"]
+    summary = (f"No stimulant or osmotic laxative is ordered with {names}."
+               + (" Docusate alone, a stool softener, is not a bowel regimen." if softeners else "")
+               + " Unless contraindicated, add a stimulant laxative such as senna, or an osmotic laxative.")
+    evidence = [f"Active: {p.text}, started {p.start}" for p in opioids + softeners]
+    return [_finding(kb, "missing-bowel-regimen", "missing-bowel-regimen", opioids[0].ade_agent, summary, evidence)]
+
+
 RULES = (bug_drug_mismatch, ampc_third_generation_cephalosporin, mssa_vancomycin, meningitis_listeria,
          double_anaerobic_coverage, duration_review, iv_to_po_switch, duplicate_anticoagulation,
-         opioid_cns_depressant)
+         opioid_cns_depressant, missing_bowel_regimen)
 
 
 def evaluate(s: Snapshot, kb: Knowledge, modules: set[str] | None = None) -> list[Finding]:

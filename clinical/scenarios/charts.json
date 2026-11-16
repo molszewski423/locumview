@@ -1928,5 +1928,93 @@
    "immunizations": [],
    "why": "Opioid-naive before surgery; gabapentin was a single enhanced recovery dose, not a home medication."
   }
+ },
+ "opioid-docusate-only-01": {
+  "demographics": {
+   "race": [
+    "2028-9"
+   ],
+   "ethnicity": [
+    "2186-5"
+   ],
+   "street": "305 Chestnut Street",
+   "city": "Springfield",
+   "state": "MA",
+   "postal_code": "01104",
+   "phone_home": "555-274-6619",
+   "marital": "W",
+   "language": "en",
+   "portrait": "short silver hair, small pearl earrings"
+  },
+  "emergency_contact": {
+   "name": "Linh Casebook",
+   "relationship": "Daughter",
+   "phone": "555-274-1206"
+  },
+  "insurance": "Medicare",
+  "history": {
+   "problems": [
+    {
+     "title": "Type 2 diabetes mellitus without complications",
+     "icd10": "E11.9"
+    },
+    {
+     "title": "Osteoporosis",
+     "icd10": "M81.0"
+    }
+   ],
+   "home_medications": [],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "None",
+   "social": "widowed, lives with her daughter's family; retired seamstress",
+   "immunizations": [],
+   "why": "Opioid-naive; constipation risk from reduced mobility and hydromorphone."
+  }
+ },
+ "opioid-senna-docusate-negative-01": {
+  "demographics": {
+   "race": [
+    "2106-3"
+   ],
+   "ethnicity": [
+    "2135-2"
+   ],
+   "street": "58 River Street",
+   "city": "Chicopee",
+   "state": "MA",
+   "postal_code": "01013",
+   "phone_home": "555-598-3021",
+   "marital": "M",
+   "language": "en",
+   "portrait": "short dark hair graying at the temples, trimmed mustache"
+  },
+  "emergency_contact": {
+   "name": "Lucia Casebook",
+   "relationship": "Spouse",
+   "phone": "555-598-7740"
+  },
+  "insurance": "Commercial",
+  "history": {
+   "problems": [
+    {
+     "title": "Personal history of urinary calculi",
+     "icd10": "Z87.442"
+    }
+   ],
+   "home_medications": [],
+   "allergies": [],
+   "tobacco": {
+    "status": "never",
+    "note": "Never smoker"
+   },
+   "alcohol": "Occasional",
+   "social": "married, two teenagers; HVAC technician",
+   "immunizations": [],
+   "why": "Second ureteral stone; first in 2022 passed spontaneously."
+  }
  }
 }

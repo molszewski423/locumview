@@ -1,6 +1,6 @@
 # Opioid stewardship module: plan
 
-Status: **In progress** (owner request, 2026-11-16). O1 is built (changelog #198); the rest is planned. Every clinical threshold below is a candidate
+Status: **In progress** (owner request, 2026-11-16). O1 (#198) and O3 (#201) are built; O2 waits on an owner decision; the rest is planned. Every clinical threshold below is a candidate
 until it is read in its primary source and approved by the owner (the clinical review process: primary sources
 first, then an OpenEvidence packet the owner runs, then the owner's decisions).
 
@@ -21,6 +21,17 @@ the ADE module's first rule (changelog #187).
 | O7 | Renally cleared opioid in renal impairment | Morphine, codeine, tramadol or meperidine with low creatinine clearance | Creatinine, weight, age, sex; overlaps the ADE renal rule | FDA labels | With the ADE renal rule |
 
 Tramadol or methadone with serotonergic drugs belongs to the ADE module's serotonin rule (planned with linezolid and SSRIs).
+
+## Inpatient sources (found 2026-11-16, #201)
+
+The CDC 2022 opioid guideline (PMID 36327391, read in PubMed Central PMC9639433) states that its recommendations do not
+apply to patients who are hospitalized; they apply to prescribing at discharge. The inpatient source is the Society of
+Hospital Medicine consensus statement (Herzig 2018, PMID 29624189, PMC6278928): statement 10, a bowel regimen for
+hospitalized patients receiving opioids unless contraindicated (stimulant or osmotic laxatives, not stool softeners);
+statement 11, limit opioids with other CNS depressants. On naloxone its working group made no recommendation: no clear
+evidence for naloxone with short-term opioid therapy for acute pain. O3 rests on statement 10. O2 as an inpatient rule
+has no supporting source; options for the owner: drop it, restrict it to patients on chronic opioid therapy (which needs
+the home medication list), or make it a discharge rule when discharge prescribing is in scope.
 
 ## Data prerequisites
 

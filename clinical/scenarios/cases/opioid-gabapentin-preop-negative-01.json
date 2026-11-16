@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "opioid-gabapentin-preop-negative-01",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "title": "Oxycodone after knee replacement; a single preoperative gabapentin dose is not a combination",
   "kind": "negative-control",
   "modules": [
@@ -12,10 +12,8 @@
     "author": "Claude Code (draft for owner review)",
     "created": "2026-11-16",
     "clinical_review": {
-      "status": "approved",
-      "by": "owner",
-      "date": "2026-11-16",
-      "notes": "Owner approved 2026-11-16 the four review points of changelog #198 as presented: the cases and reference answers, the two reviewed reasons, naming the sedative, and the lorazepam label's class wording standing for alprazolam and diazepam. The basis is the Roxicodone, Ativan, Neurontin and Lyrica label text quoted in #198, read by Claude Code on DailyMed; the owner did not report reading the labels."
+      "status": "pending",
+      "notes": "Approved 2026-11-16 (#200) at 0.1.1; changed in #201: a senna order added so the case tests only the opioid with a sedative rule. Owner to re-confirm."
     }
   },
   "story": "A 70-year-old man has an elective right total knee arthroplasty. As part of the enhanced recovery pathway he receives one dose of gabapentin 300 mg on the evening before surgery, with no further gabapentin ordered. After surgery he has oxycodone 5 mg by mouth every 4 hours as needed and scheduled acetaminophen. On the first postoperative morning only the oxycodone and acetaminophen are active.",
@@ -70,6 +68,13 @@
       "start": "2026-11-14",
       "route": "PO",
       "instructions": "1,000 mg by mouth every 8 hours"
+    },
+    {
+      "drug": "sennosides, USP 8.6 MG Oral Tablet",
+      "rxnorm": "312935",
+      "route": "PO",
+      "instructions": "17.2 mg (2 tablets) by mouth at bedtime",
+      "start": "2026-11-14"
     }
   ],
   "vitals": [

@@ -1,0 +1,120 @@
+{
+  "schema": "locumview-case/1",
+  "id": "opioid-docusate-only-01",
+  "version": "0.1.0",
+  "title": "Hydromorphone for a vertebral fracture with docusate alone: no bowel regimen",
+  "kind": "finding",
+  "modules": [
+    "opioid"
+  ],
+  "provenance": {
+    "source": "synthetic",
+    "author": "Claude Code (draft for owner review)",
+    "created": "2026-11-16",
+    "clinical_review": {
+      "status": "pending"
+    }
+  },
+  "story": "A 78-year-old woman with osteoporosis is admitted for pain control after an osteoporotic compression fracture of T12. She has hydromorphone 2 mg by mouth every 4 hours as needed and scheduled acetaminophen. The admission order set added docusate 100 mg twice daily. She has had no bowel movement in two days, has no diarrhea, and her mobility is limited by pain.",
+  "patient": {
+    "family": "Casebook",
+    "given": "Mira",
+    "birth_date": "1948-09-03",
+    "sex": "female"
+  },
+  "encounter": {
+    "class_code": "IMP",
+    "start": "2026-11-13T16:00:00-05:00",
+    "reason": "Back pain after lifting a laundry basket"
+  },
+  "problems": [
+    {
+      "title": "Age-related osteoporosis with current pathological fracture of vertebra",
+      "diagnosis": "ICD10:M80.08XA",
+      "begdate": "2026-11-13"
+    },
+    {
+      "title": "Type 2 diabetes mellitus without complications",
+      "diagnosis": "ICD10:E11.9",
+      "begdate": "2014-06-20"
+    }
+  ],
+  "allergies": [],
+  "prescriptions": [
+    {
+      "drug": "hydromorphone hydrochloride 2 MG Oral Tablet",
+      "rxnorm": "897696",
+      "start": "2026-11-13",
+      "route": "PO",
+      "instructions": "2 mg by mouth every 4 hours as needed for pain"
+    },
+    {
+      "drug": "acetaminophen 500 MG Oral Tablet",
+      "rxnorm": "198440",
+      "start": "2026-11-13",
+      "route": "PO",
+      "instructions": "1,000 mg by mouth every 8 hours"
+    },
+    {
+      "drug": "docusate sodium 100 MG Oral Capsule",
+      "rxnorm": "1115005",
+      "start": "2026-11-13",
+      "route": "PO",
+      "instructions": "100 mg by mouth twice daily (admission order set)"
+    }
+  ],
+  "vitals": [
+    {
+      "taken": "2026-11-13T16:10:00-05:00",
+      "temperature_f": 98.1,
+      "pulse": 88,
+      "bps": 152,
+      "bpd": 84,
+      "respiration": 18,
+      "oxygen_saturation": 96
+    },
+    {
+      "taken": "2026-11-15T07:30:00-05:00",
+      "temperature_f": 98.4,
+      "pulse": 80,
+      "bps": 140,
+      "bpd": 78,
+      "respiration": 16,
+      "oxygen_saturation": 96
+    }
+  ],
+  "labs": [
+    {
+      "order_code": "LV-BMP",
+      "order_text": "Basic labs",
+      "collected": "2026-11-15T05:30:00-05:00",
+      "resulted": "2026-11-15T06:30:00-05:00",
+      "results": [
+        {
+          "loinc": "2160-0",
+          "text": "Creatinine [Mass/volume] in Serum or Plasma",
+          "value": "0.9",
+          "units": "mg/dL",
+          "range": "0.5-1.1",
+          "flag": "N"
+        }
+      ]
+    }
+  ],
+  "expected_findings": [
+    {
+      "module": "opioid",
+      "type": "missing-bowel-regimen",
+      "drug": "Hydromorphone",
+      "summary": "No stimulant or osmotic laxative is ordered with hydromorphone; docusate alone, a stool softener, is not a bowel regimen."
+    }
+  ],
+  "reference_answer": "Add a stimulant laxative, for example senna 8.6 mg, two tablets at bedtime, with polyethylene glycol 17 g daily if she has no bowel movement; the docusate can stop. Track bowel movements and adjust.",
+  "rationale": "SHM's consensus statement 10 recommends a bowel regimen for hospitalized patients receiving opioids unless contraindicated (no diarrhea here), names stimulant and osmotic laxatives, and does not recommend stool softeners. The rule needs an active opioid order and no active stimulant or osmotic laxative order; docusate does not count.",
+  "citations": [
+    {
+      "ref": "shm-opioid-2018",
+      "supports": "Consensus statement 10: a bowel regimen for hospitalized patients receiving opioids; stimulant or osmotic laxatives; stool softeners not recommended. Read in the PubMed Central full text, owner review pending."
+    }
+  ]
+}

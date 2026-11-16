@@ -43,6 +43,7 @@ export const TYPE_LABELS: Record<string, string> = {
   "duplicate-anticoagulation": "Duplicate anticoagulation",
   "opioid-benzodiazepine": "Opioid with a benzodiazepine",
   "opioid-gabapentinoid": "Opioid with a gabapentinoid",
+  "missing-bowel-regimen": "Opioid without a bowel regimen",
 };
 
 export interface Explanation {

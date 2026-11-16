@@ -52,7 +52,7 @@ unknown keys.
 
 Every time carries an offset (`2026-10-20T14:00:00-04:00`); the loader stores UTC. Finding types:
 `bug-drug-mismatch`, `suboptimal-agent` (tests susceptible, but not the preferred agent), `missing-empiric-coverage`,
-`de-escalation`, `iv-to-po-switch`, `redundant-coverage`, `duration-review`; ADE monitoring: `duplicate-anticoagulation`; opioid stewardship: `opioid-benzodiazepine`, `opioid-gabapentinoid`.
+`de-escalation`, `iv-to-po-switch`, `redundant-coverage`, `duration-review`; ADE monitoring: `duplicate-anticoagulation`; opioid stewardship: `opioid-benzodiazepine`, `opioid-gabapentinoid`, `missing-bowel-regimen`.
 
 ## Codes and citations
 
