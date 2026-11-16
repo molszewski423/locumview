@@ -4,4 +4,4 @@
 @import url("style_light.css") not all and (prefers-color-scheme: dark);
 @import url("style_dark.css") (prefers-color-scheme: dark);
 @import url("locumview/login.css");
-@import url("locumview/menu.css");
+@import url("locumview/menu.css?v=8202");   /* the version keeps browsers from using a cached copy (#195) */

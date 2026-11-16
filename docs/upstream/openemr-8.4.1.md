@@ -44,7 +44,7 @@ contribute fixes in parallel). Nothing here has been submitted.
 - **Asset version** (changelog #191): `clinical/spike/patches/0007-asset-version-bump.diff`. OpenEMR adds
   `?v=$v_js_includes` (82 in 8.4.1) to its JavaScript and stylesheet URLs, and its own comment asks for the number to
   be raised whenever a .js or .css file changes, or browsers keep the cached copy. LocumView changes `utility.js` and
-  the theme, so the patch sets 8201; each later LocumView change to a .js or .css file raises it (82xx).
+  the theme, so the patch sets it to 82xx and each later LocumView change to a .js or .css file raises it (8202 since #195).
 
 Evidence: M1 `docs/evidence/clinical/20261025-openemr-m1-spike/`, M2 changelog #75, M3
 `docs/evidence/clinical/20261025-m3-local-launch/`.
