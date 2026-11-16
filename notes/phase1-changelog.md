@@ -3409,3 +3409,14 @@ Agent: Claude Code
   counting and thresholds, O1 first).
 
 Agent: Claude Code
+
+## 197. The OpenEMR image with the menu hover fix pinned (2026-11-16)
+
+- **Image:** clinical-images run 867 for the merge of #195 (commit 944a310),
+  `sha256:24537d4d40b7074ce58bc1a1d63a4e933294129a5d78a7d92f2366d50777f6cc`; its Verify step checked the signature and
+  the SBOM attestation. Pulled by digest: asset version 8202, `menu.css?v=8202` in the theme, the section hover cleared.
+- **Deploy (owner run):** `scripts/clinical/verify-images.sh`; `kubectl diff -k k8s/clinical` (only OpenEMR's image);
+  `kubectl apply -k k8s/clinical` and `kubectl -n clinical rollout status deploy/openemr`; sign the desktops' EHR out and
+  in. This branch also carries #196 (the opioid plan), so the changelog stays in order.
+
+Agent: Claude Code

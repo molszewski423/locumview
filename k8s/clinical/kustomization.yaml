@@ -18,10 +18,9 @@ resources:
 # build that is to be deployed; verify first: scripts/clinical/verify-images.sh
 images:
   - name: git.lan/mike/locumview-openemr
-    # commit 813d005, clinical-images (Gitea run 854): patches 0001 to 0007 (0006: the SMART app dialog 1280 px wide; 0007:
-    # asset version 8201, #191), the Automatic theme with the menu buttons; signature and SBOM attestation verified by CI
-    # 2026-11-16
-    digest: sha256:33c98a58298b7c124130be948fa2e63fe45f81a017cd38024c31a02b9a4a035b
+    # commit 944a310, clinical-images (Gitea run 867): patches 0001 to 0007 (asset version 8202) and the Automatic theme
+    # with the menu buttons' hover fix (#195); signature and SBOM attestation verified by CI 2026-11-16
+    digest: sha256:24537d4d40b7074ce58bc1a1d63a4e933294129a5d78a7d92f2366d50777f6cc
   - name: git.lan/mike/locumview-clinical-gateway
     # commit 145bd5b, clinical-images (Gitea run 840): the app's duplicate anticoagulation label (#187); signature and
     # SBOM attestation verified by CI 2026-11-16
