@@ -31,7 +31,10 @@ if [ -f /etc/dconf/profile/locumview-demo ]; then
   restorecon -R "/home/$U/.config" || true
 fi
 
-# 2. Egress fence for the demo uid (outbound only; replies on established flows allowed).
+# 2. Egress fence for the demo uid (outbound only; replies on established flows allowed). Blocked traffic is rejected,
+#    not dropped (changelog #184): a dropped connection makes the caller wait for a timeout. Chrome's online
+#    revocation check (DISA STIG policy EnableOnlineRevocationChecks) asks the EHR certificate's OCSP and CRL
+#    addresses on the LAN, and waited 20 to 30 s for them at every EHR start; rejected, it soft-fails at once.
 cat > /etc/nftables/locumview-demo.nft <<NFT
 table inet locumview_demo
 delete table inet locumview_demo
@@ -43,8 +46,8 @@ table inet locumview_demo {
     ct state established,related accept
     ip daddr $DNS udp dport 53 accept
     ip daddr $DNS tcp dport 53 accept
-    ip daddr { 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 100.64.0.0/10, 169.254.0.0/16 } counter drop
-    ip6 daddr { fc00::/7, fe80::/10 } counter drop
+    ip daddr { 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 100.64.0.0/10, 169.254.0.0/16 } counter reject with icmpx type admin-prohibited
+    ip6 daddr { fc00::/7, fe80::/10 } counter reject with icmpx type admin-prohibited
   }
 }
 NFT
