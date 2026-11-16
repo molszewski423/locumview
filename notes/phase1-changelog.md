@@ -3453,3 +3453,15 @@ Agent: Claude Code
   the opioid; treating the class wording of the lorazepam label as standing for alprazolam and diazepam.
 
 Agent: Claude Code
+
+## 199. The agent and gateway images with opioid stewardship pinned (2026-11-16)
+
+- **Images:** clinical-images run 873 for the merge of #198 (commit 64ae70d); its Verify step checked each signature and
+  SBOM attestation. Agent `sha256:aa5bc93c…` (pulled: knowledge base 0.10.0, `opioid_cns_depressant`, the intent filter,
+  the explanation memory); gateway `sha256:0f362f73…` (pulled: the Opioid Stewardship tab).
+- **Deploy (owner run):** `scripts/clinical/verify-images.sh`; `kubectl diff -k k8s/clinical` (the agent's, the
+  gateway's and, from #197, OpenEMR's images); `kubectl apply -k k8s/clinical`; rollout status for openemr, agent and
+  gateway; sign the desktops' EHR out and in; then `scripts/clinical/load-scenarios.sh` (Yara and Bram Casebook, with
+  photographs) and a new baseline straight away.
+
+Agent: Claude Code
