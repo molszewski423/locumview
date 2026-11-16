@@ -98,4 +98,7 @@ OpenEMR 8.4.1 with LocumView's fix (`clinical/images/openemr/`), MariaDB, and th
    - The reset restores everything in this OpenEMR, including changes made by other accounts; to keep a change, save a
      new baseline. OpenEMR's audit tables are not part of it and keep their history.
 
+After any OpenEMR restart (a new image, a rollout), EHR windows open on desktops keep a dead session and may stop taking
+input: sign out of the desktop (or close the EHR browser completely) and open the EHR again (changelog #183).
+
 Nothing in these steps displays a password, the client secret or a private key.

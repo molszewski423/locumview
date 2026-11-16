@@ -1,0 +1,14 @@
+--- a/src/FHIR/SMART/SmartLaunchController.php
++++ b/src/FHIR/SMART/SmartLaunchController.php
+@@ -84,8 +84,9 @@
+                         'title' => xl('SMART Enabled Apps'),
+                         'card_container_class_list' => ['flex-fill', 'mx-1', 'card'],
+                         'id' => 'smart',
+-                        'forceAlwaysOpen' => false,
+-                        'initiallyCollapsed' => getUserSetting('smart') == 0,
++                        // LocumView: always open, so the launch button shows on every chart (no per-user collapse)
++                        'forceAlwaysOpen' => true,
++                        'initiallyCollapsed' => false,
+                         'linkMethod' => "javascript",
+                         'auth' => false,
+                         'issuer' => $issuer,
