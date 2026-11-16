@@ -2962,3 +2962,25 @@ Agent: Claude Code
   note that it does not follow `builder.env`). The next push to main reruns rpms and image (#168 and #172 ship there).
 
 Agent: Claude Code
+
+## 174. The image with #168, #172 and #173 tried on lv-test17, promoted to `:stable`, running on lv-demo01 (2026-11-15)
+
+- **Image:** image run 755 for the merge of #116 (commit 9837f507), `sha256:71e311d1fd29f37e9c6fd0a8170946b3fc34477dc4b27f6556e4e6dca4d1eaca`;
+  its Verify step checked the signature, the SBOM and the scan attestations.
+- **lv-test17 (owner run):** `bootc switch --enforce-container-sigpolicy` to that digest, staged digest checked with
+  `bootc status`, reboot. From the dock icon the EHR opened maximized and no keyring prompt appeared (#168, #172).
+- **Promotion (owner decision and run):** the promote workflow with that digest. Previous `:stable`:
+  `sha256:1cb7cbad7496e36b24716618e4d510e34f30e70d367b863ad25774e5afb5f5db`, the rollback.
+- **lv-demo01 (owner run, as the owner's account through the lv-dev connection):** `bootc upgrade` staged
+  `:stable` at `71e311d1…` (checked with `bootc status`), reboot. As the demo account the EHR opened with no keyring
+  prompt, so the empty keyring password considered for `demo` is not needed. The EHR loaded after the reboot, so the
+  demo's EHR egress rule (#164, #165) now comes from the image instead of being applied by hand. Signed in to OpenEMR
+  as the non-admin `pharmacist`, SMART launches of LocumView Clinical worked on two charts.
+- **Seen once, not reproduced:** the first SMART launch of the session opened in a narrow dialog (about Bootstrap's
+  default width) instead of OpenEMR's `modal-full` (97%); a second launch on the same chart, and the first launch after
+  signing in again, opened full width. Not pursued unless it recurs.
+- **Noted, not investigated:** lv-test17's login summary listed `rpc-gssd.service` as failed.
+- **Open:** a dedicated non-admin OpenEMR demo account with its password in SOPS and a scheduled chart reset (#91),
+  before anyone other than the owner uses the demo desktop's EHR.
+
+Agent: Claude Code
