@@ -5,11 +5,19 @@ references. Never the chart. Its reply is shown only if it passes a guard: every
 antimicrobial it names must already be in the finding, so an explanation cannot carry a value, drug or dose the rule
 did not see. A reply that fails is withheld, never repaired. The model, its digest, the prompt and the generation
 options are pinned in model.json; the server's copy of the model must match the pinned digest. Standard library only.
+
+Explanations are kept in memory (changelog #193, owner request): the same finding, word for word as the model would see
+it, with the same model, prompt and options, is explained once and served from memory afterwards, so reopening a
+patient does not run the model again. Any change to the finding (its data, summary or references, a new knowledge
+base) or to the model, prompt or options makes a new key. Only "ok" and "withheld" results are kept; "unavailable" is
+tried again. The memory is bounded (oldest first out) and is lost when the service restarts.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import re
+from collections import OrderedDict
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -18,6 +26,7 @@ from typing import Callable
 DEFAULT_MODEL_FILE = Path(__file__).resolve().parent / "model.json"
 MAX_CHARS = 1200        # two to four sentences; anything longer is not what the prompt asked for
 TIMEOUT = 60            # seconds per model request; the first one may load the model (about 18 s measured)
+CACHE_SIZE = 2000       # explanations kept in memory; a patient has a handful of findings
 
 NUMBER = re.compile(r"\d+(?:\.\d+)?")
 # Antimicrobial names by their usual stems, so a drug the knowledge base does not list is still caught.
@@ -52,6 +61,16 @@ class Explainer:
         self.prompt_file = config["prompt"]
         self.prompt = (model_file.parent / self.prompt_file).read_text()
         self.call = call
+        self.cache: OrderedDict[str, dict] = OrderedDict()
+
+    def key(self, finding: dict) -> str:
+        """Everything the model's answer and the guard's verdict depend on."""
+        return hashlib.sha256(json.dumps([self.name, self.digest, self.prompt, self.options, message(finding),
+                                          finding["evidence"], finding["summary"]], sort_keys=True).encode()).hexdigest()
+
+    def cached(self, finding: dict) -> dict | None:
+        result = self.cache.get(self.key(finding))
+        return None if result is None else dict(result, cached=True)
 
     def describe(self) -> dict:
         return {"name": self.name, "digest": self.digest, "prompt": self.prompt_file}
@@ -69,7 +88,20 @@ class Explainer:
             raise ModelUnavailable(f"The model server's {self.name} is not the pinned version")
 
     def explain(self, finding: dict) -> dict:
-        """{"status": "ok", "text"} or {"status": "withheld" | "unavailable", "reason"}."""
+        """{"status": "ok", "text"} or {"status": "withheld" | "unavailable", "reason"}, with "cached" when it came
+        from memory."""
+        hit = self.cached(finding)
+        if hit is not None:
+            self.cache.move_to_end(self.key(finding))
+            return hit
+        result = self._explain(finding)
+        if result["status"] in ("ok", "withheld"):
+            self.cache[self.key(finding)] = result
+            while len(self.cache) > CACHE_SIZE:
+                self.cache.popitem(last=False)
+        return dict(result, cached=False)
+
+    def _explain(self, finding: dict) -> dict:
         try:
             reply = self.call("POST", f"{self.base_url}/api/chat", {
                 "model": self.name, "stream": False, "think": False, "options": self.options,

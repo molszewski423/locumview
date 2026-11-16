@@ -3332,3 +3332,31 @@ Agent: Claude Code
   the desktops' EHR out and in, #183).
 
 Agent: Claude Code
+
+## 192. The OpenEMR image with #191 pinned (2026-11-16)
+
+- **Image:** clinical-images run 854 for the merge of #191 (commit 813d005),
+  `sha256:33c98a58298b7c124130be948fa2e63fe45f81a017cd38024c31a02b9a4a035b`; its Verify step checked the signature and
+  the SBOM attestation. Pulled by digest: the 1280 px dialog in `utility.js`, `$v_js_includes = 8201`, patch 0005 still
+  in place, and `locumview/menu.css` imported by the Automatic theme.
+- **Deploy (owner run):** `scripts/clinical/verify-images.sh`; `kubectl diff -k k8s/clinical` (only OpenEMR's image);
+  `kubectl apply -k k8s/clinical` and `kubectl -n clinical rollout status deploy/openemr`; then sign the desktops' EHR
+  out and in. `scripts/clinical/load-scenarios.sh` and a new baseline store #190's photographs.
+## 193. Explanations kept in memory: a reload does not run the model again (2026-11-16)
+
+- **Owner request (2026-11-16):** reopening a patient whose findings were already explained should not draft the
+  explanations on the GPU again, unless the finding changed.
+- **Change (`clinical/agent/explain.py`, `service.py`):** the agent keeps each "ok" or "withheld" explanation in memory,
+  keyed by a hash of everything the answer and the guard's verdict depend on: the message the model sees (type,
+  module, drug, summary, the data the rule used, the reference titles), the evidence and summary, the pinned model
+  and digest, the prompt and the options. A changed finding (new data, a new knowledge base) or a changed model makes a
+  new key. "Unavailable" is not kept, so the model is tried again. When every finding is already in memory, the
+  service does not contact the model server at all. Each explanation in the reply carries `cached` (true or false).
+  The memory holds 2,000 explanations (oldest out first) and is lost when the agent restarts; the agent runs as one
+  replica.
+- **Verified:** agent tests 87 OK (a reload serves from memory with no model call and no server check; another
+  patient's findings are explained; an unavailable model is not kept); with the real gemma4:26b on the workstation,
+  Thea Casebook's finding took 25.8 s the first time (model load and generation) and 0.00 s the second.
+- **Deploy:** CI builds the agent image on merge; a follow-up pins it.
+
+Agent: Claude Code

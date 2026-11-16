@@ -91,7 +91,7 @@ class ExplainerTests(unittest.TestCase):
 
     def test_a_guarded_reply_is_returned_with_the_pinned_options(self):
         fake = FakeOllama(reply=self.finding["summary"])
-        self.assertEqual(explainer(fake).explain(self.finding), {"status": "ok", "text": self.finding["summary"]})
+        self.assertEqual(explainer(fake).explain(self.finding), {"status": "ok", "text": self.finding["summary"], "cached": False})
         method, url, body = fake.requests[-1]
         self.assertEqual((method, url), ("POST", "http://ollama.test:11434/api/chat"))
         self.assertEqual((body["model"], body["stream"], body["think"]), ("gemma4:26b", False, False))

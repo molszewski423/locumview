@@ -79,7 +79,8 @@ def create_app(kb: Knowledge, citations: dict, site_tz: str, explainer: Explaine
         as_of, modules, found = run_rules(body)
         if explainer is None:
             raise HTTPException(503, "No explanation model is set up")
-        if found:
+        # Findings explained before come from memory; the model server is checked only when one is new (#193).
+        if any(explainer.cached(f) is None for f in found):
             try:
                 explainer.check_model()
             except ModelUnavailable as error:

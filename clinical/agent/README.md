@@ -66,6 +66,10 @@ after the findings, so a slow or missing model never holds the findings back.
 
 "Now" is the newest charted time in the snapshot, never the wall clock, so a case gives the same answer every time.
 
+Explanations are kept in memory (`explain.py`, changelog #193): the same finding with the same model, prompt and
+options is explained once and then served from memory, so reopening a patient does not run the model again; any change
+to the finding or the model makes a new one. The memory is lost when the service restarts.
+
 ## Rules
 
 | Rule | Module, finding type | Fires when | References |
