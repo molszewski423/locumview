@@ -3465,3 +3465,19 @@ Agent: Claude Code
   photographs) and a new baseline straight away.
 
 Agent: Claude Code
+
+## 200. Opioid with a sedative cases: owner approved; #199 deployed (2026-11-16)
+
+- **Deployed (owner run):** #199's agent and gateway images and #197's OpenEMR image; checked: all three running and
+  ready, the agent on knowledge base 0.10.0, Yara and Bram Casebook loaded with photographs, a new baseline
+  (2026-11-16T18:16:25Z).
+- **Owner decision (2026-11-16):** "approve the O1 clinical points", the four review points of #198: both cases and
+  their reference answers, the two reviewed reasons, naming the sedative, and the lorazepam label's class wording
+  standing for alprazolam and diazepam.
+- **Basis, as recorded:** the label text quoted in #198 (Roxicodone, Ativan, Neurontin, Lyrica), read by Claude Code on
+  DailyMed; the owner approved the content as presented and did not report reading the labels. The four citations'
+  `content_check` is `owner` on that basis.
+- **Changed:** both cases approved (version 0.1.1), the citation notes and `supports` lines. No rule, knowledge or
+  fixture change, so no image change.
+
+Agent: Claude Code

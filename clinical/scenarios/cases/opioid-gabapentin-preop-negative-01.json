@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "opioid-gabapentin-preop-negative-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Oxycodone after knee replacement; a single preoperative gabapentin dose is not a combination",
   "kind": "negative-control",
   "modules": [
@@ -12,7 +12,10 @@
     "author": "Claude Code (draft for owner review)",
     "created": "2026-11-16",
     "clinical_review": {
-      "status": "pending"
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-16",
+      "notes": "Owner approved 2026-11-16 the four review points of changelog #198 as presented: the cases and reference answers, the two reviewed reasons, naming the sedative, and the lorazepam label's class wording standing for alprazolam and diazepam. The basis is the Roxicodone, Ativan, Neurontin and Lyrica label text quoted in #198, read by Claude Code on DailyMed; the owner did not report reading the labels."
     }
   },
   "story": "A 70-year-old man has an elective right total knee arthroplasty. As part of the enhanced recovery pathway he receives one dose of gabapentin 300 mg on the evening before surgery, with no further gabapentin ordered. After surgery he has oxycodone 5 mg by mouth every 4 hours as needed and scheduled acetaminophen. On the first postoperative morning only the oxycodone and acetaminophen are active.",
@@ -113,7 +116,7 @@
   "citations": [
     {
       "ref": "fda-gabapentin-label",
-      "supports": "5.8: the risk is from gabapentin coadministered with opioids; a dose that has ended is not coadministration. Read in the label, owner review pending."
+      "supports": "5.8: the risk is from gabapentin coadministered with opioids; a dose that has ended is not coadministration. Read in the label by Claude Code; owner approved 2026-11-16 (#200)."
     }
   ]
 }

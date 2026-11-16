@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "opioid-lorazepam-postop-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Oxycodone and hydromorphone after ankle surgery, lorazepam added for sleep",
   "kind": "finding",
   "modules": [
@@ -12,7 +12,10 @@
     "author": "Claude Code (draft for owner review)",
     "created": "2026-11-16",
     "clinical_review": {
-      "status": "pending"
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-16",
+      "notes": "Owner approved 2026-11-16 the four review points of changelog #198 as presented: the cases and reference answers, the two reviewed reasons, naming the sedative, and the lorazepam label's class wording standing for alprazolam and diazepam. The basis is the Roxicodone, Ativan, Neurontin and Lyrica label text quoted in #198, read by Claude Code on DailyMed; the owner did not report reading the labels."
     }
   },
   "story": "A 62-year-old woman is admitted after a fall with a right trimalleolar ankle fracture and has open reduction and internal fixation the same day. After surgery she has oxycodone 5 mg by mouth every 4 hours as needed for moderate pain, hydromorphone 0.5 mg IV every 3 hours as needed for severe pain, and scheduled acetaminophen. On the first night she cannot sleep, and the cross-covering clinician orders lorazepam 1 mg at bedtime as needed for insomnia. The next morning all three as-needed orders are active.",
@@ -126,11 +129,11 @@
   "citations": [
     {
       "ref": "fda-oxycodone-label",
-      "supports": "Boxed warning and 5.3: opioids with benzodiazepines or other CNS depressants; reserve for inadequate alternatives. Read in the label, owner review pending."
+      "supports": "Boxed warning and 5.3: opioids with benzodiazepines or other CNS depressants; reserve for inadequate alternatives. Read in the label by Claude Code; owner approved 2026-11-16 (#200)."
     },
     {
       "ref": "fda-lorazepam-label",
-      "supports": "Boxed warning: benzodiazepines with opioids; lowest effective dose, minimum duration, monitoring. Read in the label, owner review pending."
+      "supports": "Boxed warning: benzodiazepines with opioids; lowest effective dose, minimum duration, monitoring. Read in the label by Claude Code; owner approved 2026-11-16 (#200)."
     }
   ]
 }
