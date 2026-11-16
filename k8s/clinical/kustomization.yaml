@@ -23,11 +23,13 @@ images:
     # verified by CI 2026-11-16
     digest: sha256:372b5c4e3d8e8ce4447f52249164dc347b5ed99341c65d09b401d927a08515a5
   - name: git.lan/mike/locumview-clinical-gateway
-    # commit d2cc459, clinical-images run 296; signature and SBOM attestation verified by CI 2026-11-10
-    digest: sha256:b7e7d84ca6eec6477f4f45286ba13cfd2f192c3b0c27a09064351c153bdf16c6
+    # commit 145bd5b, clinical-images (Gitea run 840): the app's duplicate anticoagulation label (#187); signature and
+    # SBOM attestation verified by CI 2026-11-16
+    digest: sha256:764c0310d779e8be21f7fcd2d64f835aab8e195db4cd91f0cc1709b96279c3eb
   - name: git.lan/mike/locumview-clinical-agent
-    # commit 326d822, clinical-images (Gitea run 610); signature and SBOM attestation verified by CI 2026-11-12
-    digest: sha256:fe6659e3a6a3e8f0c82ce8d9cf348b921a194455596a2bb6001a89ab203c7e41
+    # commit 145bd5b, clinical-images (Gitea run 840): knowledge base 0.9.0 and the ADE module's duplicate
+    # anticoagulation rule (#187); signature and SBOM attestation verified by CI 2026-11-16
+    digest: sha256:38ebf229a966a9ff23aefb9022559b41d538ba7bfd0ae44203277b9119731c9e
 
 # Site values (not secret, but site-specific): read from site.env by the replacements below and never applied.
 configMapGenerator:
