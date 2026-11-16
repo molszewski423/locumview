@@ -3143,3 +3143,16 @@ Agent: Claude Code
   checks the dashboard on a desktop.
 
 Agent: Claude Code
+
+## 182. The OpenEMR image with patch 0004 pinned (2026-11-16)
+
+- **Image:** clinical-images run 818 for the merge of #181 (commit ee960a6),
+  `sha256:601e39b586f34acbe5be463d157b7d62d8346f7615e109169abf9716c7d35255`; its Verify step checked the signature
+  and the SBOM attestation. Pulled by digest and checked: patches 0001, 0003 and 0004 are in their files, and the
+  Automatic theme is present. Pinned in `k8s/clinical/kustomization.yaml`; the gateway and agent digests are unchanged.
+- **Deploy (owner run, operator-laptop):** `scripts/clinical/verify-images.sh`, then `kubectl diff -k k8s/clinical`
+  (only OpenEMR's Deployment image changes), then `kubectl apply -k k8s/clinical` and
+  `kubectl -n clinical rollout status deploy/openemr`. OpenEMR restarts; its database, the demo user and the reset
+  baseline are untouched (the dashboard file is in the image, not the database).
+
+Agent: Claude Code

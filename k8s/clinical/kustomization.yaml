@@ -18,9 +18,9 @@ resources:
 # build that is to be deployed; verify first: scripts/clinical/verify-images.sh
 images:
   - name: git.lan/mike/locumview-openemr
-    # commit df6204c, clinical-images (Gitea run 742): patches 0001 to 0003 and the Automatic theme with LocumView's
-    # login page (#169); signature and SBOM attestation verified by CI 2026-11-14
-    digest: sha256:08ccec7dca702ceca6e1cc28a82adee882f5301c7fd726f6fbf1720a00bcade3
+    # commit ee960a6, clinical-images (Gitea run 818): patches 0001 to 0004 (0004: the SMART apps card first on the
+    # patient dashboard, #181) and the Automatic theme; signature and SBOM attestation verified by CI 2026-11-16
+    digest: sha256:601e39b586f34acbe5be463d157b7d62d8346f7615e109169abf9716c7d35255
   - name: git.lan/mike/locumview-clinical-gateway
     # commit d2cc459, clinical-images run 296; signature and SBOM attestation verified by CI 2026-11-10
     digest: sha256:b7e7d84ca6eec6477f4f45286ba13cfd2f192c3b0c27a09064351c153bdf16c6
