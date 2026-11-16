@@ -3299,3 +3299,36 @@ Agent: Claude Code
   line. `check_cases.py --require-approved` no longer lists them. No rule, knowledge or fixture change.
 
 Agent: Claude Code
+
+## 190. Photographs for the two anticoagulation patients (2026-11-16)
+
+- **Deployed (owner run):** #188's agent and gateway images (both verified, only their two images in the diff),
+  `load-scenarios.sh` (Thea and Quinn Casebook loaded) and a new baseline (2026-11-16T17:01:00Z, 16,733,337 bytes). The
+  owner saw the finding in the app: "Duplicate anticoagulation: Heparin" with the label's reason and reference.
+- **Found (owner):** the two new patients had no photograph. Owner rule (2026-11-16): every patient added gets a
+  photograph that matches the demographics, in the same change.
+- **Photographs:** `LV-anticoag-apixaban-heparin-duplicate-01.jpg` (a 74-year-old white woman, short white hair, reading
+  glasses) and `LV-anticoag-apixaban-flush-negative-01.jpg` (a 68-year-old white man, bald, short gray beard), made by
+  `clinical/photos/portraits.py` on the operator's workstation GPU with the pinned RealVisXL V5.0 revision, from the
+  charts' demographics and `portrait` lines; reviewed by eye. AI-generated; neither shows a real person.
+- **Deploy (owner run):** `scripts/clinical/load-scenarios.sh` stores each once ("chart details and photograph brought
+  up to date"), then a new baseline straight away.
+## 191. The EHR's top menu as buttons, a narrower SMART app dialog, and an asset version bump (2026-11-16)
+
+- **Owner requests (2026-11-16):** the LocumView Clinical dialog is far wider than the app's content; the top menu
+  (Calendar, Finder, Patient, Reports, ...) looks like plain words and should look like buttons. Also asked: an opioid
+  stewardship module in LocumView Clinical (planned as its own milestone, like ADE monitoring).
+- **Dialog width (patch 0006, `library/js/utility.js`):** 1280 px instead of 97% of the window (97% when narrower); the
+  app's content is at most 1200 px. OpenEMR's `dlgopen` already goes full width at 1080 px or less.
+- **Menu buttons (`clinical/images/openemr/theme/locumview/menu.css`, imported by the Automatic theme):** the top-level
+  entries of `#mainMenu` get a border, rounded corners, a light fill and the brand teal on hover or when open, in light
+  and dark; the dropdown entries keep OpenEMR's look. No OpenEMR file changes for it.
+- **Asset version (patch 0007, `version.php`):** `$v_js_includes` 82 to 8201, so browsers fetch the changed
+  `utility.js` and theme instead of their cached copies (OpenEMR's own instruction in that file).
+- **Checked:** both patches apply at `--fuzz=0` to stock 8.4.1 in a local image build; `node --check` on the patched
+  `utility.js`, `php -l` on `version.php`; the menu rendered in headless Firefox with OpenEMR's own light stylesheet
+  (bordered buttons on the menu bar); the dark appearance not rendered reliably headless, to check on a desktop.
+- **Deploy:** CI builds the OpenEMR image on merge; a follow-up pins it; the owner applies it (OpenEMR restarts: sign
+  the desktops' EHR out and in, #183).
+
+Agent: Claude Code
