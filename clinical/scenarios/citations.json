@@ -192,32 +192,32 @@
       "title": "Roxicodone (oxycodone hydrochloride) tablets: prescribing information",
       "source": "DailyMed setid 5a8157d3-ba20-4abf-b0d4-6ad141b31d63 (published 2026-04-30)",
       "metadata_checked": "2026-11-16",
-      "content_check": "pending",
-      "note": "Read 2026-11-16 in the DailyMed label by Claude Code; owner review pending. Boxed warning and 5.3: concomitant use of opioids with benzodiazepines or other CNS depressants, including gabapentinoids (gabapentin or pregabalin), may result in profound sedation, respiratory depression, coma and death; reserve concomitant prescribing for patients whose alternatives are inadequate."
+      "content_check": "owner",
+      "note": "Read 2026-11-16 in the DailyMed label by Claude Code; owner approved the cases' use of it 2026-11-16 on the quoted text (#200). Boxed warning and 5.3: concomitant use of opioids with benzodiazepines or other CNS depressants, including gabapentinoids (gabapentin or pregabalin), may result in profound sedation, respiratory depression, coma and death; reserve concomitant prescribing for patients whose alternatives are inadequate."
     },
     "fda-lorazepam-label": {
       "authors": "US Food and Drug Administration (manufacturer labeling)",
       "title": "Ativan (lorazepam) tablets: prescribing information",
       "source": "DailyMed setid 89057c93-8155-4040-acec-64e877bd2b4c (published 2025-11-26)",
       "metadata_checked": "2026-11-16",
-      "content_check": "pending",
-      "note": "Read 2026-11-16 in the DailyMed label by Claude Code; owner review pending. Boxed warning and Warnings: concomitant benzodiazepines and opioids may result in profound sedation, respiratory depression, coma and death; reserve for patients whose alternatives are inadequate, prescribe the lowest effective dosages and minimum durations, and follow patients for respiratory depression and sedation. The class wording stands for the other benzodiazepines in the knowledge base."
+      "content_check": "owner",
+      "note": "Read 2026-11-16 in the DailyMed label by Claude Code; owner approved the cases' use of it 2026-11-16 on the quoted text (#200). Boxed warning and Warnings: concomitant benzodiazepines and opioids may result in profound sedation, respiratory depression, coma and death; reserve for patients whose alternatives are inadequate, prescribe the lowest effective dosages and minimum durations, and follow patients for respiratory depression and sedation. The class wording stands for the other benzodiazepines in the knowledge base."
     },
     "fda-gabapentin-label": {
       "authors": "US Food and Drug Administration (manufacturer labeling)",
       "title": "Neurontin (gabapentin): prescribing information",
       "source": "DailyMed setid 97935fd9-1d4a-43b6-a5d9-de994591187b (published 2026-08-06)",
       "metadata_checked": "2026-11-16",
-      "content_check": "pending",
-      "note": "Read 2026-11-16 in the DailyMed label by Claude Code; owner review pending. 5.8 Respiratory Depression: serious, life-threatening or fatal respiratory depression when coadministered with CNS depressants, including opioids; when co-prescribed, particularly with an opioid, monitor for respiratory depression and sedation and consider initiating at a low dose."
+      "content_check": "owner",
+      "note": "Read 2026-11-16 in the DailyMed label by Claude Code; owner approved the cases' use of it 2026-11-16 on the quoted text (#200). 5.8 Respiratory Depression: serious, life-threatening or fatal respiratory depression when coadministered with CNS depressants, including opioids; when co-prescribed, particularly with an opioid, monitor for respiratory depression and sedation and consider initiating at a low dose."
     },
     "fda-pregabalin-label": {
       "authors": "US Food and Drug Administration (manufacturer labeling)",
       "title": "Lyrica (pregabalin) capsules and oral solution: prescribing information",
       "source": "DailyMed setid 60185c88-ecfd-46f9-adb9-b97c6b00a553 (published 2025-09-29)",
       "metadata_checked": "2026-11-16",
-      "content_check": "pending",
-      "note": "Read 2026-11-16 in the DailyMed label by Claude Code; owner review pending. 5.4 Respiratory Depression: as for gabapentin, serious, life-threatening or fatal respiratory depression with CNS depressants, including opioids; monitor for respiratory depression and sedation and consider a low starting dose."
+      "content_check": "owner",
+      "note": "Read 2026-11-16 in the DailyMed label by Claude Code; owner approved the cases' use of it 2026-11-16 on the quoted text (#200). 5.4 Respiratory Depression: as for gabapentin, serious, life-threatening or fatal respiratory depression with CNS depressants, including opioids; monitor for respiratory depression and sedation and consider a low starting dose."
     }
   }
 }
