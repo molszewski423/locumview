@@ -3420,3 +3420,36 @@ Agent: Claude Code
   in. This branch also carries #196 (the opioid plan), so the changelog stays in order.
 
 Agent: Claude Code
+
+## 198. Opioid stewardship's first rule: an opioid with a benzodiazepine or gabapentinoid (prepared, review pending) (2026-11-16)
+
+- **Owner decisions (2026-11-16):** inpatient orders only; O1 covers benzodiazepines and gabapentinoids; O1 first. The
+  plan (#196) records them.
+- **Orders only:** the FHIR adapter now skips `MedicationRequest` with intent `plan`, OpenEMR's home medication list
+  (in the live chart these start 2026-01-01 and were read as active prescriptions by every rule). The case files never
+  held home medications, so the tests and the runtime now agree. A test adds a home lorazepam to a fixture: silent as
+  `plan`, a finding as `order`.
+- **Rule `opioid-cns-depressant` (module `opioid`, shown as Opioid Stewardship):** an active opioid order with an active
+  benzodiazepine or gabapentinoid order; one finding per sedative, named after it, of type `opioid-benzodiazepine` or
+  `opioid-gabapentinoid`, each with its own references and reviewed reason. Knowledge base 0.10.0: oxycodone,
+  hydromorphone, morphine, lorazepam, alprazolam, diazepam, gabapentin and pregabalin with a `class`; RxNorm products
+  checked in RxNav 2026-11-16 (all active SCDs).
+- **Sources (read 2026-11-16 on DailyMed, `content_check: pending`):** Roxicodone boxed warning and 5.3 (opioids with
+  benzodiazepines or other CNS depressants, gabapentinoids named, may cause profound sedation, respiratory depression,
+  coma and death; reserve for inadequate alternatives); Ativan boxed warning and Warnings (lowest effective dosages,
+  minimum durations, monitoring); Neurontin 5.8 and Lyrica 5.4 (respiratory depression with CNS depressants,
+  particularly opioids; monitor, consider a low starting dose).
+- **Cases (pending review), with photographs:** `opioid-lorazepam-postop-01`, a 62-year-old woman after ankle fracture
+  fixation on as-needed oxycodone and hydromorphone, given lorazepam for insomnia on the first night (finding:
+  Lorazepam); `opioid-gabapentin-preop-negative-01`, a 70-year-old man after knee replacement whose single preoperative
+  gabapentin dose has ended, on oxycodone alone (no finding). ICD-10-CM checked in NLM Clinical Tables. Portraits made
+  with `portraits.py` and reviewed by eye; the first portrait of the woman looked older than 62 and was regenerated
+  with a lighter hair description.
+- **App and service:** an Opioid Stewardship tab, the two type labels; the service accepts `opioid`.
+- **Verified:** `check_cases.py` 30 cases ok; `test_rules.py` 62 tests (FHIR fixtures for both cases from the spike,
+  six boundary tests); agent service, explain and rule tests 94 OK in the CI requirements; the app's 16 tests and build
+  in the CI's Node image; the real gemma4:26b explained the finding (guard passed, "respiratory" kept).
+- **Owner review needed:** both cases and reference answers; the two reviewed reasons; naming the sedative rather than
+  the opioid; treating the class wording of the lorazepam label as standing for alprazolam and diazepam.
+
+Agent: Claude Code

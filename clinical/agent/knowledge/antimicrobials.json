@@ -1,6 +1,6 @@
 {
   "_note": "Knowledge base for the Phase 9 lite rules (plan M4). Versioned with the rules: raise version on every change. Every rule names the references in clinical/scenarios/citations.json it rests on. Codes: RxNorm (prescribed products), LOINC (susceptibility results), SNOMED CT (organisms, specimens), ICD-10-CM (problems). Group inducible-ampc holds IDSA 2026's moderate-risk AmpC organisms (Enterobacter cloacae complex, Klebsiella aerogenes, Citrobacter freundii, Hafnia alvei) by SNOMED CT code; 62592009 is one concept that also carries the former name Enterobacter aerogenes. IDSA's low-risk Serratia, Morganella and Providencia are deliberately not in it.",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "agents": {
     "amoxicillin": {"display": "Amoxicillin"},
     "ampicillin": {"display": "Ampicillin", "covers_listeria": true},
@@ -25,16 +25,37 @@
     "vancomycin": {"display": "Vancomycin"}
   },
   "ade_agents": {
-    "_note": "ADE monitoring (changelog #187): drugs the ADE rules read, kept apart from the antimicrobials so no stewardship or IV to PO rule ever sees them. systemic_anticoagulant marks a dose that anticoagulates the patient; a heparin lock flush does not.",
+    "_note": "Medication-safety drugs the ADE monitoring (#187) and opioid stewardship (#198) rules read, kept apart from the antimicrobials so no stewardship or IV to PO rule ever sees them. systemic_anticoagulant marks a dose that anticoagulates the patient; a heparin lock flush does not. class: opioid, benzodiazepine or gabapentinoid.",
     "apixaban": {"display": "Apixaban", "systemic_anticoagulant": true},
     "heparin": {"display": "Heparin", "systemic_anticoagulant": true},
-    "heparin-flush": {"display": "Heparin lock flush", "systemic_anticoagulant": false}
+    "heparin-flush": {"display": "Heparin lock flush", "systemic_anticoagulant": false},
+    "oxycodone": {"display": "Oxycodone", "class": "opioid"},
+    "hydromorphone": {"display": "Hydromorphone", "class": "opioid"},
+    "morphine": {"display": "Morphine", "class": "opioid"},
+    "lorazepam": {"display": "Lorazepam", "class": "benzodiazepine"},
+    "alprazolam": {"display": "Alprazolam", "class": "benzodiazepine"},
+    "diazepam": {"display": "Diazepam", "class": "benzodiazepine"},
+    "gabapentin": {"display": "Gabapentin", "class": "gabapentinoid"},
+    "pregabalin": {"display": "Pregabalin", "class": "gabapentinoid"}
   },
   "ade_products": {
     "1364435": "apixaban",
     "1364445": "apixaban",
     "1798389": "heparin",
-    "1362062": "heparin-flush"
+    "1362062": "heparin-flush",
+    "1049621": "oxycodone",
+    "1049683": "oxycodone",
+    "897696": "hydromorphone",
+    "897653": "hydromorphone",
+    "1732006": "morphine",
+    "197901": "lorazepam",
+    "1665188": "lorazepam",
+    "308048": "alprazolam",
+    "197591": "diazepam",
+    "310430": "gabapentin",
+    "310431": "gabapentin",
+    "483448": "pregabalin",
+    "483450": "pregabalin"
   },
   "products": {
     "1659149": "piperacillin-tazobactam",
@@ -119,7 +140,9 @@
     "double-anaerobic-coverage": {"text": "the other agent already covers anaerobes, so the second anaerobic agent adds no coverage", "key": "anaerob"},
     "duration-review": {"text": "antibiotics continued past the recommended course add adverse effects and resistance pressure", "key": "adverse effects"},
     "iv-to-po-switch": {"text": "switching a clinically stable patient to an effective oral agent avoids IV catheter complications and cost", "key": "catheter"},
-    "duplicate-anticoagulation": {"text": "two systemic anticoagulants at once raise the risk of serious bleeding; when one replaces the other, the label stops the first and starts the second at the time of the next dose", "key": "bleeding"}
+    "duplicate-anticoagulation": {"text": "two systemic anticoagulants at once raise the risk of serious bleeding; when one replaces the other, the label stops the first and starts the second at the time of the next dose", "key": "bleeding"},
+    "opioid-cns-depressant/benzodiazepine": {"text": "an opioid with a benzodiazepine can cause profound sedation, respiratory depression, coma and death; the labels reserve the combination for patients whose alternatives are inadequate", "key": "respiratory"},
+    "opioid-cns-depressant/gabapentinoid": {"text": "gabapentin and pregabalin with an opioid are linked to serious, life-threatening respiratory depression; the labels advise watching for sedation and respiratory depression and starting the gabapentinoid low", "key": "respiratory"}
   },
   "rules": {
     "bug-drug-mismatch": {"module": "stewardship", "refs": ["clsi-m100", "idsa-shea-asp-2016"]},
@@ -129,6 +152,7 @@
     "double-anaerobic-coverage": {"module": "stewardship", "refs": ["idsa-ciai-2010"]},
     "duration-review": {"module": "stewardship", "refs": ["idsa-shea-asp-2016"]},
     "iv-to-po-switch": {"module": "iv-to-po", "refs": ["idsa-shea-asp-2016"]},
-    "duplicate-anticoagulation": {"module": "ade", "refs": ["fda-apixaban-label"]}
+    "duplicate-anticoagulation": {"module": "ade", "refs": ["fda-apixaban-label"]},
+    "opioid-cns-depressant": {"module": "opioid", "refs": ["fda-oxycodone-label", "fda-lorazepam-label", "fda-gabapentin-label", "fda-pregabalin-label"]}
   }
 }

@@ -30,6 +30,9 @@ class Knowledge:
     def display(self, agent: str) -> str:
         return (self.agents.get(agent) or self.ade_agents[agent])["display"]
 
+    def drug_class(self, ade_agent: str | None) -> str | None:
+        return self.ade_agents.get(ade_agent or "", {}).get("class")
+
     def systemic_anticoagulant(self, ade_agent: str | None) -> bool:
         return bool(self.ade_agents.get(ade_agent or "", {}).get("systemic_anticoagulant"))
 

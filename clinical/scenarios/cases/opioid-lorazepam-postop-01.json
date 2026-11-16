@@ -1,0 +1,136 @@
+{
+  "schema": "locumview-case/1",
+  "id": "opioid-lorazepam-postop-01",
+  "version": "0.1.0",
+  "title": "Oxycodone and hydromorphone after ankle surgery, lorazepam added for sleep",
+  "kind": "finding",
+  "modules": [
+    "opioid"
+  ],
+  "provenance": {
+    "source": "synthetic",
+    "author": "Claude Code (draft for owner review)",
+    "created": "2026-11-16",
+    "clinical_review": {
+      "status": "pending"
+    }
+  },
+  "story": "A 62-year-old woman is admitted after a fall with a right trimalleolar ankle fracture and has open reduction and internal fixation the same day. After surgery she has oxycodone 5 mg by mouth every 4 hours as needed for moderate pain, hydromorphone 0.5 mg IV every 3 hours as needed for severe pain, and scheduled acetaminophen. On the first night she cannot sleep, and the cross-covering clinician orders lorazepam 1 mg at bedtime as needed for insomnia. The next morning all three as-needed orders are active.",
+  "patient": {
+    "family": "Casebook",
+    "given": "Yara",
+    "birth_date": "1964-05-30",
+    "sex": "female"
+  },
+  "encounter": {
+    "class_code": "IMP",
+    "start": "2026-11-13T09:00:00-05:00",
+    "reason": "Right ankle fracture after a fall"
+  },
+  "problems": [
+    {
+      "title": "Displaced trimalleolar fracture of right lower leg",
+      "diagnosis": "ICD10:S82.851A",
+      "begdate": "2026-11-13"
+    },
+    {
+      "title": "Insomnia",
+      "diagnosis": "ICD10:G47.00",
+      "begdate": "2026-11-14"
+    },
+    {
+      "title": "Essential hypertension",
+      "diagnosis": "ICD10:I10",
+      "begdate": "2018-02-11"
+    }
+  ],
+  "allergies": [],
+  "prescriptions": [
+    {
+      "drug": "oxycodone hydrochloride 5 MG Oral Tablet",
+      "rxnorm": "1049621",
+      "start": "2026-11-13",
+      "route": "PO",
+      "instructions": "5 mg by mouth every 4 hours as needed for moderate pain"
+    },
+    {
+      "drug": "1 ML hydromorphone hydrochloride 1 MG/ML Injection",
+      "rxnorm": "897653",
+      "start": "2026-11-13",
+      "route": "IV",
+      "instructions": "0.5 mg IV every 3 hours as needed for severe pain"
+    },
+    {
+      "drug": "acetaminophen 500 MG Oral Tablet",
+      "rxnorm": "198440",
+      "start": "2026-11-13",
+      "route": "PO",
+      "instructions": "1,000 mg by mouth every 8 hours"
+    },
+    {
+      "drug": "lorazepam 1 MG Oral Tablet",
+      "rxnorm": "197901",
+      "start": "2026-11-14",
+      "route": "PO",
+      "instructions": "1 mg by mouth at bedtime as needed for insomnia"
+    }
+  ],
+  "vitals": [
+    {
+      "taken": "2026-11-13T09:10:00-05:00",
+      "temperature_f": 98.2,
+      "pulse": 92,
+      "bps": 146,
+      "bpd": 82,
+      "respiration": 18,
+      "oxygen_saturation": 97
+    },
+    {
+      "taken": "2026-11-15T07:00:00-05:00",
+      "temperature_f": 98.6,
+      "pulse": 78,
+      "bps": 132,
+      "bpd": 76,
+      "respiration": 14,
+      "oxygen_saturation": 95
+    }
+  ],
+  "labs": [
+    {
+      "order_code": "LV-BMP",
+      "order_text": "Basic labs",
+      "collected": "2026-11-15T05:30:00-05:00",
+      "resulted": "2026-11-15T06:30:00-05:00",
+      "results": [
+        {
+          "loinc": "2160-0",
+          "text": "Creatinine [Mass/volume] in Serum or Plasma",
+          "value": "0.8",
+          "units": "mg/dL",
+          "range": "0.5-1.1",
+          "flag": "N"
+        }
+      ]
+    }
+  ],
+  "expected_findings": [
+    {
+      "module": "opioid",
+      "type": "opioid-benzodiazepine",
+      "drug": "Lorazepam",
+      "summary": "Lorazepam 1 mg at bedtime as needed was added while oxycodone and hydromorphone as needed are active: an opioid with a benzodiazepine."
+    }
+  ],
+  "reference_answer": "Discontinue the lorazepam and treat the insomnia without a benzodiazepine: sleep hygiene and pain control at night first, and if a drug is needed, one that does not add respiratory depression to two opioids. If a benzodiazepine is truly needed, use the lowest dose for the shortest time and monitor sedation and respiratory rate.",
+  "rationale": "The oxycodone and lorazepam labels' boxed warnings: an opioid with a benzodiazepine may cause profound sedation, respiratory depression, coma and death, and the combination is reserved for patients whose alternatives are inadequate. Insomnia after surgery has alternatives. The rule needs an active opioid order and an active benzodiazepine order on the same day and names the benzodiazepine, the drug to question.",
+  "citations": [
+    {
+      "ref": "fda-oxycodone-label",
+      "supports": "Boxed warning and 5.3: opioids with benzodiazepines or other CNS depressants; reserve for inadequate alternatives. Read in the label, owner review pending."
+    },
+    {
+      "ref": "fda-lorazepam-label",
+      "supports": "Boxed warning: benzodiazepines with opioids; lowest effective dose, minimum duration, monitoring. Read in the label, owner review pending."
+    }
+  ]
+}

@@ -385,6 +385,59 @@ class DuplicateAnticoagulationTests(unittest.TestCase):
                 self.assertNotIn(rxnorm, KB.products)
 
 
+class OpioidCnsDepressantTests(unittest.TestCase):
+    """Opioid stewardship O1, changelog #198: an opioid order with a benzodiazepine or gabapentinoid order."""
+    POSITIVE = "opioid-lorazepam-postop-01"
+
+    def swap(self, c, old, rxnorm, drug):
+        (p,) = [p for p in c["prescriptions"] if p["rxnorm"] == old]
+        p.update(rxnorm=rxnorm, drug=drug)
+
+    def test_a_gabapentinoid_is_its_own_type_with_its_own_labels(self):
+        c = case(self.POSITIVE)
+        self.swap(c, "197901", "483450", "pregabalin 75 MG Oral Capsule")
+        (f,) = evaluate(from_case(c, KB), KB, {"opioid"})
+        self.assertEqual(f.key(), ("opioid", "opioid-gabapentinoid", "Pregabalin"))
+        self.assertEqual(f.refs, ("fda-oxycodone-label", "fda-gabapentin-label", "fda-pregabalin-label"))
+        self.assertTrue(any(e.startswith("Why it matters:") and "respiratory" in e for e in f.evidence))
+
+    def test_the_benzodiazepine_finding_cites_the_opioid_and_benzodiazepine_labels(self):
+        (f,) = evaluate(from_case(case(self.POSITIVE), KB), KB, {"opioid"})
+        self.assertEqual(f.refs, ("fda-oxycodone-label", "fda-lorazepam-label"))
+        self.assertEqual(sum(e.startswith("Active:") for e in f.evidence), 3)    # lorazepam and both opioids
+
+    def test_no_opioid_is_silent(self):
+        c = case(self.POSITIVE)
+        c["prescriptions"] = [p for p in c["prescriptions"] if p["rxnorm"] not in ("1049621", "897653")]
+        self.assertEqual(keys(c), [])
+
+    def test_a_stopped_benzodiazepine_is_silent(self):
+        c = case(self.POSITIVE)
+        [p for p in c["prescriptions"] if p["rxnorm"] == "197901"][0]["end"] = "2026-11-15"
+        self.assertEqual(keys(c), [])
+
+    def test_two_sedatives_give_two_findings(self):
+        c = case(self.POSITIVE)
+        c["prescriptions"].append({"drug": "gabapentin 300 MG Oral Capsule", "rxnorm": "310431", "start": "2026-11-14",
+                                   "route": "PO", "instructions": "300 mg by mouth three times daily"})
+        self.assertEqual(keys(c), [("opioid", "opioid-benzodiazepine", "Lorazepam"),
+                                   ("opioid", "opioid-gabapentinoid", "Gabapentin")])
+
+    def test_the_home_medication_list_is_not_read(self):
+        """Owner decision 2026-11-16, inpatient only: a home benzodiazepine (FHIR intent plan) is not an order."""
+        resources = fixture("opioid-gabapentin-preop-negative-01")
+        (order,) = [r for r in resources if r["resourceType"] == "MedicationRequest"
+                    and r["medicationCodeableConcept"]["coding"][0]["code"] == "1049621"]
+        home = copy.deepcopy(order)
+        home.update(id="home-lorazepam", intent="plan")
+        home["medicationCodeableConcept"] = {"coding": [{"system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                                                         "code": "197901", "display": "lorazepam 1 MG Oral Tablet"}]}
+        self.assertEqual(fhir_keys(resources + [home], {"opioid"}), [])
+        home["intent"] = "order"
+        self.assertEqual(fhir_keys(resources + [home], {"opioid"}),
+                         [("opioid", "opioid-benzodiazepine", "Lorazepam")])
+
+
 class FhirAdapterTests(unittest.TestCase):
     """The same rules over OpenEMR's FHIR read-back of each case (fixtures/fhir, recorded with patches 0001 and 0002
     and the loader's start dates) give the same snapshot and the same findings as over the case file."""

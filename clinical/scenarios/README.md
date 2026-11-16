@@ -39,7 +39,7 @@ unknown keys.
 |---|---|
 | `schema`, `id`, `version`, `title` | `locumview-case/1`; the file name; a semantic version, raised on every change |
 | `kind` | `finding` (at least one expected finding), `negative-control` (none) or `ambiguous` (two or more `acceptable_answers`) |
-| `modules` | `stewardship`, `iv-to-po`, `ade` (ADE monitoring); a module listed with no finding for it must stay silent |
+| `modules` | `stewardship`, `iv-to-po`, `ade` (ADE monitoring), `opioid` (opioid stewardship); a module listed with no finding for it must stay silent |
 | `provenance` | `source: synthetic` (required), author, created, and `clinical_review` (`pending` or `approved` with reviewer and date) |
 | `story` | The patient story as a clinician would tell it |
 | `patient`, `encounter` | Synthetic demographics; encounter class, start and reason |
@@ -52,7 +52,7 @@ unknown keys.
 
 Every time carries an offset (`2026-10-20T14:00:00-04:00`); the loader stores UTC. Finding types:
 `bug-drug-mismatch`, `suboptimal-agent` (tests susceptible, but not the preferred agent), `missing-empiric-coverage`,
-`de-escalation`, `iv-to-po-switch`, `redundant-coverage`, `duration-review`; ADE monitoring: `duplicate-anticoagulation`.
+`de-escalation`, `iv-to-po-switch`, `redundant-coverage`, `duration-review`; ADE monitoring: `duplicate-anticoagulation`; opioid stewardship: `opioid-benzodiazepine`, `opioid-gabapentinoid`.
 
 ## Codes and citations
 

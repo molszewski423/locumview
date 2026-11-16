@@ -1,6 +1,6 @@
 # Opioid stewardship module: plan
 
-Status: **Planned** (owner request, 2026-11-16). Nothing here is built. Every clinical threshold below is a candidate
+Status: **In progress** (owner request, 2026-11-16). O1 is built (changelog #198); the rest is planned. Every clinical threshold below is a candidate
 until it is read in its primary source and approved by the owner (the clinical review process: primary sources
 first, then an OpenEvidence packet the owner runs, then the owner's decisions).
 
@@ -52,11 +52,14 @@ photograph per new patient, and boundary tests.
    medications labelled in the app.
 4. **O4, then O5.** O7 with the ADE renal rule; O6 when a source is found.
 
-## Owner decisions needed
+## Owner decisions
 
-1. Scope: inpatient orders only for the first rules (no discharge prescribing), as in the other modules?
-2. O1's second drug class: benzodiazepines only, or also gabapentinoids and other sedatives?
+Made 2026-11-16: inpatient orders only (the rules skip the home medication list); O1 covers benzodiazepines and
+gabapentinoids; O1 first. Still open:
+
+1. (decided) Scope: inpatient only.
+2. (decided) O1's second drug class: benzodiazepines and gabapentinoids.
 3. O3 without a guideline that states it: build it on consensus, marked as such, or leave it out?
 4. O4: count as-needed orders at their maximum daily dose, or scheduled doses only; which threshold or thresholds to
    flag (the 2022 CDC guideline frames doses as points for careful evaluation rather than hard limits; to read).
-5. First rule: O1 as proposed?
+5. (decided) First rule: O1.

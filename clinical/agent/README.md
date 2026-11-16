@@ -59,8 +59,9 @@ after the findings, so a slow or missing model never holds the findings back.
 - `lvrules/rules.py`: one function per rule. Each finding carries its evidence (the data points it used) and the
   references it rests on, by key in [`../scenarios/citations.json`](../scenarios/citations.json).
 - `knowledge/antimicrobials.json`: the versioned knowledge base: agents and their properties, RxNorm products, the
-  drugs the ADE monitoring rules read (`ade_agents`, `ade_products`: anticoagulants, kept apart from the antimicrobials so
-  no stewardship rule sees them),
+  drugs the ADE monitoring and opioid stewardship rules read (`ade_agents`, `ade_products`: anticoagulants, opioids,
+  benzodiazepines and gabapentinoids, kept apart from the antimicrobials so no stewardship rule sees them). The rules read
+  inpatient orders only: the FHIR adapter skips the home medication list (intent `plan`; owner decision, #198),
   susceptibility tests by LOINC, organisms and specimens by SNOMED CT, conditions by ICD-10-CM prefix, thresholds, and
   each rule's references. Raise `version` on every change.
 
