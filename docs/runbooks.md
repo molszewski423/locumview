@@ -35,3 +35,20 @@ are on the backlog for when real evaluators exist.
 5. **Hand over** the new password to the next evaluator out of band, without displaying it, e.g.
    `sops -d --extract '["stringData"]["password"]' k8s/locumview/secrets/demo-login.sops.yaml | wl-copy -o`.
 6. **Record** the rotation (date, reason) in the changelog or the day's worklog.
+
+## Rotate the OpenEMR demo password
+
+The demo desktop's EHR has its own shared login, OpenEMR user `demo` (not an administrator; changelog #178), rotated
+with the Keycloak password above. A nightly reset restores the EHR to a saved baseline, which includes the password,
+so the baseline is saved again after every rotation.
+
+1. **Reset the EHR first**, so the new baseline does not keep what the last evaluator changed:
+   `kubectl -n clinical create job --from=cronjob/openemr-reset openemr-reset-$(date +%s)`; its log ends with
+   `reset to the baseline saved at`.
+2. **Generate and set the new password** (generated into SOPS, never displayed):
+   `scripts/clinical/openemr-demo-user.sh --rotate`. It ends with `demo: access group Physicians only`.
+3. **Save the baseline**:
+   `kubectl -n clinical create job --from=cronjob/openemr-baseline-save openemr-baseline-save-$(date +%s)`; its log
+   ends with `baseline saved`.
+4. **Commit** the re-encrypted `k8s/clinical/secrets/openemr-demo.sops.yaml`, and **hand over** the password out of
+   band: `sops -d --extract '["stringData"]["password"]' k8s/clinical/secrets/openemr-demo.sops.yaml | wl-copy -o`.

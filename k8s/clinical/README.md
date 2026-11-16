@@ -84,4 +84,18 @@ OpenEMR 8.4.1 with LocumView's fix (`clinical/images/openemr/`), MariaDB, and th
    - Launch the app from a scenario patient's chart: each finding shows "Explaining…", then the explanation, or says
      why there is none. The first one after the model was unloaded takes longer (it loads, about 18 s).
 
+11. The demo login and the nightly reset (changelog #178; `reset.yaml`):
+   - `scripts/clinical/openemr-demo-user.sh` creates OpenEMR's shared demo user `demo` (Guest Pharmacist, access group
+     Physicians, not an administrator). The first run generates its password into `secrets/openemr-demo.sops.yaml`;
+     commit that file. The password reaches the OpenEMR pod on stdin and is never shown.
+   - `kubectl diff -k k8s/clinical` should show the new PVC, ConfigMap, two CronJobs and NetworkPolicy
+     `openemr-baseline`, and MariaDB's NetworkPolicy admitting them; then `kubectl apply -k k8s/clinical`.
+   - With the demo user and the scenario library as reviewed, save the baseline:
+     `kubectl -n clinical create job --from=cronjob/openemr-baseline-save openemr-baseline-save-$(date +%s)`, and check
+     its log ends with `baseline saved`. Every night at 03:00 site time `openemr-reset` restores it; until a baseline
+     exists the reset fails without changing anything. Run a reset by hand with
+     `kubectl -n clinical create job --from=cronjob/openemr-reset openemr-reset-$(date +%s)`.
+   - The reset restores everything in this OpenEMR, including changes made by other accounts; to keep a change, save a
+     new baseline. OpenEMR's audit tables are not part of it and keep their history.
+
 Nothing in these steps displays a password, the client secret or a private key.

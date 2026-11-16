@@ -1,0 +1,154 @@
+# The demo EHR's nightly reset (changelog #178). The owner saves a baseline of OpenEMR's database once the demo user
+# and the scenario library are as reviewed; every night the reset restores it, so what one evaluator changed in the
+# synthetic charts is gone for the next, and a demo password changed from inside OpenEMR comes back.
+#
+#   save the baseline:   kubectl -n clinical create job --from=cronjob/openemr-baseline-save openemr-baseline-save-$(date +%s)
+#   reset now:           kubectl -n clinical create job --from=cronjob/openemr-reset openemr-reset-$(date +%s)
+#
+# The baseline lives on its own volume in the cluster, never in git: it holds password hashes and the gateway's OAuth
+# registration. OpenEMR's audit tables (log, log_comment_encrypt, api_log, extended_log) are left out of it, so a
+# reset never rolls back the record of what demo users did. Documents uploaded after the baseline stay on OpenEMR's
+# volume, unreferenced. Both jobs reach MariaDB only (networkpolicy.yaml).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: {name: openemr-baseline, namespace: clinical}
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: local-path
+  resources: {requests: {storage: 2Gi}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: openemr-baseline, namespace: clinical}
+data:
+  save.sh: |
+    #!/bin/bash
+    # Dump OpenEMR's database except the audit tables. Written beside the old baseline and moved into place only
+    # when the dump completed, so a failed save never replaces a good baseline.
+    set -euo pipefail
+    out=/baseline/openemr.sql
+    mariadb-dump -h mariadb -uroot --single-transaction --routines --triggers --hex-blob \
+      --ignore-table=openemr.log --ignore-table=openemr.log_comment_encrypt \
+      --ignore-table=openemr.api_log --ignore-table=openemr.extended_log \
+      openemr > "$out.partial"
+    tail -n 1 "$out.partial" | grep -q '^-- Dump completed' || { echo "dump incomplete; baseline unchanged" >&2; exit 1; }
+    mv "$out.partial" "$out"
+    date -u +%Y-%m-%dT%H:%M:%SZ > /baseline/saved-at
+    echo "baseline saved: $(stat -c %s "$out") bytes at $(cat /baseline/saved-at)"
+  restore.sh: |
+    #!/bin/bash
+    # Load the baseline over OpenEMR's database. Each table in the dump is dropped and recreated; the audit tables
+    # are not in it and keep their rows.
+    set -euo pipefail
+    in=/baseline/openemr.sql
+    [[ -s "$in" ]] || { echo "no baseline saved yet; nothing reset" >&2; exit 1; }
+    tail -n 1 "$in" | grep -q '^-- Dump completed' || { echo "baseline is incomplete; nothing reset" >&2; exit 1; }
+    mariadb -h mariadb -uroot openemr < "$in"
+    echo "reset to the baseline saved at $(cat /baseline/saved-at)"
+---
+# Run on demand only (suspended): the owner saves a new baseline with `kubectl create job --from=...`.
+apiVersion: batch/v1
+kind: CronJob
+metadata: {name: openemr-baseline-save, namespace: clinical}
+spec:
+  suspend: true
+  schedule: "0 0 1 1 *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      ttlSecondsAfterFinished: 604800
+      template:
+        metadata: {labels: {app: openemr-baseline}}
+        spec:
+          restartPolicy: Never
+          nodeSelector: {kubernetes.io/hostname: CLINICAL_NODE}   # set from site.env
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 999
+            runAsGroup: 999
+            fsGroup: 999
+            seccompProfile: {type: RuntimeDefault}
+          containers:
+            - name: save
+              # MariaDB's own image, the digest mariadb.yaml runs, for a matching mariadb-dump.
+              image: docker.io/library/mariadb@sha256:dd9b303aed4f4890ed09f766d8ca9ddfd176c0c6f6267feff53b3192ec65a979
+              command: ["bash", "/scripts/save.sh"]
+              env:
+                - {name: HOME, value: /tmp}
+                - name: MYSQL_PWD
+                  valueFrom: {secretKeyRef: {name: clinical-db, key: root}}
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities: {drop: [ALL]}
+              resources:
+                requests: {memory: 64Mi, cpu: 50m}
+                limits: {memory: 256Mi}
+              volumeMounts:
+                - {name: baseline, mountPath: /baseline}
+                - {name: scripts, mountPath: /scripts, readOnly: true}
+                - {name: tmp, mountPath: /tmp}
+          volumes:
+            - name: baseline
+              persistentVolumeClaim: {claimName: openemr-baseline}
+            - name: scripts
+              configMap: {name: openemr-baseline}
+            - name: tmp
+              emptyDir: {sizeLimit: 16Mi}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata: {name: openemr-reset, namespace: clinical}
+spec:
+  schedule: "0 3 * * *"
+  timeZone: SITE_TZ   # set from site.env
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 3600
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      ttlSecondsAfterFinished: 604800
+      template:
+        metadata: {labels: {app: openemr-baseline}}
+        spec:
+          restartPolicy: Never
+          nodeSelector: {kubernetes.io/hostname: CLINICAL_NODE}   # set from site.env
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 999
+            runAsGroup: 999
+            fsGroup: 999
+            seccompProfile: {type: RuntimeDefault}
+          containers:
+            - name: restore
+              image: docker.io/library/mariadb@sha256:dd9b303aed4f4890ed09f766d8ca9ddfd176c0c6f6267feff53b3192ec65a979
+              command: ["bash", "/scripts/restore.sh"]
+              env:
+                - {name: HOME, value: /tmp}
+                - name: MYSQL_PWD
+                  valueFrom: {secretKeyRef: {name: clinical-db, key: root}}
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities: {drop: [ALL]}
+              resources:
+                requests: {memory: 64Mi, cpu: 50m}
+                limits: {memory: 256Mi}
+              volumeMounts:
+                - {name: baseline, mountPath: /baseline, readOnly: true}
+                - {name: scripts, mountPath: /scripts, readOnly: true}
+                - {name: tmp, mountPath: /tmp}
+          volumes:
+            - name: baseline
+              persistentVolumeClaim: {claimName: openemr-baseline}
+            - name: scripts
+              configMap: {name: openemr-baseline}
+            - name: tmp
+              emptyDir: {sizeLimit: 16Mi}

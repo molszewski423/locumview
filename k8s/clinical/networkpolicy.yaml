@@ -27,7 +27,18 @@ spec:
   podSelector: {matchLabels: {app: mariadb}}
   policyTypes: [Ingress]
   ingress:
-    - from: [{podSelector: {matchLabels: {app: openemr}}}]
+    - from: [{podSelector: {matchLabels: {app: openemr}}}, {podSelector: {matchLabels: {app: openemr-baseline}}}]
+      ports: [{protocol: TCP, port: 3306}]
+---
+# The demo reset's save and restore jobs (reset.yaml): MariaDB only.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: openemr-baseline, namespace: clinical}
+spec:
+  podSelector: {matchLabels: {app: openemr-baseline}}
+  policyTypes: [Ingress, Egress]
+  egress:
+    - to: [{podSelector: {matchLabels: {app: mariadb}}}]
       ports: [{protocol: TCP, port: 3306}]
 ---
 apiVersion: networking.k8s.io/v1
