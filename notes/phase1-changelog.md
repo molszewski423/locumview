@@ -3332,3 +3332,15 @@ Agent: Claude Code
   the desktops' EHR out and in, #183).
 
 Agent: Claude Code
+
+## 192. The OpenEMR image with #191 pinned (2026-11-16)
+
+- **Image:** clinical-images run 854 for the merge of #191 (commit 813d005),
+  `sha256:33c98a58298b7c124130be948fa2e63fe45f81a017cd38024c31a02b9a4a035b`; its Verify step checked the signature and
+  the SBOM attestation. Pulled by digest: the 1280 px dialog in `utility.js`, `$v_js_includes = 8201`, patch 0005 still
+  in place, and `locumview/menu.css` imported by the Automatic theme.
+- **Deploy (owner run):** `scripts/clinical/verify-images.sh`; `kubectl diff -k k8s/clinical` (only OpenEMR's image);
+  `kubectl apply -k k8s/clinical` and `kubectl -n clinical rollout status deploy/openemr`; then sign the desktops' EHR
+  out and in. `scripts/clinical/load-scenarios.sh` and a new baseline store #190's photographs.
+
+Agent: Claude Code
