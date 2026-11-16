@@ -36,6 +36,15 @@ contribute fixes in parallel). Nothing here has been submitted.
   expands it, and keeps that choice per user in `user_settings`; the demo EHR's nightly reset restores the baseline,
   so the demo user would find it collapsed again each morning. The patch sets the card's `forceAlwaysOpen`, as other
   cards use it: always open, no collapse toggle, for every user.
+- **SMART app dialog width** (owner request, changelog #191): `clinical/spike/patches/0006-smart-app-dialog-width.diff`.
+  `library/js/utility.js` opens every SMART app with `dlgopen(..., 'modal-full', ...)`, 97% of the window, while
+  LocumView Clinical's content is at most 1200 px wide. The patch passes a width of 1280 px (97% of the window when
+  that is less); `dlgopen` turns a pixel width into a percentage and already uses the full width on screens of 1080 px
+  or less.
+- **Asset version** (changelog #191): `clinical/spike/patches/0007-asset-version-bump.diff`. OpenEMR adds
+  `?v=$v_js_includes` (82 in 8.4.1) to its JavaScript and stylesheet URLs, and its own comment asks for the number to
+  be raised whenever a .js or .css file changes, or browsers keep the cached copy. LocumView changes `utility.js` and
+  the theme, so the patch sets 8201; each later LocumView change to a .js or .css file raises it (82xx).
 
 Evidence: M1 `docs/evidence/clinical/20261025-openemr-m1-spike/`, M2 changelog #75, M3
 `docs/evidence/clinical/20261025-m3-local-launch/`.

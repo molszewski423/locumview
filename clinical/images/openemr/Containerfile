@@ -12,11 +12,15 @@ ARG PROBLEMS=src/Services/FHIR/Condition/FhirConditionProblemListItemService.php
 ARG ROUTES=apis/routes/_rest_routes_fhir_r4_us_core_3_1_0.inc.php
 ARG DASHBOARD=interface/patient_file/summary/demographics.php
 ARG SMART=src/FHIR/SMART/SmartLaunchController.php
+ARG UTILJS=library/js/utility.js
+ARG VERSION=version.php
 COPY --from=upstream /var/www/localhost/htdocs/openemr/${AUTH} /w/${AUTH}
 COPY --from=upstream /var/www/localhost/htdocs/openemr/${PROBLEMS} /w/${PROBLEMS}
 COPY --from=upstream /var/www/localhost/htdocs/openemr/${ROUTES} /w/${ROUTES}
 COPY --from=upstream /var/www/localhost/htdocs/openemr/${DASHBOARD} /w/${DASHBOARD}
 COPY --from=upstream /var/www/localhost/htdocs/openemr/${SMART} /w/${SMART}
+COPY --from=upstream /var/www/localhost/htdocs/openemr/${UTILJS} /w/${UTILJS}
+COPY --from=upstream /var/www/localhost/htdocs/openemr/${VERSION} /w/${VERSION}
 COPY clinical/spike/patches/ /patches/
 RUN cd /w && for p in /patches/*.diff; do patch -p1 --fuzz=0 --no-backup-if-mismatch < "$p"; done
 
@@ -26,11 +30,15 @@ ARG PROBLEMS=src/Services/FHIR/Condition/FhirConditionProblemListItemService.php
 ARG ROUTES=apis/routes/_rest_routes_fhir_r4_us_core_3_1_0.inc.php
 ARG DASHBOARD=interface/patient_file/summary/demographics.php
 ARG SMART=src/FHIR/SMART/SmartLaunchController.php
+ARG UTILJS=library/js/utility.js
+ARG VERSION=version.php
 COPY --from=patcher --chown=apache:apache --chmod=400 /w/${AUTH} /var/www/localhost/htdocs/openemr/${AUTH}
 COPY --from=patcher --chown=apache:apache --chmod=400 /w/${PROBLEMS} /var/www/localhost/htdocs/openemr/${PROBLEMS}
 COPY --from=patcher --chown=apache:apache --chmod=400 /w/${ROUTES} /var/www/localhost/htdocs/openemr/${ROUTES}
 COPY --from=patcher --chown=apache:apache --chmod=400 /w/${DASHBOARD} /var/www/localhost/htdocs/openemr/${DASHBOARD}
 COPY --from=patcher --chown=apache:apache --chmod=400 /w/${SMART} /var/www/localhost/htdocs/openemr/${SMART}
+COPY --from=patcher --chown=apache:apache --chmod=400 /w/${UTILJS} /var/www/localhost/htdocs/openemr/${UTILJS}
+COPY --from=patcher --chown=apache:apache --chmod=400 /w/${VERSION} /var/www/localhost/htdocs/openemr/${VERSION}
 # LocumView's "Automatic" theme and login page (changelog #169): files added beside OpenEMR's own themes, no OpenEMR
 # file changed. OpenEMR lists every public/themes/style_*.css as a theme; the scenario loader selects this one.
 COPY --chown=apache:apache clinical/images/openemr/theme/ /var/www/localhost/htdocs/openemr/public/themes/

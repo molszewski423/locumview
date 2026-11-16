@@ -1,0 +1,60 @@
+/* LocumView (changelog #191, owner request): OpenEMR's top menu entries (Calendar, Finder, Patient, Reports, ...) as
+   buttons instead of plain words. Scoped to the top-level entries of #mainMenu; the dropdown entries under them keep
+   OpenEMR's look. Colors: the LocumView brand kit, light or dark with the system's appearance. */
+
+#mainMenu {
+  --lv-menu-bg: #F4F7FA;
+  --lv-menu-border: #C9D2DB;
+  --lv-menu-text: #1D2230;
+  --lv-menu-hover-bg: rgba(15, 118, 110, 0.10);
+  --lv-menu-accent: #0F766E;
+}
+
+@media (prefers-color-scheme: dark) {
+  #mainMenu {
+    --lv-menu-bg: #151D28;
+    --lv-menu-border: #2A3646;
+    --lv-menu-text: #E6EDF3;
+    --lv-menu-hover-bg: rgba(94, 234, 212, 0.12);
+    --lv-menu-accent: #5EEAD4;
+  }
+}
+
+#mainMenu .appMenu {
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+#mainMenu .appMenu > div > .menuLabel,
+#mainMenu .appMenu > div > .menuSection > .menuLabel {
+  margin: 0.3rem 0.2rem;
+  padding: 0.25rem 0.75rem !important;
+  border: 1px solid var(--lv-menu-border);
+  border-radius: 6px;
+  background: var(--lv-menu-bg);
+  color: var(--lv-menu-text);
+  font-weight: 600;
+  line-height: 1.4;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.12s, border-color 0.12s, color 0.12s;
+}
+
+#mainMenu .appMenu > div > .menuLabel:hover,
+#mainMenu .appMenu > div > .menuSection > .menuLabel:hover,
+#mainMenu .appMenu > div > .menuSection.show > .menuLabel {
+  border-color: var(--lv-menu-accent);
+  background: var(--lv-menu-hover-bg);
+  color: var(--lv-menu-accent);
+}
+
+#mainMenu .appMenu > div > .menuLabel:focus-visible,
+#mainMenu .appMenu > div > .menuSection > .menuLabel:focus-visible {
+  outline: 2px solid var(--lv-menu-accent);
+  outline-offset: 1px;
+}
+
+#mainMenu .appMenu > div > .menuLabel.menuDisabled {
+  opacity: 0.5;
+  cursor: default;
+}

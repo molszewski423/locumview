@@ -1,0 +1,13 @@
+--- a/library/js/utility.js
++++ b/library/js/utility.js
+@@ -598,7 +598,9 @@
+                 let title = node.dataset.smartName || JSON.stringify(xl("Smart App"));
+                 // we allow external dialog's  here because that is what a SMART app is
+                 let height = window.top.innerHeight; // do our full height here
+-                dlgopen(url, '_blank', 'modal-full', height, '', title, {allowExternal: true});
++                // LocumView: as wide as the app's content (1200px plus margins), not the full window; 97% on narrow screens
++                let width = Math.min(1280, Math.floor(window.top.innerWidth * 0.97));
++                dlgopen(url, '_blank', width, height, '', title, {allowExternal: true});
+             });
+         }
+ 
