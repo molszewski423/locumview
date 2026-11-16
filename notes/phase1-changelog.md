@@ -3300,6 +3300,19 @@ Agent: Claude Code
 
 Agent: Claude Code
 
+## 190. Photographs for the two anticoagulation patients (2026-11-16)
+
+- **Deployed (owner run):** #188's agent and gateway images (both verified, only their two images in the diff),
+  `load-scenarios.sh` (Thea and Quinn Casebook loaded) and a new baseline (2026-11-16T17:01:00Z, 16,733,337 bytes). The
+  owner saw the finding in the app: "Duplicate anticoagulation: Heparin" with the label's reason and reference.
+- **Found (owner):** the two new patients had no photograph. Owner rule (2026-11-16): every patient added gets a
+  photograph that matches the demographics, in the same change.
+- **Photographs:** `LV-anticoag-apixaban-heparin-duplicate-01.jpg` (a 74-year-old white woman, short white hair, reading
+  glasses) and `LV-anticoag-apixaban-flush-negative-01.jpg` (a 68-year-old white man, bald, short gray beard), made by
+  `clinical/photos/portraits.py` on the operator's workstation GPU with the pinned RealVisXL V5.0 revision, from the
+  charts' demographics and `portrait` lines; reviewed by eye. AI-generated; neither shows a real person.
+- **Deploy (owner run):** `scripts/clinical/load-scenarios.sh` stores each once ("chart details and photograph brought
+  up to date"), then a new baseline straight away.
 ## 191. The EHR's top menu as buttons, a narrower SMART app dialog, and an asset version bump (2026-11-16)
 
 - **Owner requests (2026-11-16):** the LocumView Clinical dialog is far wider than the app's content; the top menu
