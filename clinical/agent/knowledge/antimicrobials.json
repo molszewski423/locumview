@@ -1,6 +1,6 @@
 {
   "_note": "Knowledge base for the Phase 9 lite rules (plan M4). Versioned with the rules: raise version on every change. Every rule names the references in clinical/scenarios/citations.json it rests on. Codes: RxNorm (prescribed products), LOINC (susceptibility results), SNOMED CT (organisms, specimens), ICD-10-CM (problems). Group inducible-ampc holds IDSA 2026's moderate-risk AmpC organisms (Enterobacter cloacae complex, Klebsiella aerogenes, Citrobacter freundii, Hafnia alvei) by SNOMED CT code; 62592009 is one concept that also carries the former name Enterobacter aerogenes. IDSA's low-risk Serratia, Morganella and Providencia are deliberately not in it.",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "agents": {
     "amoxicillin": {"display": "Amoxicillin"},
     "ampicillin": {"display": "Ampicillin", "covers_listeria": true},
@@ -25,7 +25,7 @@
     "vancomycin": {"display": "Vancomycin"}
   },
   "ade_agents": {
-    "_note": "Medication-safety drugs the ADE monitoring (#187) and opioid stewardship (#198) rules read, kept apart from the antimicrobials so no stewardship or IV to PO rule ever sees them. systemic_anticoagulant marks a dose that anticoagulates the patient; a heparin lock flush does not. class: opioid, benzodiazepine or gabapentinoid.",
+    "_note": "Medication-safety drugs the ADE monitoring (#187) and opioid stewardship (#198) rules read, kept apart from the antimicrobials so no stewardship or IV to PO rule ever sees them. systemic_anticoagulant marks a dose that anticoagulates the patient; a heparin lock flush does not. class: opioid, benzodiazepine, gabapentinoid, stimulant-laxative, osmotic-laxative or stool-softener.",
     "apixaban": {"display": "Apixaban", "systemic_anticoagulant": true},
     "heparin": {"display": "Heparin", "systemic_anticoagulant": true},
     "heparin-flush": {"display": "Heparin lock flush", "systemic_anticoagulant": false},
@@ -36,7 +36,17 @@
     "alprazolam": {"display": "Alprazolam", "class": "benzodiazepine"},
     "diazepam": {"display": "Diazepam", "class": "benzodiazepine"},
     "gabapentin": {"display": "Gabapentin", "class": "gabapentinoid"},
-    "pregabalin": {"display": "Pregabalin", "class": "gabapentinoid"}
+    "pregabalin": {"display": "Pregabalin", "class": "gabapentinoid"},
+    "senna": {"display": "Senna", "class": "stimulant-laxative"},
+    "senna-docusate": {"display": "Senna-docusate", "class": "stimulant-laxative"},
+    "bisacodyl": {"display": "Bisacodyl", "class": "stimulant-laxative"},
+    "polyethylene-glycol": {"display": "Polyethylene glycol 3350", "class": "osmotic-laxative"},
+    "lactulose": {"display": "Lactulose", "class": "osmotic-laxative"},
+    "docusate": {"display": "Docusate", "class": "stool-softener"}
+  },
+  "ade_conditions": {
+    "_note": "Problems the medication-safety rules read, by ICD-10-CM prefix, kept apart from the infection conditions. diarrhea: SHM's bowel regimen recommendation applies when the patient is not having diarrhea (#201).",
+    "diarrhea": {"icd10_prefixes": ["R19.7", "A04.7", "A09"]}
   },
   "ade_products": {
     "1364435": "apixaban",
@@ -55,7 +65,14 @@
     "310430": "gabapentin",
     "310431": "gabapentin",
     "483448": "pregabalin",
-    "483450": "pregabalin"
+    "483450": "pregabalin",
+    "312935": "senna",
+    "998740": "senna-docusate",
+    "198509": "bisacodyl",
+    "308753": "bisacodyl",
+    "876193": "polyethylene-glycol",
+    "391937": "lactulose",
+    "1115005": "docusate"
   },
   "products": {
     "1659149": "piperacillin-tazobactam",
@@ -142,7 +159,8 @@
     "iv-to-po-switch": {"text": "switching a clinically stable patient to an effective oral agent avoids IV catheter complications and cost", "key": "catheter"},
     "duplicate-anticoagulation": {"text": "two systemic anticoagulants at once raise the risk of serious bleeding; when one replaces the other, the label stops the first and starts the second at the time of the next dose", "key": "bleeding"},
     "opioid-cns-depressant/benzodiazepine": {"text": "an opioid with a benzodiazepine can cause profound sedation, respiratory depression, coma and death; the labels reserve the combination for patients whose alternatives are inadequate", "key": "respiratory"},
-    "opioid-cns-depressant/gabapentinoid": {"text": "gabapentin and pregabalin with an opioid are linked to serious, life-threatening respiratory depression; the labels advise watching for sedation and respiratory depression and starting the gabapentinoid low", "key": "respiratory"}
+    "opioid-cns-depressant/gabapentinoid": {"text": "gabapentin and pregabalin with an opioid are linked to serious, life-threatening respiratory depression; the labels advise watching for sedation and respiratory depression and starting the gabapentinoid low", "key": "respiratory"},
+    "missing-bowel-regimen": {"text": "opioids slow the bowel and hospitalized patients are prone to constipation; the consensus statement recommends a stimulant or osmotic laxative for hospitalized patients receiving opioids, and not a stool softener alone", "key": "constipation"}
   },
   "rules": {
     "bug-drug-mismatch": {"module": "stewardship", "refs": ["clsi-m100", "idsa-shea-asp-2016"]},
@@ -153,6 +171,7 @@
     "duration-review": {"module": "stewardship", "refs": ["idsa-shea-asp-2016"]},
     "iv-to-po-switch": {"module": "iv-to-po", "refs": ["idsa-shea-asp-2016"]},
     "duplicate-anticoagulation": {"module": "ade", "refs": ["fda-apixaban-label"]},
-    "opioid-cns-depressant": {"module": "opioid", "refs": ["fda-oxycodone-label", "fda-lorazepam-label", "fda-gabapentin-label", "fda-pregabalin-label"]}
+    "opioid-cns-depressant": {"module": "opioid", "refs": ["fda-oxycodone-label", "fda-lorazepam-label", "fda-gabapentin-label", "fda-pregabalin-label"]},
+    "missing-bowel-regimen": {"module": "opioid", "refs": ["shm-opioid-2018"]}
   }
 }

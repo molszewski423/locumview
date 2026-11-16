@@ -1,6 +1,6 @@
 # Opioid stewardship module: plan
 
-Status: **In progress** (owner request, 2026-11-16). O1 is built (changelog #198); the rest is planned. Every clinical threshold below is a candidate
+Status: **In progress** (owner request, 2026-11-16). O1 (#198) and O3 (#201) are built and approved; O2 is dropped (owner decision 2026-11-16, #202); the rest is planned. Every clinical threshold below is a candidate
 until it is read in its primary source and approved by the owner (the clinical review process: primary sources
 first, then an OpenEvidence packet the owner runs, then the owner's decisions).
 
@@ -13,7 +13,7 @@ the ADE module's first rule (changelog #187).
 | # | Rule | What it flags | Data it needs | Primary source to read | Order |
 |---|---|---|---|---|---|
 | O1 | Opioid with a benzodiazepine | An active opioid and an active benzodiazepine at the same time (respiratory depression) | Drug classes of active orders | FDA Drug Safety Communication (2016, boxed warning on combined use); CDC 2022 recommendation on concurrent benzodiazepines | First: no dose data needed |
-| O2 | No naloxone with risk factors | Opioid orders with a risk factor (O1's combination, a high daily dose, sleep apnea, opioid use disorder) and no naloxone order | Drug classes, problems; the dose part waits for D1 | CDC 2022 recommendation on naloxone; FDA 2020 labeling recommendation on naloxone | Second |
+| O2 | (Dropped 2026-11-16: no inpatient source, #202) No naloxone with risk factors | Opioid orders with a risk factor (O1's combination, a high daily dose, sleep apnea, opioid use disorder) and no naloxone order | Drug classes, problems; the dose part waits for D1 | CDC 2022 recommendation on naloxone; FDA 2020 labeling recommendation on naloxone | Second |
 | O3 | Scheduled opioid without a bowel regimen | A scheduled opioid with no stimulant laxative or similar order | Drug classes, scheduled versus as needed | To find: a guideline that states it (cancer pain or palliative care guidance); consensus evidence may be all there is, which is an owner decision | Third |
 | O4 | High daily dose | Total daily morphine milligram equivalents (MME) above a threshold, with the opioids that make it up | Dose, unit, frequency and route of every opioid order (D1); MME conversion factors | CDC 2022 guideline (its dose recommendations and MME conversion factors) | After D1 |
 | O5 | Extended-release opioid in an opioid-naive patient | An extended-release or long-acting opioid (fentanyl patch, ER oxycodone, methadone) without prior opioid tolerance | Home medications and recent opioid doses (D1, D2) | FDA labels (opioid-tolerant definition and limits for ER/LA products) | After D1, D2 |
@@ -21,6 +21,17 @@ the ADE module's first rule (changelog #187).
 | O7 | Renally cleared opioid in renal impairment | Morphine, codeine, tramadol or meperidine with low creatinine clearance | Creatinine, weight, age, sex; overlaps the ADE renal rule | FDA labels | With the ADE renal rule |
 
 Tramadol or methadone with serotonergic drugs belongs to the ADE module's serotonin rule (planned with linezolid and SSRIs).
+
+## Inpatient sources (found 2026-11-16, #201)
+
+The CDC 2022 opioid guideline (PMID 36327391, read in PubMed Central PMC9639433) states that its recommendations do not
+apply to patients who are hospitalized; they apply to prescribing at discharge. The inpatient source is the Society of
+Hospital Medicine consensus statement (Herzig 2018, PMID 29624189, PMC6278928): statement 10, a bowel regimen for
+hospitalized patients receiving opioids unless contraindicated (stimulant or osmotic laxatives, not stool softeners);
+statement 11, limit opioids with other CNS depressants. On naloxone its working group made no recommendation: no clear
+evidence for naloxone with short-term opioid therapy for acute pain. O3 rests on statement 10. O2 as an inpatient rule
+has no supporting source; options for the owner: drop it, restrict it to patients on chronic opioid therapy (which needs
+the home medication list), or make it a discharge rule when discharge prescribing is in scope.
 
 ## Data prerequisites
 

@@ -433,6 +433,58 @@
   }
  },
  {
+  "authoredOn": "2026-11-13T00:00:00+00:00",
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "community",
+      "display": "Home/Community",
+      "system": "http://terminology.hl7.org/CodeSystem/medicationrequest-category"
+     }
+    ]
+   }
+  ],
+  "dispenseRequest": {
+   "numberOfRepeatsAllowed": 0
+  },
+  "dosageInstruction": [
+   {
+    "route": {
+     "coding": [
+      {
+       "code": "C38288",
+       "display": "Per Oris",
+       "system": "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl"
+      }
+     ]
+    }
+   }
+  ],
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<MedicationRequest#5>",
+  "intent": "order",
+  "medicationCodeableConcept": {
+   "coding": [
+    {
+     "code": "312935",
+     "display": "sennosides, USP 8.6 MG Oral Tablet",
+     "system": "http://www.nlm.nih.gov/research/umls/rxnorm"
+    }
+   ]
+  },
+  "reportedBoolean": false,
+  "resourceType": "MedicationRequest",
+  "status": "active",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
   "category": [
    {
     "coding": [
@@ -975,7 +1027,7 @@
    },
    {
     "display": "Head Occipital-frontal circumference",
-    "reference": "Observation/<Observation#33>",
+    "reference": "Observation/<Observation#31>",
     "type": "Observation"
    },
    {
@@ -1065,7 +1117,7 @@
    },
    {
     "display": "Head Occipital-frontal circumference",
-    "reference": "Observation/<Observation#34>",
+    "reference": "Observation/<Observation#32>",
     "type": "Observation"
    },
    {
@@ -1421,7 +1473,7 @@
      "code": "mm[Hg]",
      "system": "http://unitsofmeasure.org",
      "unit": "mm[Hg]",
-     "value": 132
+     "value": 139
     }
    },
    {
@@ -1438,151 +1490,15 @@
      "code": "mm[Hg]",
      "system": "http://unitsofmeasure.org",
      "unit": "mm[Hg]",
-     "value": 76
+     "value": 79
     }
    }
   ],
   "effectivePeriod": {
    "end": "2026-11-15T12:00:00+00:00",
-   "start": "2026-11-15T12:00:00+00:00"
+   "start": "2026-11-13T14:10:00+00:00"
   },
   "id": "<Observation#30>",
-  "resourceType": "Observation",
-  "status": "final",
-  "subject": {
-   "reference": "Patient/<Patient#1>",
-   "type": "Patient"
-  }
- },
- {
-  "category": [
-   {
-    "coding": [
-     {
-      "code": "vital-signs",
-      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
-     }
-    ]
-   }
-  ],
-  "code": {
-   "coding": [
-    {
-     "code": "96607-7",
-     "display": "Blood pressure panel mean systolic and mean diastolic",
-     "system": "http://loinc.org"
-    }
-   ]
-  },
-  "component": [
-   {
-    "code": {
-     "coding": [
-      {
-       "code": "96608-5",
-       "display": "Systolic blood pressure mean",
-       "system": "http://loinc.org"
-      }
-     ]
-    },
-    "valueQuantity": {
-     "code": "mm[Hg]",
-     "system": "http://unitsofmeasure.org",
-     "unit": "mm[Hg]",
-     "value": 139
-    }
-   },
-   {
-    "code": {
-     "coding": [
-      {
-       "code": "96609-3",
-       "display": "Diastolic blood pressure mean",
-       "system": "http://loinc.org"
-      }
-     ]
-    },
-    "valueQuantity": {
-     "code": "mm[Hg]",
-     "system": "http://unitsofmeasure.org",
-     "unit": "mm[Hg]",
-     "value": 79
-    }
-   }
-  ],
-  "effectivePeriod": {
-   "end": "2026-11-15T12:00:00+00:00",
-   "start": "2026-11-13T14:10:00+00:00"
-  },
-  "id": "<Observation#31>",
-  "resourceType": "Observation",
-  "status": "final",
-  "subject": {
-   "reference": "Patient/<Patient#1>",
-   "type": "Patient"
-  }
- },
- {
-  "category": [
-   {
-    "coding": [
-     {
-      "code": "vital-signs",
-      "system": "http://terminology.hl7.org/CodeSystem/observation-category"
-     }
-    ]
-   }
-  ],
-  "code": {
-   "coding": [
-    {
-     "code": "96607-7",
-     "display": "Blood pressure panel mean systolic and mean diastolic",
-     "system": "http://loinc.org"
-    }
-   ]
-  },
-  "component": [
-   {
-    "code": {
-     "coding": [
-      {
-       "code": "96608-5",
-       "display": "Systolic blood pressure mean",
-       "system": "http://loinc.org"
-      }
-     ]
-    },
-    "valueQuantity": {
-     "code": "mm[Hg]",
-     "system": "http://unitsofmeasure.org",
-     "unit": "mm[Hg]",
-     "value": 139
-    }
-   },
-   {
-    "code": {
-     "coding": [
-      {
-       "code": "96609-3",
-       "display": "Diastolic blood pressure mean",
-       "system": "http://loinc.org"
-      }
-     ]
-    },
-    "valueQuantity": {
-     "code": "mm[Hg]",
-     "system": "http://unitsofmeasure.org",
-     "unit": "mm[Hg]",
-     "value": 79
-    }
-   }
-  ],
-  "effectivePeriod": {
-   "end": "2026-11-15T12:00:00+00:00",
-   "start": "2026-11-13T14:10:00+00:00"
-  },
-  "id": "<Observation#32>",
   "resourceType": "Observation",
   "status": "final",
   "subject": {

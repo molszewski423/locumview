@@ -1,0 +1,111 @@
+{
+  "schema": "locumview-case/1",
+  "id": "opioid-senna-docusate-negative-01",
+  "version": "0.1.1",
+  "title": "Oxycodone for a ureteral stone with senna-docusate: a bowel regimen is ordered",
+  "kind": "negative-control",
+  "modules": [
+    "opioid"
+  ],
+  "provenance": {
+    "source": "synthetic",
+    "author": "Claude Code (draft for owner review)",
+    "created": "2026-11-16",
+    "clinical_review": {
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-16",
+      "notes": "Owner approved 2026-11-16 (#202) the O3 review points of #201 as presented: the case and reference answer, the reviewed reason. The basis is SHM consensus statement 10 as quoted in #201, read by Claude Code in PubMed Central; the owner did not report reading the statement."
+    }
+  },
+  "story": "A 57-year-old man is admitted with a 7 mm left ureteral stone and pain not controlled in the emergency department. He has oxycodone 5 mg by mouth every 4 hours as needed, scheduled acetaminophen, and tamsulosin, and his admission orders include senna-docusate (sennosides 8.6 mg with docusate 50 mg) two tablets at bedtime.",
+  "patient": {
+    "family": "Casebook",
+    "given": "Cyrus",
+    "birth_date": "1969-01-27",
+    "sex": "male"
+  },
+  "encounter": {
+    "class_code": "IMP",
+    "start": "2026-11-14T02:00:00-05:00",
+    "reason": "Left flank pain"
+  },
+  "problems": [
+    {
+      "title": "Calculus of ureter",
+      "diagnosis": "ICD10:N20.1",
+      "begdate": "2026-11-14"
+    }
+  ],
+  "allergies": [],
+  "prescriptions": [
+    {
+      "drug": "oxycodone hydrochloride 5 MG Oral Tablet",
+      "rxnorm": "1049621",
+      "start": "2026-11-14",
+      "route": "PO",
+      "instructions": "5 mg by mouth every 4 hours as needed for pain"
+    },
+    {
+      "drug": "acetaminophen 500 MG Oral Tablet",
+      "rxnorm": "198440",
+      "start": "2026-11-14",
+      "route": "PO",
+      "instructions": "1,000 mg by mouth every 8 hours"
+    },
+    {
+      "drug": "docusate sodium 50 MG / sennosides, USP 8.6 MG Oral Tablet",
+      "rxnorm": "998740",
+      "start": "2026-11-14",
+      "route": "PO",
+      "instructions": "2 tablets by mouth at bedtime"
+    }
+  ],
+  "vitals": [
+    {
+      "taken": "2026-11-14T02:10:00-05:00",
+      "temperature_f": 98.6,
+      "pulse": 104,
+      "bps": 150,
+      "bpd": 90,
+      "respiration": 20,
+      "oxygen_saturation": 98
+    },
+    {
+      "taken": "2026-11-15T07:30:00-05:00",
+      "temperature_f": 98.4,
+      "pulse": 78,
+      "bps": 132,
+      "bpd": 80,
+      "respiration": 16,
+      "oxygen_saturation": 98
+    }
+  ],
+  "labs": [
+    {
+      "order_code": "LV-BMP",
+      "order_text": "Basic labs",
+      "collected": "2026-11-15T05:30:00-05:00",
+      "resulted": "2026-11-15T06:30:00-05:00",
+      "results": [
+        {
+          "loinc": "2160-0",
+          "text": "Creatinine [Mass/volume] in Serum or Plasma",
+          "value": "1.1",
+          "units": "mg/dL",
+          "range": "0.5-1.1",
+          "flag": "N"
+        }
+      ]
+    }
+  ],
+  "expected_findings": [],
+  "reference_answer": "No change for this rule: senna-docusate contains senna, a stimulant laxative, so a bowel regimen is ordered. Continue it while he receives oxycodone and track bowel movements.",
+  "rationale": "A near miss for the bowel regimen rule: docusate is on the order, which alone would not count, but the combination tablet also contains senna. The knowledge base classes the combination product as a stimulant laxative, and the rule must stay silent.",
+  "citations": [
+    {
+      "ref": "shm-opioid-2018",
+      "supports": "Consensus statement 10: stimulant laxatives such as senna are a bowel regimen; stool softeners alone are not. Read in the PubMed Central full text by Claude Code; owner approved 2026-11-16 (#202)."
+    }
+  ]
+}

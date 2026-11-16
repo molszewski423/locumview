@@ -3481,3 +3481,49 @@ Agent: Claude Code
   fixture change, so no image change.
 
 Agent: Claude Code
+
+## 201. Opioid stewardship O3: an opioid without a bowel regimen (prepared, review pending); O2 has no inpatient source (2026-11-16)
+
+- **Owner request (2026-11-16):** O2 (naloxone) and O3 (bowel regimen) next.
+- **Sources read:** the CDC 2022 guideline in PubMed Central (PMC9639433; cdc.gov refuses scripted access) states that
+  it does not apply to hospitalized patients, only to prescribing at discharge. The Society of Hospital Medicine
+  consensus statement on opioid safety in hospitalized adults (Herzig 2018, PMID 29624189, PMC6278928): statement 10
+  recommends, unless contraindicated, a bowel regimen for hospitalized patients receiving opioids, provided they are not
+  having diarrhea; stimulant laxatives (senna, bisacodyl), osmotic laxatives (polyethylene glycol, lactulose); stool
+  softeners not recommended. On naloxone the working group made no recommendation (no clear evidence for short-term
+  opioid therapy for acute pain). Citation `shm-opioid-2018`, `content_check: pending`.
+- **O2 not built:** no source supports an inpatient naloxone rule. Owner decision in the plan: drop it, restrict it to
+  chronic opioid therapy, or make it a discharge rule.
+- **Rule `missing-bowel-regimen` (module `opioid`):** an active opioid order with no active stimulant or osmotic laxative
+  order; docusate alone does not count and the summary says so; a problem of diarrhea (R19.7, A04.7, A09; new
+  `ade_conditions`, kept apart from the infection conditions) keeps it silent; names the opioid started first.
+  Knowledge base 0.11.0: senna, senna-docusate (a stimulant laxative), bisacodyl, polyethylene glycol 3350, lactulose
+  and docusate (a stool softener), RxNorm checked in RxNav.
+- **Cases (pending review), with photographs:** `opioid-docusate-only-01`, a 78-year-old woman with an osteoporotic T12
+  fracture on hydromorphone with docusate alone (finding: Hydromorphone); `opioid-senna-docusate-negative-01`, a
+  57-year-old man with a ureteral stone on oxycodone with senna-docusate (no finding). The two O1 cases gain a senna
+  order so each tests one rule (version 0.2.0, back to pending for the owner to re-confirm the change).
+- **Verified:** 32 cases ok; the spike rebuilt fresh with patches 0001 to 0007 and the four opioid cases' FHIR fixtures
+  recorded again; rule tests and agent service, explain and rule tests 100 OK (six O3 boundary tests); the app's tests
+  and build; the real gemma4:26b explained the O3 and O1 findings (guard passed, reasons kept).
+- **Owner review needed:** the two O3 cases and reference answers; the reviewed reason ("opioids slow the bowel and
+  hospitalized patients are prone to constipation; the consensus statement recommends a stimulant or osmotic laxative
+  for hospitalized patients receiving opioids, and not a stool softener alone"); the senna added to the O1 cases; and
+  the O2 decision.
+
+Agent: Claude Code
+
+## 202. O2 dropped; O3 and the changed O1 cases approved; the loader adds new prescriptions to loaded cases (2026-11-16)
+
+- **Owner decisions (2026-11-16):** "drop naloxone, approve the rest": O2 is dropped (no inpatient source, #201); the O3
+  cases, their reference answers and reviewed reason are approved; the O1 cases with the senna order added in #201 are
+  re-confirmed; the loader step below is wanted.
+- **Basis, as recorded:** O3 on SHM consensus statement 10 as quoted in #201, read by Claude Code in PubMed Central; the
+  owner approved the content as presented and did not report reading the statement. `shm-opioid-2018` is
+  `content_check: owner` on that basis. Cases: O3 at 0.1.1, O1 at 0.2.1, all approved.
+- **Loader (`clinical/scenarios/load.py`):** for a case already loaded, prescriptions in the case whose RxNorm code the
+  patient does not have yet are ordered on its first encounter (with their start dates), so Yara and Bram Casebook get
+  their senna on the cluster. Checked on the spike: with Yara's senna deleted, a load added one prescription, the next
+  load added none, and her FHIR read-back matched the recorded fixture (codes, start dates, status).
+
+Agent: Claude Code

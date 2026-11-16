@@ -438,6 +438,46 @@ class OpioidCnsDepressantTests(unittest.TestCase):
                          [("opioid", "opioid-benzodiazepine", "Lorazepam")])
 
 
+class MissingBowelRegimenTests(unittest.TestCase):
+    """Opioid stewardship O3, changelog #201: an opioid order with no stimulant or osmotic laxative order."""
+    POSITIVE = "opioid-docusate-only-01"
+
+    def test_docusate_alone_is_named_in_the_finding(self):
+        (f,) = evaluate(from_case(case(self.POSITIVE), KB), KB, {"opioid"})
+        self.assertEqual(f.key(), ("opioid", "missing-bowel-regimen", "Hydromorphone"))
+        self.assertIn("Docusate alone", f.summary)
+        self.assertEqual(f.refs, ("shm-opioid-2018",))
+        self.assertTrue(any(e.startswith("Why it matters:") and "constipation" in e for e in f.evidence))
+
+    def test_an_osmotic_laxative_counts(self):
+        c = case(self.POSITIVE)
+        c["prescriptions"].append({"drug": "polyethylene glycol 3350 17000 MG Powder for Oral Solution", "rxnorm": "876193",
+                                   "start": "2026-11-14", "route": "PO", "instructions": "17 g by mouth daily"})
+        self.assertEqual(keys(c), [])
+
+    def test_diarrhea_on_the_problem_list_keeps_it_silent(self):
+        c = case(self.POSITIVE)
+        c["problems"].append({"title": "Diarrhea", "diagnosis": "ICD10:R19.7", "begdate": "2026-11-14"})
+        self.assertEqual(keys(c), [])
+
+    def test_without_docusate_the_summary_does_not_mention_it(self):
+        c = case(self.POSITIVE)
+        c["prescriptions"] = [p for p in c["prescriptions"] if p["rxnorm"] != "1115005"]
+        (f,) = evaluate(from_case(c, KB), KB, {"opioid"})
+        self.assertNotIn("Docusate", f.summary)
+
+    def test_the_first_started_opioid_is_named(self):
+        c = case(self.POSITIVE)
+        c["prescriptions"].append({"drug": "oxycodone hydrochloride 5 MG Oral Tablet", "rxnorm": "1049621", "start": "2026-11-12",
+                                   "route": "PO", "instructions": "5 mg by mouth every 4 hours as needed"})
+        self.assertEqual(keys(c), [("opioid", "missing-bowel-regimen", "Oxycodone")])
+
+    def test_a_stopped_laxative_does_not_count(self):
+        c = case("opioid-senna-docusate-negative-01")
+        [p for p in c["prescriptions"] if p["rxnorm"] == "998740"][0]["end"] = "2026-11-15"
+        self.assertEqual(keys(c), [("opioid", "missing-bowel-regimen", "Oxycodone")])
+
+
 class FhirAdapterTests(unittest.TestCase):
     """The same rules over OpenEMR's FHIR read-back of each case (fixtures/fhir, recorded with patches 0001 and 0002
     and the loader's start dates) give the same snapshot and the same findings as over the case file."""

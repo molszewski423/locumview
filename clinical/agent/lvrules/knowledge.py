@@ -14,6 +14,7 @@ class Knowledge:
         self.products = data["products"]
         self.ade_agents = {k: v for k, v in data.get("ade_agents", {}).items() if not k.startswith("_")}
         self.ade_products = data.get("ade_products", {})
+        self.ade_conditions = {k: v for k, v in data.get("ade_conditions", {}).items() if not k.startswith("_")}
         self.tests = data["susceptibility_tests"]
         self.organisms = data["organisms"]
         self.specimens = data["specimens"]
@@ -32,6 +33,9 @@ class Knowledge:
 
     def drug_class(self, ade_agent: str | None) -> str | None:
         return self.ade_agents.get(ade_agent or "", {}).get("class")
+
+    def has_ade_condition(self, icd10: str | None, name: str) -> bool:
+        return bool(icd10) and any(icd10.startswith(p) for p in self.ade_conditions.get(name, {}).get("icd10_prefixes", []))
 
     def systemic_anticoagulant(self, ade_agent: str | None) -> bool:
         return bool(self.ade_agents.get(ade_agent or "", {}).get("systemic_anticoagulant"))

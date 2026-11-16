@@ -18,7 +18,8 @@ KINDS = {"finding", "negative-control", "ambiguous"}
 MODULES = {"stewardship", "iv-to-po", "ade", "opioid"}
 FINDING_TYPES = {"bug-drug-mismatch", "suboptimal-agent", "missing-empiric-coverage", "de-escalation",
                  "iv-to-po-switch", "redundant-coverage", "duration-review", "duplicate-anticoagulation",
-                 "opioid-benzodiazepine", "opioid-gabapentinoid"}
+                 "opioid-benzodiazepine", "opioid-gabapentinoid",
+                 "missing-bowel-regimen"}
 INTERPRETATIONS = {"S", "I", "R", "SDD", "NS"}
 TIME = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?(Z|[+-]\d{2}:\d{2})$")
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
