@@ -33,7 +33,9 @@ are on the backlog for when real evaluators exist.
 4. **Apply the Secret** so the cluster copy matches git: `sops -d k8s/locumview/secrets/demo-login.sops.yaml | kubectl apply -f -`.
    Commit the re-encrypted file.
 5. **Hand over** the new password to the next evaluator out of band, without displaying it, e.g.
-   `sops -d --extract '["stringData"]["password"]' k8s/locumview/secrets/demo-login.sops.yaml | wl-copy -o`.
+   `sops -d --extract '["stringData"]["password"]' k8s/locumview/secrets/demo-login.sops.yaml | wl-copy`, then
+   `wl-copy --clear` once it is pasted. Not `wl-copy -o` on GNOME: the shell reads the clipboard as soon as it changes,
+   which uses up the single paste (changelog #180).
 6. **Record** the rotation (date, reason) in the changelog or the day's worklog.
 
 ## Rotate the OpenEMR demo password
@@ -51,4 +53,8 @@ so the baseline is saved again after every rotation.
    `kubectl -n clinical create job --from=cronjob/openemr-baseline-save openemr-baseline-save-$(date +%s)`; its log
    ends with `baseline saved`.
 4. **Commit** the re-encrypted `k8s/clinical/secrets/openemr-demo.sops.yaml`, and **hand over** the password out of
-   band: `sops -d --extract '["stringData"]["password"]' k8s/clinical/secrets/openemr-demo.sops.yaml | wl-copy -o`.
+   band: `sops -d --extract '["stringData"]["password"]' k8s/clinical/secrets/openemr-demo.sops.yaml | wl-copy`, then
+   `wl-copy --clear`.
+5. **Sign the demo desktop out of OpenEMR.** The demo desktop is one session that stays open between visitors, so the
+   next one would find the EHR signed in as whoever used it last (changelog #180). Open the demo desktop, sign out of
+   OpenEMR (user menu, Logout) and close the browser.

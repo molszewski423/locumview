@@ -1,0 +1,26 @@
+--- a/interface/patient_file/summary/demographics.php
++++ b/interface/patient_file/summary/demographics.php
+@@ -99,7 +99,8 @@
+ // it's own module that people can remove / add if they don't
+ // want smart support in their system.
+ $smartLaunchController = new SMARTLaunchController(OEGlobalsBag::getInstance()->getKernel()->getEventDispatcher());
+-$smartLaunchController->registerContextEvents();
++// LocumView: the SMART apps card is rendered above the issue cards instead (below), not after the section list.
++// $smartLaunchController->registerContextEvents();
+ $hiddenCards = getHiddenDashboardCards();
+ 
+ $ed = OEGlobalsBag::getInstance()->getKernel()->getEventDispatcher();
+@@ -1094,6 +1095,13 @@
+         ?>
+         <div class="main mb-1">
+             <!-- start main content div -->
++            <?php if ($thisauth) : // LocumView: SMART apps first, above allergies, problems and medications ?>
++            <div class="row">
++                <div class="col-12 p-1">
++                    <?php $smartLaunchController->renderPatientSmartLaunchSection(new RenderEvent($pid)); ?>
++                </div>
++            </div>
++            <?php endif; ?>
+             <div class="row">
+                 <?php
+                 $t = $twig->getTwig();

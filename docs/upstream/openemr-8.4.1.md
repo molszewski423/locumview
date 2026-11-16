@@ -21,5 +21,16 @@ contribute fixes in parallel). Nothing here has been submitted.
 | 13 | FHIR ids (uuids) | OpenEMR assigns a record's FHIR id lazily, on its first FHIR read (`UPDATE procedure_report SET uuid = ?`). Two concurrent first reads of a new patient's results (an app fetching resource types in parallel) collide: "Record has changed since last read in table 'procedure_report'; try restarting transaction", and the FHIR call returns HTTP 500 with no retry; a second launch works. Worked around by assigning missing ids with `UuidRegistry::populateAllMissingUuids()` after each scenario load (`clinical/scenarios/load.py`, changelog #138). |
 | 14 | Patient photograph | The chart header's photograph (`PatientService::getPatientPictureDocumentId()`) takes the first document in the photograph category without checking `documents.deleted`, while the dashboard's list (`pic_array()` in `demographics.php`) does check it: after a photograph is replaced and the old one deleted, the header keeps showing the deleted one. | Found 2026-11-12 when the loader replaced a background patient's photograph | Worked around in `clinical/scenarios/load.py`: a replaced photograph is also removed from the category (changelog #150) |
 
+## LocumView changes that are not defects
+
+- **SMART apps first on the patient dashboard** (owner request, changelog #181):
+  `clinical/spike/patches/0004-smart-apps-above-issue-cards.diff`. Stock OpenEMR attaches the "SMART Enabled Apps"
+  card to `RenderEvent::EVENT_SECTION_LIST_RENDER_AFTER`, the end of the dashboard's main column, below the issue
+  cards, the demographics and the vitals. No event fires between the patient header and the row of allergies, medical
+  problems and medications (`EVENT_SECTION_LIST_RENDER_TOP` fires above the patient header). The patch renders the card
+  in its own full-width row at the start of the main content, under the same access check as the dashboard, and no
+  longer registers it at the end. A candidate upstream improvement is a configurable position, or an event at that
+  point; not offered.
+
 Evidence: M1 `docs/evidence/clinical/20261025-openemr-m1-spike/`, M2 changelog #75, M3
 `docs/evidence/clinical/20261025-m3-local-launch/`.
