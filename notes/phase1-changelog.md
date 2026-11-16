@@ -3081,3 +3081,19 @@ Agent: Claude Code
   baseline's password date, so a rotation (or a new baseline after one) is due within that.
 
 Agent: Claude Code
+
+## 179. The demo EHR applied; its jobs wait for the network policy (2026-11-16)
+
+- **Applied (owner runs):** `scripts/clinical/openemr-demo-user.sh` wrote `openemr-demo.sops.yaml` and created `demo`
+  (checked in the database: Guest Pharmacist, active, not authorized as a provider, provider type pharmacist, a bcrypt
+  password hash, access group Physicians only). `kubectl diff -k k8s/clinical` showed the five new objects and
+  MariaDB's NetworkPolicy; `kubectl apply -k` created them (it also reported MariaDB's StatefulSet `configured`, an
+  annotation only: generation and revision stayed 1, no restart).
+- **Found:** the first baseline save failed at once with `Can't connect to server on 'mariadb' (115)`, and a second
+  the same way. A probe pod with the jobs' label showed the cause: its connection at start was refused, and from two
+  seconds on it reached MariaDB (with the root password from the existing Secret, `SELECT 1` answered). The network
+  policy controller adds a new pod's address a moment after the pod starts, and the dump started within that moment.
+- **Fix:** both job scripts wait until MariaDB answers (`SELECT 1`, up to a minute) before the dump or the restore.
+  The next steps of #178 are unchanged: save the baseline, then the lv-demo01 test.
+
+Agent: Claude Code
