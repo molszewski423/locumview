@@ -3044,3 +3044,40 @@ Agent: Claude Code
   as designed.
 
 Agent: Claude Code
+
+## 178. The demo EHR: a non-admin OpenEMR demo login and a nightly reset (prepared, not applied) (2026-11-16)
+
+- **Owner decisions (2026-11-16):** the demo desktop's EHR gets its own shared OpenEMR login, handled like the Keycloak
+  demo password (#22, #42), and a nightly reset that restores a saved baseline of the whole OpenEMR database at 03:00
+  site time. The reset also undoes changes made by any other account in this OpenEMR; it holds synthetic data only,
+  and a change meant to stay is kept by saving a new baseline. This closes the open item of #91 and #174. Since ADR
+  0019 the demo desktop reaches the EHR by being a desktop, so the earlier plan's oauth2-proxy group change is not
+  needed.
+- **`scripts/clinical/openemr-demo-user.sh`** (owner run): user `demo`, shown as Guest Pharmacist, access group
+  Physicians (the clinical app's reads need its `patients`/`med` rights, #119), provider type pharmacist, the
+  administrator's facility, no calendar. The password is word-word-number with capitals, which meets OpenEMR's
+  `secure_password` rule (a lowercase letter, an uppercase letter, a number and a special character); it is generated
+  into `k8s/clinical/secrets/openemr-demo.sops.yaml` and reaches the pod on stdin. The user is written the way
+  OpenEMR's own create path writes it (`users`, `users_secure` with OpenEMR's `AuthHash`, `groups`, the ACL through
+  `AclExtended::setUserAro`), because that path (`AuthUtils::updatePassword`) needs the administrator's password in
+  the request. `--rotate` sets a new password and clears the password history. The script fails unless the user's
+  only access group is Physicians.
+- **`k8s/clinical/reset.yaml`:** a 2 Gi volume for the baseline; `openemr-baseline-save` (suspended, run on demand
+  with `kubectl create job --from=`), which dumps the database with MariaDB's own image and moves the dump into place
+  only when it completed; `openemr-reset`, nightly, which refuses a missing or incomplete baseline and otherwise loads
+  it. OpenEMR's audit tables (`log`, `log_comment_encrypt`, `api_log`, `extended_log`) are left out of the dump, so a
+  reset never rolls back the record of what demo users did. The baseline is never in git: it holds password hashes and
+  the gateway's OAuth registration. Both jobs run as MariaDB's user with no capabilities and a read-only root, and a
+  NetworkPolicy lets them reach MariaDB only; MariaDB's policy admits them.
+- **Docs:** deploy step 11 in `k8s/clinical/README.md`; the rotation procedure in `docs/runbooks.md`.
+- **Checked:** `kubectl kustomize` with the live site values, then a server-side dry run: the five new objects are
+  accepted with no pod-security warning, and the only existing object that changes is MariaDB's NetworkPolicy. The
+  PHP passes `php -l` in the OpenEMR pod; every OpenEMR function it calls exists in 8.4.1 with that signature. Five
+  generated passwords met OpenEMR's rule (shape checked, values not shown). Nothing applied, no user created.
+- **Next (owner runs, in order):** the script; `kubectl apply -k k8s/clinical`; save the baseline. Then on lv-demo01
+  as the demo account: OpenEMR login as `demo`, a SMART launch from a chart, an edit, a reset by hand, the edit gone.
+- **Limits:** documents uploaded after the baseline stay on OpenEMR's volume, unreferenced. A failed nightly reset is
+  seen in `kubectl -n clinical get jobs`, with no alert yet. `password_expiration_days` is 180, counted from the
+  baseline's password date, so a rotation (or a new baseline after one) is due within that.
+
+Agent: Claude Code

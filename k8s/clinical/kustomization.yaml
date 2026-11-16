@@ -12,6 +12,7 @@ resources:
   - mtls.yaml
   - sso.yaml
   - agent.yaml
+  - reset.yaml
 
 # The images CI built and signed (.gitea/workflows/clinical-images.yml), by digest. Updated by a commit after each
 # build that is to be deployed; verify first: scripts/clinical/verify-images.sh
@@ -47,10 +48,16 @@ replacements:
         fieldPaths: ["spec.template.spec.nodeSelector.[kubernetes.io/hostname]"]
       - select: {kind: Deployment, name: agent}
         fieldPaths: ["spec.template.spec.nodeSelector.[kubernetes.io/hostname]"]
+      - select: {kind: CronJob, name: openemr-baseline-save}
+        fieldPaths: ["spec.jobTemplate.spec.template.spec.nodeSelector.[kubernetes.io/hostname]"]
+      - select: {kind: CronJob, name: openemr-reset}
+        fieldPaths: ["spec.jobTemplate.spec.template.spec.nodeSelector.[kubernetes.io/hostname]"]
   - source: {kind: ConfigMap, name: site-values, fieldPath: data.SITE_TZ}
     targets:
       - select: {kind: ConfigMap, name: agent}
         fieldPaths: [data.SITE_TZ]
+      - select: {kind: CronJob, name: openemr-reset}
+        fieldPaths: [spec.timeZone]
   - source: {kind: ConfigMap, name: site-values, fieldPath: data.OLLAMA_URL}
     targets:
       - select: {kind: ConfigMap, name: agent}
