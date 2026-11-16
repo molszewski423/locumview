@@ -2984,3 +2984,47 @@ Agent: Claude Code
   before anyone other than the owner uses the demo desktop's EHR.
 
 Agent: Claude Code
+
+## 175. The tunnel to the owner's Catalyst desktop is live (owner runs, 2026-11-15)
+
+- **Key (owner run):** `new-key.sh` on the operator machine, run with `bash` because the file had lost its executable
+  bit (fixed here); the encrypted Secret merged as #118. Only `stringData.id_ed25519` is encrypted; metadata is plain,
+  as in the other `*.sops.yaml` files.
+- **Desktop (owner run, Catalyst playbook):** `devalpine_vnc_tunnel_keys` set to the pod's public key, VNC sources
+  empty, the `vdi` role on, Alt as the Sway key. The dry run stops at enabling the two new services (they do not exist
+  until a real run writes them); the real run passed (`failed=0`). Checked on the desktop: WayVNC listens on
+  `127.0.0.1:5900` only and nftables has no rule for 5900.
+- **Found:** the tunnel was refused ("not listed in AllowUsers") although sshd's files allowed the account: Catalyst's
+  SSH handler validated the configuration but never reloaded sshd, because a handler with `changed_when: false` never
+  passes its notification on. The owner reloaded sshd; Catalyst fixed the handlers and added a gate check (Catalyst
+  #267).
+- **Cluster (owner run):** host key pinned in `vnc-tunnel/known_hosts` (fingerprint checked on the desktop and from a
+  second machine), `CATALYST_VDI3_CIDR` set, Secret and `kubectl apply -k k8s/locumview` applied. The diff's change to
+  the `cloudflared` NetworkPolicy is a generation bump only (`ingress: []` in git, absent in the cluster). The pod
+  became ready after the reload.
+- **Connection (owner run):** `upsert-vnc-connection.sh "<connection name>" vnc-tunnel user:<owner>` with
+  `VNC_PORT=15902`, the WayVNC password piped from the desktop's file without being shown. The owner opened the
+  desktop through Guacamole.
+
+Agent: Claude Code
+
+## 176. Sound for the owner's Catalyst desktop through the tunnel (prepared, not applied) (2026-11-15)
+
+- **Design:** guacd streams a VNC desktop's sound from a PulseAudio server (`enable-audio`, `audio-servername`). The
+  desktop side is Catalyst #273 (`devalpine_vdi_audio`): a virtual output and pipewire-pulse on `127.0.0.1:4713`, and
+  the tunnel account may forward there too. Here: a second forward in the tunnel pod (`0.0.0.0:14713` to
+  `127.0.0.1:4713`), a Service port, guacd egress and tunnel ingress for 14713, and `VNC_AUDIO_SERVER` in
+  `upsert-vnc-connection.sh`. No microphone: guacd's VNC audio is one way. The address replacement moves to `args.28`.
+- **Tested (2026-11-15, containers, not yet the desktop):** the published guacd 1.6.0 image streamed a 440 Hz tone
+  from Debian 13's PipeWire 1.4.2 with Catalyst's two drop-ins, through a forward from a non-default port to
+  `127.0.0.1:4713`, as `audio/L16` at 44.1 kHz stereo (peak samples about 23,000); with nothing playing it sent no
+  audio. `kubectl kustomize` with placeholder site values renders the two forwards, the address after `vnc-tunnel@`,
+  both Service ports and both NetworkPolicy rules. The connection script against a disposable Postgres with the
+  Guacamole tables: sound on adds the two parameters, a rerun without `VNC_AUDIO_SERVER` removes them, a malformed
+  value is refused before any write.
+- **Order (owner runs):** merge Catalyst #273 and apply it on the desktop with `devalpine_vdi_audio: true`; apply this
+  (the pod restarts, the desktop's connection drops once); rerun the connection script with
+  `VNC_AUDIO_SERVER=tcp:vnc-tunnel:14713`. Either side may go first: the extra forward fails per connection, not at
+  start, until the desktop allows it.
+
+Agent: Claude Code
