@@ -58,7 +58,9 @@ after the findings, so a slow or missing model never holds the findings back.
   trimmed by `fixtures/slim.py`. Re-record them after a change to a case, the loader or the OpenEMR patches.
 - `lvrules/rules.py`: one function per rule. Each finding carries its evidence (the data points it used) and the
   references it rests on, by key in [`../scenarios/citations.json`](../scenarios/citations.json).
-- `knowledge/antimicrobials.json`: the versioned knowledge base: agents and their properties, RxNorm products,
+- `knowledge/antimicrobials.json`: the versioned knowledge base: agents and their properties, RxNorm products, the
+  drugs the ADE monitoring rules read (`ade_agents`, `ade_products`: anticoagulants, kept apart from the antimicrobials so
+  no stewardship rule sees them),
   susceptibility tests by LOINC, organisms and specimens by SNOMED CT, conditions by ICD-10-CM prefix, thresholds, and
   each rule's references. Raise `version` on every change.
 

@@ -20,6 +20,7 @@ class Prescription:
     start: date
     end: date | None
     ended: bool = False        # stopped with no end date given (FHIR status completed or stopped)
+    ade_agent: str | None = None   # knowledge-base ADE drug key (anticoagulants, ...); never an antimicrobial
 
     def active_on(self, day: date) -> bool:
         return not self.ended and self.start <= day and (self.end is None or self.end > day)
@@ -76,6 +77,10 @@ class Snapshot:
         day = self.as_of.date()
         return [p for p in self.prescriptions if p.agent and p.active_on(day)]
 
+    def active_ade(self) -> list[Prescription]:
+        day = self.as_of.date()
+        return [p for p in self.prescriptions if p.ade_agent and p.active_on(day)]
+
     def final_isolates(self) -> list[Culture]:
         return [c for c in self.cultures if c.final and c.organism_code]
 
@@ -93,7 +98,7 @@ def from_case(case: dict, kb: Knowledge) -> Snapshot:
         problems.append(Problem(p["title"], code.removeprefix("ICD10:") if code.startswith("ICD10:") else None))
     prescriptions = [
         Prescription(kb.products.get(p["rxnorm"]), p["drug"], p["route"], date.fromisoformat(p["start"]),
-                     date.fromisoformat(p["end"]) if p.get("end") else None)
+                     date.fromisoformat(p["end"]) if p.get("end") else None, ade_agent=kb.ade_products.get(p["rxnorm"]))
         for p in case.get("prescriptions", [])]
     vitals = []
     for v in case.get("vitals", []):

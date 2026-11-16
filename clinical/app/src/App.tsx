@@ -67,7 +67,7 @@ function Home({ findings }: { findings: FindingsState }) {
         ))}
       </div>
       <p className="note">Counts are for the patient the app was opened on. A queue across all patients needs its own
-        access design and comes later. ADE Monitoring has no rules yet.</p>
+        access design and comes later.</p>
     </section>
   );
 }

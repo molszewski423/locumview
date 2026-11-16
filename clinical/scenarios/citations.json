@@ -178,6 +178,14 @@
       "doi": "10.1093/cid/ciu444",
       "metadata_checked": "2026-10-25",
       "content_check": "owner"
+    },
+    "fda-apixaban-label": {
+      "authors": "US Food and Drug Administration (manufacturer labeling)",
+      "title": "Eliquis (apixaban) tablets, film coated: prescribing information",
+      "source": "DailyMed setid e9481622-7cc6-418a-acb6-c5450daae9b0 (published 2026-11-12)",
+      "metadata_checked": "2026-11-16",
+      "content_check": "pending",
+      "note": "Read 2026-11-16 in the DailyMed label by Claude Code; owner review pending. 2.5 Converting from or to ELIQUIS: switching between ELIQUIS and an anticoagulant other than warfarin (oral or parenteral), discontinue one and start the other at the usual time of the next dose. 5.2 Bleeding: concomitant use of drugs affecting hemostasis, including other anticoagulants and heparin, increases the risk of bleeding. 7.3 Anticoagulants and Antiplatelet Agents: coadministration of heparin increases the risk of bleeding."
     }
   }
 }

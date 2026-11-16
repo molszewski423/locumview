@@ -30,7 +30,7 @@ from lvrules import Knowledge, evaluate, from_fhir
 from lvrules.knowledge import DEFAULT as DEFAULT_KNOWLEDGE
 
 DEFAULT_CITATIONS = Path(__file__).resolve().parent.parent / "scenarios" / "citations.json"
-MODULES = {"stewardship", "iv-to-po"}
+MODULES = {"stewardship", "iv-to-po", "ade"}
 MAX_RESOURCES = 5000    # one patient's chart; a request beyond this is refused rather than processed slowly
 
 

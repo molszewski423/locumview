@@ -84,7 +84,7 @@ def from_fhir(resources: list[dict], kb: Knowledge, local_tz: str) -> Snapshot:
             kb.products.get(rx or ""), (concept.get("coding") or [{}])[0].get("display") or concept.get("text") or "",
             route, date.fromisoformat(start[:10]),
             date.fromisoformat(bounds["end"][:10]) if bounds.get("end") else None,
-            ended=m.get("status") in ENDED and not bounds.get("end")))
+            ended=m.get("status") in ENDED and not bounds.get("end"), ade_agent=kb.ade_products.get(rx or "")))
 
     vitals: dict[datetime, dict] = {}
     for o in by_type.get("Observation", []):

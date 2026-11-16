@@ -30,6 +30,7 @@ afterEach(() => vi.unstubAllGlobals());
 describe("findings", () => {
   it("names every finding type the rules produce", () => {
     expect(typeLabel("iv-to-po-switch")).toBe("IV to PO switch");
+    expect(typeLabel("duplicate-anticoagulation")).toBe("Duplicate anticoagulation");
     expect(typeLabel("something-new")).toBe("something-new");
   });
 
