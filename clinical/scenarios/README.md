@@ -21,7 +21,7 @@ loader. For the length of a load it registers and enables a loader API client an
 afterwards it deletes the client and restores the grant. Read a case back with
 `clinical/spike/readback.py LV-<case id> <dir>` (every case shares the family name Casebook).
 Loading is idempotent: each case's patient has the patient number `LV-<case id>`, and a case already present is
-skipped. No manual chart entry, ever.
+skipped, except that a prescription added to the case since (by RxNorm code) is ordered on its first encounter (#201). No manual chart entry, ever.
 
 What no rule reads lives in `charts.json`, per case: demographics, emergency contact, insurance, the portrait text, and
 `history` (past history with ICD-10-CM codes, home medications with RxNorm codes as OpenEMR's patient-reported

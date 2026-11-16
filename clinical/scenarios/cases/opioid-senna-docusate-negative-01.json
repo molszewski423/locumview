@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "opioid-senna-docusate-negative-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Oxycodone for a ureteral stone with senna-docusate: a bowel regimen is ordered",
   "kind": "negative-control",
   "modules": [
@@ -12,7 +12,10 @@
     "author": "Claude Code (draft for owner review)",
     "created": "2026-11-16",
     "clinical_review": {
-      "status": "pending"
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-16",
+      "notes": "Owner approved 2026-11-16 (#202) the O3 review points of #201 as presented: the case and reference answer, the reviewed reason. The basis is SHM consensus statement 10 as quoted in #201, read by Claude Code in PubMed Central; the owner did not report reading the statement."
     }
   },
   "story": "A 57-year-old man is admitted with a 7 mm left ureteral stone and pain not controlled in the emergency department. He has oxycodone 5 mg by mouth every 4 hours as needed, scheduled acetaminophen, and tamsulosin, and his admission orders include senna-docusate (sennosides 8.6 mg with docusate 50 mg) two tablets at bedtime.",
@@ -102,7 +105,7 @@
   "citations": [
     {
       "ref": "shm-opioid-2018",
-      "supports": "Consensus statement 10: stimulant laxatives such as senna are a bowel regimen; stool softeners alone are not. Read in the PubMed Central full text, owner review pending."
+      "supports": "Consensus statement 10: stimulant laxatives such as senna are a bowel regimen; stool softeners alone are not. Read in the PubMed Central full text by Claude Code; owner approved 2026-11-16 (#202)."
     }
   ]
 }

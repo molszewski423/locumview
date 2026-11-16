@@ -3512,3 +3512,18 @@ Agent: Claude Code
   the O2 decision.
 
 Agent: Claude Code
+
+## 202. O2 dropped; O3 and the changed O1 cases approved; the loader adds new prescriptions to loaded cases (2026-11-16)
+
+- **Owner decisions (2026-11-16):** "drop naloxone, approve the rest": O2 is dropped (no inpatient source, #201); the O3
+  cases, their reference answers and reviewed reason are approved; the O1 cases with the senna order added in #201 are
+  re-confirmed; the loader step below is wanted.
+- **Basis, as recorded:** O3 on SHM consensus statement 10 as quoted in #201, read by Claude Code in PubMed Central; the
+  owner approved the content as presented and did not report reading the statement. `shm-opioid-2018` is
+  `content_check: owner` on that basis. Cases: O3 at 0.1.1, O1 at 0.2.1, all approved.
+- **Loader (`clinical/scenarios/load.py`):** for a case already loaded, prescriptions in the case whose RxNorm code the
+  patient does not have yet are ordered on its first encounter (with their start dates), so Yara and Bram Casebook get
+  their senna on the cluster. Checked on the spike: with Yara's senna deleted, a load added one prescription, the next
+  load added none, and her FHIR read-back matched the recorded fixture (codes, start dates, status).
+
+Agent: Claude Code

@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "opioid-lorazepam-postop-01",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "title": "Oxycodone and hydromorphone after ankle surgery, lorazepam added for sleep",
   "kind": "finding",
   "modules": [
@@ -12,8 +12,10 @@
     "author": "Claude Code (draft for owner review)",
     "created": "2026-11-16",
     "clinical_review": {
-      "status": "pending",
-      "notes": "Approved 2026-11-16 (#200) at 0.1.1; changed in #201: a senna order added so the case tests only the opioid with a sedative rule. Owner to re-confirm."
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-16",
+      "notes": "Owner approved 2026-11-16 (#200) at 0.1.1 and re-confirmed 2026-11-16 (#202) at 0.2.0 with the senna order added in #201, so the case tests only the opioid with a sedative rule. The basis is the label text quoted in #198, read by Claude Code on DailyMed; the owner did not report reading the labels."
     }
   },
   "story": "A 62-year-old woman is admitted after a fall with a right trimalleolar ankle fracture and has open reduction and internal fixation the same day. After surgery she has oxycodone 5 mg by mouth every 4 hours as needed for moderate pain, hydromorphone 0.5 mg IV every 3 hours as needed for severe pain, and scheduled acetaminophen. On the first night she cannot sleep, and the cross-covering clinician orders lorazepam 1 mg at bedtime as needed for insomnia. The next morning all three as-needed orders are active.",

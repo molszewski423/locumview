@@ -436,6 +436,27 @@ def message(case, pid, encounter, orders):
 CHARTS = {} if "--no-chart-details" in sys.argv else json.loads((HERE / "charts.json").read_text())
 
 
+def add_prescriptions(case, pid, encounter, only_missing=False):
+    """Order each of the case's prescriptions; with only_missing, only those whose RxNorm code the patient does not
+    have yet, so a prescription added to an already loaded case reaches OpenEMR (changelog #201)."""
+    have = {r[0] for r in sql(f"SELECT rxnorm_drugcode FROM prescriptions WHERE patient_id = {int(pid)};")} if only_missing else set()
+    added = 0
+    for x in case.get("prescriptions", []):
+        if x["rxnorm"] in have:
+            continue
+        rx = {"drug": x["drug"], "rxnorm_drugcode": x["rxnorm"], "start_date": x["start"], "route": ROUTES[x["route"]],
+              "drug_dosage_instructions": x["instructions"], "patient_id": pid, "encounter": encounter}
+        if "end" in x:
+            rx["end_date"] = x["end"]
+        ok("prescription", *target.api("POST", "api/prescription", rx))
+        added += 1
+    # OpenEMR 8.4.1's FHIR MedicationRequest has no start date: it does not select start_date and fills authoredOn
+    # from date_added, which the API leaves empty (docs/upstream/openemr-8.4.1.md, item 11). Record each order as
+    # written on its start date, as an order entered at the start of therapy would be.
+    sql(f"UPDATE prescriptions SET date_added = start_date WHERE patient_id = {int(pid)} AND date_added IS NULL;")
+    return added
+
+
 def load(case):
     number = f"LV-{case['id']}"
     if existing := sql(f"SELECT pid FROM patient_data WHERE pubpid = {quote(number)};"):
@@ -443,10 +464,12 @@ def load(case):
             sql(f"UPDATE lists SET diagnosis = {quote(x['diagnosis'])} WHERE pid = {int(existing[0][0])} "
                 f"AND type = 'medical_problem' AND title = {quote(x['title'])} AND diagnosis <> {quote(x['diagnosis'])};")
         chart_extras(existing[0][0], number, CHARTS.get(case["id"], {}))
-        # A case loaded before the start-date fix (changelog #112) gets it now; the update is a no-op otherwise.
-        sql(f"UPDATE prescriptions SET date_added = start_date WHERE patient_id = {int(existing[0][0])} "
-            f"AND date_added IS NULL;")
-        print(f"{case['id']}: already loaded; chart details and photograph brought up to date")
+        # Prescriptions added to the case since it was loaded (#201), on its first encounter; this also gives a case
+        # loaded before the start-date fix (changelog #112) its dates, and is a no-op otherwise.
+        enc = sql(f"SELECT encounter FROM form_encounter WHERE pid = {int(existing[0][0])} ORDER BY date, id LIMIT 1;")
+        added = add_prescriptions(case, existing[0][0], enc[0][0], only_missing=True) if enc else 0
+        print(f"{case['id']}: already loaded; chart details and photograph brought up to date"
+              + (f"; {added} new prescription(s)" if added else ""))
         return
     p, e = case["patient"], case["encounter"]
     status, body = target.api("POST", "fhir/Patient", {
@@ -466,16 +489,7 @@ def load(case):
         ok("problem", *target.api("POST", f"api/patient/{puuid}/medical_problem", x))
     for x in case.get("allergies", []):
         ok("allergy", *target.api("POST", f"api/patient/{puuid}/allergy", allergy_body(x)))
-    for x in case.get("prescriptions", []):
-        rx = {"drug": x["drug"], "rxnorm_drugcode": x["rxnorm"], "start_date": x["start"], "route": ROUTES[x["route"]],
-              "drug_dosage_instructions": x["instructions"], "patient_id": pid, "encounter": encounter}
-        if "end" in x:
-            rx["end_date"] = x["end"]
-        ok("prescription", *target.api("POST", "api/prescription", rx))
-    # OpenEMR 8.4.1's FHIR MedicationRequest has no start date: it does not select start_date and fills authoredOn
-    # from date_added, which the API leaves empty (docs/upstream/openemr-8.4.1.md, item 11). Record each order as
-    # written on its start date, as an order entered at the start of therapy would be.
-    sql(f"UPDATE prescriptions SET date_added = start_date WHERE patient_id = {int(pid)} AND date_added IS NULL;")
+    add_prescriptions(case, pid, encounter)
     for v in case.get("vitals", []):
         vital = {"date": utc(v["taken"]), **{("temperature" if k == "temperature_f" else k): str(val)
                                             for k, val in v.items() if k != "taken"}}

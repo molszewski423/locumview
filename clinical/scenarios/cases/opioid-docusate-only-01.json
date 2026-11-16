@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "opioid-docusate-only-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Hydromorphone for a vertebral fracture with docusate alone: no bowel regimen",
   "kind": "finding",
   "modules": [
@@ -12,7 +12,10 @@
     "author": "Claude Code (draft for owner review)",
     "created": "2026-11-16",
     "clinical_review": {
-      "status": "pending"
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-16",
+      "notes": "Owner approved 2026-11-16 (#202) the O3 review points of #201 as presented: the case and reference answer, the reviewed reason. The basis is SHM consensus statement 10 as quoted in #201, read by Claude Code in PubMed Central; the owner did not report reading the statement."
     }
   },
   "story": "A 78-year-old woman with osteoporosis is admitted for pain control after an osteoporotic compression fracture of T12. She has hydromorphone 2 mg by mouth every 4 hours as needed and scheduled acetaminophen. The admission order set added docusate 100 mg twice daily. She has had no bowel movement in two days, has no diarrhea, and her mobility is limited by pain.",
@@ -114,7 +117,7 @@
   "citations": [
     {
       "ref": "shm-opioid-2018",
-      "supports": "Consensus statement 10: a bowel regimen for hospitalized patients receiving opioids; stimulant or osmotic laxatives; stool softeners not recommended. Read in the PubMed Central full text, owner review pending."
+      "supports": "Consensus statement 10: a bowel regimen for hospitalized patients receiving opioids; stimulant or osmotic laxatives; stool softeners not recommended. Read in the PubMed Central full text by Claude Code; owner approved 2026-11-16 (#202)."
     }
   ]
 }
