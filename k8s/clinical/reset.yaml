@@ -26,6 +26,9 @@ data:
     # Dump OpenEMR's database except the audit tables. Written beside the old baseline and moved into place only
     # when the dump completed, so a failed save never replaces a good baseline.
     set -euo pipefail
+    # A new pod's address reaches the network policy a moment after the pod starts (k3s), so a connection in the
+    # first second is refused (changelog #179). Wait until MariaDB answers, at most a minute.
+    for i in $(seq 30); do mariadb -h mariadb -uroot --connect-timeout=2 -e 'SELECT 1' >/dev/null 2>&1 && break; sleep 2; done
     out=/baseline/openemr.sql
     mariadb-dump -h mariadb -uroot --single-transaction --routines --triggers --hex-blob \
       --ignore-table=openemr.log --ignore-table=openemr.log_comment_encrypt \
@@ -40,6 +43,9 @@ data:
     # Load the baseline over OpenEMR's database. Each table in the dump is dropped and recreated; the audit tables
     # are not in it and keep their rows.
     set -euo pipefail
+    # A new pod's address reaches the network policy a moment after the pod starts (k3s), so a connection in the
+    # first second is refused (changelog #179). Wait until MariaDB answers, at most a minute.
+    for i in $(seq 30); do mariadb -h mariadb -uroot --connect-timeout=2 -e 'SELECT 1' >/dev/null 2>&1 && break; sleep 2; done
     in=/baseline/openemr.sql
     [[ -s "$in" ]] || { echo "no baseline saved yet; nothing reset" >&2; exit 1; }
     tail -n 1 "$in" | grep -q '^-- Dump completed' || { echo "baseline is incomplete; nothing reset" >&2; exit 1; }
