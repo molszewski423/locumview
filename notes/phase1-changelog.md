@@ -3209,3 +3209,27 @@ Agent: Claude Code
   windows out and in (#183).
 
 Agent: Claude Code
+
+## 186. The patient list: sex, chief complaint and last visit, 50 per page; birth sex fixed (2026-11-16)
+
+- **Owner request:** the OpenEMR patient list (Patient Finder) without the synthetic home phone and SSN, with a sex
+  column, a chief complaint (reason for visit) column and anything else useful, 50 patients per page by default. The
+  owner also confirmed #184 on the demo desktop: the EHR now opens in about 2 s instead of 20 to 30.
+- **`clinical/scenarios/patient-list.sql`, run by `load.py` on every load:**
+  - Birth sex in OpenEMR's list ids (`Female`, `Male`): FHIR patient creation stores `female`, which the
+    demographics form's required Birth Sex list does not match, so every scenario patient's form showed Unassigned and
+    refused to save (#180). The administrative Sex field, empty for all 46 patients, follows birth sex.
+  - `patient_data.lv_chief_complaint` (the most recent encounter reason that is not empty) and `lv_last_visit` (the
+    last encounter's date), refreshed from the encounters. Kept in `patient_data`, so the list sorts and searches them
+    like its own columns with no change to OpenEMR's code; a new encounter shows in them after the next load.
+  - The list's columns (stock list "Patient List Columns"): Full Name, Sex, Date of Birth, External ID, Chief
+    Complaint, Last Visit; Home Phone and SSN off. `gbl_pt_list_page_size` 50 (stock 10).
+- **Verified on the local spike:** after a load, birth sex `Female`/`Male` and Sex filled; the finder page renders
+  the six columns with `pageLength` 50; its data request sorted by Last Visit returns them newest first, with
+  Nell Casebook's "Cough, fever" and 2026-10-18; searching "cough" finds her.
+- **Deploy (owner run, in this order, before the next 03:00 reset):** `scripts/clinical/load-scenarios.sh`, then save
+  a new baseline (`kubectl -n clinical create job --from=cronjob/openemr-baseline-save openemr-baseline-save-<n>`).
+  A reset from the earlier baseline would drop the two new columns, and the list would fail until the loader ran
+  again. The README's step 11 now says to save a baseline after every loader run.
+
+Agent: Claude Code

@@ -559,6 +559,9 @@ def main(argv):
         for path in paths:
             load(json.loads(path.read_text()))
         assign_missing_uuids()
+    # The patient list's columns and page size, and the fields they show (changelog #186).
+    sql((HERE / "patient-list.sql").read_text())
+    print("patient list configured")
 
 
 if __name__ == "__main__":
