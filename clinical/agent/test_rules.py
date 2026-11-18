@@ -520,6 +520,18 @@ class FhirAdapterTests(unittest.TestCase):
         self.assertEqual(from_fhir(fixture("meningitis-listeria-gap-01"), KB, "UTC").as_of.date().isoformat(),
                          "2026-10-25")
 
+    def test_a_social_history_observation_does_not_move_the_newest_charted_time(self):
+        # OpenEMR dates the smoking status by when the history was saved: for a loaded chart, the load (#204).
+        resources = fixture("pyelo-ivpo-ambiguous-01")
+        before = from_fhir(resources, KB, SITE_TZ).as_of
+        resources.append({"resourceType": "Observation", "status": "final", "effectiveDateTime": "2026-11-16T18:44:00+00:00",
+                          "category": [{"coding": [{"system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                                                    "code": "social-history"}]}],
+                          "code": {"coding": [{"system": "http://loinc.org", "code": "72166-2"}]}})
+        self.assertEqual(from_fhir(resources, KB, SITE_TZ).as_of, before)
+        self.assertEqual(fhir_keys(resources, {"stewardship", "iv-to-po"}), fhir_keys(fixture("pyelo-ivpo-ambiguous-01"),
+                                                                                    {"stewardship", "iv-to-po"}))
+
     def test_without_problem_codes_the_condition_rules_stay_silent(self):
         # What unpatched OpenEMR 8.4.1 returns: problems as text only (docs/upstream/openemr-8.4.1.md, item 9).
         resources = fixture("meningitis-listeria-gap-01")

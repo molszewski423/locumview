@@ -3539,3 +3539,27 @@ Agent: Claude Code
   Bram Casebook) and a new baseline straight away.
 
 Agent: Claude Code
+
+## 204. The rules' "now" no longer moves to the time a chart was loaded (2026-11-16)
+
+- **Reported:** on the cluster, Mira Casebook's findings showed a newest charted time of Nov 16, 1:44 PM (the time her
+  chart was loaded), and Nell's course was at "Day 27".
+- **Found:** the loader writes a patient's social history (`history_data`) with `NOW()`, and OpenEMR's FHIR
+  social-history Observation (the smoking status) takes its `effectiveDateTime` from that row's date
+  (`FhirObservationSocialHistoryService`). The FHIR adapter counted every Observation's time toward the newest charted
+  time, so on every chart with a social history "now" became the chart's first load. The recorded fixtures are loaded
+  without chart details, so they have no such Observation and the tests did not see it. The effect is beyond the
+  displayed time: with an Observation dated Nov 16 added to the fixtures, the old adapter gave a duration review on
+  `cap-febrile-iv-negative-01` (which should have no finding) and on `cap-levofloxacin-ivpo-01`, and changed the day
+  counts in the findings for `bsi-enterobacter-ampc-01`, `cap-duration-01` and `cellulitis-duration-01`.
+- **Changed (`clinical/agent/lvrules/fhir.py`):** only vital-sign and laboratory Observations count toward the newest
+  charted time, with specimen collections, order times and the encounter start as before. The loader is unchanged:
+  the social history keeps its load date, which is when it was recorded.
+- **Verification:** new test `test_a_social_history_observation_does_not_move_the_newest_charted_time` (Cora
+  Casebook's fixture plus a smoking status dated the load time: same newest charted time and same findings); it fails
+  on the old adapter with exactly the reported time (2026-11-16 13:44 New York). All agent tests pass (101). Every
+  fixture gives the same findings with and without such an Observation on the new adapter.
+- **Deploy:** the agent image only, after merge. Explanations for findings whose wording changes are drafted once
+  more; the rest come from memory after the first launch.
+
+Agent: Claude Code

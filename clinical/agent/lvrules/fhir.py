@@ -53,6 +53,12 @@ def _fahrenheit(quantity: dict) -> float:
     return round(value * 9 / 5 + 32, 1) if quantity.get("code") in ("Cel", "C") else value
 
 
+# Observations that chart the patient's course and so set the newest charted time. Others carry the time a record was
+# written: OpenEMR dates the smoking status (social-history) by when the history was saved, which for a loaded chart
+# is the load, and that moved "now" for the rules to the load time (changelog #204).
+CHARTED = {"vital-signs", "laboratory"}
+
+
 def from_fhir(resources: list[dict], kb: Knowledge, local_tz: str) -> Snapshot:
     tz = ZoneInfo(local_tz)
 
@@ -90,9 +96,9 @@ def from_fhir(resources: list[dict], kb: Knowledge, local_tz: str) -> Snapshot:
 
     vitals: dict[datetime, dict] = {}
     for o in by_type.get("Observation", []):
-        if "effectiveDateTime" in o:
-            times.append(when(o["effectiveDateTime"]))
         category = _code((o.get("category") or [{}])[0])
+        if "effectiveDateTime" in o and category in CHARTED:
+            times.append(when(o["effectiveDateTime"]))
         if category != "vital-signs" or "effectiveDateTime" not in o:
             continue
         code, taken = _code(o.get("code")), when(o["effectiveDateTime"])

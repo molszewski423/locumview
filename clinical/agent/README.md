@@ -65,7 +65,8 @@ after the findings, so a slow or missing model never holds the findings back.
   susceptibility tests by LOINC, organisms and specimens by SNOMED CT, conditions by ICD-10-CM prefix, thresholds, and
   each rule's references. Raise `version` on every change.
 
-"Now" is the newest charted time in the snapshot, never the wall clock, so a case gives the same answer every time.
+"Now" is the newest charted time in the snapshot, never the wall clock, so a case gives the same answer every time. Only vital signs, laboratory results, specimen collections and orders count: OpenEMR dates the smoking
+status by when the history was saved, which for a loaded chart is the load (changelog #204).
 
 Explanations are kept in memory (`explain.py`, changelog #193): the same finding with the same model, prompt and
 options is explained once and then served from memory, so reopening a patient does not run the model again; any change
