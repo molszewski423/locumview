@@ -3563,3 +3563,15 @@ Agent: Claude Code
   more; the rest come from memory after the first launch.
 
 Agent: Claude Code
+
+## 205. The agent image with the date-drift fix pinned (2026-11-18)
+
+- **Image:** clinical-images run 891 for the merge of #204 (commit 09c0a8b); its Verify step checked the signature and
+  SBOM attestation. Agent `sha256:1d7cf299…` (pulled: `lvrules/fhir.py` counts only vital-sign and laboratory
+  Observations toward the newest charted time). The gateway is unchanged and stays pinned at `f71e2fc9…`.
+- **Deploy (owner run):** `scripts/clinical/verify-images.sh`; `kubectl diff -k k8s/clinical` (the agent's image
+  only); `kubectl apply -k k8s/clinical`; rollout status for the agent. No loader run and no new baseline: the charts
+  do not change. Then launch the app on Mira Casebook: the newest charted time is her last vital sign or lab, not
+  the load time.
+
+Agent: Claude Code
