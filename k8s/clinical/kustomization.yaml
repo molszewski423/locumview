@@ -28,7 +28,7 @@ images:
   - name: git.lan/mike/locumview-clinical-agent
     # commit 9e85e6c, clinical-images (Gitea run 885): knowledge base 0.11.0 and the bowel regimen rule (#201); signature
     # and SBOM attestation verified by CI 2026-11-16
-    digest: sha256:0ebe7b0126478b60c2a5863f0627658949480a28e3730e550b02ec50de3cec9e
+    digest: sha256:1d7cf29942781862f19b7c16cb29eaca822490ac1e3a12e25685fac26f500a37
 
 # Site values (not secret, but site-specific): read from site.env by the replacements below and never applied.
 configMapGenerator:
