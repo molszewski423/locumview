@@ -3589,3 +3589,31 @@ Agent: Claude Code
   885); it now names run 891 and commit 09c0a8b.
 
 Agent: Claude Code
+
+## 207. ADR 0019 step 4b: the unused Keycloak proxy removed (prepared, not applied) (2026-11-21)
+
+- **Why:** since the cut-over (#165) Traefik admits only LocumView desktops to the clinical names (mutual TLS), and no
+  route has used oauth2-proxy since step 4a (#163). Step 4b removes what is left, as `docs/plans/adr-0019-build.md`
+  step 4 lists it. By the owner's decision (2026-10-27) M3 closes once it is done.
+- **Removed from the repository:** `k8s/clinical/sso.yaml` (oauth2-proxy's Deployment and Service, the `sso`
+  middleware); its network policy in `k8s/clinical/networkpolicy.yaml`; the rule letting it reach Keycloak in
+  `k8s/locumview/networkpolicy.yaml`; the encrypted `clinical-sso` Secret and `scripts/clinical/make-sso-secret.sh`;
+  its node replacement in `kustomization.yaml`. `configure-realm.sh` now deletes the `clinical-sso` client instead
+  of creating it. The group `locumview-clinical` stays (its memberships survive) but gates nothing.
+  `login.locumview.com` leaves the EHR browser's allowlist (`image/desktop/reference/50-locumview-ehr-sites.json`);
+  that reaches desktops with the next image build and promotion, and until then the extra entry is unused.
+- **Checked:** `kubectl kustomize k8s/clinical` with the site values, before and after: exactly four objects go
+  (Deployment, Service and NetworkPolicy `oauth2-proxy`, Middleware `sso`) and every other object renders the same. No
+  Ingress on the cluster refers to the `sso` middleware (read 2026-11-21).
+- **Owner run (operator-laptop, an access change; `kubectl apply` does not delete, so the objects are deleted by name):**
+  1. `cd ~/Projects/locumview-main; and git pull --ff-only`
+  2. `kubectl -n clinical delete deployment/oauth2-proxy service/oauth2-proxy middleware.traefik.io/sso networkpolicy/oauth2-proxy secret/clinical-sso`
+  3. `kubectl diff -k k8s/clinical` shows nothing.
+  4. `kubectl diff -k k8s/locumview` shows only Keycloak's network policy losing the oauth2-proxy rule; then
+     `kubectl apply -k k8s/locumview`.
+  5. `kubectl -n locumview exec -i deploy/keycloak -- bash -s < k8s/locumview/keycloak/configure-realm.sh` ends with
+     "client clinical-sso: deleted" and "CONFIGURE DONE".
+  6. On MikePC, `scripts/clinical/mtls-checks.sh` (all PASS), and the EHR icon on a desktop: OpenEMR's login only.
+- **After the run:** ADR 0019 build step 4 is complete; the ADR's status and M3 are updated in a follow-up.
+
+Agent: Claude Code

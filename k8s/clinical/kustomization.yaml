@@ -10,7 +10,6 @@ resources:
   - gateway.yaml
   - ingress.yaml
   - mtls.yaml
-  - sso.yaml
   - agent.yaml
   - reset.yaml
 
@@ -45,8 +44,6 @@ replacements:
       - select: {kind: Deployment, name: openemr}
         fieldPaths: ["spec.template.spec.nodeSelector.[kubernetes.io/hostname]"]
       - select: {kind: Deployment, name: gateway}
-        fieldPaths: ["spec.template.spec.nodeSelector.[kubernetes.io/hostname]"]
-      - select: {kind: Deployment, name: oauth2-proxy}
         fieldPaths: ["spec.template.spec.nodeSelector.[kubernetes.io/hostname]"]
       - select: {kind: Deployment, name: agent}
         fieldPaths: ["spec.template.spec.nodeSelector.[kubernetes.io/hostname]"]
