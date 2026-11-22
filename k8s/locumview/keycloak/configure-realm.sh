@@ -37,7 +37,8 @@ echo "realm master: brute-force protection applied"
 # --- Role and groups ----------------------------------------------------------------------------
 k get "roles/mfa-exempt" -r "$R" >/dev/null 2>&1 || k create roles -r "$R" -s name=mfa-exempt \
   -s 'description=Skips TOTP in the locumview-browser flow. Granted only through group locumview-demo (ADR 0005).'
-# locumview-clinical: may open the clinical names (OpenEMR and the clinical app) through clinical-sso below.
+# locumview-clinical: gated the clinical names through the clinical-sso client until ADR 0019 step 4b (changelog
+# #207); kept so its memberships survive, gates nothing now (desktop mTLS decides who reaches the EHR).
 # catalyst-users: may open the Catalyst desktops (k8s/locumview/guacamole/upsert-vnc-connection.sh).
 for g in locumview-admins locumview-users locumview-demo locumview-clinical catalyst-users; do
   k get groups -r "$R" --fields name --format csv --noquotes | grep -qx "$g" || k create groups -r "$R" -s name="$g"
@@ -91,21 +92,10 @@ k get "clients/$CID/protocol-mappers/models" -r "$R" --fields name --format csv 
     -s 'config."id.token.claim"=true' -s 'config."access.token.claim"=false' -s 'config."userinfo.token.claim"=false'
 echo "client guacamole: redirect $GUAC_URL/"
 
-# --- clinical-sso client: oauth2-proxy in front of the clinical names (k8s/clinical/sso.yaml) ------------------------
-# Confidential, authorization code with PKCE (S256) only. Its secret is read once by scripts/clinical/make-sso-secret.sh
-# into SOPS. The groups claim lets oauth2-proxy admit locumview-clinical only.
-CLINICAL_URLS="https://emr.corp.locumview.com https://clinical.corp.locumview.com"
-redirects=$(printf '"%s/lv-sso/callback",' $CLINICAL_URLS); redirects="[${redirects%,}]"
+# --- clinical-sso client: removed (ADR 0019 step 4b, changelog #207) ------------------------------------------------
+# oauth2-proxy no longer stands in front of the clinical names; desktop mTLS does (k8s/clinical/mtls.yaml). Deleted
+# here so a realm configured before #207 loses the client and its secret on the next run.
 SID=$(k get clients -r "$R" -q clientId=clinical-sso --fields id --format csv --noquotes)
-[ -n "$SID" ] || { k create clients -r "$R" -s clientId=clinical-sso; SID=$(k get clients -r "$R" -q clientId=clinical-sso --fields id --format csv --noquotes); }
-k update "clients/$SID" -r "$R" -s name="LocumView clinical" -s protocol=openid-connect -s publicClient=false \
-  -s clientAuthenticatorType=client-secret -s standardFlowEnabled=true -s implicitFlowEnabled=false \
-  -s directAccessGrantsEnabled=false -s serviceAccountsEnabled=false -s consentRequired=false \
-  -s "redirectUris=$redirects" -s 'webOrigins=[]' -s 'attributes."pkce.code.challenge.method"=S256'
-k get "clients/$SID/protocol-mappers/models" -r "$R" --fields name --format csv --noquotes | grep -qx groups ||
-  k create "clients/$SID/protocol-mappers/models" -r "$R" -s name=groups -s protocol=openid-connect \
-    -s protocolMapper=oidc-group-membership-mapper -s 'config."claim.name"=groups' -s 'config."full.path"=false' \
-    -s 'config."id.token.claim"=true' -s 'config."access.token.claim"=false' -s 'config."userinfo.token.claim"=false'
-echo "client clinical-sso: redirects $redirects"
+if [ -n "$SID" ]; then k delete "clients/$SID" -r "$R"; echo "client clinical-sso: deleted"; else echo "client clinical-sso: absent"; fi
 rm -f /tmp/kcadm.config
 echo "CONFIGURE DONE"
