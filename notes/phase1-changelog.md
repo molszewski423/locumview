@@ -3671,3 +3671,24 @@ Agent: Claude Code
   below it, no gear.
 
 Agent: Claude Code
+
+## 211. Running-window dots below the dock icons, not on them (prepared; next image) (2026-11-21)
+
+- **Reported (owner, demo desktop):** the dot that marks an open window sits on the icon, for every app, not only the
+  EHR's fallback icon (#210).
+- **Found, reproduced off the desktop:** the `:stable` desktop image's own GNOME Shell 49.5 with Dash to Dock 102,
+  started headless in a container on MikePC (software rendering, a session and system bus, Calculator open), with a
+  screenshot through the shell. The dot is a child of the icon's own 60 px box, placed 2 px above its bottom, and a
+  48 px icon fills that box from 6 to 54 px, so the dot (53 to 58 px) lands on any icon drawn to its bottom edge.
+- **Changed:** `packaging/extensions/locumview-layout@locumview.org/stylesheet.css` (the layout extension is always
+  enabled): 20 px of room under the icon image puts the dot below it; the tile's bottom padding drops from 14 to 2 px
+  to give most of that height back. Selectors start with `#uiGroup` so they win over Dash to Dock's own rules
+  whichever loads last. Dash to Dock's packaged files are untouched (the STIG's package verification stays clean).
+  The `locumview-shell-extensions` RPM installs every file in the extension directory, so the spec is unchanged.
+- **Tried and dropped:** a negative bottom margin on the dot (the dock no longer appeared at all); the padding alone
+  without the tile change (dot below the icon but touching it).
+- **Checked (same harness):** with the stylesheet installed in the extension's directory the dock appears, the dot
+  sits clearly under the Calculator icon, and the other icons are unchanged; each tile is 2 px taller (86 px, was 84) and the dock is a little wider.
+- **Verify on the next image (lv-test17, before promotion):** open two or three apps; each dot under its icon.
+
+Agent: Claude Code

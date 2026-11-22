@@ -1,0 +1,15 @@
+/* LocumView Layout: Dash to Dock at the bottom draws a window's running dot 2 px above the bottom of the icon's own
+   box, so on an icon that fills its square (Calculator, OpenEMR) the dot sat on the icon (changelog #211). Room below
+   the icon image puts the dot under it; the tile gives back most of that height. #uiGroup makes these rules win over
+   Dash to Dock's own, whichever stylesheet loads last. Checked on GNOME Shell 49 with Dash to Dock 102. */
+#uiGroup #dashtodockContainer.bottom #dash .dash-item-container .app-well-app .overview-icon,
+#uiGroup #dashtodockContainer.bottom #dash .dash-item-container .overview-tile .overview-icon,
+#uiGroup #dashtodockContainer.bottom #dash .dash-item-container .show-apps .overview-icon {
+  padding-bottom: 20px;
+}
+
+#uiGroup #dashtodockContainer.bottom #dash .dash-item-container .app-well-app,
+#uiGroup #dashtodockContainer.bottom #dash .dash-item-container .show-apps,
+#uiGroup #dashtodockContainer.bottom #dash .dash-item-container .overview-tile {
+  padding-bottom: 2px;
+}
