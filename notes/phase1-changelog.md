@@ -3638,3 +3638,16 @@ Agent: Claude Code
   build (M6 exit). The `login.locumview.com` allowlist removal reaches desktops with the next promoted image.
 
 Agent: Claude Code
+
+## 209. The frozen evaluation build: plan (2026-11-21)
+
+- **What:** `docs/plans/evaluation-build.md`, the plan for M6's exit: what a build pins (commit, the three images by
+  digest, knowledge base, citations, model and options, prompt, every case with its version and review status, the
+  FHIR fixtures, the export), an identifier `eval-<date>-<n>` plus the manifest's sha256, a `freeze.py` that runs the
+  pinned agent image itself on the recorded read-backs and stores each explanation once, and an export in two parts:
+  `review/` for reviewers (no case kind, expected findings or reference answer) and `key/` for the owner's analysis.
+- **Owner decisions asked:** scope of the first build (all 32 cases recommended), what reviewers see, explanations
+  frozen as text, and a git tag pushed by the owner.
+- **Status:** Planned; nothing built. The live demo is unchanged.
+
+Agent: Claude Code
