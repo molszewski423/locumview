@@ -3776,3 +3776,16 @@ Agent: Claude Code
 - **Status:** Planned; rows pending the owner's approval; nothing built.
 
 Agent: Claude Code
+
+## 216. The agent image with AmpC at every site pinned (2026-11-22)
+
+- **Image:** clinical-images run 928 for the merge of #214 (commit cad385d, which contains #212); its Verify step
+  checked the signature and SBOM attestation. Agent `sha256:ed48e46f…` (pulled: knowledge base 0.12.0 and the
+  AmpC rule for urine sites). Run 921, for #212's own merge, was cancelled while queued; 928 replaces it. The gateway
+  is unchanged and stays pinned.
+- **Deploy (owner run, operator-laptop):** `kubectl diff -k k8s/clinical` (the agent's image only); `kubectl apply -k
+  k8s/clinical`; rollout status for the agent. Then, if not done already for #214, `scripts/clinical/load-scenarios.sh`
+  (the new names and the three cases' new versions) and a baseline save. Check Fern Whitcombe and Mae Robinson in
+  LocumView Clinical: each shows the AmpC finding.
+
+Agent: Claude Code
