@@ -3756,3 +3756,23 @@ Agent: Claude Code
   nightly reset would otherwise restore the old names).
 
 Agent: Claude Code
+
+## 215. Case library v2 revised: drug interactions and de-escalations instead of repeated pairs (2026-11-22)
+
+- **Owner review of #213 (2026-11-22):** R2 to R5 approved for drafting; renal dosing (R1) stays in this program; the
+  opioid with a benzodiazepine pair and duplicate anticoagulation were too common in the draft. Instead: drug
+  interactions (warfarin with TMP-SMX; a fluoroquinolone with a prolonged QTc on a recent ECG; linezolid with an SSRI
+  and another serotonergic drug; daptomycin with a high CK; nirmatrelvir-ritonavir with apixaban and rosuvastatin;
+  pregnancy with a positive urine culture) and more de-escalations (vancomycin and cefepime with a negative MRSA nasal
+  screen). The owner may add more.
+- **Revised plan (`docs/plans/case-library-v2.md`):** new rules R6 (warfarin with an interacting anti-infective), R7
+  (fluoroquinolone with QTc 500 ms or more, or a 60 ms rise), R8 (nirmatrelvir-ritonavir with a restricted drug), R9
+  (pregnancy with untreated bacteriuria), R10 (vancomycin after a negative MRSA nasal screen in pneumonia), R11
+  (narrow to the culture), R12 (vancomycin past 72 hours with no MRSA); R3 now counts every serotonergic drug.
+  Interactions are a knowledge-base table, so a new pair is a row with its source. The 32 rows and the Synthea
+  admissions are redistributed: the opioid with a sedative falls from 12 added uses to 4, duplicate anticoagulation
+  from 7 to 2, and every new rule has a positive and a negative case. Thresholds are the owner's to confirm with
+  each rule's sources.
+- **Status:** Planned; rows pending the owner's approval; nothing built.
+
+Agent: Claude Code
