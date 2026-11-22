@@ -26,8 +26,8 @@ images:
     # verified by CI 2026-11-16
     digest: sha256:f71e2fc922333f715d06c9f03d53ea9c216a798c674b8a7a8e3e7ed6108152eb
   - name: git.lan/mike/locumview-clinical-agent
-    # commit 9e85e6c, clinical-images (Gitea run 885): knowledge base 0.11.0 and the bowel regimen rule (#201); signature
-    # and SBOM attestation verified by CI 2026-11-16
+    # commit 09c0a8b, clinical-images (Gitea run 891): knowledge base 0.11.0; the newest charted time from vital signs
+    # and laboratory results only (#204); signature and SBOM attestation verified by CI 2026-11-18
     digest: sha256:1d7cf29942781862f19b7c16cb29eaca822490ac1e3a12e25685fac26f500a37
 
 # Site values (not secret, but site-specific): read from site.env by the replacements below and never applied.

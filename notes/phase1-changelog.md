@@ -3575,3 +3575,17 @@ Agent: Claude Code
   the load time.
 
 Agent: Claude Code
+
+## 206. ROADMAP.md brought up to #205; #205 deployed (2026-11-21)
+
+- **Deploy of #205 (owner run on operator-laptop, 2026-11-21):** `kubectl apply -k k8s/clinical`: the agent was
+  replaced; MariaDB's StatefulSet was reported "configured" but kept its only revision and its pod (no restart), so
+  only kubectl's record of the applied settings changed. Checked afterwards: the agent runs `sha256:1d7cf299…`, its
+  health checks answer 200, and its `lvrules/fhir.py` has the #204 change.
+- **ROADMAP.md:** the Phase 9 lite entry now covers #166 to #205: 32 cases, knowledge base 0.11.0 and four modules,
+  the demo login and nightly reset, the EHR changes, the explanation memory and the date fix. Next, as agreed with the
+  owner on 2026-11-20: remove the unused Keycloak proxy (closes M3), then the frozen evaluation build (M6 exit).
+- **Corrected:** #205 pinned the new agent digest but left the comment above it describing the previous image (run
+  885); it now names run 891 and commit 09c0a8b.
+
+Agent: Claude Code
