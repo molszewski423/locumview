@@ -55,6 +55,9 @@ class Knowledge:
         return [name for name, c in self.conditions.items()
                 if any(icd10.startswith(prefix) for prefix in c["icd10_prefixes"])]
 
+    def display_condition(self, name: str) -> str:
+        return self.conditions[name].get("display", name.replace("-", " "))
+
     def listeria_risks(self, icd10: str | None) -> list[str]:
         """The Listeria risk-factor groups a problem code falls in (knowledge listeria_risk_factors)."""
         if not icd10:

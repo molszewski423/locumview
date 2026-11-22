@@ -3692,3 +3692,38 @@ Agent: Claude Code
 - **Verify on the next image (lv-test17, before promotion):** open two or three apps; each dot under its icon.
 
 Agent: Claude Code
+
+## 212. AmpC at every site: pyelonephritis and cystitis on ceftriaxone flagged too (prepared, review pending) (2026-11-21)
+
+- **Reported (owner):** a patient with Enterobacter cloacae in urine on ceftriaxone got no AmpC warning and no
+  cefepime suggestion. The AmpC rule fired for blood isolates only (owner's option A, 2026-11-12): Mae's
+  pyelonephritis (`pyelo-enterobacter-ambiguous-01`) showed only an AmpC note inside the IV to PO finding, and Fern's
+  cystitis (`cystitis-enterobacter-negative-01`) nothing, as a negative control.
+- **Owner decision (2026-11-21):** the owner supplied an OpenEvidence answer on Fern's case: ceftriaxone is not
+  preferred even for bladder-limited cystitis with E. cloacae complex, since IDSA 2026 suggests generally avoiding it
+  regardless of susceptibility, with the exception for an empirically started, non-severe, improving,
+  source-controlled infection; on her panel the alternatives are a single gentamicin dose or renally adjusted
+  cefepime. Recorded as the owner's decision on an OpenEvidence answer; the owner did not report reading IDSA's text.
+- **Source, read by Claude Code (IDSA's published 2026 guidance page, Question 2.4, 2026-11-21):** "the panel
+  suggests generally avoiding third-generation cephalosporins" for E. cloacae complex, K. aerogenes, C. freundii and
+  H. alvei, and ceftriaxone "is not suggested for the treatment of invasive infections"; the section does not define
+  invasive and does not mention pyelonephritis or cystitis. **Correction:** #125 and the case texts said Question 2.4
+  "limits" the caution to invasive infections; it states a general caution as well, so that reading was too narrow.
+- **Changed (knowledge base 0.12.0):** `ampc_third_generation_cephalosporin` fires for a final blood or urine isolate
+  of a moderate-risk AmpC organism on a third-generation cephalosporin (blood first when both grow). Bacteremia: as
+  before. Pyelonephritis or another complicated UTI on the problem list: cefepime adjusted for renal function as the
+  IV alternative, a susceptible oral agent when ready. Cystitis or no upper tract source charted: the preferred
+  nitrofurantoin or TMP-SMX with which of them the isolate allows ("neither is active" on Fern's panel), and a single
+  aminoglycoside dose or renally adjusted cefepime as alternatives (Question 2.7, as recorded in #125). The fever and
+  empiric-course exception wording is unchanged. The IV to PO finding no longer repeats the AmpC note. New condition
+  `cystitis` (ICD-10 N30), used only for the wording.
+- **Cases (0.2.0, review pending):** Fern's case becomes a finding (its id keeps "negative", since the chart, photo and
+  fixture are keyed on it) with a reference answer from the OpenEvidence points (gentamicin 5 mg/kg once or
+  renally adjusted cefepime; confirm symptoms and no catheter; 3 to 7 days counting ceftriaxone).
+  `pyelo-enterobacter-ambiguous-01` (still ambiguous) and `pyelo-kaerogenes-ivpo-01` gain the AmpC finding beside IV to
+  PO. Library: 16 findings, 12 negative controls, 4 ambiguous.
+- **Verification:** 102 agent tests pass, including new ones for each site, the susceptibility wording, blood first,
+  and silence on cefepime; the case checker passes (every case gives its expected findings from the case file and
+  from its recorded FHIR read-back).
+
+Agent: Claude Code

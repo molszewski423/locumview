@@ -1,9 +1,9 @@
 {
   "schema": "locumview-case/1",
   "id": "cystitis-enterobacter-negative-01",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "title": "Enterobacter cloacae cystitis on ceftriaxone, no fever or upper tract signs, nothing by mouth",
-  "kind": "negative-control",
+  "kind": "finding",
   "modules": [
     "stewardship",
     "iv-to-po"
@@ -13,10 +13,10 @@
     "author": "Claude Code (draft for owner review), case list approved by the owner",
     "created": "2026-10-25",
     "clinical_review": {
-      "status": "approved",
-      "by": "owner",
-      "date": "2026-10-25",
-      "notes": "Owner clinical review: cases look good."
+      "status": "pending",
+      "by": null,
+      "date": null,
+      "notes": "Changed in #212 (AmpC at every site, owner decision 2026-11-21); awaiting owner review."
     }
   },
   "story": "A 74-year-old woman on postoperative day 2 after hip fracture repair develops dysuria and frequency without fever, flank pain or bacteremia; she has no indwelling urinary catheter. She has an ileus and takes nothing by mouth. Urine grows Enterobacter cloacae complex, resistant to the usual oral agents; she is on IV ceftriaxone.",
@@ -211,17 +211,20 @@
       ]
     }
   ],
-  "expected_findings": [],
-  "reference_answer": "No AmpC finding: IDSA 2026 limits its caution about ceftriaxone for moderate-risk AmpC organisms to invasive infections, and this is cystitis without upper tract or bloodstream involvement. Its preferred agents for AmpC cystitis (nitrofurantoin, TMP-SMX) are resistant or cannot be taken by mouth; a single-dose aminoglycoside is a listed alternative a pharmacist may suggest, which is outside what the AmpC rule addresses.",
-  "rationale": "The negative pair of the Enterobacter bacteremia case. IDSA 2026 (Question 2.4) limits its caution about ceftriaxone for moderate-risk AmpC organisms to invasive infections, so the AmpC rule must stay silent here; a rule that fires on organism and drug alone, ignoring the site, fails this case. IDSA 2026 does not list ceftriaxone among its agents for AmpC cystitis; the choice of agent is outside the rules this case tests. IV to PO does not apply: she is not taking anything by mouth and no susceptible oral agent exists.",
+  "expected_findings": [
+    {
+      "module": "stewardship",
+      "type": "suboptimal-agent",
+      "drug": "Ceftriaxone",
+      "summary": "Enterobacter cloacae complex cystitis on ceftriaxone: generally avoided for an inducible AmpC organism even when susceptible; the preferred agents (nitrofurantoin, TMP-SMX) are not active here, so a single dose of an aminoglycoside or renally adjusted cefepime are the alternatives."
+    }
+  ],
+  "reference_answer": "Flag ceftriaxone. IDSA 2026 suggests generally avoiding third-generation cephalosporins for Enterobacter cloacae complex even when susceptible. Its preferred agents for AmpC cystitis, nitrofurantoin and TMP-SMX, test resistant, and she takes nothing by mouth. Suggest a single dose of gentamicin (5 mg/kg IV, adjusted body weight if obese; avoid with hearing loss or significant renal impairment) or cefepime adjusted for her creatinine clearance (check weight; Cockcroft-Gault likely under 60 mL/min at 74). Completing ceftriaxone may be reasonable only if it was started empirically, she is clearly improving and no catheter or other source persists; repeat the urine culture if symptoms persist. Confirm she has urinary symptoms (otherwise this is asymptomatic bacteriuria and needs no antibiotic) and no indwelling catheter. Total 3 to 7 days for cystitis, counting the ceftriaxone days, or one gentamicin dose.",
+  "rationale": "Changed from a negative control in #212 (owner decision, 2026-11-21, after an OpenEvidence answer on this case): ceftriaxone is not preferred even for bladder-limited cystitis with an inducible AmpC organism, so the AmpC rule now fires at every site with site-specific alternatives. The case id keeps its original name because the chart, photograph and recorded FHIR fixture are keyed on it. IV to PO does not apply: she is not taking anything by mouth and no susceptible oral agent exists.",
   "citations": [
     {
       "ref": "idsa-amr-gn-2024",
       "supports": "AmpC-producing Enterobacterales: ceftriaxone for uncomplicated cystitis versus invasive infections; cefepime when the MIC is 2 or lower."
-    },
-    {
-      "ref": "idsa-amr-gn-2026",
-      "supports": "Current version: Question 2.4 limits the ceftriaxone caution to invasive infections; Question 2.7 prefers nitrofurantoin or TMP-SMX for AmpC uncomplicated cystitis, with a single-dose aminoglycoside among alternatives; checked against IDSA's published 2026 text and approved by the owner, 2026-11-12."
     },
     {
       "ref": "clsi-m100",
@@ -230,6 +233,10 @@
     {
       "ref": "idsa-shea-asp-2016",
       "supports": "Prospective audit and feedback of antibiotic therapy as a stewardship intervention."
+    },
+    {
+      "ref": "idsa-amr-gn-2026",
+      "supports": "Question 2.4, read in IDSA's published 2026 text 2026-11-21: \"the panel suggests generally avoiding third-generation cephalosporins\" for moderate-risk AmpC organisms, and ceftriaxone \"is not suggested for the treatment of invasive infections\"; continuing an empirically started course may be reasonable in a non-severe infection with improvement and source control. The section does not define invasive or mention pyelonephritis or cystitis."
     }
   ]
 }

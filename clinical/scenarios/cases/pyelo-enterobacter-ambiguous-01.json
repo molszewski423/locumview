@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "pyelo-enterobacter-ambiguous-01",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "title": "Enterobacter cloacae pyelonephritis improving on ceftriaxone, no bacteremia",
   "kind": "ambiguous",
   "modules": [
@@ -13,10 +13,10 @@
     "author": "Claude Code (draft for owner review), case list approved by the owner",
     "created": "2026-10-25",
     "clinical_review": {
-      "status": "approved",
-      "by": "owner",
-      "date": "2026-10-25",
-      "notes": "Owner clinical review: cases look good."
+      "status": "pending",
+      "by": null,
+      "date": null,
+      "notes": "Changed in #212 (AmpC at every site, owner decision 2026-11-21); awaiting owner review."
     }
   },
   "story": "A 55-year-old woman with acute pyelonephritis is on IV ceftriaxone, hospital day 3, afebrile for 24 hours and eating. Urine grows Enterobacter cloacae complex susceptible to ceftriaxone, cefepime, trimethoprim-sulfamethoxazole and ciprofloxacin; blood cultures show no growth so far (final report pending).",
@@ -213,6 +213,12 @@
   ],
   "expected_findings": [
     {
+      "module": "stewardship",
+      "type": "suboptimal-agent",
+      "drug": "Ceftriaxone",
+      "summary": "Enterobacter cloacae complex pyelonephritis on ceftriaxone: generally avoided for an inducible AmpC organism; cefepime the usual IV alternative, a susceptible oral agent when ready; the exception for an improving patient applies only to an empirically started course."
+    },
+    {
       "module": "iv-to-po",
       "type": "iv-to-po-switch",
       "drug": "Ceftriaxone",
@@ -224,16 +230,12 @@
     "Change ceftriaxone to cefepime because of the AmpC risk in an upper tract infection, then step down orally.",
     "Continue ceftriaxone, given clinical response and no bacteremia, and step down orally when ready."
   ],
-  "reference_answer": "Flag both the oral step-down and the AmpC concern. Oral TMP-SMX or a fluoroquinolone is the simplest answer that resolves both; changing to cefepime or continuing ceftriaxone in a responding patient is defensible.",
-  "rationale": "An ambiguous case: whether pyelonephritis counts as an invasive infection for the AmpC caution, and whether a clinical response on ceftriaxone changes it, is where reasonable pharmacists differ. Fully susceptible oral agents make step-down attractive.",
+  "reference_answer": "Flag both the AmpC concern and the oral step-down. Oral TMP-SMX or a fluoroquinolone is the simplest answer that resolves both; changing to cefepime, adjusted for renal function, or continuing ceftriaxone in a responding patient whose course was started empirically is defensible.",
+  "rationale": "An ambiguous case: IDSA 2026 does not define invasive infection or name pyelonephritis, so whether its caution applies, and whether a clinical response on ceftriaxone changes it, is where reasonable pharmacists differ. Since #212 (owner decision, 2026-11-21) the rules treat pyelonephritis as within the caution and show the AmpC finding beside IV to PO, instead of a note inside it. Fully susceptible oral agents make step-down attractive.",
   "citations": [
     {
       "ref": "idsa-amr-gn-2024",
       "supports": "AmpC-producing Enterobacterales: ceftriaxone for uncomplicated cystitis versus invasive infections; cefepime when the MIC is 2 or lower."
-    },
-    {
-      "ref": "idsa-amr-gn-2026",
-      "supports": "Current version of the same guidance; owner confirmed 2026-11-12 against IDSA's 2026 text: generally avoid ceftriaxone for moderate-risk AmpC organisms (Hafnia alvei added); completing an empirically started course may be reasonable in a non-severe infection with improvement and source control."
     },
     {
       "ref": "idsa-cuti-2025",
@@ -246,6 +248,10 @@
     {
       "ref": "idsa-shea-asp-2016",
       "supports": "Stewardship programs promoting timely IV to oral transition once criteria are met."
+    },
+    {
+      "ref": "idsa-amr-gn-2026",
+      "supports": "Question 2.4, read in IDSA's published 2026 text 2026-11-21: \"the panel suggests generally avoiding third-generation cephalosporins\" for moderate-risk AmpC organisms, and ceftriaxone \"is not suggested for the treatment of invasive infections\"; continuing an empirically started course may be reasonable in a non-severe infection with improvement and source control. The section does not define invasive or mention pyelonephritis or cystitis."
     }
   ]
 }

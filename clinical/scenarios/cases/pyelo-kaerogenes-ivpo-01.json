@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "pyelo-kaerogenes-ivpo-01",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "title": "Klebsiella aerogenes pyelonephritis, stable on ceftriaxone, ciprofloxacin the only oral option",
   "kind": "finding",
   "modules": [
@@ -13,10 +13,10 @@
     "author": "Claude Code (draft for owner review)",
     "created": "2026-11-12",
     "clinical_review": {
-      "status": "approved",
-      "by": "owner",
-      "date": "2026-11-12",
-      "notes": "Owner approved revision 2 of the M6 library-growth draft (with OpenEvidence's review)."
+      "status": "pending",
+      "by": null,
+      "date": null,
+      "notes": "Changed in #212 (AmpC at every site, owner decision 2026-11-21); awaiting owner review."
     }
   },
   "story": "A 44-year-old woman with acute pyelonephritis is on IV ceftriaxone, hospital day 3. She has been afebrile for 36 hours, is eating, and her vital signs are normal. The urine grows Klebsiella aerogenes; blood cultures have no growth.",
@@ -161,14 +161,20 @@
   ],
   "expected_findings": [
     {
+      "module": "stewardship",
+      "type": "suboptimal-agent",
+      "drug": "Ceftriaxone",
+      "summary": "Klebsiella aerogenes pyelonephritis on ceftriaxone: generally avoided for an inducible AmpC organism; cefepime the usual IV alternative, ciprofloxacin by mouth when ready."
+    },
+    {
       "module": "iv-to-po",
       "type": "iv-to-po-switch",
       "drug": "Ceftriaxone",
-      "summary": "Clinically stable; ciprofloxacin is the susceptible oral option, with the AmpC note."
+      "summary": "Clinically stable; ciprofloxacin is the susceptible oral option."
     }
   ],
-  "reference_answer": "Switch to ciprofloxacin 500 mg by mouth every 12 hours for 5 to 7 days in total, counting the IV days (IDSA 2025 cUTI); no oral cephalosporin for an AmpC organism. No AmpC finding is expected by design (no bacteremia); this is not an endorsement of continuing ceftriaxone for an AmpC organism in pyelonephritis, where IDSA's caution about invasive infection is debatable.",
-  "rationale": "Tests Klebsiella aerogenes (one SNOMED CT concept that also carries the former name Enterobacter aerogenes) end to end, and IV to PO for pyelonephritis without an oral cephalosporin option for an AmpC organism.",
+  "reference_answer": "Switch to ciprofloxacin 500 mg by mouth every 12 hours for 5 to 7 days in total, counting the IV days (IDSA 2025 cUTI); no oral cephalosporin for an AmpC organism. The AmpC finding (since #212) notes that ceftriaxone is generally avoided for Klebsiella aerogenes; the oral switch resolves it.",
+  "rationale": "Tests Klebsiella aerogenes (one SNOMED CT concept that also carries the former name Enterobacter aerogenes) end to end: the AmpC finding for pyelonephritis (since #212) and IV to PO without an oral cephalosporin option for an AmpC organism.",
   "citations": [
     {
       "ref": "idsa-cuti-2025-ivpo",
@@ -179,12 +185,12 @@
       "supports": "5 to 7 days of a fluoroquinolone; checked against IDSA's PDF 2026-11-12."
     },
     {
-      "ref": "idsa-amr-gn-2026",
-      "supports": "Oral fluoroquinolone transition for AmpC organisms (Question 2.7); checked 2026-11-12."
-    },
-    {
       "ref": "idsa-shea-asp-2016",
       "supports": "Prospective audit and feedback of antibiotic therapy as a stewardship intervention."
+    },
+    {
+      "ref": "idsa-amr-gn-2026",
+      "supports": "Question 2.4, read in IDSA's published 2026 text 2026-11-21: \"the panel suggests generally avoiding third-generation cephalosporins\" for moderate-risk AmpC organisms, and ceftriaxone \"is not suggested for the treatment of invasive infections\"; continuing an empirically started course may be reasonable in a non-severe infection with improvement and source control. The section does not define invasive or mention pyelonephritis or cystitis."
     }
   ]
 }

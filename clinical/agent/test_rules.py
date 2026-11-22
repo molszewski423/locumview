@@ -114,9 +114,13 @@ class KnowledgeTests(unittest.TestCase):
         (f,) = ampc(c)
         self.assertIn("If it was started empirically, completing the course may be reasonable only if", f.summary)
         self.assertNotIn("does not apply yet", f.summary)
+        # Since #212 the AmpC concern is its own finding at every site; IV to PO no longer repeats it.
         (f,) = evaluate(from_case(case("pyelo-enterobacter-ambiguous-01"), KB), KB, {"iv-to-po"})
-        self.assertIn("if ceftriaxone was started empirically, completing the course may be reasonable", f.summary)
-        self.assertIn("idsa-amr-gn-2026", f.refs)
+        self.assertNotIn("AmpC", f.summary)
+        (f,) = ampc(case("pyelo-enterobacter-ambiguous-01"))
+        self.assertIn("pyelonephritis on ceftriaxone", f.summary)
+        self.assertIn("If it was started empirically, completing the course may be reasonable only if", f.summary)
+        self.assertIn("Cefepime, adjusted for renal function, is the usual IV alternative", f.summary)
 
     def test_cuti_caution_only_for_amoxicillin_not_an_oral_third_generation_cephalosporin(self):
         # IDSA 2025 cUTI (owner decision, 2026-11-12): no warning for cefpodoxime after ceftriaxone; caution for amoxicillin.
@@ -192,10 +196,32 @@ class RuleBoundaryTests(unittest.TestCase):
         culture["status"] = "pending"
         self.assertEqual(keys(c), [])
 
-    def test_ampc_rule_needs_a_blood_isolate(self):
+    def test_ampc_rule_fires_at_every_site_with_site_advice(self):
+        # Bacteremia only until #212; since then urine too (owner decision, 2026-11-21).
+        def summary(c):
+            (f,) = [f for f in evaluate(from_case(c, KB), KB) if f.type == "suboptimal-agent"]
+            return f.summary
         c = case("bsi-enterobacter-ampc-01")
         c["cultures"][0]["specimen"] = {"snomed": "122575003", "text": "Urine specimen"}
-        self.assertNotIn(("stewardship", "suboptimal-agent", "Ceftriaxone"), keys(c))
+        self.assertIn("urine (no upper tract source charted) on ceftriaxone", summary(c))   # no urinary problem charted
+        self.assertIn("preferred agents are nitrofurantoin or trimethoprim-sulfamethoxazole", summary(c))
+        cystitis = summary(case("cystitis-enterobacter-negative-01"))
+        self.assertIn("cystitis on ceftriaxone", cystitis)
+        self.assertIn("(neither is active on this isolate)", cystitis)               # both resistant on her panel
+        self.assertIn("a single dose of an aminoglycoside or cefepime", cystitis)
+        c = case("cystitis-enterobacter-negative-01")
+        for x in c["cultures"][0]["susceptibilities"]:
+            if x.get("loinc") == "516-5":
+                x["interpretation"] = "S"
+        self.assertIn("(trimethoprim-sulfamethoxazole test susceptible)", summary(c))
+        # Blood decides the advice when blood and urine grow the same organism.
+        self.assertIn("bacteremia on ceftriaxone", summary(case("bsi-citrobacter-ampc-01")))
+
+    def test_ampc_rule_is_silent_on_cefepime(self):
+        c = case("cystitis-enterobacter-negative-01")
+        for rx in c["prescriptions"]:
+            rx.update(drug="cefepime 1000 MG Injection", rxnorm="1665088")
+        self.assertNotIn(("stewardship", "suboptimal-agent", "Cefepime"), keys(c))
 
     def test_mssa_rule_is_silent_once_a_beta_lactam_is_added(self):
         c = case("bsi-mssa-vancomycin-01")
