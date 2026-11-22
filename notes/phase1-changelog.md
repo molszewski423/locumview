@@ -3617,3 +3617,24 @@ Agent: Claude Code
 - **After the run:** ADR 0019 build step 4 is complete; the ADR's status and M3 are updated in a follow-up.
 
 Agent: Claude Code
+
+## 208. Step 4b applied: ADR 0019 Built, M3 Done (2026-11-21)
+
+- **Owner run (operator-laptop), as listed in #207:** oauth2-proxy's Deployment, Service and NetworkPolicy, the `sso`
+  middleware and the `clinical-sso` Secret deleted; `kubectl diff -k k8s/clinical` empty; `kubectl diff -k
+  k8s/locumview` showed Keycloak's network policy losing only the oauth2-proxy rule (and a generation-only line for
+  cloudflared's), then applied; `configure-realm.sh` ended "client clinical-sso: deleted", "CONFIGURE DONE".
+- **Found in the apply:** two ConfigMaps and the two database StatefulSets in `locumview` were reported "configured".
+  Checked afterwards: no pod restarted, both StatefulSets kept their only revision, and the ConfigMaps' last change
+  is from 2026-10-02, so only kubectl's record of the applied settings changed.
+- **Checks:** no oauth2-proxy or `sso` object left in `clinical`; `scripts/clinical/mtls-checks.sh` from MikePC, 6 of 6
+  PASS (no client certificate and a certificate from another CA refused at the handshake on both names; another TLS
+  name answered 421). The owner opened the EHR on the demo desktop: OpenEMR's login only, and the clinical app
+  launched from a chart.
+- **ADR 0019 build step 5:** the desktop checks pass (above, and #165); a non-desktop client is refused at the handshake
+  (mtls-checks); a reboot was observed on lv-demo01 (#174); renewal is inferred, not watched: the desktop certificate
+  is valid 3 days, and lv-demo01's EHR still opens eight days after the cut-over.
+- **Status:** ADR 0019 Built; its build plan Done; Phase 9 lite M3 Done in ROADMAP.md. Next: the frozen evaluation
+  build (M6 exit). The `login.locumview.com` allowlist removal reaches desktops with the next promoted image.
+
+Agent: Claude Code
