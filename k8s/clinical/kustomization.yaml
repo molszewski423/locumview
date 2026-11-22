@@ -25,9 +25,9 @@ images:
     # verified by CI 2026-11-16
     digest: sha256:f71e2fc922333f715d06c9f03d53ea9c216a798c674b8a7a8e3e7ed6108152eb
   - name: git.lan/mike/locumview-clinical-agent
-    # commit 09c0a8b, clinical-images (Gitea run 891): knowledge base 0.11.0; the newest charted time from vital signs
-    # and laboratory results only (#204); signature and SBOM attestation verified by CI 2026-11-18
-    digest: sha256:1d7cf29942781862f19b7c16cb29eaca822490ac1e3a12e25685fac26f500a37
+    # commit cad385d, clinical-images (Gitea run 928): knowledge base 0.12.0, AmpC at every site (#212); signature and
+    # SBOM attestation verified by CI 2026-11-22
+    digest: sha256:ed48e46f7b46fa976e2750c676e70e45a3a81f3bb2fc4272d34f3244b59e73b1
 
 # Site values (not secret, but site-specific): read from site.env by the replacements below and never applied.
 configMapGenerator:
