@@ -1,24 +1,25 @@
 {
   "schema": "locumview-case/1",
   "id": "opioid-gabapentin-preop-negative-01",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "title": "Oxycodone after knee replacement; a single preoperative gabapentin dose is not a combination",
   "kind": "negative-control",
   "modules": [
-    "opioid"
+    "opioid",
+    "ade"
   ],
   "provenance": {
     "source": "synthetic",
     "author": "Claude Code (draft for owner review)",
     "created": "2026-11-16",
     "clinical_review": {
-      "status": "approved",
-      "by": "owner",
-      "date": "2026-11-16",
-      "notes": "Owner approved 2026-11-16 (#200) at 0.1.1 and re-confirmed 2026-11-16 (#202) at 0.2.0 with the senna order added in #201, so the case tests only the opioid with a sedative rule. The basis is the label text quoted in #198, read by Claude Code on DailyMed; the owner did not report reading the labels."
+      "status": "pending",
+      "by": null,
+      "date": null,
+      "notes": "Case library v2 Batch A (#217): findings added from another module; awaiting owner review."
     }
   },
-  "story": "A 70-year-old man has an elective right total knee arthroplasty. As part of the enhanced recovery pathway he receives one dose of gabapentin 300 mg on the evening before surgery, with no further gabapentin ordered. After surgery he has oxycodone 5 mg by mouth every 4 hours as needed and scheduled acetaminophen. On the first postoperative morning only the oxycodone and acetaminophen are active.",
+  "story": "A 70-year-old man has an elective right total knee arthroplasty. As part of the enhanced recovery pathway he receives one dose of gabapentin 300 mg on the evening before surgery, with no further gabapentin ordered. After surgery he has oxycodone 5 mg by mouth every 4 hours as needed and scheduled acetaminophen. On the first postoperative morning only the oxycodone and acetaminophen are active. After surgery both enoxaparin 40 mg daily and rivaroxaban 10 mg daily were ordered for VTE prophylaxis, one from the surgeon's order set and one from the hospitalist's.",
   "patient": {
     "family": "Vandermeer",
     "given": "Bram",
@@ -77,6 +78,20 @@
       "route": "PO",
       "instructions": "17.2 mg (2 tablets) by mouth at bedtime",
       "start": "2026-11-14"
+    },
+    {
+      "drug": "0.4 ML enoxaparin sodium 100 MG/ML Prefilled Syringe",
+      "rxnorm": "854235",
+      "route": "SC",
+      "instructions": "40 mg subcutaneously daily (VTE prophylaxis after knee replacement)",
+      "start": "2026-11-14"
+    },
+    {
+      "drug": "rivaroxaban 10 MG Oral Tablet",
+      "rxnorm": "1114198",
+      "route": "PO",
+      "instructions": "10 mg by mouth daily (VTE prophylaxis after knee replacement)",
+      "start": "2026-11-14"
     }
   ],
   "vitals": [
@@ -117,13 +132,35 @@
       ]
     }
   ],
-  "expected_findings": [],
-  "reference_answer": "No change for this rule: the single preoperative gabapentin dose has ended, so oxycodone is the only CNS depressant now ordered. Continue multimodal analgesia and the usual postoperative monitoring.",
-  "rationale": "A near miss for the opioid with a sedative rule: gabapentin is on the chart, but as one preoperative dose that ended before the newest charted day. The rule reads orders active on that day and must stay silent.",
+  "expected_findings": [
+    {
+      "module": "ade",
+      "type": "duplicate-anticoagulation",
+      "drug": "Enoxaparin",
+      "summary": "Enoxaparin 40 mg daily and rivaroxaban 10 mg daily were both started after knee replacement: two anticoagulants for VTE prophylaxis."
+    }
+  ],
+  "silent": [
+    {
+      "module": "opioid",
+      "type": "opioid-gabapentinoid",
+      "reason": "the one preoperative gabapentin dose ended before the newest charted day"
+    }
+  ],
+  "reference_answer": "No change for this rule: the single preoperative gabapentin dose has ended, so oxycodone is the only CNS depressant now ordered. Continue multimodal analgesia and the usual postoperative monitoring. Duplicate anticoagulation: keep one VTE prophylaxis agent after knee replacement (rivaroxaban 10 mg daily, or enoxaparin) and discontinue the other; the Xarelto label says to avoid concurrent use with other anticoagulants.",
+  "rationale": "A near miss for the opioid with a sedative rule: gabapentin is on the chart, but as one preoperative dose that ended before the newest charted day. The rule reads orders active on that day and must stay silent. Case library v2 (#217): the silent question stays (one preoperative gabapentin dose); the duplicate anticoagulation finding is added. On the same start date the rule names the parenteral order.",
   "citations": [
     {
       "ref": "fda-gabapentin-label",
       "supports": "5.8: the risk is from gabapentin coadministered with opioids; a dose that has ended is not coadministration. Read in the label by Claude Code; owner approved 2026-11-16 (#200)."
+    },
+    {
+      "ref": "fda-rivaroxaban-label",
+      "supports": "7.4: avoid concurrent use of Xarelto with other anticoagulants unless benefit outweighs risk. Read by Claude Code 2026-11-22; owner review pending (#217)."
+    },
+    {
+      "ref": "fda-enoxaparin-label",
+      "supports": "7 Drug interactions: anticoagulants should be discontinued before Lovenox is started. Read by Claude Code 2026-11-22; owner review pending (#217)."
     }
   ]
 }

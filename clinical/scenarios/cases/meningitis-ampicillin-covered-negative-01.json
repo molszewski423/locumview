@@ -1,25 +1,26 @@
 {
   "schema": "locumview-case/1",
   "id": "meningitis-ampicillin-covered-negative-01",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "title": "Suspected bacterial meningitis at 72 with ampicillin already in the regimen",
   "kind": "negative-control",
   "modules": [
     "stewardship",
-    "iv-to-po"
+    "iv-to-po",
+    "opioid"
   ],
   "provenance": {
     "source": "synthetic",
     "author": "Claude Code (draft for owner review)",
     "created": "2026-11-12",
     "clinical_review": {
-      "status": "approved",
-      "by": "owner",
-      "date": "2026-11-12",
-      "notes": "Owner approved revision 2 of the M6 library-growth draft (with OpenEvidence's review)."
+      "status": "pending",
+      "by": null,
+      "date": null,
+      "notes": "Case library v2 Batch A (#217): findings added from another module; awaiting owner review."
     }
   },
-  "story": "A 72-year-old woman, not immunocompromised, presents with fever, headache and neck stiffness; CSF shows a neutrophilic pleocytosis with low glucose. Empiric vancomycin, ceftriaxone 2 g every 12 hours, ampicillin 2 g every 4 hours and dexamethasone (with or before the first antibiotic dose) are started; cultures are pending.",
+  "story": "A 72-year-old woman, not immunocompromised, presents with fever, headache and neck stiffness; CSF shows a neutrophilic pleocytosis with low glucose. Empiric vancomycin, ceftriaxone 2 g every 12 hours, ampicillin 2 g every 4 hours and dexamethasone (with or before the first antibiotic dose) are started; cultures are pending. She has hydromorphone 0.5 mg IV as needed for headache; no laxative is ordered.",
   "patient": {
     "family": "Jefferson",
     "given": "Wren",
@@ -66,6 +67,13 @@
       "start": "2026-10-24",
       "route": "IV",
       "instructions": "0.15 mg/kg (10 mg) IV every 6 hours, first dose with or before the first antibiotic dose"
+    },
+    {
+      "drug": "1 ML hydromorphone hydrochloride 1 MG/ML Injection",
+      "rxnorm": "897653",
+      "route": "IV",
+      "instructions": "0.5 mg IV every 3 hours as needed for headache",
+      "start": "2026-10-24"
     }
   ],
   "vitals": [
@@ -105,9 +113,23 @@
       ]
     }
   ],
-  "expected_findings": [],
-  "reference_answer": "No intervention: the empiric regimen covers Listeria (age over 50). Continue dexamethasone only if pneumococcal; narrow when cultures return.",
-  "rationale": "Negative control for the Listeria rule: ampicillin in the regimen must keep it silent.",
+  "expected_findings": [
+    {
+      "module": "opioid",
+      "type": "missing-bowel-regimen",
+      "drug": "Hydromorphone",
+      "summary": "Hydromorphone as needed for headache with no stimulant or osmotic laxative ordered."
+    }
+  ],
+  "silent": [
+    {
+      "module": "stewardship",
+      "type": "missing-empiric-coverage",
+      "reason": "ampicillin is in the regimen"
+    }
+  ],
+  "reference_answer": "No intervention: the empiric regimen covers Listeria (age over 50). Continue dexamethasone only if pneumococcal; narrow when cultures return. Add a bowel regimen with the hydromorphone (senna or polyethylene glycol) once she can take it by mouth.",
+  "rationale": "Negative control for the Listeria rule: ampicillin in the regimen must keep it silent. Case library v2 (#217): the silent Listeria question stays; the bowel regimen finding is added.",
   "citations": [
     {
       "ref": "idsa-meningitis-2004",
@@ -120,6 +142,10 @@
     {
       "ref": "who-meningitis-2025",
       "supports": "Ampicillin or amoxicillin added with Listeria risk factors, including age over 60; checked against the WHO document 2026-11-12."
+    },
+    {
+      "ref": "shm-opioid-2018",
+      "supports": "Statement 10: a bowel regimen with a stimulant or osmotic laxative for hospitalized patients on opioids unless contraindicated; owner approved 2026-11-16 (#202)."
     }
   ]
 }

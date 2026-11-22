@@ -1,25 +1,26 @@
 {
   "schema": "locumview-case/1",
   "id": "cap-levofloxacin-ivpo-01",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "title": "Community-acquired pneumonia improving on IV levofloxacin",
   "kind": "finding",
   "modules": [
     "stewardship",
-    "iv-to-po"
+    "iv-to-po",
+    "opioid"
   ],
   "provenance": {
     "source": "synthetic",
     "author": "Claude Code (draft for owner review), case list approved by the owner",
     "created": "2026-10-25",
     "clinical_review": {
-      "status": "approved",
-      "by": "owner",
-      "date": "2026-10-25",
-      "notes": "Owner clinical review: cases look good."
+      "status": "pending",
+      "by": null,
+      "date": null,
+      "notes": "Case library v2 Batch A (#217): findings added from another module; awaiting owner review."
     }
   },
-  "story": "A 59-year-old man admitted with community-acquired pneumonia is on IV levofloxacin 750 mg daily, hospital day 3. He has been afebrile for 48 hours, eats normally, and his heart rate, respiratory rate and oxygen saturation on room air are normal.",
+  "story": "A 59-year-old man admitted with community-acquired pneumonia is on IV levofloxacin 750 mg daily, hospital day 3. He has been afebrile for 48 hours, eats normally, and his heart rate, respiratory rate and oxygen saturation on room air are normal. He has oxycodone 5 mg as needed for pleuritic chest pain; no laxative is ordered.",
   "patient": {
     "family": "Tran",
     "given": "Kit",
@@ -36,6 +37,11 @@
       "title": "Community-acquired pneumonia",
       "diagnosis": "ICD10:J18.9",
       "begdate": "2026-10-22"
+    },
+    {
+      "title": "Pleurodynia",
+      "diagnosis": "ICD10:R07.81",
+      "begdate": "2026-10-22"
     }
   ],
   "prescriptions": [
@@ -45,6 +51,13 @@
       "start": "2026-10-22",
       "route": "IV",
       "instructions": "750 mg IV every 24 hours"
+    },
+    {
+      "drug": "oxycodone hydrochloride 5 MG Oral Tablet",
+      "rxnorm": "1049621",
+      "route": "PO",
+      "instructions": "5 mg by mouth every 4 hours as needed for pleuritic chest pain",
+      "start": "2026-10-22"
     }
   ],
   "vitals": [
@@ -108,10 +121,16 @@
       "type": "iv-to-po-switch",
       "drug": "Levofloxacin",
       "summary": "Clinically stable, afebrile for 48 hours and eating: IV levofloxacin can change to the same dose by mouth."
+    },
+    {
+      "module": "opioid",
+      "type": "missing-bowel-regimen",
+      "drug": "Oxycodone",
+      "summary": "Oxycodone as needed for pleuritic pain with no stimulant or osmotic laxative ordered."
     }
   ],
-  "reference_answer": "Change to levofloxacin 750 mg by mouth once daily, completing a total course of 3 to 5 days if he stays clinically stable (ATS 2025: fewer than 5 days, at least 3, once stable in nonsevere pneumonia). Give oral levofloxacin at least 2 hours apart from magnesium or aluminum antacids, sucralfate, iron and zinc.",
-  "rationale": "Levofloxacin's oral bioavailability is close to complete, so the oral dose matches the IV dose. He meets clinical stability criteria. The stewardship module has nothing to flag: the agent and dose are appropriate.",
+  "reference_answer": "Change to levofloxacin 750 mg by mouth once daily, completing a total course of 3 to 5 days if he stays clinically stable (ATS 2025: fewer than 5 days, at least 3, once stable in nonsevere pneumonia). Give oral levofloxacin at least 2 hours apart from magnesium or aluminum antacids, sucralfate, iron and zinc. Add a bowel regimen with the oxycodone: senna (or an osmotic laxative such as polyethylene glycol) unless contraindicated.",
+  "rationale": "Levofloxacin's oral bioavailability is close to complete, so the oral dose matches the IV dose. He meets clinical stability criteria. The stewardship module has nothing to flag: the agent and dose are appropriate. Case library v2 (#217): adds the missing bowel regimen finding beside IV to PO.",
   "citations": [
     {
       "ref": "ats-idsa-cap-2019",
@@ -124,6 +143,10 @@
     {
       "ref": "idsa-shea-asp-2016",
       "supports": "Stewardship programs promoting timely IV to oral transition once criteria are met."
+    },
+    {
+      "ref": "shm-opioid-2018",
+      "supports": "Statement 10: a bowel regimen with a stimulant or osmotic laxative for hospitalized patients on opioids unless contraindicated; owner approved 2026-11-16 (#202)."
     }
   ]
 }

@@ -1,25 +1,26 @@
 {
   "schema": "locumview-case/1",
   "id": "bsi-mssa-cefazolin-negative-01",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "title": "MSSA catheter-related bacteremia already on cefazolin",
   "kind": "negative-control",
   "modules": [
     "stewardship",
-    "iv-to-po"
+    "iv-to-po",
+    "opioid"
   ],
   "provenance": {
     "source": "synthetic",
     "author": "Claude Code (draft for owner review), case list approved by the owner",
     "created": "2026-10-25",
     "clinical_review": {
-      "status": "approved",
-      "by": "owner",
-      "date": "2026-10-25",
-      "notes": "Owner clinical review: cases look good. 2026-11-13: short bowel problem recoded K91.2 to K90.829 (owner approved, OpenEvidence review)."
+      "status": "pending",
+      "by": null,
+      "date": null,
+      "notes": "Case library v2 Batch A (#217): findings added from another module; awaiting owner review."
     }
   },
-  "story": "A 58-year-old man receiving home parenteral nutrition through a tunneled catheter is admitted with fever and rigors. Blood cultures grow methicillin-susceptible Staphylococcus aureus; empiric vancomycin was changed to cefazolin 2 g IV every 8 hours on day 2 and the catheter removed. On day 3 he is still febrile; repeat blood cultures are pending.",
+  "story": "A 58-year-old man receiving home parenteral nutrition through a tunneled catheter is admitted with fever and rigors. Blood cultures grow methicillin-susceptible Staphylococcus aureus; empiric vancomycin was changed to cefazolin 2 g IV every 8 hours on day 2 and the catheter removed. On day 3 he is still febrile; repeat blood cultures are pending. For pain at the old catheter site he has hydromorphone 0.5 mg IV as needed; on day 2 lorazepam 0.5 mg IV as needed was added for anxiety. His short bowel gives him high-output diarrhea.",
   "patient": {
     "family": "Pritchard",
     "given": "Hal",
@@ -41,6 +42,11 @@
       "title": "Short bowel syndrome on parenteral nutrition",
       "diagnosis": "ICD10:K90.829",
       "begdate": "2021-03-15"
+    },
+    {
+      "title": "Diarrhea (high output from short bowel)",
+      "diagnosis": "ICD10:R19.7",
+      "begdate": "2026-10-21"
     }
   ],
   "prescriptions": [
@@ -58,6 +64,20 @@
       "start": "2026-10-22",
       "route": "IV",
       "instructions": "2 g IV every 8 hours"
+    },
+    {
+      "drug": "1 ML hydromorphone hydrochloride 1 MG/ML Injection",
+      "rxnorm": "897653",
+      "route": "IV",
+      "instructions": "0.5 mg IV every 3 hours as needed for pain",
+      "start": "2026-10-21"
+    },
+    {
+      "drug": "1 ML lorazepam 2 MG/ML Injection",
+      "rxnorm": "1665188",
+      "route": "IV",
+      "instructions": "0.5 mg IV every 6 hours as needed for anxiety",
+      "start": "2026-10-22"
     }
   ],
   "vitals": [
@@ -211,9 +231,28 @@
       "status": "pending"
     }
   ],
-  "expected_findings": [],
-  "reference_answer": "No intervention: cefazolin is a preferred agent for MSSA bacteremia, the catheter is out, and repeat cultures are pending. No oral switch this early in S. aureus bacteremia. Persistent fever on day 3 calls for echocardiography, with TEE if fever or bacteremia persists.",
-  "rationale": "A negative control for de-escalation and IV to PO: therapy is already the preferred beta-lactam. Early oral step-down is not a standard recommendation for S. aureus bacteremia while febrile with clearance unconfirmed.",
+  "expected_findings": [
+    {
+      "module": "opioid",
+      "type": "opioid-benzodiazepine",
+      "drug": "Lorazepam",
+      "summary": "Lorazepam IV as needed for anxiety was added while hydromorphone IV as needed is active: an opioid with a benzodiazepine."
+    }
+  ],
+  "silent": [
+    {
+      "module": "stewardship",
+      "type": "de-escalation",
+      "reason": "cefazolin, the preferred beta-lactam, is already ordered"
+    },
+    {
+      "module": "iv-to-po",
+      "type": "iv-to-po-switch",
+      "reason": "S. aureus bacteremia with clearance unconfirmed is not stepped down early"
+    }
+  ],
+  "reference_answer": "No intervention: cefazolin is a preferred agent for MSSA bacteremia, the catheter is out, and repeat cultures are pending. No oral switch this early in S. aureus bacteremia. Persistent fever on day 3 calls for echocardiography, with TEE if fever or bacteremia persists. Opioid with a benzodiazepine: question the lorazepam; treat anxiety without a benzodiazepine where possible, and if one is needed, use the lowest dose for the shortest time and monitor sedation and respiratory rate. A bowel regimen is not needed while he has high-output diarrhea.",
+  "rationale": "A negative control for de-escalation and IV to PO: therapy is already the preferred beta-lactam. Early oral step-down is not a standard recommendation for S. aureus bacteremia while febrile with clearance unconfirmed. Case library v2 (#217): the silent questions stay (de-escalation, IV to PO); the opioid with a benzodiazepine finding is added so the chart flags something. The diarrhea problem keeps the bowel regimen rule silent, as SHM statement 10 intends.",
   "citations": [
     {
       "ref": "idsa-crbsi-2009",
@@ -230,6 +269,14 @@
     {
       "ref": "idsa-escmid-sab-2026",
       "supports": "Transthoracic echocardiography for every adult with S. aureus bacteremia; TEE by endocarditis risk (Consensus Statement 4); checked on IDSA's page 2026-11-12."
+    },
+    {
+      "ref": "fda-lorazepam-label",
+      "supports": "Boxed warning: lorazepam with opioids may cause profound sedation, respiratory depression, coma and death; owner approved the rule's use of the label 2026-11-16 (#200)."
+    },
+    {
+      "ref": "fda-oxycodone-label",
+      "supports": "Boxed warning and 5.3: opioids with benzodiazepines or other CNS depressants, including gabapentinoids; the oxycodone label stands for the opioid class in this rule (#200)."
     }
   ]
 }

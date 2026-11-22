@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "opioid-senna-docusate-negative-01",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "title": "Oxycodone for a ureteral stone with senna-docusate: a bowel regimen is ordered",
   "kind": "negative-control",
   "modules": [
@@ -100,6 +100,13 @@
     }
   ],
   "expected_findings": [],
+  "silent": [
+    {
+      "module": "opioid",
+      "type": "missing-bowel-regimen",
+      "reason": "the combination tablet contains senna, a stimulant laxative"
+    }
+  ],
   "reference_answer": "No change for this rule: senna-docusate contains senna, a stimulant laxative, so a bowel regimen is ordered. Continue it while he receives oxycodone and track bowel movements.",
   "rationale": "A near miss for the bowel regimen rule: docusate is on the order, which alone would not count, but the combination tablet also contains senna. The knowledge base classes the combination product as a stimulant laxative, and the rule must stay silent.",
   "citations": [

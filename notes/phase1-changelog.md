@@ -3789,3 +3789,40 @@ Agent: Claude Code
   LocumView Clinical: each shows the AmpC finding.
 
 Agent: Claude Code
+
+## 217. Case library v2, Batch A: eleven patients gain a finding from the built rules (review pending) (2026-11-22)
+
+- **Owner decision (2026-11-22):** "the rows look fine" for `docs/plans/case-library-v2.md` (#215). Batch A is the
+  rows that use rules already built.
+- **Cases (minor version up, review pending):** Hal Pritchard (hydromorphone with lorazepam; a diarrhea problem from
+  his short bowel keeps the bowel rule silent), Iris Nakamura (oxycodone with home gabapentin for diabetic
+  neuropathy), Kit Tran (oxycodone without a bowel regimen), Rue Hartley (the same after appendectomy; the reference
+  answer leaves timing to the surgeons, since SHM statement 10 is written for medical patients), Fern Whitcombe
+  (heparin on top of enoxaparin), Ned Kowalski (lorazepam for alcohol withdrawal with hydromorphone; the answer says
+  the opioid, not the indicated benzodiazepine, is the one to reconsider), Wren Jefferson (hydromorphone without a
+  bowel regimen), Rosa Castillo (hydromorphone with home pregabalin while confused), Bram Vandermeer (enoxaparin and
+  rivaroxaban both after knee replacement), Cora Callahan (oxycodone without a bowel regimen) and Mira Sato
+  (gabapentin added: opioid with a gabapentinoid; renal dosing follows in Batch C). New problems and drug codes were
+  checked against NLM's ICD-10-CM table and RxNav.
+- **Departure from the approved row:** Fern's row said enoxaparin on top of continued apixaban; she takes nothing by
+  mouth with an ileus, so an oral anticoagulant would not be running. Changed to heparin from the medicine order set on
+  top of enoxaparin from the orthopedic orders, the common two-order-set duplicate.
+- **Negative controls keep their question:** new case field `silent` (module, type, reason): the finding a negative
+  control must not produce. All 12 negative controls now name it; the checker refuses an expected finding of that
+  type, and the library test still requires exactly the expected findings, so a silent rule that fires fails CI.
+- **Knowledge base 0.13.0:** enoxaparin (RxNorm 854235) and rivaroxaban (1114198) as systemic anticoagulants; the
+  duplicate anticoagulation finding now cites the labels of the drugs involved. New citations, read by Claude Code in
+  DailyMed 2026-11-22, owner review pending: Lovenox section 7 ("agents which may enhance the risk of hemorrhage
+  should be discontinued prior to initiation of Lovenox therapy... If coadministration is essential, conduct close
+  clinical and laboratory monitoring") and Xarelto 7.4 ("Avoid concurrent use of XARELTO with other anticoagulants due
+  to increased bleeding risk unless benefit outweighs risk").
+- **Loader:** a problem added to a case since it was loaded is now posted on the next run, as prescriptions already
+  were (#201). Checked on a fresh local OpenEMR: with Iris's new problem deleted, a load added it back ("1 new
+  problem"), and the next load added nothing.
+- **Fixtures and tests:** the 11 changed cases re-recorded from that instance (FHIR read-back). Rule tests read the
+  module each case was built for; the library and fixture tests read every module. 102 agent tests pass; the case
+  checker passes.
+- **Deploy (owner, after merge and the agent image pin):** `scripts/clinical/load-scenarios.sh` adds the new orders
+  and problems to the loaded patients; then a baseline save.
+
+Agent: Claude Code

@@ -460,8 +460,15 @@ def add_prescriptions(case, pid, encounter, only_missing=False):
 def load(case):
     number = f"LV-{case['id']}"
     if existing := sql(f"SELECT pid FROM patient_data WHERE pubpid = {quote(number)};"):
+        pid0 = int(existing[0][0])
+        titles = {r[0] for r in sql(f"SELECT title FROM lists WHERE pid = {pid0} AND type = 'medical_problem';")}
+        new_problems = 0
         for x in case.get("problems", []):
-            sql(f"UPDATE lists SET diagnosis = {quote(x['diagnosis'])} WHERE pid = {int(existing[0][0])} "
+            if x["title"] not in titles:   # a problem added to the case since it was loaded (case library v2, #217)
+                ok("problem", *target.api("POST", f"api/patient/{puuid_of(pid0)}/medical_problem", x))
+                new_problems += 1
+                continue
+            sql(f"UPDATE lists SET diagnosis = {quote(x['diagnosis'])} WHERE pid = {pid0} "
                 f"AND type = 'medical_problem' AND title = {quote(x['title'])} AND diagnosis <> {quote(x['diagnosis'])};")
         # The case's name too, so a renamed patient (the Casebook surnames, #214) changes on the next run.
         chart_extras(existing[0][0], number, {**CHARTS.get(case["id"], {}),
@@ -471,7 +478,8 @@ def load(case):
         enc = sql(f"SELECT encounter FROM form_encounter WHERE pid = {int(existing[0][0])} ORDER BY date, id LIMIT 1;")
         added = add_prescriptions(case, existing[0][0], enc[0][0], only_missing=True) if enc else 0
         print(f"{case['id']}: already loaded; chart details and photograph brought up to date"
-              + (f"; {added} new prescription(s)" if added else ""))
+              + (f"; {added} new prescription(s)" if added else "")
+              + (f"; {new_problems} new problem(s)" if new_problems else ""))
         return
     p, e = case["patient"], case["encounter"]
     status, body = target.api("POST", "fhir/Patient", {

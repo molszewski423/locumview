@@ -1,25 +1,26 @@
 {
   "schema": "locumview-case/1",
   "id": "ciai-piptazo-alone-negative-01",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "title": "Perforated appendicitis on piperacillin-tazobactam alone after source control",
   "kind": "negative-control",
   "modules": [
     "stewardship",
-    "iv-to-po"
+    "iv-to-po",
+    "opioid"
   ],
   "provenance": {
     "source": "synthetic",
     "author": "Claude Code (draft for owner review)",
     "created": "2026-11-12",
     "clinical_review": {
-      "status": "approved",
-      "by": "owner",
-      "date": "2026-11-12",
-      "notes": "Owner approved revision 2 of the M6 library-growth draft (with OpenEvidence's review)."
+      "status": "pending",
+      "by": null,
+      "date": null,
+      "notes": "Case library v2 Batch A (#217): findings added from another module; awaiting owner review."
     }
   },
-  "story": "A 33-year-old woman had a laparoscopic appendectomy for perforated appendicitis with localized peritonitis. Source control is adequate; she is on piperacillin-tazobactam 4.5 g IV every 6 hours alone and improving on postoperative day 1.",
+  "story": "A 33-year-old woman had a laparoscopic appendectomy for perforated appendicitis with localized peritonitis. Source control is adequate; she is on piperacillin-tazobactam 4.5 g IV every 6 hours alone and improving on postoperative day 1. After surgery she has oxycodone 5 mg as needed and is tolerating clear liquids; no laxative is ordered.",
   "patient": {
     "family": "Hartley",
     "given": "Rue",
@@ -45,6 +46,13 @@
       "start": "2026-10-22",
       "route": "IV",
       "instructions": "4.5 g IV every 6 hours"
+    },
+    {
+      "drug": "oxycodone hydrochloride 5 MG Oral Tablet",
+      "rxnorm": "1049621",
+      "route": "PO",
+      "instructions": "5 mg by mouth every 4 hours as needed for pain",
+      "start": "2026-10-22"
     }
   ],
   "vitals": [
@@ -93,9 +101,23 @@
       ]
     }
   ],
-  "expected_findings": [],
-  "reference_answer": "No intervention: a single agent with anaerobic activity; plan about 4 days of antibiotics after source control.",
-  "rationale": "Negative control for the double-anaerobic-coverage rule: one agent that covers anaerobes must not trigger it.",
+  "expected_findings": [
+    {
+      "module": "opioid",
+      "type": "missing-bowel-regimen",
+      "drug": "Oxycodone",
+      "summary": "Oxycodone as needed after appendectomy with no stimulant or osmotic laxative ordered."
+    }
+  ],
+  "silent": [
+    {
+      "module": "stewardship",
+      "type": "redundant-coverage",
+      "reason": "one agent that covers anaerobes is not double coverage"
+    }
+  ],
+  "reference_answer": "No intervention: a single agent with anaerobic activity; plan about 4 days of antibiotics after source control. Add a bowel regimen with the oxycodone once bowel function is returning and she tolerates a diet (senna or polyethylene glycol), unless the surgeons want to hold it after bowel surgery.",
+  "rationale": "Negative control for the double-anaerobic-coverage rule: one agent that covers anaerobes must not trigger it. Case library v2 (#217): the silent question stays (one anaerobic agent); the bowel regimen finding is added. SHM statement 10 is written for hospitalized medical patients; after abdominal surgery whether and when to start a laxative is the surgeons' call, which the reference answer says, so this finding is a softer one than in a medical patient.",
   "citations": [
     {
       "ref": "idsa-ciai-2010",
@@ -108,6 +130,10 @@
     {
       "ref": "idsa-shea-asp-2016",
       "supports": "Prospective audit and feedback of antibiotic therapy as a stewardship intervention."
+    },
+    {
+      "ref": "shm-opioid-2018",
+      "supports": "Statement 10: a bowel regimen with a stimulant or osmotic laxative for hospitalized patients on opioids unless contraindicated; owner approved 2026-11-16 (#202)."
     }
   ]
 }

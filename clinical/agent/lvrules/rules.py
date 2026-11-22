@@ -347,7 +347,8 @@ def duplicate_anticoagulation(s: Snapshot, kb: Knowledge) -> list[Finding]:
                      f"{kb.display(latest.ade_agent)} was started while {names} is active: two systemic "
                      f"anticoagulants at once. Confirm whether both are intended; if one replaces the other, stop the "
                      f"first and start the second at the time of its next dose.",
-                     [f"Active: {p.text}, started {p.start}" for p in active])]
+                     [f"Active: {p.text}, started {p.start}" for p in active],
+                     refs=tuple(dict.fromkeys(l for p in active if (l := kb.ade_label(p.ade_agent)))) or None)]
 
 
 def opioid_cns_depressant(s: Snapshot, kb: Knowledge) -> list[Finding]:

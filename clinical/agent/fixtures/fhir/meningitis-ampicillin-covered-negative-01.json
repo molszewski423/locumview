@@ -341,6 +341,57 @@
   }
  },
  {
+  "authoredOn": "2026-10-24T00:00:00+00:00",
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "community",
+      "display": "Home/Community",
+      "system": "http://terminology.hl7.org/CodeSystem/medicationrequest-category"
+     }
+    ]
+   }
+  ],
+  "dispenseRequest": {
+   "numberOfRepeatsAllowed": 0
+  },
+  "dosageInstruction": [
+   {
+    "route": {
+     "coding": [
+      {
+       "code": "C38276",
+       "system": "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl"
+      }
+     ]
+    }
+   }
+  ],
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<MedicationRequest#5>",
+  "intent": "order",
+  "medicationCodeableConcept": {
+   "coding": [
+    {
+     "code": "897653",
+     "display": "1 ML hydromorphone hydrochloride 1 MG/ML Injection",
+     "system": "http://www.nlm.nih.gov/research/umls/rxnorm"
+    }
+   ]
+  },
+  "reportedBoolean": false,
+  "resourceType": "MedicationRequest",
+  "status": "active",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
   "category": [
    {
     "coding": [
@@ -1100,9 +1151,9 @@
    {
     "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-sex",
     "valueCoding": {
-     "code": "unknown",
-     "display": "Unknown",
-     "system": "DataAbsentReason"
+     "code": "248153007",
+     "display": "Female",
+     "system": "http://snomed.info/sct"
     }
    },
    {

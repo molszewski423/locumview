@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "meningitis-steroid-covered-negative-01",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "title": "Suspected bacterial meningitis at 45 on long-term prednisone, ampicillin already ordered",
   "kind": "negative-control",
   "modules": [
@@ -169,6 +169,13 @@
     }
   ],
   "expected_findings": [],
+  "silent": [
+    {
+      "module": "stewardship",
+      "type": "missing-empiric-coverage",
+      "reason": "ampicillin is in the regimen for a Listeria risk factor (long-term steroids)"
+    }
+  ],
   "reference_answer": "No intervention: the empiric regimen covers Listeria, which long-term corticosteroids make more likely. Some reviews prefer cefepime or meropenem in immunocompromised hosts; the rules do not flag ceftriaxone. Narrow therapy when cultures return.",
   "rationale": "Long-term systemic steroids are a Listeria risk factor (ESCMID 2016: immunosuppressive drugs; WHO 2025: immunosuppressive therapy), and ampicillin is already ordered, so the rule must stay silent. No meningitis guideline sets a steroid dose threshold; the rule reads the long-term steroid problem code.",
   "citations": [

@@ -80,7 +80,8 @@ def check(path, citations, require_approved=False):
     d = c.fields("case", data,
                  ["schema", "id", "version", "title", "kind", "modules", "provenance", "story", "patient", "encounter",
                   "expected_findings", "reference_answer", "rationale", "citations"],
-                 ["problems", "allergies", "prescriptions", "vitals", "labs", "cultures", "acceptable_answers"])
+                 ["problems", "allergies", "prescriptions", "vitals", "labs", "cultures", "acceptable_answers",
+                  "silent"])
     if d.get("schema") != SCHEMA:
         c.error("schema", f"must be {SCHEMA!r}")
     c.match("id", d.get("id"), re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$"), "lowercase words joined by hyphens")
@@ -198,8 +199,20 @@ def check(path, citations, require_approved=False):
         c.text(f"expected_findings[{i}].summary", f.get("summary"))
     if kind == "finding" and not findings:
         c.error("expected_findings", "a 'finding' case needs at least one expected finding")
-    if kind == "negative-control" and findings:
-        c.error("expected_findings", "a negative control has no expected findings")
+    # A negative control names the finding that must not appear (silent); since case library v2 (#217) it may also
+    # expect findings from other rules, so every chart flags something while the silent question stays measurable.
+    silent = c.items("silent", d.get("silent"), 1) if kind == "negative-control" or "silent" in d else []
+    for i, q in enumerate(silent):
+        q = c.fields(f"silent[{i}]", q, ["module", "type", "reason"])
+        if q.get("module") not in modules:
+            c.error(f"silent[{i}].module", "must be one of the case's modules")
+        if q.get("type") not in FINDING_TYPES:
+            c.error(f"silent[{i}].type", f"must be one of {sorted(FINDING_TYPES)}")
+        if any((f.get("module"), f.get("type")) == (q.get("module"), q.get("type")) for f in findings):
+            c.error(f"silent[{i}]", "an expected finding has the type this case must not produce")
+        c.text(f"silent[{i}].reason", q.get("reason"))
+    if kind != "negative-control" and "silent" in d:
+        c.error("silent", "only negative controls name a silent question")
     if kind == "ambiguous":
         for a in c.items("acceptable_answers", d.get("acceptable_answers"), 2):
             c.text("acceptable_answers[]", a)

@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "meningitis-young-negative-01",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "title": "Suspected bacterial meningitis at 35, immunocompetent, on vancomycin and ceftriaxone without ampicillin",
   "kind": "negative-control",
   "modules": [
@@ -152,6 +152,13 @@
     }
   ],
   "expected_findings": [],
+  "silent": [
+    {
+      "module": "stewardship",
+      "type": "missing-empiric-coverage",
+      "reason": "under 50 with no Listeria risk factor"
+    }
+  ],
   "reference_answer": "No intervention. Vancomycin plus a third-generation cephalosporin with dexamethasone is the empiric regimen for an immunocompetent adult under 50; ampicillin is not routinely needed. Narrow therapy when cultures return.",
   "rationale": "The negative pair of the Listeria case: the same presentation and regimen, but age and risk factors do not call for Listeria coverage. A rule that flags every meningitis regimen without ampicillin fails this case.",
   "citations": [

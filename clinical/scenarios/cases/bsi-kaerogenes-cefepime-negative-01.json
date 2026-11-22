@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "bsi-kaerogenes-cefepime-negative-01",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "title": "Klebsiella aerogenes bacteremia on cefepime at a susceptible dose-dependent MIC",
   "kind": "negative-control",
   "modules": [
@@ -166,6 +166,13 @@
     }
   ],
   "expected_findings": [],
+  "silent": [
+    {
+      "module": "stewardship",
+      "type": "suboptimal-agent",
+      "reason": "cefepime is the preferred agent for an AmpC organism at an MIC of 8 or lower; it is not a third-generation cephalosporin"
+    }
+  ],
   "reference_answer": "No change in antibiotic: cefepime 2 g every 8 hours (adjusted for renal function) is preferred for an AmpC organism when the cefepime MIC is 8 or lower, provided an ESBL or its gene has not been identified (IDSA 2026 Question 2.3). Follow the repeat cultures and the imaging; reassess oral step-down once afebrile and improving.",
   "rationale": "Negative control for IDSA 2026's cefepime threshold: under the 2024 guidance (MIC 2 or lower) this would have prompted a carbapenem. Cefepime is not a third-generation cephalosporin, so the AmpC rule must stay silent; febrile, so no IV to PO.",
   "citations": [

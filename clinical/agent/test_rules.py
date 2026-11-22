@@ -32,9 +32,17 @@ def fhir_keys(resources, modules):
     return sorted(f.key() for f in evaluate(from_fhir(resources, KB, SITE_TZ), KB, modules))
 
 
+# Modules case library v2 (#217) added to cases built for another module; the rule tests below read only the modules a
+# case was built for, and the library test reads them all.
+ADDED_MODULES = {"opioid", "ade"}
+
+
 def keys(c, modules=None):
     s = from_case(c, KB)
-    return sorted(f.key() for f in evaluate(s, KB, modules or set(c["modules"])))
+    if modules is None:
+        built_for = "opioid" if c["id"].startswith("opioid-") else "ade" if c["id"].startswith("anticoag-") else None
+        modules = {m for m in c["modules"] if m not in ADDED_MODULES or m == built_for}
+    return sorted(f.key() for f in evaluate(s, KB, modules))
 
 
 class LibraryTests(unittest.TestCase):
@@ -45,7 +53,7 @@ class LibraryTests(unittest.TestCase):
             c = json.loads(path.read_text())
             expected = sorted((e["module"], e["type"], e["drug"]) for e in c["expected_findings"])
             with self.subTest(case=c["id"]):
-                self.assertEqual(keys(c), expected)
+                self.assertEqual(keys(c, set(c["modules"])), expected)
 
     def test_rules_never_read_the_story_or_the_answer(self):
         c = case("cap-levofloxacin-ivpo-01")
@@ -468,32 +476,38 @@ class MissingBowelRegimenTests(unittest.TestCase):
     """Opioid stewardship O3, changelog #201: an opioid order with no stimulant or osmotic laxative order."""
     POSITIVE = "opioid-docusate-only-01"
 
+    def positive(self):
+        """Mira's chart without the gabapentin case library v2 added (#217), so only this rule speaks."""
+        c = case(self.POSITIVE)
+        c["prescriptions"] = [p for p in c["prescriptions"] if p["rxnorm"] != "310431"]
+        return c
+
     def test_docusate_alone_is_named_in_the_finding(self):
-        (f,) = evaluate(from_case(case(self.POSITIVE), KB), KB, {"opioid"})
+        (f,) = evaluate(from_case(self.positive(), KB), KB, {"opioid"})
         self.assertEqual(f.key(), ("opioid", "missing-bowel-regimen", "Hydromorphone"))
         self.assertIn("Docusate alone", f.summary)
         self.assertEqual(f.refs, ("shm-opioid-2018",))
         self.assertTrue(any(e.startswith("Why it matters:") and "constipation" in e for e in f.evidence))
 
     def test_an_osmotic_laxative_counts(self):
-        c = case(self.POSITIVE)
+        c = self.positive()
         c["prescriptions"].append({"drug": "polyethylene glycol 3350 17000 MG Powder for Oral Solution", "rxnorm": "876193",
                                    "start": "2026-11-14", "route": "PO", "instructions": "17 g by mouth daily"})
         self.assertEqual(keys(c), [])
 
     def test_diarrhea_on_the_problem_list_keeps_it_silent(self):
-        c = case(self.POSITIVE)
+        c = self.positive()
         c["problems"].append({"title": "Diarrhea", "diagnosis": "ICD10:R19.7", "begdate": "2026-11-14"})
         self.assertEqual(keys(c), [])
 
     def test_without_docusate_the_summary_does_not_mention_it(self):
-        c = case(self.POSITIVE)
+        c = self.positive()
         c["prescriptions"] = [p for p in c["prescriptions"] if p["rxnorm"] != "1115005"]
         (f,) = evaluate(from_case(c, KB), KB, {"opioid"})
         self.assertNotIn("Docusate", f.summary)
 
     def test_the_first_started_opioid_is_named(self):
-        c = case(self.POSITIVE)
+        c = self.positive()
         c["prescriptions"].append({"drug": "oxycodone hydrochloride 5 MG Oral Tablet", "rxnorm": "1049621", "start": "2026-11-12",
                                    "route": "PO", "instructions": "5 mg by mouth every 4 hours as needed"})
         self.assertEqual(keys(c), [("opioid", "missing-bowel-regimen", "Oxycodone")])
@@ -515,7 +529,7 @@ class FhirAdapterTests(unittest.TestCase):
         for path in sorted(CASES.glob("*.json")):
             c = json.loads(path.read_text())
             with self.subTest(case=c["id"]):
-                self.assertEqual(fhir_keys(fixture(c["id"]), set(c["modules"])), keys(c))
+                self.assertEqual(fhir_keys(fixture(c["id"]), set(c["modules"])), keys(c, set(c["modules"])))
 
     def test_every_fixture_gives_the_case_file_snapshot(self):
         def rx(s):

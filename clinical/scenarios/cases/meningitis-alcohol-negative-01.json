@@ -1,24 +1,25 @@
 {
   "schema": "locumview-case/1",
   "id": "meningitis-alcohol-negative-01",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "title": "Suspected bacterial meningitis at 48 with alcohol use disorder, on vancomycin and ceftriaxone without ampicillin",
   "kind": "ambiguous",
   "modules": [
-    "stewardship"
+    "stewardship",
+    "opioid"
   ],
   "provenance": {
     "source": "synthetic",
     "author": "Claude Code (draft for owner review), converted from an ambiguous case on the owner's correction",
     "created": "2026-10-25",
     "clinical_review": {
-      "status": "approved",
-      "by": "owner",
-      "date": "2026-10-25",
-      "notes": "Owner clinical review: revised text approved after conversion to a negative control."
+      "status": "pending",
+      "by": null,
+      "date": null,
+      "notes": "Case library v2 Batch A (#217): findings added from another module; awaiting owner review."
     }
   },
-  "story": "A 48-year-old man with alcohol use disorder presents with fever, headache and neck stiffness; CSF shows a neutrophilic pleocytosis with low glucose. Empiric vancomycin, ceftriaxone and dexamethasone are started; cultures are pending. Ampicillin is not ordered; he is not immunocompromised and has no cirrhosis.",
+  "story": "A 48-year-old man with alcohol use disorder presents with fever, headache and neck stiffness; CSF shows a neutrophilic pleocytosis with low glucose. Empiric vancomycin, ceftriaxone and dexamethasone are started; cultures are pending. Ampicillin is not ordered; he is not immunocompromised and has no cirrhosis. He is withdrawing from alcohol and has lorazepam IV by CIWA-Ar score, and hydromorphone 0.5 mg IV as needed for headache, with senna.",
   "patient": {
     "family": "Kowalski",
     "given": "Ned",
@@ -40,6 +41,11 @@
       "title": "Alcohol use disorder",
       "diagnosis": "ICD10:F10.20",
       "begdate": "2018-01-01"
+    },
+    {
+      "title": "Alcohol dependence with withdrawal, uncomplicated",
+      "diagnosis": "ICD10:F10.230",
+      "begdate": "2026-10-24"
     }
   ],
   "prescriptions": [
@@ -62,6 +68,27 @@
       "rxnorm": "309696",
       "route": "IV",
       "instructions": "10 mg IV every 6 hours, first dose with or before the first antibiotic dose",
+      "start": "2026-10-24"
+    },
+    {
+      "drug": "1 ML lorazepam 2 MG/ML Injection",
+      "rxnorm": "1665188",
+      "route": "IV",
+      "instructions": "1 to 2 mg IV every hour as needed by CIWA-Ar score for alcohol withdrawal",
+      "start": "2026-10-24"
+    },
+    {
+      "drug": "1 ML hydromorphone hydrochloride 1 MG/ML Injection",
+      "rxnorm": "897653",
+      "route": "IV",
+      "instructions": "0.5 mg IV every 3 hours as needed for headache",
+      "start": "2026-10-24"
+    },
+    {
+      "drug": "sennosides, USP 8.6 MG Oral Tablet",
+      "rxnorm": "312935",
+      "route": "PO",
+      "instructions": "17.2 mg (2 tablets) by mouth at bedtime",
       "start": "2026-10-24"
     }
   ],
@@ -156,9 +183,16 @@
       "status": "pending"
     }
   ],
-  "expected_findings": [],
-  "reference_answer": "The Listeria rule does not fire: at 48 he is under the IDSA 2004 and ESCMID 2016 age criterion and not immunocompromised. Adding ampicillin is still defensible: WHO 2025 lists alcohol use disease as a Listeria risk factor. Narrow therapy when cultures return.",
-  "rationale": "An ambiguous case (owner review, 2026-11-12): the society guidelines the rule follows (IDSA 2004, ESCMID 2016) base Listeria coverage on age over 50 and immunocompromise, while WHO 2025 also lists alcohol use disease and liver cirrhosis. The rule must not fire on the society criteria, and a pharmacist who adds ampicillin is not wrong.",
+  "expected_findings": [
+    {
+      "module": "opioid",
+      "type": "opioid-benzodiazepine",
+      "drug": "Lorazepam",
+      "summary": "Lorazepam by CIWA-Ar for alcohol withdrawal and hydromorphone as needed for headache are both active: an opioid with a benzodiazepine."
+    }
+  ],
+  "reference_answer": "The Listeria rule does not fire: at 48 he is under the IDSA 2004 and ESCMID 2016 age criterion and not immunocompromised. Adding ampicillin is still defensible: WHO 2025 lists alcohol use disease as a Listeria risk factor. Narrow therapy when cultures return. Opioid with a benzodiazepine: the lorazepam treats alcohol withdrawal and should continue; reconsider the hydromorphone, treating the headache with acetaminophen first, and if an opioid is still needed, monitor sedation and respiration closely (continuous pulse oximetry or capnography).",
+  "rationale": "An ambiguous case (owner review, 2026-11-12): the society guidelines the rule follows (IDSA 2004, ESCMID 2016) base Listeria coverage on age over 50 and immunocompromise, while WHO 2025 also lists alcohol use disease and liver cirrhosis. The rule must not fire on the society criteria, and a pharmacist who adds ampicillin is not wrong. Case library v2 (#217): the rule names the benzodiazepine as the drug to question, but here the benzodiazepine is indicated and the opioid is the one to reconsider: a judgment the finding leaves to the pharmacist. The Listeria question stays ambiguous.",
   "citations": [
     {
       "ref": "idsa-meningitis-2004",
@@ -171,6 +205,14 @@
     {
       "ref": "who-meningitis-2025",
       "supports": "Listeria risk factors include alcohol use disease and liver cirrhosis besides age over 60; checked against the WHO document and approved by the owner, 2026-11-12."
+    },
+    {
+      "ref": "fda-lorazepam-label",
+      "supports": "Boxed warning: lorazepam with opioids may cause profound sedation, respiratory depression, coma and death; owner approved the rule's use of the label 2026-11-16 (#200)."
+    },
+    {
+      "ref": "fda-oxycodone-label",
+      "supports": "Boxed warning and 5.3: opioids with benzodiazepines or other CNS depressants, including gabapentinoids; the oxycodone label stands for the opioid class in this rule (#200)."
     }
   ],
   "acceptable_answers": [

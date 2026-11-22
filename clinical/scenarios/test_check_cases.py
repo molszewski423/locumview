@@ -53,8 +53,19 @@ class CheckerTests(unittest.TestCase):
             c["cultures"][0]["organism"] = [org, {"snomed": "40886007", "text": "Klebsiella oxytoca"}]
         self.assertRefused(two, "exactly one organism")
 
-    def test_negative_control_with_a_finding_is_refused(self):
-        self.assertRefused(lambda c: c.update(kind="negative-control"), "negative control has no expected findings")
+    def test_negative_control_needs_a_silent_question(self):
+        self.assertRefused(lambda c: c.update(kind="negative-control"), "silent: must be a list")
+
+    def test_negative_control_may_not_expect_its_silent_finding(self):
+        # Case library v2 (#217): a negative control may expect other findings, never the one it must not produce.
+        def change(c):
+            f = c["expected_findings"][0]
+            c.update(kind="negative-control", silent=[{"module": f["module"], "type": f["type"], "reason": "test"}])
+        self.assertRefused(change, "an expected finding has the type this case must not produce")
+
+    def test_silent_question_only_on_negative_controls(self):
+        self.assertRefused(lambda c: c.update(silent=[{"module": "stewardship", "type": "duration-review",
+                                                       "reason": "test"}]), "only negative controls name a silent")
 
     def test_finding_case_without_findings_is_refused(self):
         self.assertRefused(lambda c: c.update(expected_findings=[]), "needs at least one expected finding")

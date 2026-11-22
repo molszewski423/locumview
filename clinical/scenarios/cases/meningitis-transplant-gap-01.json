@@ -1,24 +1,25 @@
 {
   "schema": "locumview-case/1",
   "id": "meningitis-transplant-gap-01",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "title": "Suspected bacterial meningitis at 40 after kidney transplant, on vancomycin and ceftriaxone without ampicillin",
   "kind": "finding",
   "modules": [
-    "stewardship"
+    "stewardship",
+    "opioid"
   ],
   "provenance": {
     "source": "synthetic",
     "author": "Claude Code (draft for owner review), Listeria risk-factor rule (owner decision 2026-11-12)",
     "created": "2026-11-12",
     "clinical_review": {
-      "status": "approved",
-      "by": "owner",
-      "date": "2026-11-12",
-      "notes": "Owner approved the Listeria risk-factor cases as drafted (after the OpenEvidence review of the rule's evidence)."
+      "status": "pending",
+      "by": null,
+      "date": null,
+      "notes": "Case library v2 Batch A (#217): findings added from another module; awaiting owner review."
     }
   },
-  "story": "A 40-year-old woman who received a kidney transplant three years ago, on tacrolimus and mycophenolate, presents with fever, severe headache, neck stiffness and new confusion. Lumbar puncture shows a neutrophilic pleocytosis with low glucose and high protein. Empiric vancomycin, ceftriaxone 2 g every 12 hours and dexamethasone are started; CSF and blood cultures are pending. Ampicillin is not ordered.",
+  "story": "A 40-year-old woman who received a kidney transplant three years ago, on tacrolimus and mycophenolate, presents with fever, severe headache, neck stiffness and new confusion. Lumbar puncture shows a neutrophilic pleocytosis with low glucose and high protein. Empiric vancomycin, ceftriaxone 2 g every 12 hours and dexamethasone are started; CSF and blood cultures are pending. Ampicillin is not ordered. She takes pregabalin 75 mg twice daily for neuropathy, continued on admission, and has hydromorphone 0.5 mg IV as needed for headache, with senna.",
   "patient": {
     "family": "Castillo",
     "given": "Rosa",
@@ -50,6 +51,11 @@
       "title": "Long term use of mycophenolate",
       "diagnosis": "ICD10:Z79.624",
       "begdate": "2023-05-02"
+    },
+    {
+      "title": "Polyneuropathy, unspecified",
+      "diagnosis": "ICD10:G62.9",
+      "begdate": "2024-03-02"
     }
   ],
   "prescriptions": [
@@ -73,6 +79,27 @@
       "start": "2026-10-24",
       "route": "IV",
       "instructions": "10 mg IV every 6 hours, first dose with or before the first antibiotic dose"
+    },
+    {
+      "drug": "1 ML hydromorphone hydrochloride 1 MG/ML Injection",
+      "rxnorm": "897653",
+      "route": "IV",
+      "instructions": "0.5 mg IV every 3 hours as needed for headache",
+      "start": "2026-10-24"
+    },
+    {
+      "drug": "pregabalin 75 MG Oral Capsule",
+      "rxnorm": "483450",
+      "route": "PO",
+      "instructions": "75 mg by mouth twice daily (home medication continued)",
+      "start": "2026-10-24"
+    },
+    {
+      "drug": "sennosides, USP 8.6 MG Oral Tablet",
+      "rxnorm": "312935",
+      "route": "PO",
+      "instructions": "17.2 mg (2 tablets) by mouth at bedtime",
+      "start": "2026-10-24"
     }
   ],
   "vitals": [
@@ -172,10 +199,16 @@
       "type": "missing-empiric-coverage",
       "drug": "Ampicillin",
       "summary": "Empiric therapy for suspected bacterial meningitis in a patient with a kidney transplant on immunosuppressive therapy lacks ampicillin: cephalosporins and vancomycin do not cover Listeria monocytogenes."
+    },
+    {
+      "module": "opioid",
+      "type": "opioid-gabapentinoid",
+      "drug": "Pregabalin",
+      "summary": "Pregabalin, continued from home for neuropathy, is active with hydromorphone as needed: an opioid with a gabapentinoid in a confused patient."
     }
   ],
-  "reference_answer": "Add ampicillin 2 g IV every 4 hours (a full first dose, then intervals adjusted to graft function) to vancomycin, ceftriaxone and dexamethasone until cultures exclude Listeria; with a serious penicillin allergy, trimethoprim-sulfamethoxazole is the usual alternative. The ceftriaxone backbone is consistent with ESCMID 2016 and WHO 2025; some reviews prefer cefepime or meropenem in immunocompromised hosts, a clinician's choice that the rules do not flag. In a transplant recipient, also consider cryptococcal and tuberculous meningitis. Narrow therapy when cultures return.",
-  "rationale": "Immunosuppressive therapy after transplantation is the strongest clinical discriminator of Listeria from pneumococcal meningitis, and Listeria is intrinsically resistant to cephalosporins. ESCMID 2016 adds amoxicillin or ampicillin for adults with Listeria risk factors at any age; the age rule alone would miss this 40-year-old. The finding rests on the transplant and immunosuppressant problems, the working diagnosis and the absence of an ampicillin order.",
+  "reference_answer": "Add ampicillin 2 g IV every 4 hours (a full first dose, then intervals adjusted to graft function) to vancomycin, ceftriaxone and dexamethasone until cultures exclude Listeria; with a serious penicillin allergy, trimethoprim-sulfamethoxazole is the usual alternative. The ceftriaxone backbone is consistent with ESCMID 2016 and WHO 2025; some reviews prefer cefepime or meropenem in immunocompromised hosts, a clinician's choice that the rules do not flag. In a transplant recipient, also consider cryptococcal and tuberculous meningitis. Narrow therapy when cultures return. Opioid with a gabapentinoid in a patient with new confusion: consider holding the pregabalin while she is encephalopathic (and check its dose against her transplant kidney function), use non-opioid analgesia first, and monitor sedation and respiration.",
+  "rationale": "Immunosuppressive therapy after transplantation is the strongest clinical discriminator of Listeria from pneumococcal meningitis, and Listeria is intrinsically resistant to cephalosporins. ESCMID 2016 adds amoxicillin or ampicillin for adults with Listeria risk factors at any age; the age rule alone would miss this 40-year-old. The finding rests on the transplant and immunosuppressant problems, the working diagnosis and the absence of an ampicillin order. Case library v2 (#217): adds the opioid with a gabapentinoid finding beside the Listeria gap.",
   "citations": [
     {
       "ref": "escmid-meningitis-2016",
@@ -184,6 +217,18 @@
     {
       "ref": "who-meningitis-2025",
       "supports": "Add ampicillin or amoxicillin to the initial empiric regimen with any Listeria risk factor, including organ transplantation and immunosuppressive therapy; checked against the WHO document, 2026-11-12."
+    },
+    {
+      "ref": "fda-pregabalin-label",
+      "supports": "5.4 Respiratory depression: pregabalin with opioids or other CNS depressants; owner approved the rule's use of the label 2026-11-16 (#200)."
+    },
+    {
+      "ref": "fda-oxycodone-label",
+      "supports": "Boxed warning and 5.3: opioids with benzodiazepines or other CNS depressants, including gabapentinoids; the oxycodone label stands for the opioid class in this rule (#200)."
+    },
+    {
+      "ref": "fda-gabapentin-label",
+      "supports": "5.8 Respiratory depression: gabapentin with opioids; the rule cites both gabapentinoid labels for the class (#200)."
     }
   ]
 }

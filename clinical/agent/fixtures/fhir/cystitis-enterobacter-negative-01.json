@@ -385,6 +385,108 @@
   }
  },
  {
+  "authoredOn": "2026-10-22T00:00:00+00:00",
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "community",
+      "display": "Home/Community",
+      "system": "http://terminology.hl7.org/CodeSystem/medicationrequest-category"
+     }
+    ]
+   }
+  ],
+  "dispenseRequest": {
+   "numberOfRepeatsAllowed": 0
+  },
+  "dosageInstruction": [
+   {
+    "route": {
+     "coding": [
+      {
+       "code": "C38299",
+       "system": "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl"
+      }
+     ]
+    }
+   }
+  ],
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<MedicationRequest#2>",
+  "intent": "order",
+  "medicationCodeableConcept": {
+   "coding": [
+    {
+     "code": "854235",
+     "display": "0.4 ML enoxaparin sodium 100 MG/ML Prefilled Syringe",
+     "system": "http://www.nlm.nih.gov/research/umls/rxnorm"
+    }
+   ]
+  },
+  "reportedBoolean": false,
+  "resourceType": "MedicationRequest",
+  "status": "active",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
+  "authoredOn": "2026-10-23T00:00:00+00:00",
+  "category": [
+   {
+    "coding": [
+     {
+      "code": "community",
+      "display": "Home/Community",
+      "system": "http://terminology.hl7.org/CodeSystem/medicationrequest-category"
+     }
+    ]
+   }
+  ],
+  "dispenseRequest": {
+   "numberOfRepeatsAllowed": 0
+  },
+  "dosageInstruction": [
+   {
+    "route": {
+     "coding": [
+      {
+       "code": "C38299",
+       "system": "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl"
+      }
+     ]
+    }
+   }
+  ],
+  "encounter": {
+   "reference": "Encounter/<Encounter#1>",
+   "type": "Encounter"
+  },
+  "id": "<MedicationRequest#3>",
+  "intent": "order",
+  "medicationCodeableConcept": {
+   "coding": [
+    {
+     "code": "1798389",
+     "display": "1 ML heparin sodium, porcine 5000 UNT/ML Prefilled Syringe",
+     "system": "http://www.nlm.nih.gov/research/umls/rxnorm"
+    }
+   ]
+  },
+  "reportedBoolean": false,
+  "resourceType": "MedicationRequest",
+  "status": "active",
+  "subject": {
+   "reference": "Patient/<Patient#1>",
+   "type": "Patient"
+  }
+ },
+ {
   "category": [
    {
     "coding": [
@@ -2328,9 +2430,9 @@
    {
     "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-sex",
     "valueCoding": {
-     "code": "unknown",
-     "display": "Unknown",
-     "system": "DataAbsentReason"
+     "code": "248153007",
+     "display": "Female",
+     "system": "http://snomed.info/sct"
     }
    },
    {
@@ -2454,7 +2556,7 @@
      }
     ]
    },
-   "value": "LV12"
+   "value": "LV9"
   },
   "collection": {
    "collectedDateTime": "2026-10-23T12:30:00+00:00"
@@ -2463,7 +2565,7 @@
   "identifier": [
    {
     "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
-    "value": "LV12-1"
+    "value": "LV9-1"
    }
   ],
   "resourceType": "Specimen",
@@ -2492,7 +2594,7 @@
      }
     ]
    },
-   "value": "LV12"
+   "value": "LV9"
   },
   "collection": {
    "collectedDateTime": "2026-10-23T12:30:00+00:00"
@@ -2501,7 +2603,7 @@
   "identifier": [
    {
     "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
-    "value": "LV12-1"
+    "value": "LV9-1"
    }
   ],
   "resourceType": "Specimen",

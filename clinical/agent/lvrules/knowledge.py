@@ -37,6 +37,10 @@ class Knowledge:
     def has_ade_condition(self, icd10: str | None, name: str) -> bool:
         return bool(icd10) and any(icd10.startswith(p) for p in self.ade_conditions.get(name, {}).get("icd10_prefixes", []))
 
+    def ade_label(self, ade_agent: str | None) -> str | None:
+        """The drug's own label among the citations, for rules that cite the labels of the drugs involved."""
+        return self.ade_agents.get(ade_agent or "", {}).get("label")
+
     def systemic_anticoagulant(self, ade_agent: str | None) -> bool:
         return bool(self.ade_agents.get(ade_agent or "", {}).get("systemic_anticoagulant"))
 

@@ -1,12 +1,13 @@
 {
   "schema": "locumview-case/1",
   "id": "cystitis-enterobacter-negative-01",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "title": "Enterobacter cloacae cystitis on ceftriaxone, no fever or upper tract signs, nothing by mouth",
   "kind": "finding",
   "modules": [
     "stewardship",
-    "iv-to-po"
+    "iv-to-po",
+    "ade"
   ],
   "provenance": {
     "source": "synthetic",
@@ -16,10 +17,10 @@
       "status": "pending",
       "by": null,
       "date": null,
-      "notes": "Changed in #212 (AmpC at every site, owner decision 2026-11-21); awaiting owner review."
+      "notes": "Case library v2 Batch A (#217): findings added from another module; awaiting owner review."
     }
   },
-  "story": "A 74-year-old woman on postoperative day 2 after hip fracture repair develops dysuria and frequency without fever, flank pain or bacteremia; she has no indwelling urinary catheter. She has an ileus and takes nothing by mouth. Urine grows Enterobacter cloacae complex, resistant to the usual oral agents; she is on IV ceftriaxone.",
+  "story": "A 74-year-old woman on postoperative day 2 after hip fracture repair develops dysuria and frequency without fever, flank pain or bacteremia; she has no indwelling urinary catheter. She has an ileus and takes nothing by mouth. Urine grows Enterobacter cloacae complex, resistant to the usual oral agents; she is on IV ceftriaxone. After surgery the orthopedic team started enoxaparin 40 mg daily; when she transferred to medicine on day 2, the admission order set added heparin 5,000 units every 8 hours.",
   "patient": {
     "family": "Whitcombe",
     "given": "Fern",
@@ -54,6 +55,20 @@
       "rxnorm": "1665021",
       "route": "IV",
       "instructions": "1 g IV every 24 hours",
+      "start": "2026-10-23"
+    },
+    {
+      "drug": "0.4 ML enoxaparin sodium 100 MG/ML Prefilled Syringe",
+      "rxnorm": "854235",
+      "route": "SC",
+      "instructions": "40 mg subcutaneously daily (orthopedic VTE prophylaxis after hip repair)",
+      "start": "2026-10-22"
+    },
+    {
+      "drug": "1 ML heparin sodium, porcine 5000 UNT/ML Prefilled Syringe",
+      "rxnorm": "1798389",
+      "route": "SC",
+      "instructions": "5,000 units subcutaneously every 8 hours (medicine admission order set on transfer)",
       "start": "2026-10-23"
     }
   ],
@@ -217,10 +232,16 @@
       "type": "suboptimal-agent",
       "drug": "Ceftriaxone",
       "summary": "Enterobacter cloacae complex cystitis on ceftriaxone: generally avoided for an inducible AmpC organism even when susceptible; the preferred agents (nitrofurantoin, TMP-SMX) are not active here, so a single dose of an aminoglycoside or renally adjusted cefepime are the alternatives."
+    },
+    {
+      "module": "ade",
+      "type": "duplicate-anticoagulation",
+      "drug": "Heparin",
+      "summary": "Heparin 5,000 units every 8 hours was started on transfer while enoxaparin 40 mg daily from the orthopedic orders is active: two anticoagulants for VTE prophylaxis."
     }
   ],
-  "reference_answer": "Flag ceftriaxone. IDSA 2026 suggests generally avoiding third-generation cephalosporins for Enterobacter cloacae complex even when susceptible. Its preferred agents for AmpC cystitis, nitrofurantoin and TMP-SMX, test resistant, and she takes nothing by mouth. Suggest a single dose of gentamicin (5 mg/kg IV, adjusted body weight if obese; avoid with hearing loss or significant renal impairment) or cefepime adjusted for her creatinine clearance (check weight; Cockcroft-Gault likely under 60 mL/min at 74). Completing ceftriaxone may be reasonable only if it was started empirically, she is clearly improving and no catheter or other source persists; repeat the urine culture if symptoms persist. Confirm she has urinary symptoms (otherwise this is asymptomatic bacteriuria and needs no antibiotic) and no indwelling catheter. Total 3 to 7 days for cystitis, counting the ceftriaxone days, or one gentamicin dose.",
-  "rationale": "Changed from a negative control in #212 (owner decision, 2026-11-21, after an OpenEvidence answer on this case): ceftriaxone is not preferred even for bladder-limited cystitis with an inducible AmpC organism, so the AmpC rule now fires at every site with site-specific alternatives. The case id keeps its original name because the chart, photograph and recorded FHIR fixture are keyed on it. IV to PO does not apply: she is not taking anything by mouth and no susceptible oral agent exists.",
+  "reference_answer": "Flag ceftriaxone. IDSA 2026 suggests generally avoiding third-generation cephalosporins for Enterobacter cloacae complex even when susceptible. Its preferred agents for AmpC cystitis, nitrofurantoin and TMP-SMX, test resistant, and she takes nothing by mouth. Suggest a single dose of gentamicin (5 mg/kg IV, adjusted body weight if obese; avoid with hearing loss or significant renal impairment) or cefepime adjusted for her creatinine clearance (check weight; Cockcroft-Gault likely under 60 mL/min at 74). Completing ceftriaxone may be reasonable only if it was started empirically, she is clearly improving and no catheter or other source persists; repeat the urine culture if symptoms persist. Confirm she has urinary symptoms (otherwise this is asymptomatic bacteriuria and needs no antibiotic) and no indwelling catheter. Total 3 to 7 days for cystitis, counting the ceftriaxone days, or one gentamicin dose. Duplicate anticoagulation: stop one VTE prophylaxis order. Keep enoxaparin 40 mg daily (adjusted for renal function), which is standard after hip fracture surgery, and discontinue the heparin.",
+  "rationale": "Changed from a negative control in #212 (owner decision, 2026-11-21, after an OpenEvidence answer on this case): ceftriaxone is not preferred even for bladder-limited cystitis with an inducible AmpC organism, so the AmpC rule now fires at every site with site-specific alternatives. The case id keeps its original name because the chart, photograph and recorded FHIR fixture are keyed on it. IV to PO does not apply: she is not taking anything by mouth and no susceptible oral agent exists. Case library v2 (#217): the plan's row had enoxaparin on top of continued apixaban; changed to heparin on top of enoxaparin because she takes nothing by mouth with an ileus, so an oral anticoagulant would not be running. Two order sets each adding prophylaxis is the common real-world duplicate.",
   "citations": [
     {
       "ref": "idsa-amr-gn-2024",
@@ -237,6 +258,10 @@
     {
       "ref": "idsa-amr-gn-2026",
       "supports": "Question 2.4, read in IDSA's published 2026 text 2026-11-21: \"the panel suggests generally avoiding third-generation cephalosporins\" for moderate-risk AmpC organisms, and ceftriaxone \"is not suggested for the treatment of invasive infections\"; continuing an empirically started course may be reasonable in a non-severe infection with improvement and source control. The section does not define invasive or mention pyelonephritis or cystitis."
+    },
+    {
+      "ref": "fda-enoxaparin-label",
+      "supports": "7 Drug interactions: anticoagulants should be discontinued before Lovenox is started; if coadministration is essential, close clinical and laboratory monitoring. Read by Claude Code 2026-11-22; owner review pending (#217)."
     }
   ]
 }

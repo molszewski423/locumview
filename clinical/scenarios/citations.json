@@ -228,6 +228,22 @@
       "metadata_checked": "2026-11-16",
       "content_check": "owner",
       "note": "Read 2026-11-16 in the PubMed Central full text (PMC6278928) by Claude Code; owner approved the cases' use of it 2026-11-16 on the quoted text (#202). Consensus Statement 10: unless contraindicated, order a bowel regimen to prevent opioid-induced constipation in patients receiving opioids; for all hospitalized medical patients receiving opioids, provided the patient is not having diarrhea; stimulant laxatives (senna, bisacodyl) recommended, osmotic laxatives (polyethylene glycol, lactulose) effective for constipation generally; stool softeners not recommended. On naloxone the working group made no recommendation: no clear evidence for naloxone with short-term opioid therapy for acute pain."
+    },
+    "fda-enoxaparin-label": {
+      "authors": "US Food and Drug Administration (manufacturer labeling)",
+      "title": "Lovenox (enoxaparin sodium) injection: prescribing information",
+      "source": "DailyMed setid 5017a927-2a24-4f27-89f9-27c805bf7d59 (published 2026-05-29)",
+      "metadata_checked": "2026-11-22",
+      "content_check": "owner",
+      "note": "Read 2026-11-22 in the DailyMed label by Claude Code; owner review pending (#217). 7 Drug Interactions: agents which may enhance the risk of hemorrhage, including anticoagulants, should be discontinued prior to initiation of Lovenox therapy; if coadministration is essential, conduct close clinical and laboratory monitoring."
+    },
+    "fda-rivaroxaban-label": {
+      "authors": "US Food and Drug Administration (manufacturer labeling)",
+      "title": "Xarelto (rivaroxaban) tablets: prescribing information",
+      "source": "DailyMed setid 10db92f9-2300-4a80-836b-673e1ae91610 (published 2026-09-11)",
+      "metadata_checked": "2026-11-22",
+      "content_check": "owner",
+      "note": "Read 2026-11-22 in the DailyMed label by Claude Code; owner review pending (#217). 7.4 Anticoagulants and NSAIDs/Aspirin: coadministration of enoxaparin, warfarin, aspirin, clopidogrel and chronic NSAID use may increase the risk of bleeding; avoid concurrent use of XARELTO with other anticoagulants due to increased bleeding risk unless benefit outweighs risk. 2.3 Switching from anticoagulants other than warfarin: start XARELTO 0 to 2 hours prior to the next scheduled dose of the other drug and omit the other anticoagulant."
     }
   }
 }

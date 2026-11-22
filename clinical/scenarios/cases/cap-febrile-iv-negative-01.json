@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "cap-febrile-iv-negative-01",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "title": "Community-acquired pneumonia on IV levofloxacin, day 2, still febrile and tachycardic",
   "kind": "negative-control",
   "modules": [
@@ -94,6 +94,13 @@
     }
   ],
   "expected_findings": [],
+  "silent": [
+    {
+      "module": "iv-to-po",
+      "type": "iv-to-po-switch",
+      "reason": "febrile and tachycardic on day 2: not clinically stable"
+    }
+  ],
   "reference_answer": "No intervention yet: reassess for oral levofloxacin 750 mg daily (bioequivalent, same dose) once clinically stable; at least 5 days in total for this regimen.",
   "rationale": "Negative control for the IV to PO stability gate in pneumonia: febrile and tachycardic on day 2, before the duration review.",
   "citations": [

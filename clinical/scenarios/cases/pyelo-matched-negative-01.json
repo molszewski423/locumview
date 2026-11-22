@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "pyelo-matched-negative-01",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "title": "Pyelonephritis on ceftriaxone; E. coli susceptible; still febrile and vomiting",
   "kind": "negative-control",
   "modules": [
@@ -174,6 +174,18 @@
     }
   ],
   "expected_findings": [],
+  "silent": [
+    {
+      "module": "stewardship",
+      "type": "bug-drug-mismatch",
+      "reason": "the organism is susceptible to ceftriaxone"
+    },
+    {
+      "module": "iv-to-po",
+      "type": "iv-to-po-switch",
+      "reason": "febrile: not clinically stable"
+    }
+  ],
   "reference_answer": "No intervention: ceftriaxone matches the susceptibilities, and an IV to PO switch is premature while she is febrile, tachycardic and vomiting. Reassess oral step-down once she is clinically improving and tolerating oral intake.",
   "rationale": "A negative control for both modules. The organism is susceptible to the current therapy, so there is no bug-drug mismatch; ceftriaxone is a reasonable agent for pyelonephritis, so de-escalation is not expected. IV to PO criteria (clinical improvement, afebrile, able to take oral medication) are not met.",
   "citations": [

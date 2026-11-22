@@ -90,7 +90,7 @@ class ServiceTests(unittest.TestCase):
             create_app(Knowledge.load(), CITATIONS, "Mars/Olympus_Mons")
 
     def test_health_reports_the_knowledge_version(self):
-        self.assertEqual(self.client.get("/healthz").json(), {"status": "ok", "knowledge_version": "0.12.0"})
+        self.assertEqual(self.client.get("/healthz").json(), {"status": "ok", "knowledge_version": "0.13.0"})
 
     def test_no_api_documentation_is_served(self):
         for path in ("/docs", "/redoc", "/openapi.json"):
@@ -101,9 +101,9 @@ class ExplanationTests(unittest.TestCase):
     def test_a_reload_serves_the_explanation_from_memory(self):
         fake = FakeOllama(reply="Levofloxacin is given IV while the patient is stable.")
         client = self.client(fake)
-        first = client.post("/v1/explanations", json={"resources": fixture("cap-levofloxacin-ivpo-01")}).json()
+        first = client.post("/v1/explanations", json={"resources": fixture("cap-levofloxacin-ivpo-01"), "modules": ["iv-to-po"]}).json()
         calls = len(fake.requests)
-        second = client.post("/v1/explanations", json={"resources": fixture("cap-levofloxacin-ivpo-01")}).json()
+        second = client.post("/v1/explanations", json={"resources": fixture("cap-levofloxacin-ivpo-01"), "modules": ["iv-to-po"]}).json()
         self.assertEqual(len(fake.requests), calls)              # no model call and no model-server check
         (a,), (b,) = first["explanations"], second["explanations"]
         self.assertEqual((a["cached"], b["cached"]), (False, True))
@@ -112,7 +112,7 @@ class ExplanationTests(unittest.TestCase):
     def test_a_changed_finding_is_explained_again(self):
         fake = FakeOllama(reply="Levofloxacin is given IV while the patient is stable.")
         client = self.client(fake)
-        client.post("/v1/explanations", json={"resources": fixture("cap-levofloxacin-ivpo-01")})
+        client.post("/v1/explanations", json={"resources": fixture("cap-levofloxacin-ivpo-01"), "modules": ["iv-to-po"]})
         chats = sum(u.endswith("/api/chat") for _, u, _ in fake.requests)
         resources = fixture("pyelo-kaerogenes-ivpo-01")           # another patient: other findings, other data
         client.post("/v1/explanations", json={"resources": resources})
@@ -130,7 +130,7 @@ class ExplanationTests(unittest.TestCase):
 
     def test_each_of_the_services_own_findings_is_explained(self):
         fake = FakeOllama(reply="Levofloxacin is given IV while the patient is stable.")
-        reply = self.client(fake).post("/v1/explanations", json={"resources": fixture("cap-levofloxacin-ivpo-01")})
+        reply = self.client(fake).post("/v1/explanations", json={"resources": fixture("cap-levofloxacin-ivpo-01"), "modules": ["iv-to-po"]})
         self.assertEqual(reply.status_code, 200)
         body = reply.json()
         self.assertEqual(body["model"], {"name": "gemma4:26b", "digest": "sha256:" + "ab" * 32, "prompt": "prompts/explain-v2.txt"})
@@ -145,7 +145,7 @@ class ExplanationTests(unittest.TestCase):
     def test_a_reply_that_adds_a_drug_is_withheld(self):
         fake = FakeOllama(reply="Switch to doxycycline.")
         (e,) = self.client(fake).post("/v1/explanations",
-                                      json={"resources": fixture("cap-levofloxacin-ivpo-01")}).json()["explanations"]
+                                      json={"resources": fixture("cap-levofloxacin-ivpo-01"), "modules": ["iv-to-po"]}).json()["explanations"]
         self.assertEqual(e["status"], "withheld")
         self.assertNotIn("text", e)
 

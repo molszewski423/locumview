@@ -1,6 +1,6 @@
 {
   "_note": "Knowledge base for the Phase 9 lite rules (plan M4). Versioned with the rules: raise version on every change. Every rule names the references in clinical/scenarios/citations.json it rests on. Codes: RxNorm (prescribed products), LOINC (susceptibility results), SNOMED CT (organisms, specimens), ICD-10-CM (problems). Group inducible-ampc holds IDSA 2026's moderate-risk AmpC organisms (Enterobacter cloacae complex, Klebsiella aerogenes, Citrobacter freundii, Hafnia alvei) by SNOMED CT code; 62592009 is one concept that also carries the former name Enterobacter aerogenes. IDSA's low-risk Serratia, Morganella and Providencia are deliberately not in it.",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "agents": {
     "amoxicillin": {"display": "Amoxicillin"},
     "ampicillin": {"display": "Ampicillin", "covers_listeria": true},
@@ -26,7 +26,7 @@
   },
   "ade_agents": {
     "_note": "Medication-safety drugs the ADE monitoring (#187) and opioid stewardship (#198) rules read, kept apart from the antimicrobials so no stewardship or IV to PO rule ever sees them. systemic_anticoagulant marks a dose that anticoagulates the patient; a heparin lock flush does not. class: opioid, benzodiazepine, gabapentinoid, stimulant-laxative, osmotic-laxative or stool-softener.",
-    "apixaban": {"display": "Apixaban", "systemic_anticoagulant": true},
+    "apixaban": {"display": "Apixaban", "systemic_anticoagulant": true, "label": "fda-apixaban-label"}, "enoxaparin": {"display": "Enoxaparin", "systemic_anticoagulant": true, "label": "fda-enoxaparin-label"}, "rivaroxaban": {"display": "Rivaroxaban", "systemic_anticoagulant": true, "label": "fda-rivaroxaban-label"},
     "heparin": {"display": "Heparin", "systemic_anticoagulant": true},
     "heparin-flush": {"display": "Heparin lock flush", "systemic_anticoagulant": false},
     "oxycodone": {"display": "Oxycodone", "class": "opioid"},
@@ -49,7 +49,7 @@
     "diarrhea": {"icd10_prefixes": ["R19.7", "A04.7", "A09"]}
   },
   "ade_products": {
-    "1364435": "apixaban",
+    "1364435": "apixaban", "854235": "enoxaparin", "1114198": "rivaroxaban",
     "1364445": "apixaban",
     "1798389": "heparin",
     "1362062": "heparin-flush",
@@ -171,7 +171,7 @@
     "double-anaerobic-coverage": {"module": "stewardship", "refs": ["idsa-ciai-2010"]},
     "duration-review": {"module": "stewardship", "refs": ["idsa-shea-asp-2016"]},
     "iv-to-po-switch": {"module": "iv-to-po", "refs": ["idsa-shea-asp-2016"]},
-    "duplicate-anticoagulation": {"module": "ade", "refs": ["fda-apixaban-label"]},
+    "duplicate-anticoagulation": {"module": "ade", "refs": ["fda-apixaban-label", "fda-enoxaparin-label", "fda-rivaroxaban-label"]},
     "opioid-cns-depressant": {"module": "opioid", "refs": ["fda-oxycodone-label", "fda-lorazepam-label", "fda-gabapentin-label", "fda-pregabalin-label"]},
     "missing-bowel-regimen": {"module": "opioid", "refs": ["shm-opioid-2018"]}
   }

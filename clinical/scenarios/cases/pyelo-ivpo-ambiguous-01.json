@@ -1,25 +1,26 @@
 {
   "schema": "locumview-case/1",
   "id": "pyelo-ivpo-ambiguous-01",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "title": "Improving pyelonephritis on ceftriaxone; only oral beta-lactam options remain",
   "kind": "ambiguous",
   "modules": [
     "stewardship",
-    "iv-to-po"
+    "iv-to-po",
+    "opioid"
   ],
   "provenance": {
     "source": "synthetic",
     "author": "Claude Code (draft for owner review)",
     "created": "2026-10-25",
     "clinical_review": {
-      "status": "approved",
-      "by": "owner",
-      "date": "2026-10-25",
-      "notes": "Owner clinical review: cases look good."
+      "status": "pending",
+      "by": null,
+      "date": null,
+      "notes": "Case library v2 Batch A (#217): findings added from another module; awaiting owner review."
     }
   },
-  "story": "A 52-year-old woman with acute pyelonephritis is on IV ceftriaxone, hospital day 3. She has been afebrile for 36 hours, is eating and drinking, and her vital signs are normal. The urine E. coli is susceptible to ceftriaxone and to cefazolin at the urinary surrogate breakpoint, but resistant to trimethoprim-sulfamethoxazole and ciprofloxacin.",
+  "story": "A 52-year-old woman with acute pyelonephritis is on IV ceftriaxone, hospital day 3. She has been afebrile for 36 hours, is eating and drinking, and her vital signs are normal. The urine E. coli is susceptible to ceftriaxone and to cefazolin at the urinary surrogate breakpoint, but resistant to trimethoprim-sulfamethoxazole and ciprofloxacin. She has oxycodone 5 mg as needed for flank pain; no laxative is ordered.",
   "patient": {
     "family": "Callahan",
     "given": "Cora",
@@ -45,6 +46,13 @@
       "start": "2026-10-19",
       "route": "IV",
       "instructions": "1 g IV every 24 hours"
+    },
+    {
+      "drug": "oxycodone hydrochloride 5 MG Oral Tablet",
+      "rxnorm": "1049621",
+      "route": "PO",
+      "instructions": "5 mg by mouth every 4 hours as needed for flank pain",
+      "start": "2026-10-19"
     }
   ],
   "vitals": [
@@ -172,6 +180,12 @@
       "type": "iv-to-po-switch",
       "drug": "Ceftriaxone",
       "summary": "Clinical criteria for an oral switch are met; with the isolate susceptible to ceftriaxone, the oral option is a third-generation cephalosporin such as cefpodoxime."
+    },
+    {
+      "module": "opioid",
+      "type": "missing-bowel-regimen",
+      "drug": "Oxycodone",
+      "summary": "Oxycodone as needed for flank pain with no stimulant or osmotic laxative ordered."
     }
   ],
   "acceptable_answers": [
@@ -179,8 +193,8 @@
     "Continue IV ceftriaxone to complete a short course when oral therapy is not practical, documenting the reason.",
     "Discuss with the team or infectious diseases before switching, given the very low certainty of the evidence for short non-fluoroquinolone courses."
   ],
-  "reference_answer": "Flag the patient as meeting clinical IV to PO criteria with an oral third-generation cephalosporin such as cefpodoxime, supported by the isolate's ceftriaxone susceptibility: IDSA 2025 calls this a reasonable switch after improvement on ceftriaxone, as cefpodoxime 200 to 400 mg every 12 hours (IDSA 2025 Table 1.2; above the labeled dose, which covers uncomplicated UTI only), taken with food (antacids and H2 blockers reduce absorption), every 24 hours below a creatinine clearance of 30 mL/min and three times a week after hemodialysis, for a total course of about 7 days. The finding should not present the switch as the only defensible choice.",
-  "rationale": "She meets clinical switch criteria, and the only susceptible oral agents are beta-lactams. The 2011 IDSA guideline considered oral beta-lactams less effective for pyelonephritis and advised a longer course; the 2025 IDSA complicated UTI guideline supersedes it: after improvement on ceftriaxone an oral third-generation cephalosporin is a reasonable switch, with optimized dosing and 7 days total for a non-fluoroquinolone (very low certainty), and no longer course for beta-lactams. Nitrofurantoin does not reach renal tissue. It stays an ambiguous case because the evidence for short oral beta-lactam courses is limited (owner review, 2026-11-12).",
+  "reference_answer": "Flag the patient as meeting clinical IV to PO criteria with an oral third-generation cephalosporin such as cefpodoxime, supported by the isolate's ceftriaxone susceptibility: IDSA 2025 calls this a reasonable switch after improvement on ceftriaxone, as cefpodoxime 200 to 400 mg every 12 hours (IDSA 2025 Table 1.2; above the labeled dose, which covers uncomplicated UTI only), taken with food (antacids and H2 blockers reduce absorption), every 24 hours below a creatinine clearance of 30 mL/min and three times a week after hemodialysis, for a total course of about 7 days. The finding should not present the switch as the only defensible choice. Add a bowel regimen with the oxycodone (senna or polyethylene glycol).",
+  "rationale": "She meets clinical switch criteria, and the only susceptible oral agents are beta-lactams. The 2011 IDSA guideline considered oral beta-lactams less effective for pyelonephritis and advised a longer course; the 2025 IDSA complicated UTI guideline supersedes it: after improvement on ceftriaxone an oral third-generation cephalosporin is a reasonable switch, with optimized dosing and 7 days total for a non-fluoroquinolone (very low certainty), and no longer course for beta-lactams. Nitrofurantoin does not reach renal tissue. It stays an ambiguous case because the evidence for short oral beta-lactam courses is limited (owner review, 2026-11-12). Case library v2 (#217): adds the bowel regimen finding beside the ambiguous IV to PO question.",
   "citations": [
     {
       "ref": "idsa-cuti-2025-ivpo",
@@ -205,6 +219,10 @@
     {
       "ref": "idsa-shea-asp-2016",
       "supports": "Stewardship programs promoting timely IV to oral transition once criteria are met."
+    },
+    {
+      "ref": "shm-opioid-2018",
+      "supports": "Statement 10: a bowel regimen with a stimulant or osmotic laxative for hospitalized patients on opioids unless contraindicated; owner approved 2026-11-16 (#202)."
     }
   ]
 }

@@ -38,7 +38,8 @@ unknown keys.
 | Field | Content |
 |---|---|
 | `schema`, `id`, `version`, `title` | `locumview-case/1`; the file name; a semantic version, raised on every change |
-| `kind` | `finding` (at least one expected finding), `negative-control` (none) or `ambiguous` (two or more `acceptable_answers`) |
+| `kind` | `finding` (at least one expected finding), `negative-control` (a `silent` question; since #217 it may also expect findings from other rules) or `ambiguous` (two or more `acceptable_answers`) |
+| `silent` | Negative controls only: the finding (module, type) that must not appear, and why |
 | `modules` | `stewardship`, `iv-to-po`, `ade` (ADE monitoring), `opioid` (opioid stewardship); a module listed with no finding for it must stay silent |
 | `provenance` | `source: synthetic` (required), author, created, and `clinical_review` (`pending` or `approved` with reviewer and date) |
 | `story` | The patient story as a clinician would tell it |

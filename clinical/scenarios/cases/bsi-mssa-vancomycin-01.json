@@ -1,25 +1,26 @@
 {
   "schema": "locumview-case/1",
   "id": "bsi-mssa-vancomycin-01",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "title": "MSSA bacteremia still on vancomycin after susceptibilities",
   "kind": "finding",
   "modules": [
     "stewardship",
-    "iv-to-po"
+    "iv-to-po",
+    "opioid"
   ],
   "provenance": {
     "source": "synthetic",
     "author": "Claude Code (draft for owner review), case list approved by the owner",
     "created": "2026-10-25",
     "clinical_review": {
-      "status": "approved",
-      "by": "owner",
-      "date": "2026-10-25",
-      "notes": "Owner clinical review: cases look good."
+      "status": "pending",
+      "by": null,
+      "date": null,
+      "notes": "Case library v2 Batch A (#217): findings added from another module; awaiting owner review."
     }
   },
-  "story": "A 63-year-old woman with a peripherally inserted central catheter for home antibiotics is admitted with fever. Blood cultures grow methicillin-susceptible Staphylococcus aureus, oxacillin susceptible, on day 2; she remains on the empiric vancomycin started at admission. The PICC has been removed.",
+  "story": "A 63-year-old woman with a peripherally inserted central catheter for home antibiotics is admitted with fever. Blood cultures grow methicillin-susceptible Staphylococcus aureus, oxacillin susceptible, on day 2; she remains on the empiric vancomycin started at admission. The PICC has been removed. She takes gabapentin 300 mg three times daily for diabetic polyneuropathy, continued on admission, and has oxycodone 5 mg as needed for pain at the PICC site, with senna at bedtime.",
   "patient": {
     "family": "Nakamura",
     "given": "Iris",
@@ -36,6 +37,11 @@
       "title": "Catheter-related bloodstream infection",
       "diagnosis": "ICD10:T80.211A",
       "begdate": "2026-10-22"
+    },
+    {
+      "title": "Type 2 diabetes mellitus with diabetic polyneuropathy",
+      "diagnosis": "ICD10:E11.42",
+      "begdate": "2019-05-14"
     }
   ],
   "prescriptions": [
@@ -44,6 +50,27 @@
       "rxnorm": "1807513",
       "route": "IV",
       "instructions": "Loading dose then 15 to 20 mg/kg IV every 8 to 12 hours, pharmacy to dose",
+      "start": "2026-10-22"
+    },
+    {
+      "drug": "oxycodone hydrochloride 5 MG Oral Tablet",
+      "rxnorm": "1049621",
+      "route": "PO",
+      "instructions": "5 mg by mouth every 4 hours as needed for pain",
+      "start": "2026-10-22"
+    },
+    {
+      "drug": "gabapentin 300 MG Oral Capsule",
+      "rxnorm": "310431",
+      "route": "PO",
+      "instructions": "300 mg by mouth three times daily (home medication continued)",
+      "start": "2026-10-22"
+    },
+    {
+      "drug": "sennosides, USP 8.6 MG Oral Tablet",
+      "rxnorm": "312935",
+      "route": "PO",
+      "instructions": "17.2 mg (2 tablets) by mouth at bedtime",
       "start": "2026-10-22"
     }
   ],
@@ -194,10 +221,16 @@
       "type": "de-escalation",
       "drug": "Vancomycin",
       "summary": "MSSA bacteremia on vancomycin: an anti-staphylococcal beta-lactam (cefazolin, nafcillin or oxacillin) is preferred once oxacillin susceptibility is known."
+    },
+    {
+      "module": "opioid",
+      "type": "opioid-gabapentinoid",
+      "drug": "Gabapentin",
+      "summary": "Gabapentin, continued from home for diabetic neuropathy, is active with oxycodone as needed: an opioid with a gabapentinoid."
     }
   ],
-  "reference_answer": "Change vancomycin to cefazolin 2 g IV every 8 hours (or nafcillin or oxacillin 2 g IV every 4 hours), adjusted for renal function. Repeat blood cultures to document clearance, obtain a transthoracic echocardiogram (transesophageal by endocarditis risk), and request infectious diseases consultation. No oral switch yet.",
-  "rationale": "Beta-lactams are more effective than vancomycin for MSSA bacteremia, and the switch also narrows therapy. The finding needs the organism, its oxacillin result and the current drug together. The IV to PO module should stay silent in early S. aureus bacteremia.",
+  "reference_answer": "Change vancomycin to cefazolin 2 g IV every 8 hours (or nafcillin or oxacillin 2 g IV every 4 hours), adjusted for renal function. Repeat blood cultures to document clearance, obtain a transthoracic echocardiogram (transesophageal by endocarditis risk), and request infectious diseases consultation. No oral switch yet. Opioid with a gabapentinoid: gabapentin is reasonable to continue for her neuropathy, so review the oxycodone (lowest dose, shortest course, non-opioid analgesia first) and monitor sedation and respiratory rate, especially in older or renally impaired patients.",
+  "rationale": "Beta-lactams are more effective than vancomycin for MSSA bacteremia, and the switch also narrows therapy. The finding needs the organism, its oxacillin result and the current drug together. The IV to PO module should stay silent in early S. aureus bacteremia. Case library v2 (#217): adds the opioid with a gabapentinoid finding beside the MSSA de-escalation; senna keeps the bowel regimen rule silent.",
   "citations": [
     {
       "ref": "idsa-crbsi-2009",
@@ -214,6 +247,18 @@
     {
       "ref": "idsa-shea-asp-2016",
       "supports": "Prospective audit and feedback of antibiotic therapy as a stewardship intervention."
+    },
+    {
+      "ref": "fda-gabapentin-label",
+      "supports": "5.8 Respiratory depression: gabapentin with opioids or other CNS depressants; owner approved the rule's use of the label 2026-11-16 (#200)."
+    },
+    {
+      "ref": "fda-oxycodone-label",
+      "supports": "Boxed warning and 5.3: opioids with benzodiazepines or other CNS depressants, including gabapentinoids; the oxycodone label stands for the opioid class in this rule (#200)."
+    },
+    {
+      "ref": "fda-pregabalin-label",
+      "supports": "5.4 Respiratory depression: pregabalin with opioids; the rule cites both gabapentinoid labels for the class (#200)."
     }
   ]
 }

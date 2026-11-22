@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "opioid-docusate-only-01",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "title": "Hydromorphone for a vertebral fracture with docusate alone: no bowel regimen",
   "kind": "finding",
   "modules": [
@@ -12,13 +12,13 @@
     "author": "Claude Code (draft for owner review)",
     "created": "2026-11-16",
     "clinical_review": {
-      "status": "approved",
-      "by": "owner",
-      "date": "2026-11-16",
-      "notes": "Owner approved 2026-11-16 (#202) the O3 review points of #201 as presented: the case and reference answer, the reviewed reason. The basis is SHM consensus statement 10 as quoted in #201, read by Claude Code in PubMed Central; the owner did not report reading the statement."
+      "status": "pending",
+      "by": null,
+      "date": null,
+      "notes": "Case library v2 Batch A (#217): findings added from another module; awaiting owner review."
     }
   },
-  "story": "A 78-year-old woman with osteoporosis is admitted for pain control after an osteoporotic compression fracture of T12. She has hydromorphone 2 mg by mouth every 4 hours as needed and scheduled acetaminophen. The admission order set added docusate 100 mg twice daily. She has had no bowel movement in two days, has no diarrhea, and her mobility is limited by pain.",
+  "story": "A 78-year-old woman with osteoporosis is admitted for pain control after an osteoporotic compression fracture of T12. She has hydromorphone 2 mg by mouth every 4 hours as needed and scheduled acetaminophen. The admission order set added docusate 100 mg twice daily. She has had no bowel movement in two days, has no diarrhea, and her mobility is limited by pain. On day 2 gabapentin 300 mg three times daily was added for radicular pain from the fracture.",
   "patient": {
     "family": "Sato",
     "given": "Mira",
@@ -40,6 +40,11 @@
       "title": "Type 2 diabetes mellitus without complications",
       "diagnosis": "ICD10:E11.9",
       "begdate": "2014-06-20"
+    },
+    {
+      "title": "Radiculopathy, thoracic region",
+      "diagnosis": "ICD10:M54.14",
+      "begdate": "2026-11-13"
     }
   ],
   "allergies": [],
@@ -64,6 +69,13 @@
       "start": "2026-11-13",
       "route": "PO",
       "instructions": "100 mg by mouth twice daily (admission order set)"
+    },
+    {
+      "drug": "gabapentin 300 MG Oral Capsule",
+      "rxnorm": "310431",
+      "route": "PO",
+      "instructions": "300 mg by mouth three times daily for radicular pain",
+      "start": "2026-11-14"
     }
   ],
   "vitals": [
@@ -110,14 +122,32 @@
       "type": "missing-bowel-regimen",
       "drug": "Hydromorphone",
       "summary": "No stimulant or osmotic laxative is ordered with hydromorphone; docusate alone, a stool softener, is not a bowel regimen."
+    },
+    {
+      "module": "opioid",
+      "type": "opioid-gabapentinoid",
+      "drug": "Gabapentin",
+      "summary": "Gabapentin 300 mg three times daily was added for radicular pain while hydromorphone as needed is active: an opioid with a gabapentinoid in a 78-year-old."
     }
   ],
-  "reference_answer": "Add a stimulant laxative, for example senna 8.6 mg, two tablets at bedtime, with polyethylene glycol 17 g daily if she has no bowel movement; the docusate can stop. Track bowel movements and adjust.",
-  "rationale": "SHM's consensus statement 10 recommends a bowel regimen for hospitalized patients receiving opioids unless contraindicated (no diarrhea here), names stimulant and osmotic laxatives, and does not recommend stool softeners. The rule needs an active opioid order and no active stimulant or osmotic laxative order; docusate does not count.",
+  "reference_answer": "Add a stimulant laxative, for example senna 8.6 mg, two tablets at bedtime, with polyethylene glycol 17 g daily if she has no bowel movement; the docusate can stop. Track bowel movements and adjust. Opioid with a gabapentinoid in an older patient: start gabapentin low (100 to 300 mg at bedtime) and titrate, adjusted for kidney function, and monitor sedation and respiration; also the bowel regimen above.",
+  "rationale": "SHM's consensus statement 10 recommends a bowel regimen for hospitalized patients receiving opioids unless contraindicated (no diarrhea here), names stimulant and osmotic laxatives, and does not recommend stool softeners. The rule needs an active opioid order and no active stimulant or osmotic laxative order; docusate does not count. Case library v2 (#217): adds the opioid with a gabapentinoid finding; renal dosing of the gabapentin follows in Batch C with her creatinine.",
   "citations": [
     {
       "ref": "shm-opioid-2018",
       "supports": "Consensus statement 10: a bowel regimen for hospitalized patients receiving opioids; stimulant or osmotic laxatives; stool softeners not recommended. Read in the PubMed Central full text by Claude Code; owner approved 2026-11-16 (#202)."
+    },
+    {
+      "ref": "fda-gabapentin-label",
+      "supports": "5.8 Respiratory depression: gabapentin with opioids or other CNS depressants, higher risk in the elderly; owner approved the rule's use of the label 2026-11-16 (#200)."
+    },
+    {
+      "ref": "fda-oxycodone-label",
+      "supports": "Boxed warning and 5.3: opioids with benzodiazepines or other CNS depressants, including gabapentinoids; the oxycodone label stands for the opioid class in this rule (#200)."
+    },
+    {
+      "ref": "fda-pregabalin-label",
+      "supports": "5.4 Respiratory depression: pregabalin with opioids; the rule cites both gabapentinoid labels for the class (#200)."
     }
   ]
 }
