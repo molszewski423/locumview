@@ -3740,3 +3740,19 @@ Agent: Claude Code
 - **Status:** Planned; the owner reviews the rows. Nothing built.
 
 Agent: Claude Code
+
+## 214. Every scenario patient has a surname of their own (2026-11-21)
+
+- **Owner request (2026-11-21):** "the last name casebook is redundant, give all the patients unique names". Step 1 of
+  `docs/plans/case-library-v2.md` (#213).
+- **Changed:** the 32 cases' family name, from Casebook to the surnames in the plan's table (each fitting the
+  patient's recorded race and ethnicity; none shared, none the same as a Synthea patient's), in the case files, their
+  emergency contacts in `charts.json`, and the recorded FHIR fixtures. Each case's version goes up by a patch number;
+  its clinical review status is unchanged, since nothing clinical changed. Photos are keyed by patient number and stay.
+- **Loader:** for a case already loaded, the name is now brought up to date from the case file (as it already was for
+  Synthea's numbered names), so the next `load-scenarios.sh` renames the patients on the cluster.
+- **Checked:** no "Casebook" left outside the changelog; 102 agent tests pass; the case checker passes.
+- **Deploy (owner, after merge):** `scripts/clinical/load-scenarios.sh`, then save a new baseline straight away (the
+  nightly reset would otherwise restore the old names).
+
+Agent: Claude Code

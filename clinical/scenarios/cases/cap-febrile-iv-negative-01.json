@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "cap-febrile-iv-negative-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Community-acquired pneumonia on IV levofloxacin, day 2, still febrile and tachycardic",
   "kind": "negative-control",
   "modules": [
@@ -21,7 +21,7 @@
   },
   "story": "A 63-year-old woman with community-acquired pneumonia is on IV levofloxacin 750 mg daily, hospital day 2: temperature 101.2 F, heart rate 108, oxygen saturation 92% on 2 L. She is not in the ICU and has no MRSA or Pseudomonas risk factors.",
   "patient": {
-    "family": "Casebook",
+    "family": "Gallagher",
     "given": "Una",
     "birth_date": "1963-05-27",
     "sex": "female"

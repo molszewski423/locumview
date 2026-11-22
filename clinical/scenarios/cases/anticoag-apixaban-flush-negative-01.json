@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "anticoag-apixaban-flush-negative-01",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "title": "Apixaban with a heparin lock flush for a port: not a duplicate",
   "kind": "negative-control",
   "modules": [
@@ -20,7 +20,7 @@
   },
   "story": "A 68-year-old man with sigmoid colon cancer on chemotherapy through an implanted port, and on apixaban 5 mg twice daily for a left femoral vein thrombosis diagnosed in September, is admitted with dehydration after poor oral intake. Apixaban is continued. Nursing flushes the port with heparin 100 units/mL, 3 mL (300 units), after each access, per the port protocol. Weight 80 kg, creatinine 0.9 mg/dL.",
   "patient": {
-    "family": "Casebook",
+    "family": "Holloway",
     "given": "Quinn",
     "birth_date": "1958-07-22",
     "sex": "male"

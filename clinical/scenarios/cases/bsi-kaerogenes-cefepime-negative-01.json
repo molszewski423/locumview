@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "bsi-kaerogenes-cefepime-negative-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Klebsiella aerogenes bacteremia on cefepime at a susceptible dose-dependent MIC",
   "kind": "negative-control",
   "modules": [
@@ -21,7 +21,7 @@
   },
   "story": "A 71-year-old man with Klebsiella aerogenes bacteremia from a urinary source is on IV cefepime 2 g every 8 hours, hospital day 3, and still febrile; repeat blood cultures have been drawn and a renal ultrasound for obstruction or abscess is ordered. The isolate's cefepime MIC is 4 (susceptible dose-dependent); no ESBL or ESBL gene was identified.",
   "patient": {
-    "family": "Casebook",
+    "family": "Whitfield",
     "given": "Abe",
     "birth_date": "1955-01-30",
     "sex": "male"

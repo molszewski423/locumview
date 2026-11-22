@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "anticoag-apixaban-heparin-duplicate-01",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "title": "Apixaban continued and heparin prophylaxis added: two anticoagulants",
   "kind": "finding",
   "modules": [
@@ -20,7 +20,7 @@
   },
   "story": "A 74-year-old woman with permanent atrial fibrillation on apixaban 5 mg twice daily is admitted with an exacerbation of heart failure. Her home apixaban is continued, and the admission order set also adds heparin 5,000 units subcutaneously every 8 hours for VTE prophylaxis. Both are active the next morning. Weight 72 kg, creatinine 1.0 mg/dL, platelets and hemoglobin stable.",
   "patient": {
-    "family": "Casebook",
+    "family": "Lindqvist",
     "given": "Thea",
     "birth_date": "1952-03-09",
     "sex": "female"

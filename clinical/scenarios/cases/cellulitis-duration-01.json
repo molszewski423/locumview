@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "cellulitis-duration-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Uncomplicated cellulitis on day 12 of antibiotics after clinical resolution",
   "kind": "finding",
   "modules": [
@@ -21,7 +21,7 @@
   },
   "story": "A 47-year-old woman admitted with nonpurulent cellulitis of the lower leg received IV cefazolin for 2 days, then oral cephalexin. On day 12 of antibiotics the erythema and warmth have resolved and she is afebrile; cephalexin has no stop date.",
   "patient": {
-    "family": "Casebook",
+    "family": "Chen",
     "given": "Lia",
     "birth_date": "1979-03-08",
     "sex": "female"

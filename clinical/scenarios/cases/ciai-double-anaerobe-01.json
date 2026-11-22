@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "ciai-double-anaerobe-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Complicated intra-abdominal infection on piperacillin-tazobactam plus metronidazole",
   "kind": "finding",
   "modules": [
@@ -20,7 +20,7 @@
   },
   "story": "A 41-year-old man has a laparoscopic appendectomy for perforated appendicitis with localized peritonitis. He is started on piperacillin-tazobactam and metronidazole. Source control is adequate and he is improving on postoperative day 1.",
   "patient": {
-    "family": "Casebook",
+    "family": "Ellison",
     "given": "Jon",
     "birth_date": "1985-09-19",
     "sex": "male"

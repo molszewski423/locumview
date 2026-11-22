@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "meningitis-alcohol-negative-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Suspected bacterial meningitis at 48 with alcohol use disorder, on vancomycin and ceftriaxone without ampicillin",
   "kind": "ambiguous",
   "modules": [
@@ -20,7 +20,7 @@
   },
   "story": "A 48-year-old man with alcohol use disorder presents with fever, headache and neck stiffness; CSF shows a neutrophilic pleocytosis with low glucose. Empiric vancomycin, ceftriaxone and dexamethasone are started; cultures are pending. Ampicillin is not ordered; he is not immunocompromised and has no cirrhosis.",
   "patient": {
-    "family": "Casebook",
+    "family": "Kowalski",
     "given": "Ned",
     "birth_date": "1978-05-21",
     "sex": "male"

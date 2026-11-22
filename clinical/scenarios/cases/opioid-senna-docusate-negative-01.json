@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "opioid-senna-docusate-negative-01",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "title": "Oxycodone for a ureteral stone with senna-docusate: a bowel regimen is ordered",
   "kind": "negative-control",
   "modules": [
@@ -20,7 +20,7 @@
   },
   "story": "A 57-year-old man is admitted with a 7 mm left ureteral stone and pain not controlled in the emergency department. He has oxycodone 5 mg by mouth every 4 hours as needed, scheduled acetaminophen, and tamsulosin, and his admission orders include senna-docusate (sennosides 8.6 mg with docusate 50 mg) two tablets at bedtime.",
   "patient": {
-    "family": "Casebook",
+    "family": "Ibarra",
     "given": "Cyrus",
     "birth_date": "1969-01-27",
     "sex": "male"

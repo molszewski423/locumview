@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "pyelo-kaerogenes-ivpo-01",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "title": "Klebsiella aerogenes pyelonephritis, stable on ceftriaxone, ciprofloxacin the only oral option",
   "kind": "finding",
   "modules": [
@@ -21,7 +21,7 @@
   },
   "story": "A 44-year-old woman with acute pyelonephritis is on IV ceftriaxone, hospital day 3. She has been afebrile for 36 hours, is eating, and her vital signs are normal. The urine grows Klebsiella aerogenes; blood cultures have no growth.",
   "patient": {
-    "family": "Casebook",
+    "family": "Kim",
     "given": "Pia",
     "birth_date": "1982-06-21",
     "sex": "female"

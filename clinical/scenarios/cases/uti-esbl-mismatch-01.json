@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "uti-esbl-mismatch-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Pyelonephritis on ceftriaxone; urine E. coli resistant to ceftriaxone",
   "kind": "finding",
   "modules": [
@@ -21,7 +21,7 @@
   },
   "story": "A 68-year-old woman admitted with acute pyelonephritis is started on IV ceftriaxone. On hospital day 3 she is still febrile, and the urine culture grows E. coli resistant to ceftriaxone, cefepime susceptible-dose dependent, resistant to trimethoprim-sulfamethoxazole and ciprofloxacin, and susceptible to the carbapenems: an ESBL-like pattern.",
   "patient": {
-    "family": "Casebook",
+    "family": "Wong",
     "given": "Ada",
     "birth_date": "1958-03-14",
     "sex": "female"

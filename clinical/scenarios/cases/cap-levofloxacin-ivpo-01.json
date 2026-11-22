@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "cap-levofloxacin-ivpo-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Community-acquired pneumonia improving on IV levofloxacin",
   "kind": "finding",
   "modules": [
@@ -21,7 +21,7 @@
   },
   "story": "A 59-year-old man admitted with community-acquired pneumonia is on IV levofloxacin 750 mg daily, hospital day 3. He has been afebrile for 48 hours, eats normally, and his heart rate, respiratory rate and oxygen saturation on room air are normal.",
   "patient": {
-    "family": "Casebook",
+    "family": "Tran",
     "given": "Kit",
     "birth_date": "1967-12-02",
     "sex": "male"

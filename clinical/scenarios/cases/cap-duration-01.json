@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "cap-duration-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Nonsevere community-acquired pneumonia, stable, day 6 of oral levofloxacin without a stop date",
   "kind": "finding",
   "modules": [
@@ -21,7 +21,7 @@
   },
   "story": "A 54-year-old woman is admitted to a medical ward (not the ICU) with nonsevere community-acquired pneumonia and treated with oral levofloxacin 750 mg daily from admission. She was clinically stable by hospital day 3: afebrile, normal heart rate, respiratory rate, blood pressure and oxygen saturation, eating, and mentally normal. Blood and sputum cultures grew no S. aureus or Pseudomonas, and imaging shows no empyema. On day 6 levofloxacin is still active with no stop date.",
   "patient": {
-    "family": "Casebook",
+    "family": "Morales",
     "given": "Nell",
     "birth_date": "1972-04-17",
     "sex": "female"
