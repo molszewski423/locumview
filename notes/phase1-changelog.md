@@ -3638,3 +3638,36 @@ Agent: Claude Code
   build (M6 exit). The `login.locumview.com` allowlist removal reaches desktops with the next promoted image.
 
 Agent: Claude Code
+
+## 209. The frozen evaluation build: plan (2026-11-21)
+
+- **What:** `docs/plans/evaluation-build.md`, the plan for M6's exit: what a build pins (commit, the three images by
+  digest, knowledge base, citations, model and options, prompt, every case with its version and review status, the
+  FHIR fixtures, the export), an identifier `eval-<date>-<n>` plus the manifest's sha256, a `freeze.py` that runs the
+  pinned agent image itself on the recorded read-backs and stores each explanation once, and an export in two parts:
+  `review/` for reviewers (no case kind, expected findings or reference answer) and `key/` for the owner's analysis.
+- **Owner decisions asked:** scope of the first build (all 32 cases recommended), what reviewers see, explanations
+  frozen as text, and a git tag pushed by the owner.
+- **Status:** Planned; nothing built. The live demo is unchanged.
+
+Agent: Claude Code
+
+## 210. The open EHR window grouped under the EHR launcher in the dock (prepared; next image) (2026-11-21)
+
+- **Reported (owner, demo desktop):** the open OpenEMR window appeared in the dock as a second app with a generic gear
+  icon, not under the pinned EHR launcher, and its running-window dot sat on that icon.
+- **Found:** the launcher's desktop file says `StartupWMClass=locumview-ehr` and starts Chrome with
+  `--class=locumview-ehr`, but under Wayland Chrome ignores `--class` for an `--app` window and names it
+  `chrome-<host>__-<profile>` (here `chrome-emr.corp.locumview.com__-Default`). GNOME found no desktop file with that
+  name, so it showed an unknown app with the fallback icon. (Matches reports such as
+  https://forum.manjaro.org/t/web-apps-no-longer-have-an-icon/104534; not yet observed on our desktop.)
+- **Changed (`image/desktop/Containerfile`, step 3d):** the reference launcher copy now also sets
+  `StartupWMClass=chrome-emr.corp.locumview.com__-Default`, checked at build time. The generic package's launcher
+  (EHR on a local page) is unchanged.
+- **Dots:** the gear is a fallback icon that fills its whole square, so the dot drew over it; the other apps' icons
+  leave room below. Once the window is grouped under the EHR logo, its dot should sit below like the others. To check
+  on lv-test17 with the next image; if a dot still overlaps, the dock spacing is the next change.
+- **Verify on the next image (lv-test17, before promotion):** open the EHR: one dock item (the EHR logo) with a dot
+  below it, no gear.
+
+Agent: Claude Code
