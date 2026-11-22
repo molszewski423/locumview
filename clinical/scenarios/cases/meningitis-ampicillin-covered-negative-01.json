@@ -14,10 +14,10 @@
     "author": "Claude Code (draft for owner review)",
     "created": "2026-11-12",
     "clinical_review": {
-      "status": "pending",
-      "by": null,
-      "date": null,
-      "notes": "Case library v2 Batch A (#217): findings added from another module; awaiting owner review."
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-22",
+      "notes": "Owner approved Batch A as presented (\"yeah they look fine\", #218); the owner did not report reading the sources."
     }
   },
   "story": "A 72-year-old woman, not immunocompromised, presents with fever, headache and neck stiffness; CSF shows a neutrophilic pleocytosis with low glucose. Empiric vancomycin, ceftriaxone 2 g every 12 hours, ampicillin 2 g every 4 hours and dexamethasone (with or before the first antibiotic dose) are started; cultures are pending. She has hydromorphone 0.5 mg IV as needed for headache; no laxative is ordered.",

@@ -13,10 +13,10 @@
     "author": "Claude Code (draft for owner review), Listeria risk-factor rule (owner decision 2026-11-12)",
     "created": "2026-11-12",
     "clinical_review": {
-      "status": "pending",
-      "by": null,
-      "date": null,
-      "notes": "Case library v2 Batch A (#217): findings added from another module; awaiting owner review."
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-22",
+      "notes": "Owner approved Batch A as presented (\"yeah they look fine\", #218); the owner did not report reading the sources."
     }
   },
   "story": "A 40-year-old woman who received a kidney transplant three years ago, on tacrolimus and mycophenolate, presents with fever, severe headache, neck stiffness and new confusion. Lumbar puncture shows a neutrophilic pleocytosis with low glucose and high protein. Empiric vancomycin, ceftriaxone 2 g every 12 hours and dexamethasone are started; CSF and blood cultures are pending. Ampicillin is not ordered. She takes pregabalin 75 mg twice daily for neuropathy, continued on admission, and has hydromorphone 0.5 mg IV as needed for headache, with senna.",

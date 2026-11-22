@@ -3826,3 +3826,15 @@ Agent: Claude Code
   and problems to the loaded patients; then a baseline save.
 
 Agent: Claude Code
+
+## 218. Batch A approved (2026-11-22)
+
+- **Owner decision (2026-11-22):** "yeah they look fine" for the eleven Batch A cases in #217 as presented; recorded as
+  approved by the owner on 2026-11-22. The owner did not report reading the sources (the Lovenox and Xarelto labels
+  were read by Claude Code; their `citations.json` notes keep "owner review pending" until the owner says otherwise).
+- **Fern Whitcombe** (`cystitis-enterobacter-negative-01`) was pending from #212 as well; her approval here covers the
+  case as it now stands, AmpC finding included, since the Batch A table showed it.
+- **Still pending from #212:** `pyelo-enterobacter-ambiguous-01` (Mae Robinson) and `pyelo-kaerogenes-ivpo-01` (Pia
+  Kim), the AmpC finding for pyelonephritis.
+
+Agent: Claude Code

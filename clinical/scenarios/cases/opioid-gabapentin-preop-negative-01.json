@@ -13,10 +13,10 @@
     "author": "Claude Code (draft for owner review)",
     "created": "2026-11-16",
     "clinical_review": {
-      "status": "pending",
-      "by": null,
-      "date": null,
-      "notes": "Case library v2 Batch A (#217): findings added from another module; awaiting owner review."
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-22",
+      "notes": "Owner approved Batch A as presented (\"yeah they look fine\", #218); the owner did not report reading the sources."
     }
   },
   "story": "A 70-year-old man has an elective right total knee arthroplasty. As part of the enhanced recovery pathway he receives one dose of gabapentin 300 mg on the evening before surgery, with no further gabapentin ordered. After surgery he has oxycodone 5 mg by mouth every 4 hours as needed and scheduled acetaminophen. On the first postoperative morning only the oxycodone and acetaminophen are active. After surgery both enoxaparin 40 mg daily and rivaroxaban 10 mg daily were ordered for VTE prophylaxis, one from the surgeon's order set and one from the hospitalist's.",

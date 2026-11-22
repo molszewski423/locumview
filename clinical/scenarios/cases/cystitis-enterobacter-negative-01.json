@@ -14,10 +14,10 @@
     "author": "Claude Code (draft for owner review), case list approved by the owner",
     "created": "2026-10-25",
     "clinical_review": {
-      "status": "pending",
-      "by": null,
-      "date": null,
-      "notes": "Case library v2 Batch A (#217): findings added from another module; awaiting owner review."
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-22",
+      "notes": "Owner approved Batch A as presented (\"yeah they look fine\", #218); the owner did not report reading the sources."
     }
   },
   "story": "A 74-year-old woman on postoperative day 2 after hip fracture repair develops dysuria and frequency without fever, flank pain or bacteremia; she has no indwelling urinary catheter. She has an ileus and takes nothing by mouth. Urine grows Enterobacter cloacae complex, resistant to the usual oral agents; she is on IV ceftriaxone. After surgery the orthopedic team started enoxaparin 40 mg daily; when she transferred to medicine on day 2, the admission order set added heparin 5,000 units every 8 hours.",

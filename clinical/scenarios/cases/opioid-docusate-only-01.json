@@ -12,10 +12,10 @@
     "author": "Claude Code (draft for owner review)",
     "created": "2026-11-16",
     "clinical_review": {
-      "status": "pending",
-      "by": null,
-      "date": null,
-      "notes": "Case library v2 Batch A (#217): findings added from another module; awaiting owner review."
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-22",
+      "notes": "Owner approved Batch A as presented (\"yeah they look fine\", #218); the owner did not report reading the sources."
     }
   },
   "story": "A 78-year-old woman with osteoporosis is admitted for pain control after an osteoporotic compression fracture of T12. She has hydromorphone 2 mg by mouth every 4 hours as needed and scheduled acetaminophen. The admission order set added docusate 100 mg twice daily. She has had no bowel movement in two days, has no diarrhea, and her mobility is limited by pain. On day 2 gabapentin 300 mg three times daily was added for radicular pain from the fracture.",

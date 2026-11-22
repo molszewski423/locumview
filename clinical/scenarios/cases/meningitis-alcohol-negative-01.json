@@ -13,10 +13,10 @@
     "author": "Claude Code (draft for owner review), converted from an ambiguous case on the owner's correction",
     "created": "2026-10-25",
     "clinical_review": {
-      "status": "pending",
-      "by": null,
-      "date": null,
-      "notes": "Case library v2 Batch A (#217): findings added from another module; awaiting owner review."
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-22",
+      "notes": "Owner approved Batch A as presented (\"yeah they look fine\", #218); the owner did not report reading the sources."
     }
   },
   "story": "A 48-year-old man with alcohol use disorder presents with fever, headache and neck stiffness; CSF shows a neutrophilic pleocytosis with low glucose. Empiric vancomycin, ceftriaxone and dexamethasone are started; cultures are pending. Ampicillin is not ordered; he is not immunocompromised and has no cirrhosis. He is withdrawing from alcohol and has lorazepam IV by CIWA-Ar score, and hydromorphone 0.5 mg IV as needed for headache, with senna.",

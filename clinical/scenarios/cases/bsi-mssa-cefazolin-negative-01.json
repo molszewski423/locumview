@@ -14,10 +14,10 @@
     "author": "Claude Code (draft for owner review), case list approved by the owner",
     "created": "2026-10-25",
     "clinical_review": {
-      "status": "pending",
-      "by": null,
-      "date": null,
-      "notes": "Case library v2 Batch A (#217): findings added from another module; awaiting owner review."
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-22",
+      "notes": "Owner approved Batch A as presented (\"yeah they look fine\", #218); the owner did not report reading the sources."
     }
   },
   "story": "A 58-year-old man receiving home parenteral nutrition through a tunneled catheter is admitted with fever and rigors. Blood cultures grow methicillin-susceptible Staphylococcus aureus; empiric vancomycin was changed to cefazolin 2 g IV every 8 hours on day 2 and the catheter removed. On day 3 he is still febrile; repeat blood cultures are pending. For pain at the old catheter site he has hydromorphone 0.5 mg IV as needed; on day 2 lorazepam 0.5 mg IV as needed was added for anxiety. His short bowel gives him high-output diarrhea.",

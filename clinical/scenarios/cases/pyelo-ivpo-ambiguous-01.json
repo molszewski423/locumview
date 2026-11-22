@@ -14,10 +14,10 @@
     "author": "Claude Code (draft for owner review)",
     "created": "2026-10-25",
     "clinical_review": {
-      "status": "pending",
-      "by": null,
-      "date": null,
-      "notes": "Case library v2 Batch A (#217): findings added from another module; awaiting owner review."
+      "status": "approved",
+      "by": "owner",
+      "date": "2026-11-22",
+      "notes": "Owner approved Batch A as presented (\"yeah they look fine\", #218); the owner did not report reading the sources."
     }
   },
   "story": "A 52-year-old woman with acute pyelonephritis is on IV ceftriaxone, hospital day 3. She has been afebrile for 36 hours, is eating and drinking, and her vital signs are normal. The urine E. coli is susceptible to ceftriaxone and to cefazolin at the urinary surrogate breakpoint, but resistant to trimethoprim-sulfamethoxazole and ciprofloxacin. She has oxycodone 5 mg as needed for flank pain; no laxative is ordered.",
