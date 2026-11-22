@@ -1,6 +1,6 @@
 {
   "_note": "Knowledge base for the Phase 9 lite rules (plan M4). Versioned with the rules: raise version on every change. Every rule names the references in clinical/scenarios/citations.json it rests on. Codes: RxNorm (prescribed products), LOINC (susceptibility results), SNOMED CT (organisms, specimens), ICD-10-CM (problems). Group inducible-ampc holds IDSA 2026's moderate-risk AmpC organisms (Enterobacter cloacae complex, Klebsiella aerogenes, Citrobacter freundii, Hafnia alvei) by SNOMED CT code; 62592009 is one concept that also carries the former name Enterobacter aerogenes. IDSA's low-risk Serratia, Morganella and Providencia are deliberately not in it.",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "agents": {
     "amoxicillin": {"display": "Amoxicillin"},
     "ampicillin": {"display": "Ampicillin", "covers_listeria": true},
@@ -130,7 +130,8 @@
     "bacterial-meningitis": {"icd10_prefixes": ["G00"]},
     "cellulitis": {"icd10_prefixes": ["L03"], "recommended_days": 5, "review_after_days": 7, "refs": ["idsa-ssti-2014"]},
     "community-acquired-pneumonia": {"icd10_prefixes": ["J18"], "review_after_days": 4, "duration_text": "ATS 2025 suggests fewer than 5 days (at least 3) once clinically stable in nonsevere pneumonia, and 5 days or more in severe pneumonia", "refs": ["ats-idsa-cap-2019"], "duration_refs": ["ats-cap-2025"]},
-    "pyelonephritis": {"icd10_prefixes": ["N10"], "refs": ["idsa-cuti-2025-ivpo"], "complicated_uti": true}
+    "cystitis": {"display": "cystitis", "icd10_prefixes": ["N30"]},
+    "pyelonephritis": {"display": "pyelonephritis", "icd10_prefixes": ["N10"], "refs": ["idsa-cuti-2025-ivpo"], "complicated_uti": true}
   },
   "listeria_risk_factors": {
     "_comment": "Chart problems that call for empiric Listeria coverage in suspected bacterial meningitis at any adult age (owner decision 2026-11-12): the groups ESCMID 2016 names (immunosuppressive drugs, diabetes, cancer, other immunocompromising conditions). WHO-only factors (pregnancy, end-stage kidney disease, cirrhosis, alcohol use disorder) are not triggers; who marks the groups WHO 2025 also lists.",

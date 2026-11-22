@@ -64,40 +64,71 @@ def bug_drug_mismatch(s: Snapshot, kb: Knowledge) -> list[Finding]:
 
 
 def ampc_third_generation_cephalosporin(s: Snapshot, kb: Knowledge) -> list[Finding]:
-    """A third-generation cephalosporin for bacteremia with an organism at moderate risk of inducible AmpC.
+    """A third-generation cephalosporin for an organism at moderate risk of inducible AmpC, at any site.
 
-    IDSA 2026: generally avoided even when susceptible; completing an empirically started course may be reasonable in
-    a non-severe infection with clinical improvement and source control. The guidance does not define non-severe, so
-    the finding states the condition and leaves that judgment to the pharmacist (owner decision, 2026-11-12)."""
+    IDSA 2026 (Question 2.4) suggests generally avoiding third-generation cephalosporins for these organisms even when
+    susceptible, and does not suggest them for invasive infections; completing an empirically started course may be
+    reasonable in a non-severe infection with clinical improvement and source control. The guidance does not define
+    non-severe, so the finding states the condition and leaves that judgment to the pharmacist (owner decision,
+    2026-11-12). Bacteremia only until #212; since then also pyelonephritis or another complicated UTI, and cystitis
+    (owner decision, 2026-11-21, from an OpenEvidence answer on the cystitis case), each with its own alternatives."""
+    conditions = {name for problem in s.problems for name in kb.condition_of(problem.icd10)}
+    upper_tract = next((n for n in conditions if kb.conditions[n].get("complicated_uti")), None)
+    order = {"blood": 0, "urine": 1}
+    isolates = sorted((c for c in s.final_isolates()
+                       if c.specimen in order and kb.organism_in(c.organism_code, "inducible-ampc")),
+                      key=lambda c: order[c.specimen])
     out = []
     for p in s.active_antimicrobials():
-        if not kb.has(p.agent, "third_generation_cephalosporin"):
+        if not kb.has(p.agent, "third_generation_cephalosporin") or not isolates:
             continue
         drug = kb.display(p.agent).lower()
-        for c in s.final_isolates():
-            if c.specimen == "blood" and kb.organism_in(c.organism_code, "inducible-ampc"):
-                evidence = [f"Blood culture collected {c.collected:%Y-%m-%d %H:%M}: {c.organism}",
-                            f"Active: {p.text}, started {p.start}"]
-                # Same fever threshold and window as the IV to PO rule; "yet": the exception can apply once the
-                # fever resolves (owner decision, 2026-11-12).
-                if _recent_fever(s, kb):
-                    exception = ("The exception for completing an empirically started course (non-severe "
-                                 "infection, clinical improvement, source control) does not apply yet: fever in "
-                                 "the last 24 hours.")
-                    evidence.append(f"Temperature of {kb.thresholds['fever_f']} F or more in the last "
-                                    f"{kb.thresholds['afebrile_hours']} hours")
-                    variant = "febrile"
-                else:
-                    exception = ("If it was started empirically, completing the course may be reasonable only if "
-                                 "the infection is non-severe, the patient is improving and the source is "
-                                 "controlled.")
-                    variant = ""
-                out.append(_finding(kb, "ampc-third-generation-cephalosporin", "suboptimal-agent", p.agent,
-                                    f"{c.organism} bacteremia on {drug}: the organism has a moderate risk of "
-                                    f"inducible AmpC, so {drug} is generally avoided even when susceptible. "
-                                    f"{exception} Cefepime is the usual alternative.",
-                                    evidence, variant=variant))
-                break
+        c = isolates[0]   # blood first: the bloodstream infection decides the advice
+        kind = "Blood" if c.specimen == "blood" else "Urine"
+        evidence = [f"{kind} culture collected {c.collected:%Y-%m-%d %H:%M}: {c.organism}",
+                    f"Active: {p.text}, started {p.start}"]
+        # Same fever threshold and window as the IV to PO rule; "yet": the exception can apply once the fever resolves
+        # (owner decision, 2026-11-12).
+        if _recent_fever(s, kb):
+            exception = ("The exception for completing an empirically started course (non-severe infection, clinical "
+                         "improvement, source control) does not apply yet: fever in the last 24 hours.")
+            evidence.append(f"Temperature of {kb.thresholds['fever_f']} F or more in the last "
+                            f"{kb.thresholds['afebrile_hours']} hours")
+            variant = "febrile"
+        else:
+            exception = ("If it was started empirically, completing the course may be reasonable only if the infection "
+                         "is non-severe, the patient is improving and the source is controlled.")
+            variant = ""
+        risk = (f"the organism has a moderate risk of inducible AmpC, so {drug} is generally avoided even when "
+                "susceptible.")
+        if c.specimen == "blood":
+            summary = f"{c.organism} bacteremia on {drug}: {risk} {exception} Cefepime is the usual alternative."
+        elif upper_tract:
+            site = kb.display_condition(upper_tract)
+            evidence.append(f"Problem list: {site}")
+            summary = (f"{c.organism} {site} on {drug}: {risk} {exception} Cefepime, adjusted for renal function, is "
+                       "the usual IV alternative; a susceptible oral agent is another when the patient is ready.")
+        else:
+            # IDSA 2026 (Question 2.7): nitrofurantoin or TMP-SMX preferred for AmpC cystitis; a single-dose
+            # aminoglycoside among the alternatives. Which of the preferred agents this isolate allows comes from its
+            # susceptibilities.
+            tested = {x.agent: x.interpretation for x in c.susceptibilities}
+            if "cystitis" in conditions:
+                evidence.append("Problem list: cystitis")
+            preferred = [a for a in ("nitrofurantoin", "trimethoprim-sulfamethoxazole") if tested.get(a) == "S"]
+            if preferred:
+                which = " and ".join(kb.display(a).lower() for a in preferred) + " test susceptible"
+            elif all(a in tested for a in ("nitrofurantoin", "trimethoprim-sulfamethoxazole")):
+                which = "neither is active on this isolate"
+            else:
+                which = "where susceptible"
+            site = "cystitis" if "cystitis" in conditions else "urine (no upper tract source charted)"
+            summary = (f"{c.organism} {site} on {drug}: {risk} "
+                       f"{exception} For cystitis the preferred agents are nitrofurantoin or "
+                       f"trimethoprim-sulfamethoxazole ({which}); alternatives include a single dose of an "
+                       "aminoglycoside or cefepime, adjusted for renal function.")
+        out.append(_finding(kb, "ampc-third-generation-cephalosporin", "suboptimal-agent", p.agent, summary,
+                            evidence, variant=variant))
     return out
 
 
@@ -277,7 +308,6 @@ def iv_to_po_switch(s: Snapshot, kb: Knowledge) -> list[Finding]:
     conditions = {name for problem in s.problems for name in kb.condition_of(problem.icd10)}
     cautions = {t["oral_step_down"]: t["cuti_caution"] for t in kb.tests.values() if t.get("cuti_caution")}
     cuti = any(kb.conditions[n].get("complicated_uti") for n in conditions)
-    ampc = any(kb.organism_in(c.organism_code, "inducible-ampc") for c in s.final_isolates())
     out = []
     for p in s.active_antimicrobials():
         if p.route != "IV":
@@ -287,12 +317,8 @@ def iv_to_po_switch(s: Snapshot, kb: Knowledge) -> list[Finding]:
             continue
         drug = kb.display(p.agent).lower()
         notes, refs = [], condition_refs
-        if ampc and kb.has(p.agent, "third_generation_cephalosporin"):
-            # IDSA 2026 (owner decision, 2026-11-12): the exception covers an empirically started course only.
-            notes.append(f"The organism has a moderate risk of inducible AmpC; if {drug} was started empirically, "
-                         "completing the course may be reasonable if the infection is non-severe, the patient is "
-                         "improving and the source is controlled; the susceptible oral options avoid the question.")
-            refs = refs + ("idsa-amr-gn-2026",)
+        # Since #212 the AmpC concern is its own finding (ampc_third_generation_cephalosporin) at every site, so this
+        # finding no longer repeats it.
         if cuti:
             # IDSA 2025 cUTI (owner decision, 2026-11-12): caution for amoxicillin and similar oral beta-lactams only;
             # an oral third-generation cephalosporin after improvement on ceftriaxone is a reasonable switch.
