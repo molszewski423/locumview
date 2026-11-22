@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "opioid-lorazepam-postop-01",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "title": "Oxycodone and hydromorphone after ankle surgery, lorazepam added for sleep",
   "kind": "finding",
   "modules": [
@@ -20,7 +20,7 @@
   },
   "story": "A 62-year-old woman is admitted after a fall with a right trimalleolar ankle fracture and has open reduction and internal fixation the same day. After surgery she has oxycodone 5 mg by mouth every 4 hours as needed for moderate pain, hydromorphone 0.5 mg IV every 3 hours as needed for severe pain, and scheduled acetaminophen. On the first night she cannot sleep, and the cross-covering clinician orders lorazepam 1 mg at bedtime as needed for insomnia. The next morning all three as-needed orders are active.",
   "patient": {
-    "family": "Casebook",
+    "family": "Coleman",
     "given": "Yara",
     "birth_date": "1964-05-30",
     "sex": "female"

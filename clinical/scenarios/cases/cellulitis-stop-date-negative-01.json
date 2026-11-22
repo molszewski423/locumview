@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "cellulitis-stop-date-negative-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Cellulitis on cephalexin with a stop date set: regression check",
   "kind": "negative-control",
   "modules": [
@@ -21,7 +21,7 @@
   },
   "story": "A 52-year-old man with cellulitis of the right forearm is on cephalexin 500 mg every 6 hours, day 6, with a stop date at the end of day 6 entered on day 1; he is improving.",
   "patient": {
-    "family": "Casebook",
+    "family": "Navarro",
     "given": "Sol",
     "birth_date": "1974-09-03",
     "sex": "male"

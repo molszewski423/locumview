@@ -198,7 +198,7 @@ def chart_extras(pid, number, record):
     the patient's primary policy, the last visit (by date) with its vital signs, each immunization (by vaccine and
     date), and the photograph (per image)."""
     pid = int(pid)
-    if record.get("name"):   # Synthea's numbered names on patients loaded before the owner's decision of 2026-11-12
+    if record.get("name"):   # Synthea's numbered names (2026-11-12) and the Casebook surnames (#214), on patients loaded before
         given, family = record["name"]
         sql(f"UPDATE patient_data SET fname = {quote(given)}, lname = {quote(family)} WHERE pid = {pid};")
     if d := record.get("demographics"):
@@ -463,7 +463,9 @@ def load(case):
         for x in case.get("problems", []):
             sql(f"UPDATE lists SET diagnosis = {quote(x['diagnosis'])} WHERE pid = {int(existing[0][0])} "
                 f"AND type = 'medical_problem' AND title = {quote(x['title'])} AND diagnosis <> {quote(x['diagnosis'])};")
-        chart_extras(existing[0][0], number, CHARTS.get(case["id"], {}))
+        # The case's name too, so a renamed patient (the Casebook surnames, #214) changes on the next run.
+        chart_extras(existing[0][0], number, {**CHARTS.get(case["id"], {}),
+                                              "name": (case["patient"]["given"], case["patient"]["family"])})
         # Prescriptions added to the case since it was loaded (#201), on its first encounter; this also gives a case
         # loaded before the start-date fix (changelog #112) its dates, and is a no-op otherwise.
         enc = sql(f"SELECT encounter FROM form_encounter WHERE pid = {int(existing[0][0])} ORDER BY date, id LIMIT 1;")

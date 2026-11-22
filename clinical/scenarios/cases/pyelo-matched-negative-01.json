@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "pyelo-matched-negative-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Pyelonephritis on ceftriaxone; E. coli susceptible; still febrile and vomiting",
   "kind": "negative-control",
   "modules": [
@@ -21,7 +21,7 @@
   },
   "story": "A 45-year-old woman admitted with acute pyelonephritis on IV ceftriaxone. On hospital day 2 the urine culture grows E. coli susceptible to ceftriaxone. She is still febrile, tachycardic and vomiting, and is not taking anything by mouth.",
   "patient": {
-    "family": "Casebook",
+    "family": "Thornton",
     "given": "Bea",
     "birth_date": "1981-07-02",
     "sex": "female"

@@ -42,7 +42,7 @@ the home medication list), or make it a discharge rule when discharge prescribin
   dose's truncation to a whole number (`intval` in `FhirMedicationRequestService`: hydromorphone 0.5 mg reads back as 0,
   oxycodone 7.5 mg as 7), recorded in `docs/upstream/openemr-8.4.1.md` as a defect.
 - **D2, home medications versus orders.** Home medications reach FHIR as `MedicationRequest` with intent `plan` beside
-  the orders (intent `order`); the app lists both (Thea Casebook's apixaban shows twice). Opioid tolerance needs the
+  the orders (intent `order`); the app lists both (Thea Lindqvist's apixaban shows twice). Opioid tolerance needs the
   home list on purpose, and every rule needs to tell the two apart: the snapshot keeps intent, rules state which they
   read, and the app labels home medications.
 - **D3, opioid knowledge.** `opioid_agents` in the knowledge base: class (opioid, benzodiazepine, laxative, naloxone),

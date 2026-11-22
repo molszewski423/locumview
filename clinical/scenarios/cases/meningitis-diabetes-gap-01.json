@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "meningitis-diabetes-gap-01",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "title": "Suspected bacterial meningitis at 44 with type 2 diabetes, on vancomycin and ceftriaxone without ampicillin",
   "kind": "finding",
   "modules": [
@@ -20,7 +20,7 @@
   },
   "story": "A 44-year-old man with type 2 diabetes on metformin, not otherwise immunocompromised, presents with fever, severe headache, neck stiffness and new confusion. Lumbar puncture shows a neutrophilic pleocytosis with low glucose and high protein. Empiric vancomycin, ceftriaxone 2 g every 12 hours and dexamethasone are started; CSF and blood cultures are pending. Ampicillin is not ordered.",
   "patient": {
-    "family": "Casebook",
+    "family": "Delgado",
     "given": "Victor",
     "birth_date": "1982-07-09",
     "sex": "male"

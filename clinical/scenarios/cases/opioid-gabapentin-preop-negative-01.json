@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "opioid-gabapentin-preop-negative-01",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "title": "Oxycodone after knee replacement; a single preoperative gabapentin dose is not a combination",
   "kind": "negative-control",
   "modules": [
@@ -20,7 +20,7 @@
   },
   "story": "A 70-year-old man has an elective right total knee arthroplasty. As part of the enhanced recovery pathway he receives one dose of gabapentin 300 mg on the evening before surgery, with no further gabapentin ordered. After surgery he has oxycodone 5 mg by mouth every 4 hours as needed and scheduled acetaminophen. On the first postoperative morning only the oxycodone and acetaminophen are active.",
   "patient": {
-    "family": "Casebook",
+    "family": "Vandermeer",
     "given": "Bram",
     "birth_date": "1956-02-08",
     "sex": "male"

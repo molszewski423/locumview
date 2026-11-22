@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "meningitis-steroid-covered-negative-01",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "title": "Suspected bacterial meningitis at 45 on long-term prednisone, ampicillin already ordered",
   "kind": "negative-control",
   "modules": [
@@ -20,7 +20,7 @@
   },
   "story": "A 45-year-old woman with pulmonary sarcoidosis on prednisone 20 mg a day for six months presents with fever, severe headache, neck stiffness and new confusion. Lumbar puncture shows a neutrophilic pleocytosis with low glucose and high protein. Empiric vancomycin, ceftriaxone 2 g every 12 hours, ampicillin 2 g every 4 hours and dexamethasone are started; CSF and blood cultures are pending.",
   "patient": {
-    "family": "Casebook",
+    "family": "Fischer",
     "given": "Lena",
     "birth_date": "1981-05-30",
     "sex": "female"

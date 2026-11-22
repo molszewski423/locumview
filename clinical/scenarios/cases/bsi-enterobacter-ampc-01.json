@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "bsi-enterobacter-ampc-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Enterobacter cloacae complex bacteremia on ceftriaxone reported susceptible",
   "kind": "finding",
   "modules": [
@@ -21,7 +21,7 @@
   },
   "story": "A 66-year-old man with an indwelling urinary catheter is admitted with fever and rigors and started on IV ceftriaxone for presumed urosepsis. On hospital day 2 both blood culture sets grow Enterobacter cloacae complex, reported susceptible to ceftriaxone and cefepime. He is still febrile.",
   "patient": {
-    "family": "Casebook",
+    "family": "Abrams",
     "given": "Dov",
     "birth_date": "1960-05-09",
     "sex": "male"

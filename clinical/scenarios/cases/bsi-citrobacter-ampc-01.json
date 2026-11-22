@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "bsi-citrobacter-ampc-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Citrobacter freundii bacteremia from pyelonephritis, afebrile and improving on ceftriaxone",
   "kind": "ambiguous",
   "modules": [
@@ -21,7 +21,7 @@
   },
   "story": "A 58-year-old man with acute pyelonephritis and Citrobacter freundii bacteremia (urine and blood, same susceptibilities) has been on IV ceftriaxone since admission. On hospital day 4 he has been afebrile for 48 hours, his vital signs are normal and he is eating; ultrasound shows no obstruction or abscess, and repeat blood cultures from day 2 have no growth. Prostatitis is not suspected: no prostatic tenderness and no urinary retention.",
   "patient": {
-    "family": "Casebook",
+    "family": "Brandt",
     "given": "Otto",
     "birth_date": "1968-03-09",
     "sex": "male"

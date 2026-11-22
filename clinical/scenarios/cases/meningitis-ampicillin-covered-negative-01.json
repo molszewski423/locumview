@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "meningitis-ampicillin-covered-negative-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Suspected bacterial meningitis at 72 with ampicillin already in the regimen",
   "kind": "negative-control",
   "modules": [
@@ -21,7 +21,7 @@
   },
   "story": "A 72-year-old woman, not immunocompromised, presents with fever, headache and neck stiffness; CSF shows a neutrophilic pleocytosis with low glucose. Empiric vancomycin, ceftriaxone 2 g every 12 hours, ampicillin 2 g every 4 hours and dexamethasone (with or before the first antibiotic dose) are started; cultures are pending.",
   "patient": {
-    "family": "Casebook",
+    "family": "Jefferson",
     "given": "Wren",
     "birth_date": "1954-07-08",
     "sex": "female"

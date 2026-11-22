@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "ciai-piptazo-alone-negative-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Perforated appendicitis on piperacillin-tazobactam alone after source control",
   "kind": "negative-control",
   "modules": [
@@ -21,7 +21,7 @@
   },
   "story": "A 33-year-old woman had a laparoscopic appendectomy for perforated appendicitis with localized peritonitis. Source control is adequate; she is on piperacillin-tazobactam 4.5 g IV every 6 hours alone and improving on postoperative day 1.",
   "patient": {
-    "family": "Casebook",
+    "family": "Hartley",
     "given": "Rue",
     "birth_date": "1993-02-11",
     "sex": "female"

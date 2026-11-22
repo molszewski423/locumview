@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "bsi-ecoli-esbl-mismatch-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Ceftriaxone-resistant E. coli bacteremia from pyelonephritis on ceftriaxone",
   "kind": "finding",
   "modules": [
@@ -21,7 +21,7 @@
   },
   "story": "A 76-year-old woman with urosepsis from pyelonephritis (no urinary catheter) is on IV ceftriaxone. On hospital day 2 blood and urine grow E. coli resistant to ceftriaxone, cefepime, ciprofloxacin and TMP-SMX and susceptible to piperacillin-tazobactam, ertapenem and meropenem. She is still febrile; her creatinine is normal for her.",
   "patient": {
-    "family": "Casebook",
+    "family": "Simmons",
     "given": "Vera",
     "birth_date": "1950-08-14",
     "sex": "female"

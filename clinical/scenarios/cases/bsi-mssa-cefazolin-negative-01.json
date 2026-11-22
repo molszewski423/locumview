@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "bsi-mssa-cefazolin-negative-01",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "title": "MSSA catheter-related bacteremia already on cefazolin",
   "kind": "negative-control",
   "modules": [
@@ -21,7 +21,7 @@
   },
   "story": "A 58-year-old man receiving home parenteral nutrition through a tunneled catheter is admitted with fever and rigors. Blood cultures grow methicillin-susceptible Staphylococcus aureus; empiric vancomycin was changed to cefazolin 2 g IV every 8 hours on day 2 and the catheter removed. On day 3 he is still febrile; repeat blood cultures are pending.",
   "patient": {
-    "family": "Casebook",
+    "family": "Pritchard",
     "given": "Hal",
     "birth_date": "1968-08-04",
     "sex": "male"

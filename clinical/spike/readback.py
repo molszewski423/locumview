@@ -3,7 +3,7 @@
 
     readback.py <family-name or patient number> <out-dir>     for example LV-uti-esbl-mismatch-01
 
-Every scenario case shares the family name Casebook, so read cases back by patient number (LV-<case id>). A family
+Read cases back by patient number (LV-<case id>); until #214 every case shared the family name Casebook. A family
 name that matches more than one patient is refused.
 
 Writes the raw search bundles and normalized.json: every resource with server-assigned values removed (ids, UUID

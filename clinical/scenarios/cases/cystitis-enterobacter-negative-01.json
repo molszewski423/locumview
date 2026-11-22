@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "cystitis-enterobacter-negative-01",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "title": "Enterobacter cloacae cystitis on ceftriaxone, no fever or upper tract signs, nothing by mouth",
   "kind": "finding",
   "modules": [
@@ -21,7 +21,7 @@
   },
   "story": "A 74-year-old woman on postoperative day 2 after hip fracture repair develops dysuria and frequency without fever, flank pain or bacteremia; she has no indwelling urinary catheter. She has an ileus and takes nothing by mouth. Urine grows Enterobacter cloacae complex, resistant to the usual oral agents; she is on IV ceftriaxone.",
   "patient": {
-    "family": "Casebook",
+    "family": "Whitcombe",
     "given": "Fern",
     "birth_date": "1952-01-30",
     "sex": "female"

@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "meningitis-transplant-gap-01",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "title": "Suspected bacterial meningitis at 40 after kidney transplant, on vancomycin and ceftriaxone without ampicillin",
   "kind": "finding",
   "modules": [
@@ -20,7 +20,7 @@
   },
   "story": "A 40-year-old woman who received a kidney transplant three years ago, on tacrolimus and mycophenolate, presents with fever, severe headache, neck stiffness and new confusion. Lumbar puncture shows a neutrophilic pleocytosis with low glucose and high protein. Empiric vancomycin, ceftriaxone 2 g every 12 hours and dexamethasone are started; CSF and blood cultures are pending. Ampicillin is not ordered.",
   "patient": {
-    "family": "Casebook",
+    "family": "Castillo",
     "given": "Rosa",
     "birth_date": "1986-03-14",
     "sex": "female"

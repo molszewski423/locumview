@@ -1,7 +1,7 @@
 {
   "schema": "locumview-case/1",
   "id": "meningitis-young-negative-01",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "Suspected bacterial meningitis at 35, immunocompetent, on vancomycin and ceftriaxone without ampicillin",
   "kind": "negative-control",
   "modules": [
@@ -20,7 +20,7 @@
   },
   "story": "A previously healthy 35-year-old man presents with fever, headache and neck stiffness; CSF shows a neutrophilic pleocytosis with low glucose. He is not immunocompromised. Empiric vancomycin, ceftriaxone 2 g every 12 hours and dexamethasone are started; cultures are pending.",
   "patient": {
-    "family": "Casebook",
+    "family": "Barrett",
     "given": "Gil",
     "birth_date": "1991-06-11",
     "sex": "male"
