@@ -3727,3 +3727,16 @@ Agent: Claude Code
   from its recorded FHIR read-back).
 
 Agent: Claude Code
+
+## 213. Case library v2: plan (2026-11-21)
+
+- **What:** `docs/plans/case-library-v2.md`, from the owner's decisions of 2026-11-21: every patient flags something;
+  negative controls keep their silent question and gain a finding from another module; the 20 Synthea patients become
+  inpatient cases; existing cases gain second and third findings; "Casebook" is replaced by unique surnames.
+- **Contents:** one row per scenario patient (new name, today's flag, the addition, flags after), the Synthea
+  admissions grouped around four new rules (suspected HIT, linezolid with an SSRI, daptomycin with a high CK,
+  daptomycin for pneumonia) with their negative pairs, renal dosing (R1) last because it needs the dose groundwork
+  (D1), and a build order: names first, then three clinical batches, then the evaluation build.
+- **Status:** Planned; the owner reviews the rows. Nothing built.
+
+Agent: Claude Code
