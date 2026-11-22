@@ -3838,3 +3838,21 @@ Agent: Claude Code
   Kim), the AmpC finding for pyelonephritis.
 
 Agent: Claude Code
+
+## 219. Batch B: sources read and owner questions for R2 to R12 (2026-11-22)
+
+- **What:** `docs/plans/batch-b-sources.md`: for each new rule (HIT, linezolid with serotonergic drugs, daptomycin
+  CK, daptomycin for pneumonia, warfarin interactions, fluoroquinolone with a prolonged QTc, nirmatrelvir-ritonavir
+  interactions, pregnancy bacteriuria, and three de-escalations) the proposed trigger and the source text Claude Code
+  read on 2026-11-22 (current DailyMed labels for Zyvox, Cubicin RF, warfarin, levofloxacin, Paxlovid and Eliquis;
+  ASH 2018 HIT abstract, ATS/IDSA 2019 CAP and the AHA/ACCF 2010 torsade statement in PubMed Central; PubMed metadata
+  for all five guideline references), seven threshold decisions for the owner, and seven OpenEvidence questions for
+  the owner to run.
+- **Found:** the current Paxlovid label gives no recommendation for rosuvastatin (its study shows Cmax 212% and AUC 131%
+  of control); atorvastatin is "consider temporary discontinuation" and lovastatin and simvastatin are contraindicated.
+  The owner's example (Paxlovid with rosuvastatin) needs a decision: question 4.
+- **Not read:** the IDSA 2019 bacteriuria guideline and the MRSA nasal screen meta-analysis are not in PubMed Central;
+  OpenEvidence questions 5 and 6 cover them.
+- **Status:** In progress; no rule built until the owner answers.
+
+Agent: Claude Code
